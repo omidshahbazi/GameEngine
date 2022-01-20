@@ -29,7 +29,7 @@ namespace Engine
 
 			virtual void Update(void) override;
 
-			virtual void Render(EditorRenderDeviceBase* Device) const override;
+			virtual void Render(EditorRenderCommandBuffer* CommandBuffer) const override;
 
 		protected:
 			virtual void OnPositionChanged(void) override

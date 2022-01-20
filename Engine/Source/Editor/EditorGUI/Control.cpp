@@ -38,9 +38,9 @@ namespace Engine
 				child->UpdateAll();
 		}
 
-		void Control::RenderAll(EditorRenderDeviceBase* Device) const
+		void Control::RenderAll(EditorRenderCommandBuffer* CommandBuffer) const
 		{
-			RenderAll(Device, Vector2I::Zero);
+			RenderAll(CommandBuffer, Vector2I::Zero);
 		}
 
 		void Control::AddChild(Control* Control)
@@ -100,23 +100,23 @@ namespace Engine
 			OnRotationChangedEvent(this);
 		}
 
-		void Control::RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot) const
+		void Control::RenderAll(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Pivot) const
 		{
 			if (!m_IsVisible)
 				return;
 
-			Render(Device);
+			Render(CommandBuffer);
 
 			auto& clientRect = GetClientRect();
 
 			Vector2I pivot = Pivot + clientRect.Position;
 
-			Device->SetPivot(pivot);
+			CommandBuffer->SetPivot(pivot);
 
 			for (auto child : m_Children)
-				child->RenderAll(Device, pivot);
+				child->RenderAll(CommandBuffer, pivot);
 
-			Device->SetPivot(Pivot);
+			CommandBuffer->SetPivot(Pivot);
 		}
 
 		bool Control::OnInternalKeyDown(PlatformWindow::VirtualKeys Key)

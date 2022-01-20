@@ -59,8 +59,8 @@ namespace Engine
 			private:
 				void SetTransfomData(const TransformData& Data);
 
-				void OnContextChanged(RenderContext* Context);
-				DECLARE_MEMBER_EVENT_LISTENER(BuiltiInProgramConstants, OnContextChanged);
+				void OnContextSizeChanged(const Vector2I& Size);
+				DECLARE_MEMBER_EVENT_LISTENER(BuiltiInProgramConstants, OnContextSizeChanged);
 
 			private:
 				DeviceInterface* m_DeviceInterface;

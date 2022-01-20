@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\SpriteRenderer.h>
 #include <EditorGUI\Private\Resources.h>
-#include <EditorGUI\EditorRenderDeviceBase.h>
+#include <EditorGUI\EditorRenderCommandBuffer.h>
 #include <ResourceManagement\ResourceManager.h>
 
 namespace Engine
@@ -46,9 +46,9 @@ namespace Engine
 				}
 			}
 
-			void SpriteRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
+			void SpriteRenderer::Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const
 			{
-				Device->DrawQuad(Position, GetRotation(), GetDimension(), &GetMaterial());
+				CommandBuffer->DrawQuad(Position, GetRotation(), GetDimension(), &GetMaterial());
 			}
 
 			void SpriteRenderer::SetColor(const ColorUI8& Value)

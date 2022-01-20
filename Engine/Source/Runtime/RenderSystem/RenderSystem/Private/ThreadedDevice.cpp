@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\Private\ThreadedDevice.h>
+#include <RenderSystem\Private\FrameConstantBuffers.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <Debugging\CoreDebug.h>
 
@@ -289,8 +290,6 @@ namespace Engine
 				promise->SetValue(m_Device->SubmitCommandBuffer(Buffers, Count));
 
 				END_CALL();
-
-				//m_Device->SwapBuffers();
 			}
 
 			Promise<bool> ThreadedDevice::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
@@ -302,7 +301,18 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SWAP_BUFFERS_PLACEHOLDER(void)
+			Promise<bool> ThreadedDevice::SyncConstantBuffers(const FrameConstantBuffers* Buffers)
+			{
+				BEGIN_CALL(bool, &, promise, Buffers);
+
+				Buffers->UploadBuffersToGPU(m_Device);
+
+				promise->SetValue(true);
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::SwapBuffers(void)
 			{
 				BEGIN_CALL(bool, &, promise);
 

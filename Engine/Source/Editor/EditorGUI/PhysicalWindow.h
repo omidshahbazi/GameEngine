@@ -21,10 +21,10 @@ namespace Engine
 		class EDITORGUI_API PhysicalWindow : public RenderWindow, public RenderableWindow
 		{
 		public:
-			PhysicalWindow(void);
+			PhysicalWindow(DeviceInterface* Device);
 			virtual ~PhysicalWindow(void);
 
-			void RenderAll(EditorRenderDeviceBase* Device) const override;
+			void RenderAll(EditorRenderCommandBuffer* CommandBuffer) const override;
 
 			virtual void SetSize(const Vector2I& Value)
 			{
@@ -51,6 +51,11 @@ namespace Engine
 			virtual void SetTitle(const WString& Value)
 			{
 				RenderableWindow::SetTitle(Value);
+			}
+
+			const RenderContext* GetContext(void) const
+			{
+				return m_RenderContext;
 			}
 
 		protected:
@@ -128,6 +133,7 @@ namespace Engine
 			DECLARE_MEMBER_EVENT_LISTENER(PhysicalWindow, OnMouseLeaveHandler);
 
 		private:
+			DeviceInterface* m_Device;
 			RenderContext* m_RenderContext;
 
 			bool m_ShouldUpdateSizeFromRenderableWindow;

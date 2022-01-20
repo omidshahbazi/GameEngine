@@ -4,9 +4,7 @@
 #define CONTROL_H
 
 #include <Containers\Delegate.h>
-#include <EditorGUI\EditorRenderDeviceBase.h>
-
-#include <iostream>
+#include <EditorGUI\EditorRenderCommandBuffer.h>
 
 namespace Engine
 {
@@ -54,8 +52,8 @@ namespace Engine
 			{
 			}
 
-			virtual void RenderAll(EditorRenderDeviceBase* Device) const;
-			virtual void Render(EditorRenderDeviceBase* Device) const
+			virtual void RenderAll(EditorRenderCommandBuffer* CommandBuffer) const;
+			virtual void Render(EditorRenderCommandBuffer* CommandBuffer) const
 			{
 			}
 
@@ -122,7 +120,7 @@ namespace Engine
 			}
 
 		protected:
-			virtual void RenderAll(EditorRenderDeviceBase* Device, const Vector2I& Pivot) const;
+			virtual void RenderAll(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Pivot) const;
 
 			virtual void OnVisibleChanged(void)
 			{

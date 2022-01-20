@@ -46,7 +46,7 @@ namespace Engine
 
 				virtual void Update(void) override;
 
-				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const override;
+				virtual void Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const override;
 
 				void SetColor(const ColorUI8& Value) override;
 

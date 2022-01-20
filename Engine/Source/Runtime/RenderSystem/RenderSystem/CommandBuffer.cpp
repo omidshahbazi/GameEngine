@@ -8,7 +8,7 @@
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\Commands.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
-#include <RenderSystem\Private\FrameDataChain.h>
+#include <RenderSystem\Private\FrameConstantBuffers.h>
 #include <RenderSystem\Private\GPUConstantBuffer.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
@@ -161,16 +161,11 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, FrameDataChain* FrameDataChain, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
+		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
 		{
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
 			const WString name = m_Name.ChangeType<char16>();
-
-			ICommandBuffer* copyConstantBuffersCB = nullptr;
-			CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(ICommandBuffer::Types::Copy, copyConstantBuffersCB).Wait(), "Couldn't create a native command buffer");
-			copyConstantBuffersCB->SetName(name.GetValue());
-			bool hasAnyCopy = false;
 
 			ICommandBuffer* currentCB = nullptr;
 
@@ -182,12 +177,15 @@ namespace Engine
 
 				if (currentCB == nullptr || currentCB->GetType() == desiredType)
 				{
-					CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(desiredType, currentCB).Wait(), "Couldn't create a native command buffer");
+					bool res = Device->CreateCommandBuffer(desiredType, currentCB).Wait();
+
+					CoreDebugAssert(Categories::RenderSystem, res, "Couldn't create a native command buffer");
 
 					currentCB->SetName(name.GetValue());
 
 					NativeCommandBuffers.Add(currentCB);
 
+					//RENDERING
 					//Set viewport for each new command buffer to the Context
 					//Set prev viewport and bounded render-target
 				}
@@ -242,9 +240,7 @@ namespace Engine
 					DrawCommandData data = {};
 					m_Buffer.Read(data);
 
-					hasAnyCopy = true;
-
-					InsertDrawCommand(FrameDataChain, copyConstantBuffersCB, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
+					InsertDrawCommand(ConstantBuffers, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
 				case CommandTypes::BeginEvent:
@@ -275,14 +271,9 @@ namespace Engine
 					CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
 				}
 			}
-
-			if (hasAnyCopy)
-				NativeCommandBuffers.Insert(0, copyConstantBuffersCB);
-			else
-				CoreDebugAssert(Categories::RenderSystem, Device->DestroyCommandBuffer(&copyConstantBuffersCB, 1).Wait(), "Couldn't destroy a native command buffer");
 		}
 
-		void CommandBuffer::InsertDrawCommand(FrameDataChain* FrameDataChain, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(FrameConstantBuffers* ConstantBuffers, ICommandBuffer* CommandBuffer, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;
@@ -295,7 +286,7 @@ namespace Engine
 			{
 				const ProgramResource* program = pass.GetProgram();
 
-				GraphicsCB->SetProgram(program->GetPointer()->GetHandle());
+				CommandBuffer->SetProgram(program->GetPointer()->GetHandle());
 
 				ProgramConstantSupplier::GPUBufferDataBaseMap buffers;
 				for (auto& info : pass.GetBuffers())
@@ -304,7 +295,7 @@ namespace Engine
 					auto& localConstantInfo = buffers[info.GetFirst()];
 
 					localConstantInfo.Handle = constantInfo.Handle;
-					localConstantInfo.Value = FrameDataChain->GetFrontConstantBuffers()->Get(constantInfo.Value->GetSize());
+					localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
 					localConstantInfo.Value->Copy(constantInfo.Value);
 				}
 
@@ -318,9 +309,7 @@ namespace Engine
 				{
 					auto& constant = info.GetSecond();
 
-					constant.Value->UploadToGPU();
-
-					GraphicsCB->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+					CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
 				}
 
 				for (auto& info : textures)
@@ -335,20 +324,20 @@ namespace Engine
 						texHandle = tex->GetHandle();
 					}
 
-					GraphicsCB->SetProgramTexture(constant.Handle, texHandle);
+					CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
 				}
 
 				for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 				{
 					SubMesh& subMesh = Mesh->GetSubMeshes()[i];
 
-					GraphicsCB->SetMesh(subMesh.GetHandle());
+					CommandBuffer->SetMesh(subMesh.GetHandle());
 
 					const uint16 idxCount = subMesh.GetIndexCount();
 					if (idxCount == 0)
-						GraphicsCB->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
+						CommandBuffer->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
 					else
-						GraphicsCB->DrawIndexed(subMesh.GetPolygonType(), idxCount);
+						CommandBuffer->DrawIndexed(subMesh.GetPolygonType(), idxCount);
 				}
 			}
 		}

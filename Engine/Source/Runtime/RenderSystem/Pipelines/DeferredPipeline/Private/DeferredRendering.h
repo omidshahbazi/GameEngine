@@ -39,7 +39,7 @@ namespace Engine
 					TextureResource AlbedoSpecularTexture;
 				};
 
-				typedef Map<RenderContext*, ContextRenderTargetInfo> RenderTargetContextMap;
+				typedef Map<const RenderContext*, ContextRenderTargetInfo> RenderTargetContextMap;
 
 			public:
 				DeferredRendering(void);
@@ -71,15 +71,13 @@ namespace Engine
 					return &m_SpotLightProgram;
 				}
 
-				void OnContextChanged(RenderContext* Context);
+				void OnContextChanged(const RenderContext* Context);
 				DECLARE_MEMBER_EVENT_LISTENER(DeferredRendering, OnContextChanged);
 
-				void OnContextResized(RenderContext* Context);
+				void OnContextResized(const Vector2I& Size);
 				DECLARE_MEMBER_EVENT_LISTENER(DeferredRendering, OnContextResized);
 
 				void SetPassConstants(Material* Material) override;
-
-				void RefreshRenderTarget(RenderContext* Context);
 
 			private:
 				DeviceInterface* m_DeviceInterface;

@@ -8,7 +8,13 @@
 
 namespace Engine
 {
+	namespace RenderDevice
+	{
+		class IDevice;
+	}
+
 	using namespace Common;
+	using namespace RenderDevice;
 
 	namespace RenderSystem
 	{
@@ -26,6 +32,8 @@ namespace Engine
 				void Reset(void);
 
 				GPUConstantBuffer* Get(uint16 Size);
+
+				void UploadBuffersToGPU(IDevice* Device) const;
 
 			private:
 				ThreadedDevice* m_Device;

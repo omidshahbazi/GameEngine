@@ -8,13 +8,14 @@ namespace Engine
 
 	namespace EditorGUI
 	{
-		PhysicalWindow::PhysicalWindow(void) :
+		PhysicalWindow::PhysicalWindow(DeviceInterface* Device) :
 			RenderWindow("PhysicalWindow"),
+			m_Device(Device),
 			m_RenderContext(nullptr),
 			m_ShouldUpdateSizeFromRenderableWindow(true),
 			m_ShouldUpdateSizeFromRenderWindow(true)
 		{
-			m_RenderContext = RenderManager::GetInstance()->GetDevice()->CreateContext(this);
+			m_RenderContext = m_Device->CreateContext(this);
 
 			RenderWindow::OnSizeChangedEvent += EventListener_OnSizeChangedHandler;
 			RenderWindow::OnKeyDownEvent += EventListener_OnKeyDownHandler;
@@ -44,19 +45,17 @@ namespace Engine
 			RenderWindow::OnMouseLeaveEvent -= EventListener_OnMouseLeaveHandler;
 
 			if (m_RenderContext != nullptr)
-				RenderManager::GetInstance()->GetDevice()->DestroyContext(m_RenderContext);
+				m_Device->DestroyContext(m_RenderContext);
 		}
 
-		void PhysicalWindow::RenderAll(EditorRenderDeviceBase* Device) const
+		void PhysicalWindow::RenderAll(EditorRenderCommandBuffer* CommandBuffer) const
 		{
 			if (m_RenderContext == nullptr)
 				return;
 
-			RenderManager::GetInstance()->GetDevice()->SetContext(m_RenderContext);
+			CommandBuffer->SetProjectionSize(RenderWindow::GetClientSize());
 
-			Device->SetProjectionSize(RenderWindow::GetClientSize());
-
-			RenderableWindow::RenderAll(Device);
+			RenderableWindow::RenderAll(CommandBuffer);
 		}
 
 		void PhysicalWindow::OnSizeChanged(void)

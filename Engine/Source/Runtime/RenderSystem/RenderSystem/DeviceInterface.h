@@ -55,8 +55,8 @@ namespace Engine
 			friend class CommandBuffer;
 
 		public:
-			typedef Delegate<RenderContext*> ContextChangedEventHandler;
-			typedef Delegate<RenderContext*> ContextResizedEventHandler;
+			typedef Delegate<const RenderContext*> ContextChangedEventHandler;
+			typedef Delegate<const Vector2I&> ContextResizedEventHandler;
 
 			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 32768;
 
@@ -75,11 +75,6 @@ namespace Engine
 
 			RenderContext* CreateContext(Window* Window);
 			void DestroyContext(RenderContext* Context);
-			void SetContext(const RenderContext* Context);
-			RenderContext* GetContext(void)
-			{
-				return m_CurentContext;
-			}
 
 			Texture* CreateTexture(const TextureInfo* Info);
 			Sprite* CreateSprite(const TextureInfo* Info);
@@ -99,8 +94,8 @@ namespace Engine
 			void SubmitCommandBuffer(const CommandBuffer* Buffer);
 			void SubmitCommandBufferAsync(const CommandBuffer* Buffer);
 
-			void BeginRender(void);
-			void EndRender(void);
+			void BeginFrame(const RenderContext* Context);
+			void EndFrame(void);
 
 			DeviceTypes GetType(void) const
 			{
@@ -121,9 +116,6 @@ namespace Engine
 
 			void DestroyContextInternal(RenderContext* Context);
 
-			void OnWindowSizeChanged(Window* Window);
-			DECLARE_MEMBER_EVENT_LISTENER(DeviceInterface, OnWindowSizeChanged);
-
 		public:
 			ContextChangedEventHandler OnContextChangedEvent;
 			ContextResizedEventHandler OnContextResizedEvent;
@@ -133,10 +125,16 @@ namespace Engine
 
 			DeviceTypes m_DeviceType;
 			IDevice* m_Device;
-			IPipeline* m_Pipeline;
 			ThreadedDevice* m_ThreadedDevice;
+			const RenderContext* m_LastContext;
+
+			//RENDERING
+			//Should be per context
 			FrameDataChain* m_FrameDataChain;
-			RenderContext* m_CurentContext;
+
+			//RENDERING
+			//Should be per camera
+			IPipeline* m_Pipeline;
 		};
 	}
 }

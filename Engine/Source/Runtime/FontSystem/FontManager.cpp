@@ -85,18 +85,6 @@ namespace Engine
 		{
 			SubMeshInfo subMeshInfo;
 
-			//subMeshInfo.Vertices.Add(Vertex(Vector3F(0, -1, 0), Vector2F(0, 0)));
-			//subMeshInfo.Vertices.Add(Vertex(Vector3F(0, 0, 0), Vector2F(0, 1)));
-			//subMeshInfo.Vertices.Add(Vertex(Vector3F(1, 0, 0), Vector2F(1, 1)));
-			//subMeshInfo.Vertices.Add(Vertex(Vector3F(1, -1, 0), Vector2F(1, 0)));
-			//subMeshInfo.Indices.Add(0);
-			//subMeshInfo.Indices.Add(1);
-			//subMeshInfo.Indices.Add(2);
-			//subMeshInfo.Indices.Add(1);
-			//subMeshInfo.Indices.Add(3);
-			//subMeshInfo.Indices.Add(0);
-			//subMeshInfo.Layout = VertexLayouts::Position | VertexLayouts::TexCoord;
-
 			subMeshInfo.Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
 			subMeshInfo.Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
 			subMeshInfo.Vertices.Add({ Vector3F(0.5F, 0.5F, 0), Vector2F(1, 1) });

@@ -13,16 +13,21 @@ namespace Engine
 		{
 			class GPUConstantBuffer : public GPUBuffer, private ConstantBuffer
 			{
+				friend class FrameConstantBuffers;
+
 			public:
 				GPUConstantBuffer(ThreadedDevice* Device, uint32 Size, ResourceHandle Handle);
 
 				void Copy(const ConstantBuffer* const Other);
 
-				void UploadToGPU(void);
-
 				uint32 GetSize(void) const
 				{
 					return GPUBuffer::GetSize();
+				}
+
+				const byte* GetCachedData(void) const
+				{
+					return m_CachedData;
 				}
 			};
 		}

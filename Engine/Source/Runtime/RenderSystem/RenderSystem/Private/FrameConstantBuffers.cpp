@@ -58,6 +58,21 @@ namespace Engine
 
 				return buffer;
 			}
+
+			void FrameConstantBuffers::UploadBuffersToGPU(IDevice* Device) const
+			{
+				for (uint16 i = 0; i < m_BufferIndex; ++i)
+				{
+					const GPUConstantBuffer& buffer = m_Buffers[i];
+
+					byte* data = nullptr;
+					Device->LockBuffer(buffer.GetHandle(), GPUBufferAccess::WriteOnly, &data);
+
+					PlatformMemory::Copy(buffer.GetCachedData(), data, buffer.GetSize());
+
+					Device->UnlockBuffer(buffer.GetHandle());
+				}
+			}
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace EditorGUI
 	{
-		class EditorRenderDeviceBase;
+		class EditorRenderCommandBuffer;
 
 		namespace Private
 		{
@@ -29,7 +29,7 @@ namespace Engine
 				{
 				}
 
-				virtual void Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const = 0;
+				virtual void Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const = 0;
 
 			protected:
 				void SetMaterial(Material* Material);

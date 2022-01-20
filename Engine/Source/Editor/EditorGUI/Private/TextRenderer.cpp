@@ -1,7 +1,7 @@
-﻿// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <EditorGUI\Private\TextRenderer.h>
 #include <EditorGUI\Private\Resources.h>
-#include <EditorGUI\EditorRenderDeviceBase.h>
+#include <EditorGUI\EditorRenderCommandBuffer.h>
 #include <FontSystem\StringRenderer.h>
 
 namespace Engine
@@ -26,7 +26,7 @@ namespace Engine
 				m_Font = Resources::GetInstance()->GetFont();
 			}
 
-			void TextRenderer::Render(EditorRenderDeviceBase* Device, const Vector2I& Position) const
+			void TextRenderer::Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const
 			{
 				if (m_Text.GetLength() == 0)
 					return;
@@ -44,7 +44,7 @@ namespace Engine
 
 					renderer->GetMaterial().SetBuffer(ConstantHash_data, &m_Data);
 
-					Device->DrawMesh(Character->GetMesh(), Model, &GetMaterial());
+					CommandBuffer->DrawMesh(Character->GetMesh(), Model, &GetMaterial());
 				};
 
 				static StringRenderer::Info info;

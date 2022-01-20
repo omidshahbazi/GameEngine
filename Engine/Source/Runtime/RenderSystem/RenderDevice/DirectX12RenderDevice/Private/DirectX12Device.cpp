@@ -565,6 +565,7 @@ namespace Engine
 					m_CurrentContextHandle = 0;
 					m_CurrentContext = nullptr;
 
+					//RENDERING
 					//m_CurrentRenderTargetViewCount = 0;
 					//m_CurrentDepthStencilView = nullptr;
 
@@ -583,6 +584,7 @@ namespace Engine
 				m_CurrentContextHandle = Handle;
 				m_CurrentContext = info;
 
+				//RENDERING
 				//if (m_CurrentRenderTarget == nullptr)
 				//	BindRenderTarget(0);
 
@@ -596,6 +598,7 @@ namespace Engine
 				if (m_CurrentContext == nullptr)
 					return false;
 
+				//RENDERING
 				//ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
@@ -605,6 +608,7 @@ namespace Engine
 
 				m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
+				//RENDERING
 				//if (m_CurrentRenderTarget == nullptr)
 				//	FILL_RENDER_VIEWS_USING_CONTEXT();
 
@@ -1036,6 +1040,7 @@ namespace Engine
 
 			bool DirectX12Device::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
 			{
+				//RENDERING
 				//TODO: must execute inside another thread
 				SubmitCommandBuffer(Buffers, Count);
 

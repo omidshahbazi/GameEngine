@@ -425,7 +425,9 @@ namespace Engine
 			void DirectX12CommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
+
+				if (Value == 0)
+					return;
 
 				BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Value);
 
@@ -435,7 +437,9 @@ namespace Engine
 			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
 				CoreDebugAssert(Categories::RenderSystem, m_Type != Types::Copy, "Command buffer type is not Graphics/Compute");
-				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
+
+				if (Value == 0)
+					return;
 
 				TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
 
@@ -613,6 +617,7 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(m_List)))
 					return false;
 
+				//RENDERING
 				//if (Set.SkipFrameCount != 0)
 				//	--Set.SkipFrameCount;
 				//else

@@ -1,9 +1,10 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef EDITOR_RENDER_DEVICE_BASE_H
-#define EDITOR_RENDER_DEVICE_BASE_H
+#ifndef EDITOR_RENDER_COMMAND_BUFFER_H
+#define EDITOR_RENDER_COMMAND_BUFFER_H
 
 #include <MathContainers\MathContainers.h>
+#include <RenderSystem\CommandBuffer.h>
 #include <RenderSystem\Material.h>
 #include <RenderSystem\Mesh.h>
 
@@ -14,25 +15,20 @@ namespace Engine
 
 	namespace EditorGUI
 	{
-		class EDITORGUI_API EditorRenderDeviceBase
+		class EDITORGUI_API EditorRenderCommandBuffer : public CommandBuffer
 		{
 		public:
-			EditorRenderDeviceBase(void);
+			EditorRenderCommandBuffer(void);
 
 		public:
-			virtual void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material);
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material);
 
-			virtual void DrawQuad(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
+			void DrawQuad(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
 
-			virtual void SetProjectionSize(const Vector2I& Size)
+			void SetProjectionSize(const Vector2I& Size)
 			{
-				//To mirror the Y axis
+				//-1 To mirror the Y axis
 				m_ProjMat.SetOrthographicProjection(Size.X, 0, 0, Size.Y, -1, 100);
-			}
-
-			const Matrix4F& GetProjectionMatrix(void) const
-			{
-				return m_ProjMat;
 			}
 
 			INLINE Vector2I GetPivot(void) const
@@ -46,9 +42,6 @@ namespace Engine
 			{
 				m_PivotMat.SetTranslate(Vector3F(Position.X, Position.Y, 0));
 			}
-
-		protected:
-			virtual void Render(Mesh* Mesh, const Matrix4F& Model, const Material* Material) = 0;
 
 		private:
 			Matrix4F m_ProjMat;

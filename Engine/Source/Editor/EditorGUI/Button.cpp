@@ -36,13 +36,13 @@ namespace Engine
 			m_Text.Update();
 		}
 
-		void Button::Render(EditorRenderDeviceBase* Device) const
+		void Button::Render(EditorRenderCommandBuffer* CommandBuffer) const
 		{
 			auto& rect = GetRect();
 
-			m_Sprite.Render(Device, rect.Position);
+			m_Sprite.Render(CommandBuffer, rect.Position);
 
-			m_Text.Render(Device, rect.Position);
+			m_Text.Render(CommandBuffer, rect.Position);
 		}
 
 		void Button::OnEnabledChanged(void)

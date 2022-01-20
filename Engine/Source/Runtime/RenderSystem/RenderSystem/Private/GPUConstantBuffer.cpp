@@ -18,14 +18,14 @@ namespace Engine
 				PlatformMemory::Copy(Other->m_CachedData, m_CachedData, Math::Min<uint16>(GPUBuffer::GetSize(), Other->GetSize()));
 			}
 
-			void GPUConstantBuffer::UploadToGPU(void)
-			{
-				GPUBuffer::Lock(GPUBufferAccess::WriteOnly, true);
+			//void GPUConstantBuffer::UploadToGPU(void)
+			//{
+			//	GPUBuffer::Lock(GPUBufferAccess::WriteOnly, true);
 
-				PlatformMemory::Copy(m_CachedData, GetCurrentBuffer(), GPUBuffer::GetSize());
+			//	PlatformMemory::Copy(m_CachedData, GetCurrentBuffer(), GPUBuffer::GetSize());
 
-				GPUBuffer::Unlock(true);
-			}
+			//	GPUBuffer::Unlock(true);
+			//}
 		}
 	}
 }

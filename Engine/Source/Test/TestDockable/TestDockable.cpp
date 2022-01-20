@@ -13,6 +13,8 @@
 #include <Debugging\LogManager.h>
 #include <Platform\PlatformGL.h>
 
+#include <iostream>
+
 USE_HIGH_PERFORMANCE_GPU();
 
 using namespace Engine::Allocators;
@@ -30,24 +32,6 @@ using namespace Engine::EditorGUI;
 using namespace Engine::EditorGUI::Private;
 using namespace Engine::Debugging;
 using namespace Engine::DynamicModuleSystem;
-
-class EditorRenderDevice : public EditorRenderDeviceBase
-{
-public:
-	EditorRenderDevice(DeviceInterface* Device) :
-		m_Device(Device)
-	{
-	}
-
-protected:
-	virtual void Render(Mesh* Mesh, const Matrix4F& Model, const Material* Material) override
-	{
-		//m_Device->DrawMesh(Mesh, Model, Matrix4F::Identity, GetProjectionMatrix(), Material);
-	}
-
-private:
-	DeviceInterface* m_Device;
-};
 
 BEGIN_ENTRY_POINT
 {
@@ -76,11 +60,11 @@ BEGIN_ENTRY_POINT
 	EditorGUIManager::Create(RootAllocator::GetInstance());
 
 	{
-		PhysicalWindow physWindow;
+		PhysicalWindow physWindow(device);
 		physWindow.SetSize({ 800, 600 });
 		physWindow.SetTitle("Test Window Title!");
 
-		EditorRenderDevice editorRenderDevice(device);
+		EditorRenderCommandBuffer cmd;
 
 		while (!physWindow.IsClosed())
 		{
@@ -88,14 +72,15 @@ BEGIN_ENTRY_POINT
 
 			physWindow.UpdateAll();
 
-			device->BeginRender();
+			device->BeginFrame(physWindow.GetContext());
 
-			//device->SetContext(nullptr);
-			//device->Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer | ClearFlags::StencilBuffer, ColorUI8::White, RenderQueues::Default);
+			cmd.Clear();
 
-			physWindow.RenderAll(&editorRenderDevice);
+			physWindow.RenderAll(&cmd);
 
-			device->EndRender();
+			device->SubmitCommandBuffer(&cmd);
+
+			device->EndFrame();
 
 			PlatformWindow::PollEvents();
 		}

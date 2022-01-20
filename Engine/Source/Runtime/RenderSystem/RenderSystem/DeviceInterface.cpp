@@ -42,9 +42,9 @@ namespace Engine
 			m_Initialized(false),
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
-			m_Pipeline(nullptr),
 			m_ThreadedDevice(nullptr),
-			m_CurentContext(nullptr)
+			m_LastContext(nullptr),
+			m_Pipeline(nullptr)
 		{
 			ProgramToAPICompiler::Create(RenderSystemAllocators::RenderSystemAllocator);
 			ProgramConstantSupplier::Create(RenderSystemAllocators::RenderSystemAllocator);
@@ -194,28 +194,6 @@ namespace Engine
 		void DeviceInterface::DestroyContext(RenderContext* Context)
 		{
 			DestroyContextInternal(Context);
-		}
-
-		void DeviceInterface::SetContext(const RenderContext* Context)
-		{
-			if (m_CurentContext == Context)
-				return;
-
-			if (m_CurentContext != nullptr)
-				m_CurentContext->GetWindow()->OnSizeChangedEvent -= EventListener_OnWindowSizeChanged;
-
-			Window* window = nullptr;
-			if (Context != nullptr)
-				window = Context->GetWindow();
-
-			m_ThreadedDevice->SetContext(Context == nullptr ? 0 : Context->GetHandle());
-
-			m_CurentContext = ConstCast(RenderContext*, Context);
-
-			if (window != nullptr)
-				window->OnSizeChangedEvent += EventListener_OnWindowSizeChanged;
-
-			OnContextChangedEvent(m_CurentContext);
 		}
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
@@ -409,11 +387,19 @@ namespace Engine
 
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
+			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
+
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_FrameDataChain, m_CurentContext, nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, buffers, m_LastContext, nativeBuffers);
 
 			if (nativeBuffers.GetSize() != 0)
 			{
+				{
+					//RENDERING
+					//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
+					CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
+				}
+
 				{
 					CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
 				}
@@ -426,29 +412,54 @@ namespace Engine
 
 		void DeviceInterface::SubmitCommandBufferAsync(const CommandBuffer* Buffer)
 		{
+			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
+
 			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, m_FrameDataChain, m_CurentContext, nativeBuffers);
+			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, buffers, m_LastContext, nativeBuffers);
 
 			if (nativeBuffers.GetSize() != 0)
 			{
-				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBufferAsync(nativeBuffers.GetData(), nativeBuffers.GetSize()));
+				{
+					//RENDERING
+					//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
+					CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
+				}
+
+				{
+					CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBufferAsync(nativeBuffers.GetData(), nativeBuffers.GetSize()));
+				}
 			}
 		}
 
-		void DeviceInterface::BeginRender(void)
+		void DeviceInterface::BeginFrame(const RenderContext* Context)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Context != nullptr, "Context cannot be null");
+
+			m_LastContext = Context;
+
+			Window* window = Context->GetWindow();
+
+			m_ThreadedDevice->SetContext(Context->GetHandle());
+
+			OnContextChangedEvent(m_LastContext);
+			OnContextResizedEvent(window->GetClientSize());
+
 			if (m_Pipeline != nullptr)
 				m_Pipeline->BeginRender();
 		}
 
-		void DeviceInterface::EndRender(void)
+		void DeviceInterface::EndFrame(void)
 		{
-			m_FrameDataChain->Swap();
-
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
 
-			m_ThreadedDevice->SWAP_BUFFERS_PLACEHOLDER();
+			m_FrameDataChain->Swap();
+
+			m_ThreadedDevice->SwapBuffers();
+
+			m_ThreadedDevice->SetContext(0);
+
+			m_LastContext = nullptr;
 		}
 
 		void DeviceInterface::SetPipeline(IPipeline* Pipeline)
@@ -464,17 +475,9 @@ namespace Engine
 
 		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
 		{
-			if (m_CurentContext == Context && m_CurentContext != nullptr)
-				m_CurentContext->GetWindow()->OnSizeChangedEvent -= EventListener_OnWindowSizeChanged;
-
 			CHECK_CALL_STRONG(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
 
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(Context);
-		}
-
-		void DeviceInterface::OnWindowSizeChanged(Window* Window)
-		{
-			OnContextResizedEvent(m_CurentContext);
 		}
 	}
 }

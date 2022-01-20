@@ -81,12 +81,12 @@ namespace Engine
 			m_TitleText.Update();
 		}
 
-		void RenderableWindow::Render(EditorRenderDeviceBase* Device) const
+		void RenderableWindow::Render(EditorRenderCommandBuffer* CommandBuffer) const
 		{
 			auto& rect = GetRect();
 
-			m_BackgroundSprite.Render(Device, rect.Position);
-			m_TitleText.Render(Device, rect.Position);
+			m_BackgroundSprite.Render(CommandBuffer, rect.Position);
+			m_TitleText.Render(CommandBuffer, rect.Position);
 		}
 
 		void RenderableWindow::OnSizeChanged(void)

@@ -30,8 +30,7 @@ namespace Engine
 
 			BuiltiInProgramConstants::~BuiltiInProgramConstants(void)
 			{
-				m_DeviceInterface->OnContextChangedEvent -= EventListener_OnContextChanged;
-				m_DeviceInterface->OnContextResizedEvent -= EventListener_OnContextChanged;
+				m_DeviceInterface->OnContextResizedEvent -= EventListener_OnContextSizeChanged;
 
 				m_DeviceInterface = nullptr;
 			}
@@ -66,10 +65,7 @@ namespace Engine
 						return &m_TimeDataBuffer;
 					});
 
-				m_DeviceInterface->OnContextChangedEvent += EventListener_OnContextChanged;
-				m_DeviceInterface->OnContextResizedEvent += EventListener_OnContextChanged;
-
-				OnContextChanged(m_DeviceInterface->GetContext());
+				m_DeviceInterface->OnContextResizedEvent += EventListener_OnContextSizeChanged;
 			}
 
 			void BuiltiInProgramConstants::SetTransfomData(const TransformData& Data)
@@ -85,15 +81,10 @@ namespace Engine
 				m_InverseTransformDataBuffer.Set(&inverseData);
 			}
 
-			void BuiltiInProgramConstants::OnContextChanged(RenderContext* Context)
+			void BuiltiInProgramConstants::OnContextSizeChanged(const Vector2I& Size)
 			{
-				if (Context == nullptr)
-					return;
-
-				Vector2I size = Context->GetWindow()->GetClientSize();
-
 				ViewportData* data = m_ViewportDataBuffer.Get<ViewportData>();
-				data->FrameSize = Vector2F(size.X, size.Y);
+				data->FrameSize = Vector2F(Size.X, Size.Y);
 			}
 		}
 	}

@@ -26,6 +26,8 @@ namespace Engine
 
 		namespace Private
 		{
+			class FrameConstantBuffers;
+
 			class ThreadedDevice
 			{
 				friend class GPUBuffer;
@@ -76,7 +78,9 @@ namespace Engine
 				Promise<bool> SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count);
 				Promise<bool> SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count);
 
-				Promise<bool> SWAP_BUFFERS_PLACEHOLDER(void);
+				Promise<bool> SyncConstantBuffers(const FrameConstantBuffers* Buffers);
+
+				Promise<bool> SwapBuffers(void);
 
 				Promise<bool> SetResourceName(ResourceHandle Handle, IDevice::ResourceTypes Type, cwstr Name);
 				Promise<bool> SetDebugCallback(IDevice::DebugFunction Callback);

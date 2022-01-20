@@ -21,7 +21,7 @@ namespace Engine
 		namespace Private
 		{
 			class ThreadedDevice;
-			class FrameDataChain;
+			class FrameConstantBuffers;
 		}
 
 		using namespace Private;
@@ -83,15 +83,16 @@ namespace Engine
 			void SetMarker(const String& Label);
 			void SetMarker(const WString& Label);
 
+			//RENDERING
 			//public GPUFence CreateGPUFence();
 			//Blit
 			//copy texture
 			//Dispatch Compute
 
 		private:
-			void PrepareNativeBuffers(ThreadedDevice* Device, FrameDataChain* FrameDataChain, RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
+			void PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
 
-			void InsertDrawCommand(FrameDataChain* FrameDataChain, ICommandBuffer* CopyConstantBuffersCB, ICommandBuffer* GraphicsCB, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			static void InsertDrawCommand(FrameConstantBuffers* ConstantBuffers, ICommandBuffer* CommandBuffer, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 		private:
 			String m_Name;

@@ -248,7 +248,7 @@ namespace Engine
 				m_DeviceInterface->SubmitCommandBuffer(&m_CommandBufferFinal);
 			}
 
-			void DeferredRendering::OnContextChanged(RenderContext* Context)
+			void DeferredRendering::OnContextChanged(const RenderContext* Context)
 			{
 				if (Context == nullptr)
 					return;
@@ -261,39 +261,19 @@ namespace Engine
 
 				m_RenderTargets[Context] = {};
 				m_ActiveInfo = &m_RenderTargets[Context];
-
-				RefreshRenderTarget(Context);
 			}
 
-			void DeferredRendering::OnContextResized(RenderContext* Context)
+			void DeferredRendering::OnContextResized(const Vector2I& Size)
 			{
-				RefreshRenderTarget(Context);
-			}
+				ContextRenderTargetInfo& info = *m_ActiveInfo;
 
-			void DeferredRendering::SetPassConstants(Material* Material)
-			{
-				static const Pass::ConstantHash ConstantHash_PositionTexture = Pass::GetHash("PositionTexture");
-				static const Pass::ConstantHash ConstantHash_NormalTexture = Pass::GetHash("NormalTexture");
-				static const Pass::ConstantHash ConstantHash_AlbedoSpecTexture = Pass::GetHash("AlbedoSpecTexture");
-
-				Material->SetTexture(ConstantHash_PositionTexture, &m_ActiveInfo->PositionTexture);
-				Material->SetTexture(ConstantHash_NormalTexture, &m_ActiveInfo->NormalTexture);
-				Material->SetTexture(ConstantHash_AlbedoSpecTexture, &m_ActiveInfo->AlbedoSpecularTexture);
-			}
-
-			void DeferredRendering::RefreshRenderTarget(RenderContext* Context)
-			{
-				ContextRenderTargetInfo& info = m_RenderTargets[Context];
-
-				const Vector2I& clientSize = Context->GetWindow()->GetClientSize();
-
-				if (info.Size == clientSize)
+				if (info.Size == Size)
 					return;
 
 				if (info.RenderTarget != nullptr)
 					m_DeviceInterface->DestroyRenderTarget(info.RenderTarget);
 
-				info.Size = clientSize;
+				info.Size = Size;
 
 				RenderTargetInfo gbuffer;
 
@@ -326,6 +306,17 @@ namespace Engine
 				info.PositionTexture = TextureResource((*info.RenderTarget)[0]);
 				info.NormalTexture = TextureResource((*info.RenderTarget)[1]);
 				info.AlbedoSpecularTexture = TextureResource((*info.RenderTarget)[2]);
+			}
+
+			void DeferredRendering::SetPassConstants(Material* Material)
+			{
+				static const Pass::ConstantHash ConstantHash_PositionTexture = Pass::GetHash("PositionTexture");
+				static const Pass::ConstantHash ConstantHash_NormalTexture = Pass::GetHash("NormalTexture");
+				static const Pass::ConstantHash ConstantHash_AlbedoSpecTexture = Pass::GetHash("AlbedoSpecTexture");
+
+				Material->SetTexture(ConstantHash_PositionTexture, &m_ActiveInfo->PositionTexture);
+				Material->SetTexture(ConstantHash_NormalTexture, &m_ActiveInfo->NormalTexture);
+				Material->SetTexture(ConstantHash_AlbedoSpecTexture, &m_ActiveInfo->AlbedoSpecularTexture);
 			}
 		}
 	}

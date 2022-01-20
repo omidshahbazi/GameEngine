@@ -114,7 +114,7 @@ namespace Engine
 			data.Model = Model;
 			data.View = View;
 			data.Projection = Projection;
-			data.MVP = Projection;
+			data.MVP = MVP;
 			data.Material = ConstCast(RenderSystem::Material*, Material);
 
 			m_Buffer.Append(data);
@@ -175,7 +175,7 @@ namespace Engine
 			{
 				const ICommandBuffer::Types desiredType = TypePerCommand[(uint8)commandType];
 
-				if (currentCB == nullptr || currentCB->GetType() == desiredType)
+				if (currentCB == nullptr || currentCB->GetType() != desiredType)
 				{
 					bool res = Device->CreateCommandBuffer(desiredType, currentCB).Wait();
 

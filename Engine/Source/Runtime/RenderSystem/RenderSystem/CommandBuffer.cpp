@@ -163,9 +163,17 @@ namespace Engine
 
 		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
 		{
+#define SET_VIEWPORT(Position, Size) \
+			m_LastViewportPosition = Position; \
+			m_LastViewportSize = Size; \
+			currentCB->SetViewport(Position, Size);
+
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
 			const WString name = m_Name.ChangeType<char16>();
+
+			Vector2I m_LastViewportPosition;
+			Vector2I m_LastViewportSize;
 
 			ICommandBuffer* currentCB = nullptr;
 
@@ -183,9 +191,9 @@ namespace Engine
 
 					NativeCommandBuffers.Add(currentCB);
 
-					//RENDERING
-					//Set viewport for each new command buffer to the Context
-					//Set prev viewport and bounded render-target
+					//Set prev bounded render-target
+
+					SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
 				}
 
 				switch (commandType)
@@ -214,7 +222,7 @@ namespace Engine
 
 					currentCB->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
 
-					currentCB->SetViewport(Vector2I::Zero, size);
+					SET_VIEWPORT(Vector2I::Zero, size);
 				} break;
 
 				case CommandTypes::SetViewport:
@@ -222,7 +230,7 @@ namespace Engine
 					SetViewportCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->SetViewport(data.Position, data.Size);
+					SET_VIEWPORT(data.Position, data.Size);
 				} break;
 
 				case CommandTypes::Clear:
@@ -269,6 +277,8 @@ namespace Engine
 					CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
 				}
 			}
+
+#undef SET_VIEWPORT
 		}
 
 		void CommandBuffer::InsertDrawCommand(FrameConstantBuffers* ConstantBuffers, ICommandBuffer* CommandBuffer, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)

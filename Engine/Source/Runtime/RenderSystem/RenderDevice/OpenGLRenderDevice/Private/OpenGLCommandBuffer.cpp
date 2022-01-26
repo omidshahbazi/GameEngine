@@ -564,6 +564,8 @@ namespace Engine
 
 						glGenerateMipmap(type);
 
+						glBindTexture(type, 0);
+
 					} break;
 
 					case CommandTypes::SetProgram:

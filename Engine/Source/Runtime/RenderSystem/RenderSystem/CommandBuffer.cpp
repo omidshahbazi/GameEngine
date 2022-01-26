@@ -163,6 +163,10 @@ namespace Engine
 
 		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, ConstantBuffers != nullptr, "ConstantBuffers cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, RenderContext != nullptr, "RenderContext cannot be null");
+
 #define SET_VIEWPORT(Position, Size) \
 			m_LastViewportPosition = Position; \
 			m_LastViewportSize = Size; \
@@ -173,7 +177,7 @@ namespace Engine
 			const WString name = m_Name.ChangeType<char16>();
 
 			Vector2I m_LastViewportPosition;
-			Vector2I m_LastViewportSize;
+			Vector2I m_LastViewportSize = RenderContext->GetWindow()->GetClientSize();
 
 			ICommandBuffer* currentCB = nullptr;
 

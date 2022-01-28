@@ -27,20 +27,13 @@ namespace Engine
 		{
 			enum class CommandTypes
 			{
-				GenerateMipMap = 0,
-				SetRenderTarget,
+				SetRenderTarget = 0,
 				SetViewport,
 				Clear,
 				Draw,
 				BeginEvent,
 				EndEvent,
 				SetMarker
-			};
-
-			struct GenerateMipMapCommandData
-			{
-			public:
-				Texture* Texture;
 			};
 
 			struct SetRenderTargetCommandData

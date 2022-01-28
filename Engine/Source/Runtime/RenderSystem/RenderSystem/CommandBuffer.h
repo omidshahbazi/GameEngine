@@ -66,8 +66,6 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
-			bool GenerateMipMap(const Texture* Texture);
-
 			void SetRenderTarget(const RenderTarget* RenderTarget);
 			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);

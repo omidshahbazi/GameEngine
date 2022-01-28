@@ -206,9 +206,6 @@ namespace Engine
 			Texture* texture = RenderSystemAllocators::ResourceAllocator_Allocate<Texture>();
 			ConstructMacro(Texture, texture, m_ThreadedDevice, handle, Info->Type, Info->Format, Info->Dimension);
 
-			if (Info->Data != nullptr)
-				texture->GenerateMipMaps();
-
 			return texture;
 		}
 
@@ -221,9 +218,6 @@ namespace Engine
 
 			Sprite* sprite = RenderSystemAllocators::ResourceAllocator_Allocate<Sprite>();
 			ConstructMacro(Sprite, sprite, m_ThreadedDevice, handle, Info->Format, Info->Dimension, Info->Borders);
-
-			if (Info->Data != nullptr)
-				sprite->GenerateMipMaps();
 
 			return sprite;
 		}

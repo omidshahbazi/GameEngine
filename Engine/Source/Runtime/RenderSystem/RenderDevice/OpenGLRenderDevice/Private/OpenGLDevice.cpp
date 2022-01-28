@@ -590,6 +590,7 @@ namespace Engine
 				glGenTextures(1, &handle);
 
 				TextureBufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<TextureBufferInfo>();
+				Handle = (ResourceHandle)info;
 
 				INITIALIZE_BUFFER_INFO(info, handle, Helper::GetTextureBufferSize(Info->Format, Info->Dimension), GPUBufferTypes::Pixel, false);
 				info->TextureType = Info->Type;
@@ -597,16 +598,19 @@ namespace Engine
 				info->Height = Info->Dimension.Y;
 				info->Format = Info->Format;
 
-				glBindTexture(GetTextureType(Info->Type), handle);
+				uint32 type = GetTextureType(Info->Type);
+
+				glBindTexture(type, handle);
 
 				if (Helper::GetTextureChannelCount(Info->Format) == 4)
 					glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 				else
 					glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-				glTexImage2D(GetTextureType(Info->Type), 0, GetTextureInternalFormat(Info->Format), Info->Dimension.X, Info->Dimension.Y, 0, GetTextureFormat(Info->Format), GetTexturePixelType(Info->Format), Info->Data);
+				glTexImage2D(type, 0, GetTextureInternalFormat(Info->Format), Info->Dimension.X, Info->Dimension.Y, 0, GetTextureFormat(Info->Format), GetTexturePixelType(Info->Format), Info->Data);
 
-				Handle = (ResourceHandle)info;
+				SetTextureMinifyFilter(Handle, TextureMinifyFilters::Linear);
+				SetTextureMagnifyFilter(Handle, TextureMagnfyFilters::Linear);
 
 				return true;
 			}
@@ -625,58 +629,66 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			bool OpenGLDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				if (Handle == 0)
 					return false;
 
 				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
-				glBindTexture(GetTextureType(Type), info->Handle);
+				uint32 type = GetTextureType(info->TextureType);
 
-				glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
+				glBindTexture(type, info->Handle);
+
+				glTexParameteri(type, GL_TEXTURE_WRAP_T, GetWrapMode(Mode));
 
 				return true;
 			}
 
-			bool OpenGLDevice::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			bool OpenGLDevice::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				if (Handle == 0)
 					return false;
 
 				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
-				glBindTexture(GetTextureType(Type), info->Handle);
+				uint32 type = GetTextureType(info->TextureType);
 
-				glTexParameteri(GetTextureType(Type), GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
+				glBindTexture(type, info->Handle);
+
+				glTexParameteri(type, GL_TEXTURE_WRAP_S, GetWrapMode(Mode));
 
 				return true;
 			}
 
-			bool OpenGLDevice::SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter)
+			bool OpenGLDevice::SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter)
 			{
 				if (Handle == 0)
 					return false;
 
 				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
-				glBindTexture(GetTextureType(Type), info->Handle);
+				uint32 type = GetTextureType(info->TextureType);
 
-				glTexParameteri(GetTextureType(Type), GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
+				glBindTexture(type, info->Handle);
+
+				glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GetMinifyFilter(Filter));
 
 				return true;
 			}
 
-			bool OpenGLDevice::SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter)
+			bool OpenGLDevice::SetTextureMagnifyFilter(ResourceHandle Handle, TextureMagnfyFilters Filter)
 			{
 				if (Handle == 0)
 					return false;
 
 				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
 
-				glBindTexture(GetTextureType(Type), info->Handle);
+				uint32 type = GetTextureType(info->TextureType);
 
-				glTexParameteri(GetTextureType(Type), GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
+				glBindTexture(type, info->Handle);
+
+				glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GetMagnifyFilter(Filter));
 
 				return true;
 			}
@@ -872,7 +884,7 @@ namespace Engine
 
 					glObjectLabel(GL_BUFFER, info->Handle, -1, name);
 				}
-				if (Type == ResourceTypes::Program)
+				else if (Type == ResourceTypes::Program)
 				{
 					ProgramInfo* info = ReinterpretCast(ProgramInfo*, Handle);
 

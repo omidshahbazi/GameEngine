@@ -37,28 +37,28 @@ namespace Engine
 
 		bool Texture::SetVerticalWrapping(TextureWrapModes Mode)
 		{
-			GetDevice()->SetTextureVerticalWrapping(GetHandle(), m_Type, Mode);
+			GetDevice()->SetTextureVerticalWrapping(GetHandle(), Mode);
 
 			return true;
 		}
 
 		bool Texture::SetHorizontalWrapping(TextureWrapModes Mode)
 		{
-			GetDevice()->SetTextureHorizontalWrapping(GetHandle(), m_Type, Mode);
+			GetDevice()->SetTextureHorizontalWrapping(GetHandle(), Mode);
 
 			return true;
 		}
 
 		bool Texture::SetMinifyFilter(TextureMinifyFilters Filter)
 		{
-			GetDevice()->SetTextureMinifyFilter(GetHandle(), m_Type, Filter);
+			GetDevice()->SetTextureMinifyFilter(GetHandle(), Filter);
 
 			return true;
 		}
 
 		bool Texture::SetMagnifyFilter(TextureMagnfyFilters Filter)
 		{
-			GetDevice()->SetTextureMagnifyFilter(GetHandle(), m_Type, Filter);
+			GetDevice()->SetTextureMagnifyFilter(GetHandle(), Filter);
 
 			return true;
 		}

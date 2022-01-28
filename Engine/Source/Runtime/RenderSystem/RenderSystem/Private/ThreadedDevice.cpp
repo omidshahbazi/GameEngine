@@ -193,38 +193,38 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			Promise<bool> ThreadedDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Mode);
+				BEGIN_CALL(bool, &, promise, Handle, Mode);
 
-				promise->SetValue(m_Device->SetTextureVerticalWrapping(Handle, Type, Mode));
+				promise->SetValue(m_Device->SetTextureVerticalWrapping(Handle, Mode));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			Promise<bool> ThreadedDevice::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Mode);
+				BEGIN_CALL(bool, &, promise, Handle, Mode);
 
-				promise->SetValue(m_Device->SetTextureHorizontalWrapping(Handle, Type, Mode));
+				promise->SetValue(m_Device->SetTextureHorizontalWrapping(Handle, Mode));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter)
+			Promise<bool> ThreadedDevice::SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Filter);
+				BEGIN_CALL(bool, &, promise, Handle, Filter);
 
-				promise->SetValue(m_Device->SetTextureMinifyFilter(Handle, Type, Filter));
+				promise->SetValue(m_Device->SetTextureMinifyFilter(Handle, Filter));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter)
+			Promise<bool> ThreadedDevice::SetTextureMagnifyFilter(ResourceHandle Handle, TextureMagnfyFilters Filter)
 			{
-				BEGIN_CALL(bool, &, promise, Handle, Type, Filter);
+				BEGIN_CALL(bool, &, promise, Handle, Filter);
 
-				promise->SetValue(m_Device->SetTextureMagnifyFilter(Handle, Type, Filter));
+				promise->SetValue(m_Device->SetTextureMagnifyFilter(Handle, Filter));
 
 				END_CALL();
 			}

@@ -91,19 +91,19 @@ namespace Engine
 			{
 				return true;
 			}
-			bool VulkanDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			bool VulkanDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				return true;
 			}
-			bool VulkanDevice::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			bool VulkanDevice::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				return true;
 			}
-			bool VulkanDevice::SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter)
+			bool VulkanDevice::SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter)
 			{
 				return true;
 			}
-			bool VulkanDevice::SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter)
+			bool VulkanDevice::SetTextureMagnifyFilter(ResourceHandle Handle, TextureMagnfyFilters Filter)
 			{
 				return true;
 			}

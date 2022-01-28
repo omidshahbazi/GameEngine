@@ -124,10 +124,10 @@ namespace Engine
 
 			virtual bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) = 0;
 			virtual bool DestroyTexture(ResourceHandle Handle) = 0;
-			virtual bool SetTextureVerticalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode) = 0;
-			virtual bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode) = 0;
-			virtual bool SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter) = 0;
-			virtual bool SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter) = 0;
+			virtual bool SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode) = 0;
+			virtual bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode) = 0;
+			virtual bool SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter) = 0;
+			virtual bool SetTextureMagnifyFilter(ResourceHandle Handle, TextureMagnfyFilters Filter) = 0;
 
 			virtual bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) = 0;
 			virtual bool DestroyRenderTarget(ResourceHandle Handle) = 0;

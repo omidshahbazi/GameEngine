@@ -53,10 +53,10 @@ namespace Engine
 
 				bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyTexture(ResourceHandle Handle) override;
-				bool SetTextureVerticalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode) override;
-				bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode) override;
-				bool SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter) override;
-				bool SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter) override;
+				bool SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode) override;
+				bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode) override;
+				bool SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter) override;
+				bool SetTextureMagnifyFilter(ResourceHandle Handle, TextureMagnfyFilters Filter) override;
 
 				bool CreateRenderTarget(const RenderTargetInfo* Info, ResourceHandle& Handle, TextureList& Textures) override;
 				bool DestroyRenderTarget(ResourceHandle Handle) override;

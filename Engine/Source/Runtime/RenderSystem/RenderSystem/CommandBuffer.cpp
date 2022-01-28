@@ -30,21 +30,6 @@ namespace Engine
 		{
 		}
 
-		bool CommandBuffer::GenerateMipMap(const Texture* Texture)
-		{
-			if (Texture == nullptr)
-				return false;
-
-			m_Buffer.Append(CommandTypes::GenerateMipMap);
-
-			GenerateMipMapCommandData data = {};
-			data.Texture = ConstCast(RenderSystem::Texture*, Texture);
-
-			m_Buffer.Append(data);
-
-			return true;
-		}
-
 		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
 		{
 			m_Buffer.Append(CommandTypes::SetRenderTarget);
@@ -202,14 +187,6 @@ namespace Engine
 
 				switch (commandType)
 				{
-				case CommandTypes::GenerateMipMap:
-				{
-					GenerateMipMapCommandData data = {};
-					m_Buffer.Read(data);
-
-					currentCB->GenerateMipMap(data.Texture->GetHandle());
-				} break;
-
 				case CommandTypes::SetRenderTarget:
 				{
 					SetRenderTargetCommandData data = {};

@@ -806,7 +806,7 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::SetTextureVerticalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			bool DirectX12Device::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				if (Handle == 0)
 					return false;
@@ -817,7 +817,7 @@ namespace Engine
 				REALLOCATE_SAMPLER(textureResourceInfo);
 			}
 
-			bool DirectX12Device::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureTypes Type, TextureWrapModes Mode)
+			bool DirectX12Device::SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				if (Handle == 0)
 					return false;
@@ -828,7 +828,7 @@ namespace Engine
 				REALLOCATE_SAMPLER(textureResourceInfo);
 			}
 
-			bool DirectX12Device::SetTextureMinifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMinifyFilters Filter)
+			bool DirectX12Device::SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter)
 			{
 				if (Handle == 0)
 					return false;
@@ -839,7 +839,7 @@ namespace Engine
 				REALLOCATE_SAMPLER(textureResourceInfo);
 			}
 
-			bool DirectX12Device::SetTextureMagnifyFilter(ResourceHandle Handle, TextureTypes Type, TextureMagnfyFilters Filter)
+			bool DirectX12Device::SetTextureMagnifyFilter(ResourceHandle Handle, TextureMagnfyFilters Filter)
 			{
 				if (Handle == 0)
 					return false;

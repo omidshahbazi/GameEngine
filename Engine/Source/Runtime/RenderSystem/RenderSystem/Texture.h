@@ -28,7 +28,7 @@ namespace Engine
 		public:
 			virtual ~Texture(void);
 
-			virtual void SetName(const WString& Name) override;
+			virtual void SetNameInternal(const WString& Name) override;
 
 		public:
 			virtual bool SetVerticalWrapping(TextureWrapModes Mode);

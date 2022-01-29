@@ -619,16 +619,17 @@ namespace Engine
 #define SET_STATE_FOR_CULL(CullMode) \
 						{ \
 							RenderState::FaceState& state = data.State.GetFaceState(CullMode); \
+							uint32 cullMode = GetCullingMode(CullMode); \
 							if (state.StencilTestFunction == TestFunctions::Never) \
 								glDisable(GL_STENCIL_TEST); \
 							else \
 							{ \
 								glEnable(GL_STENCIL_TEST); \
-								glStencilFuncSeparate(GetCullingMode(CullMode), GetTestFunction(state.StencilTestFunction), state.StencilTestFunctionReference, state.StencilTestFunctionMask); \
+								glStencilFuncSeparate(cullMode, GetTestFunction(state.StencilTestFunction), state.StencilTestFunctionReference, state.StencilTestFunctionMask); \
 							} \
-							glStencilMaskSeparate(GetCullingMode(CullMode), state.StencilMask);\
-							glStencilOpSeparate(GetCullingMode(CullMode), GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed)); \
-							glPolygonMode(GetCullingMode(CullMode), GetPolygonRenderMode(state.PolygonMode)); \
+							glStencilMaskSeparate(cullMode, state.StencilMask);\
+							glStencilOpSeparate(cullMode, GetStencilingOperation(state.StencilOperationStencilFailed), GetStencilingOperation(state.StencilOperationDepthFailed), GetStencilingOperation(state.StencilOperationDepthPassed)); \
+							glPolygonMode(cullMode, GetPolygonRenderMode(state.PolygonMode)); \
 						}
 
 						glFrontFace(GetFaceOrdering(data.State.FaceOrder));

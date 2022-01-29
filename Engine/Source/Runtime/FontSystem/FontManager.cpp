@@ -5,6 +5,7 @@
 #include <Allocators\RootAllocator.h>
 #include <RenderSystem\RenderManager.h>
 #include <RenderSystem\Texture.h>
+#include <RenderSystem\Mesh.h>
 
 namespace Engine
 {
@@ -102,6 +103,7 @@ namespace Engine
 			meshInfo.SubMeshes.Add(&subMeshInfo);
 
 			m_QuadMesh = RenderManager::GetInstance()->GetDevice()->CreateMesh(&meshInfo);
+			m_QuadMesh->SetName("FontQuadMesh");
 		}
 	}
 }

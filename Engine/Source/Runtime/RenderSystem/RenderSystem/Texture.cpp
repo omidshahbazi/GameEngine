@@ -20,6 +20,8 @@ namespace Engine
 			m_Buffer(nullptr)
 		{
 			GenerateBuffer();
+
+			SetName("Texture");
 		}
 
 		Texture::~Texture(void)
@@ -28,11 +30,12 @@ namespace Engine
 				RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_Buffer);
 		}
 
-		void Texture::SetName(const WString& Name)
+		void Texture::SetNameInternal(const WString& Name)
 		{
-			NativeType::SetName(Name);
-
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Texture, GetName().GetValue());
+
+			if (m_Buffer != nullptr)
+				m_Buffer->SetName(Name + L"_PixelBuffer");
 		}
 
 		bool Texture::SetVerticalWrapping(TextureWrapModes Mode)

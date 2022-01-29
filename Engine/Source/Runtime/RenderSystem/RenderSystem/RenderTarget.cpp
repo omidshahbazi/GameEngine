@@ -10,12 +10,11 @@ namespace Engine
 			NativeType(Device, Handle),
 			m_Textures(Textures)
 		{
+			SetName("RenderTarget");
 		}
 
-		void RenderTarget::SetName(const WString& Name)
+		void RenderTarget::SetNameInternal(const WString& Name)
 		{
-			NativeType::SetName(Name);
-
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::RenderTarget, GetName().GetValue());
 		}
 	}

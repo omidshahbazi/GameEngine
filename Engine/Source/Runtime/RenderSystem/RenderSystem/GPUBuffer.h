@@ -19,6 +19,8 @@ namespace Engine
 			virtual	~GPUBuffer(void);
 
 		public:
+			virtual void SetNameInternal(const WString& Name) override;
+
 			virtual void Reset(void)
 			{
 				m_CurrentBuffer = m_StartBuffer;

@@ -30,7 +30,7 @@ namespace Engine
 		public:
 			virtual ~SubMesh(void);
 
-			virtual void SetName(const WString& Name) override;
+			virtual void SetNameInternal(const WString& Name) override;
 
 			INLINE uint16 GetVertexCount(void) const
 			{

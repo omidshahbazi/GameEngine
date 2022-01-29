@@ -41,12 +41,20 @@ namespace Engine
 				return m_Name;
 			}
 
-			virtual void SetName(const WString& Name)
+			void SetName(const String& Name)
+			{
+				SetName(Name.ChangeType<char16>());
+			}
+			void SetName(const WString& Name)
 			{
 				m_Name = Name;
+
+				SetNameInternal(Name);
 			}
 
 		protected:
+			virtual void SetNameInternal(const WString& Name) = 0;
+
 			INLINE ThreadedDevice* GetDevice(void) const
 			{
 				return m_Device;

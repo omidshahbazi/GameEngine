@@ -1077,11 +1077,11 @@ namespace Engine
 
 					WString tempName(Name);
 
-					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->Resource.Resource, (tempName + L"_VertexBuffer").GetValue())))
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->Resource.Resource, (tempName + L"_Vertex").GetValue())))
 						return false;
 
 					if (meshBufferInfo->IndexBuffer.Resource.Resource != nullptr)
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource.Resource, (tempName + L"_IndexBuffer").GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(meshBufferInfo->IndexBuffer.Resource.Resource, (tempName + L"_Index").GetValue())))
 							return false;
 				}
 				else if (Type == ResourceTypes::Texture)
@@ -1099,7 +1099,7 @@ namespace Engine
 
 					uint8 index = 0;
 					for (auto view : renderTargetInfos->Views)
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource.Resource, (tempName + L"_TextureBuffer_" + StringUtility::ToString<char16>(index++)).GetValue())))
+						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(view.Resource.Resource, (tempName + L"_Texture_" + StringUtility::ToString<char16>(index++)).GetValue())))
 							return false;
 				}
 

@@ -20,7 +20,7 @@ namespace Engine
 		public:
 			RenderTarget(ThreadedDevice* Device, ResourceHandle Handle, const TexturesList& Textures);
 
-			virtual void SetName(const WString& Name) override;
+			virtual void SetNameInternal(const WString& Name) override;
 
 			INLINE Texture* operator [] (uint8 Index)
 			{

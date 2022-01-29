@@ -2,6 +2,7 @@
 #include <EditorGUI\Private\Resources.h>
 #include <EditorGUI\Private\EditorGUIAllocators.h>
 #include <RenderSystem\RenderManager.h>
+#include <RenderSystem\Program.h>
 #include <ResourceManagement\ResourceManager.h>
 #include <ResourceSystem\ResourceHolder.h>
 #include <FileUtility\FileSystem.h>
@@ -68,6 +69,8 @@ namespace Engine
 
 				ProgramResource* textRendererProgram = CreateProgram(TEXTURE_TEXT_PROGRAM_SOURCE);
 				{
+					textRendererProgram->GetPointer()->SetName("TextProgram");
+
 					Pass pass(textRendererProgram);
 					pass.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
 					pass.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;

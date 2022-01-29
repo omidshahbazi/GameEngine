@@ -25,7 +25,7 @@ namespace Engine
 			Program(ThreadedDevice* Device, ResourceHandle Handle, const MetaInfo& Meta);
 
 		public:
-			void SetName(const WString& Name) override;
+			void SetNameInternal(const WString& Name) override;
 
 		private:
 			const StructMetaInfo* GetStructInfoOf(const String& VariableName) const;

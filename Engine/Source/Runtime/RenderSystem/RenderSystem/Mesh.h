@@ -18,6 +18,11 @@ namespace Engine
 			{
 			}
 
+			void SetName(const String& Name)
+			{
+				SetName(Name.ChangeType<char16>());
+			}
+
 			void SetName(const WString& Name)
 			{
 				for (uint16 i = 0; i < m_SubMeshCount; ++i)

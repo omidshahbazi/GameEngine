@@ -30,6 +30,16 @@ namespace Engine
 				writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "%ii", width); \
 				Result += PrintFunctionName(Result, format##DataType, va_arg(Args, DataType));
 
+#define PRINT_HEX(CharType, PrintFunctionName, DataType, UpperCase) \
+				CharType format##DataType[10] = {}; \
+				uint32 writtenCount##DataType = 0; \
+				writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "%%"); \
+				if (fillZeros) \
+					writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "0"); \
+				writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, "%i", width); \
+				writtenCount##DataType += sprintf(format##DataType + writtenCount##DataType, (UpperCase ? "X": "x")); \
+				Result += PrintFunctionName(Result, format##DataType, va_arg(Args, DataType));
+
 #define PUT_CHARACTER(Character) *(Result++) = Character
 
 #define PRINT_STRING_POINTER(Pointer) \
@@ -456,13 +466,17 @@ namespace Engine
 
 					case 'x':
 					{
-						Result += sprintf(Result, "%x", va_arg(Args, uint32));
+						PRINT_HEX(char8, sprintf, uint32, false);
+
+						//Result += sprintf(Result, "%x", va_arg(Args, uint32));
 					}
 					break;
 
 					case 'X':
 					{
-						Result += sprintf(Result, "%X", va_arg(Args, uint32));
+						PRINT_HEX(char8, sprintf, uint32, true);
+
+						//Result += sprintf(Result, "%X", va_arg(Args, uint32));
 					}
 					break;
 
@@ -636,13 +650,17 @@ namespace Engine
 
 					case 'x':
 					{
-						Result += wprintf_s(Result, "%x", va_arg(Args, uint32));
+						PRINT_HEX(char8, wprintf_s, uint32, false);
+
+						//Result += wprintf_s(Result, "%x", va_arg(Args, uint32));
 					}
 					break;
 
 					case 'X':
 					{
-						Result += wprintf_s(Result, "%X", va_arg(Args, uint32));
+						PRINT_HEX(char8, wprintf_s, uint32, true);
+
+						//Result += wprintf_s(Result, "%X", va_arg(Args, uint32));
 					}
 					break;
 
@@ -841,6 +859,7 @@ namespace Engine
 #undef PRINT_STRING_POINTER
 #undef PUT_CHARACTER
 #undef PRINT_NUMBER
+#undef PRINT_HEX
 	}
 }
 

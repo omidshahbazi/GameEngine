@@ -2,6 +2,7 @@
 #include <FontSystem\Font.h>
 #include <FontSystem\Private\FontSystemAllocators.h>
 #include <RenderSystem\RenderManager.h>
+#include <RenderSystem\Texture.h>
 
 namespace Engine
 {
@@ -30,6 +31,17 @@ namespace Engine
 				for (auto& character : m_Characters)
 					device->DestroyMesh(character.GetSecond().GetMesh());
 			}
+		}
+
+		void Font::SetName(const String& Name)
+		{
+			SetName(Name.ChangeType<char16>());
+		}
+
+		void Font::SetName(const WString& Name)
+		{
+			if (m_RenderType == FontRenderTypes::Texture)
+				m_Texture->SetName(Name);
 		}
 
 		Font::Character* Font::GetCharacter(const uint64& CharCode)

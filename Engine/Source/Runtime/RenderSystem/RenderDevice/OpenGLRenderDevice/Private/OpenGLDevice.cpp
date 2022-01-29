@@ -896,10 +896,10 @@ namespace Engine
 
 					String tempName(name);
 
-					glObjectLabel(GL_BUFFER, info->Handle, -1, (tempName + "_VertexBuffer").GetValue());
+					glObjectLabel(GL_BUFFER, info->Handle, -1, (tempName + "_Vertex").GetValue());
 
 					if (info->IndexBufferObject != nullptr)
-						glObjectLabel(GL_BUFFER, info->IndexBufferObject->Handle, -1, (tempName + "_IndexBuffer").GetValue());
+						glObjectLabel(GL_BUFFER, info->IndexBufferObject->Handle, -1, (tempName + "_Index").GetValue());
 				}
 				else if (Type == ResourceTypes::Texture)
 				{
@@ -913,14 +913,14 @@ namespace Engine
 
 					String tempName(name);
 
-					glObjectLabel(GL_FRAMEBUFFER, info->Handle, -1, (tempName + "_FrameBuffer").GetValue());
+					glObjectLabel(GL_FRAMEBUFFER, info->Handle, -1, (tempName + "_Frames").GetValue());
 
 					uint8 index = 0;
 					for (auto texture : info->Textures)
 					{
 						TextureBufferInfo* texInfo = ReinterpretCast(TextureBufferInfo*, texture);
 
-						glObjectLabel(GL_TEXTURE, texInfo->Handle, -1, (tempName + "_TextureBuffer_" + StringUtility::ToString<char8>(index++)).GetValue());
+						glObjectLabel(GL_TEXTURE, texInfo->Handle, -1, (tempName + "_Texture_" + StringUtility::ToString<char8>(index++)).GetValue());
 					}
 				}
 

@@ -273,9 +273,9 @@ namespace Engine
 
 			for (auto& pass : Material->GetPasses())
 			{
-				const ProgramResource* program = pass.GetProgram();
+				CommandBuffer->SetState(pass.GetRenderState());
 
-				CommandBuffer->SetProgram(program->GetPointer()->GetHandle());
+				CommandBuffer->SetProgram(pass.GetProgram()->GetPointer()->GetHandle());
 
 				ProgramConstantSupplier::GPUBufferDataBaseMap buffers;
 				for (auto& info : pass.GetBuffers())

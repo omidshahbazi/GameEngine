@@ -23,6 +23,8 @@ namespace Engine
 			m_VertexBuffer(nullptr)
 		{
 			GenerateBuffers();
+
+			SetName("Mesh");
 		}
 
 		SubMesh::~SubMesh(void)
@@ -34,11 +36,15 @@ namespace Engine
 				RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_VertexBuffer);
 		}
 
-		void SubMesh::SetName(const WString& Name)
+		void SubMesh::SetNameInternal(const WString& Name)
 		{
-			NativeType::SetName(Name);
-
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Mesh, GetName().GetValue());
+
+			if (m_VertexBuffer != nullptr)
+				m_VertexBuffer->SetName(Name + L"_VertexBuffer");
+
+			if (m_IndexBuffer != nullptr)
+				m_IndexBuffer->SetName(Name + L"_IndexBuffer");
 		}
 
 		void SubMesh::GenerateBuffers(void)

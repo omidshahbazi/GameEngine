@@ -4,7 +4,7 @@
 
 namespace Engine
 {
- namespace RenderSystem
+	namespace RenderSystem
 	{
 		GPUBuffer::GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size) :
 			NativeType(Device, Handle),
@@ -14,6 +14,7 @@ namespace Engine
 			m_CurrentBuffer(nullptr),
 			m_LastLockAccess(GPUBufferAccess::ReadOnly)
 		{
+			SetName("GPUBuffer");
 		}
 
 		GPUBuffer::~GPUBuffer(void)
@@ -22,6 +23,11 @@ namespace Engine
 				return;
 
 			GetDevice()->DestroyBuffer(GetHandle());
+		}
+
+		void GPUBuffer::SetNameInternal(const WString& Name)
+		{
+			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Buffer, GetName().GetValue());
 		}
 
 		byte* GPUBuffer::GetBuffer(GPUBufferAccess Access, bool Directly)

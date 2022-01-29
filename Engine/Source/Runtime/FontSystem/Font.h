@@ -117,9 +117,8 @@ namespace Engine
 			Font(void);
 			~Font(void);
 
-			void SetName(const WString& Name)
-			{
-			}
+			void SetName(const String& Name);
+			void SetName(const WString& Name);
 
 			Font::Character* GetCharacter(const uint64& CharCode);
 

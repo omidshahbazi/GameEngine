@@ -13,12 +13,12 @@ namespace Engine
 			m_MetaInfo(MetaInfo)
 		{
 			GenerateConstantData();
+
+			SetName("Program");
 		}
 
-		void Program::SetName(const WString& Name)
+		void Program::SetNameInternal(const WString& Name)
 		{
-			NativeType::SetName(Name);
-
 			GetDevice()->SetResourceName(GetHandle(), IDevice::ResourceTypes::Program, GetName().GetValue());
 		}
 

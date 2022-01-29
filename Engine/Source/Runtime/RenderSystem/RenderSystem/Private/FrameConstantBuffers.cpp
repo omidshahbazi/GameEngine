@@ -56,6 +56,8 @@ namespace Engine
 				GPUConstantBuffer* buffer = &m_Buffers[m_BufferIndex++];
 				ConstructMacro(GPUConstantBuffer, buffer, m_Device, Size, handle);
 
+				buffer->SetName(L"FrameConstantBuffer");
+
 				return buffer;
 			}
 

@@ -17,14 +17,17 @@ namespace Engine
 		{
 			uint32 GetCullingMode(CullModes Modes)
 			{
-				if (BitwiseUtils::IsEnabled(Modes, CullModes::Front) && BitwiseUtils::IsEnabled(Modes, CullModes::Back))
+				switch (Modes)
+				{
+				case CullModes::None:
 					return GL_FRONT_AND_BACK;
 
-				if (BitwiseUtils::IsEnabled(Modes, CullModes::Front))
+				case CullModes::Front:
 					return GL_FRONT;
 
-				if (BitwiseUtils::IsEnabled(Modes, CullModes::Back))
+				case CullModes::Back:
 					return GL_BACK;
+				}
 
 				return 0;
 			}

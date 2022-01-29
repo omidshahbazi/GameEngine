@@ -653,7 +653,6 @@ namespace Engine
 						SET_STATE_FOR_CULL(CullModes::None);
 						SET_STATE_FOR_CULL(CullModes::Back);
 						SET_STATE_FOR_CULL(CullModes::Front);
-						SET_STATE_FOR_CULL(CullModes::Both);
 
 						glBlendEquation(GetBlendingEquation(data.State.BlendEquation));
 

@@ -155,10 +155,9 @@ namespace Engine
 
 		enum class CullModes
 		{
-			None = 2,
-			Front = 4,
-			Back = 8,
-			Both = Front | Back
+			None = 0,
+			Front = 2,
+			Back = 4
 		};
 
 		enum class TestFunctions

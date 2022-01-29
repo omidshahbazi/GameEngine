@@ -186,9 +186,6 @@ namespace Engine
 
 			void GLAPIENTRY DebugOutputProcedure(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, const GLchar* Message, const GLvoid* Param)
 			{
-				//if (ID == 131169 || ID == 131185 || ID == 131218 || ID == 131204)
-				//	return;
-
 				OpenGLDevice* device = ConstCast(OpenGLDevice*, ReinterpretCast(const OpenGLDevice*, Param));
 				IDevice::DebugFunction procedure = device->GetDebugCallback();
 				if (procedure == nullptr)

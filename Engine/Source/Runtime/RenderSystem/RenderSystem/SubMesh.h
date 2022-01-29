@@ -24,14 +24,16 @@ namespace Engine
 			friend class VertexBuffer;
 			friend class IndexBuffer;
 
-		protected:
+		private:
 			SubMesh(ThreadedDevice* Device, ResourceHandle Handle, uint16 VertexCount, uint16 IndexCount, PolygonTypes PolygonType, VertexLayouts VertexLayout);
 
 		public:
 			virtual ~SubMesh(void);
 
+		private:
 			virtual void SetNameInternal(const WString& Name) override;
 
+		public:
 			INLINE uint16 GetVertexCount(void) const
 			{
 				return m_VertexCount;

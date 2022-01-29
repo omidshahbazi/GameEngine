@@ -28,6 +28,7 @@ namespace Engine
 		public:
 			virtual ~Texture(void);
 
+		private:
 			virtual void SetNameInternal(const WString& Name) override;
 
 		public:

@@ -18,9 +18,9 @@ namespace Engine
 			GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size);
 			virtual	~GPUBuffer(void);
 
-		public:
 			virtual void SetNameInternal(const WString& Name) override;
 
+		public:
 			virtual void Reset(void)
 			{
 				m_CurrentBuffer = m_StartBuffer;

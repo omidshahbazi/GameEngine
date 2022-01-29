@@ -54,9 +54,9 @@ namespace Engine
 
 			void SetStencilTestFunction(TestFunctions Function, int32 Reference, uint32 Mask)
 			{
+				SetStencilTestFunction(CullModes::None, Function, Reference, Mask);
 				SetStencilTestFunction(CullModes::Front, Function, Reference, Mask);
 				SetStencilTestFunction(CullModes::Back, Function, Reference, Mask);
-				SetStencilTestFunction(CullModes::Both, Function, Reference, Mask);
 			}
 
 			void SetStencilTestFunction(CullModes CullMode, TestFunctions Function, int32 Reference, uint32 Mask)
@@ -78,9 +78,9 @@ namespace Engine
 
 			void SetStencilOperation(StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
 			{
+				SetStencilOperation(CullModes::None, StencilFailed, DepthFailed, DepthPassed);
 				SetStencilOperation(CullModes::Front, StencilFailed, DepthFailed, DepthPassed);
 				SetStencilOperation(CullModes::Back, StencilFailed, DepthFailed, DepthPassed);
-				SetStencilOperation(CullModes::Both, StencilFailed, DepthFailed, DepthPassed);
 			}
 
 			void SetStencilOperation(CullModes CullMode, StencilOperations StencilFailed, StencilOperations DepthFailed, StencilOperations DepthPassed)
@@ -102,9 +102,9 @@ namespace Engine
 
 			void SetPolygonMode(PolygonModes Mode)
 			{
+				SetPolygonMode(CullModes::None, Mode);
 				SetPolygonMode(CullModes::Front, Mode);
 				SetPolygonMode(CullModes::Back, Mode);
-				SetPolygonMode(CullModes::Both, Mode);
 			}
 
 			void SetPolygonMode(CullModes CullMode, PolygonModes Mode)

@@ -50,7 +50,6 @@ namespace Engine
 				switch (CullMode)
 				{
 				case CullModes::None:
-				case CullModes::Both:
 					return D3D12_CULL_MODE_NONE;
 
 				case CullModes::Front:

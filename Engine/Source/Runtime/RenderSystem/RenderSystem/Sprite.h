@@ -15,7 +15,7 @@ namespace Engine
 		{
 			friend class DeviceInterface;
 
-		protected:
+		private:
 			Sprite(ThreadedDevice* Device, ResourceHandle Handle, Formats Format, const Vector2I& Dimension, const Vector4I& Borders);
 
 		public:

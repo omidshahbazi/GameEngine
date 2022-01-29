@@ -14,14 +14,17 @@ namespace Engine
 	{
 		class RenderTarget : public NativeType
 		{
+			friend class DeviceInterface;
+
 		public:
 			typedef Vector<Texture*> TexturesList;
 
-		public:
+		private:
 			RenderTarget(ThreadedDevice* Device, ResourceHandle Handle, const TexturesList& Textures);
 
 			virtual void SetNameInternal(const WString& Name) override;
 
+		public:
 			INLINE Texture* operator [] (uint8 Index)
 			{
 				return GetTexture(Index);

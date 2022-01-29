@@ -3,6 +3,8 @@
 #ifndef RENDER_CONTEXT_H
 #define RENDER_CONTEXT_H
 
+#include <RenderCommon\RenderCommon.h>
+
 namespace Engine
 {
 	namespace WindowUtility
@@ -10,6 +12,7 @@ namespace Engine
 		class Window;
 	}
 
+	using namespace RenderCommon;
 	using namespace WindowUtility;
 
 	namespace RenderSystem
@@ -19,11 +22,7 @@ namespace Engine
 			friend class DeviceInterface;
 
 		private:
-			RenderContext(ResourceHandle Handle, Window* Window) :
-				m_Handle(Handle),
-				m_Window(Window)
-			{
-			}
+			RenderContext(ResourceHandle Handle, Window* Window);
 
 		public:
 			Window* GetWindow(void) const

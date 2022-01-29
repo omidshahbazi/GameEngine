@@ -150,7 +150,6 @@ namespace Engine
 		{
 			CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
 			CoreDebugAssert(Categories::RenderSystem, ConstantBuffers != nullptr, "ConstantBuffers cannot be null");
-			CoreDebugAssert(Categories::RenderSystem, RenderContext != nullptr, "RenderContext cannot be null");
 
 #define SET_VIEWPORT(Position, Size) \
 			m_LastViewportPosition = Position; \
@@ -162,7 +161,10 @@ namespace Engine
 			const WString name = m_Name.ChangeType<char16>();
 
 			Vector2I m_LastViewportPosition;
-			Vector2I m_LastViewportSize = RenderContext->GetWindow()->GetClientSize();
+			Vector2I m_LastViewportSize;
+
+			if (RenderContext != nullptr)
+				m_LastViewportSize = RenderContext->GetWindow()->GetClientSize();
 
 			ICommandBuffer* currentCB = nullptr;
 
@@ -180,6 +182,7 @@ namespace Engine
 
 					NativeCommandBuffers.Add(currentCB);
 
+					//RENDERING
 					//Set prev bounded render-target
 
 					SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
@@ -193,7 +196,10 @@ namespace Engine
 					m_Buffer.Read(data);
 
 					ResourceHandle handle = 0;
-					Vector2I size = RenderContext->GetWindow()->GetClientSize();
+					Vector2I size;
+
+					if (RenderContext != nullptr)
+						size = RenderContext->GetWindow()->GetClientSize();
 
 					if (data.RenderTarget != nullptr)
 					{

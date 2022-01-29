@@ -127,9 +127,6 @@ namespace Engine
 			IDevice* m_Device;
 			ThreadedDevice* m_ThreadedDevice;
 			const RenderContext* m_LastContext;
-
-			//RENDERING
-			//Should be per context
 			FrameDataChain* m_FrameDataChain;
 
 			//RENDERING

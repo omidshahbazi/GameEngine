@@ -24,14 +24,14 @@ namespace Engine
 			{
 				CopyBuffer = 0,
 				GenerateMipMap,
-				SetProgram,
-				SetProgramConstantBuffer,
-				SetProgramTexture,
-				SetState,
 				SetRenderTarget,
 				SetViewport,
 				Clear,
 				SetMesh,
+				SetProgram,
+				SetProgramConstantBuffer,
+				SetProgramTexture,
+				SetState,
 				DrawIndexed,
 				DrawArray,
 				BeginEvent,
@@ -52,32 +52,6 @@ namespace Engine
 				TextureBufferInfo* Texture;
 			};
 
-			struct SetProgramCommandData
-			{
-			public:
-				ProgramInfo* Program;
-			};
-
-			struct SetProgramConstantBufferCommandData
-			{
-			public:
-				ProgramConstantHandle Handle;
-				BufferInfo* Value;
-			};
-
-			struct SetProgramTextureCommandData
-			{
-			public:
-				ProgramConstantHandle Handle;
-				TextureBufferInfo* Value;
-			};
-
-			struct SetStateCommandData
-			{
-			public:
-				RenderState State;
-			};
-
 			struct SetRenderTargetCommandData
 			{
 			public:
@@ -96,6 +70,32 @@ namespace Engine
 			public:
 				ClearFlags Flags;
 				ColorUI8 Color;
+			};
+
+			struct SetStateCommandData
+			{
+			public:
+				RenderState State;
+			};
+
+			struct SetProgramCommandData
+			{
+			public:
+				ProgramInfo* Program;
+			};
+
+			struct SetProgramConstantBufferCommandData
+			{
+			public:
+				ProgramConstantHandle Handle;
+				BufferInfo* Value;
+			};
+
+			struct SetProgramTextureCommandData
+			{
+			public:
+				ProgramConstantHandle Handle;
+				TextureBufferInfo* Value;
 			};
 
 			struct SetMeshCommandData

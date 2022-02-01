@@ -29,8 +29,8 @@ namespace Engine
 				bool Deinitialize(void);
 
 			private:
+				DirectX12Device* m_Device;
 				ID3D12InfoQueue* m_InfoQueue;
-				IDevice::DebugFunction m_DebugCallback;
 			};
 
 			bool RaiseDebugMessages(DirectX12DebugInfo* Info);

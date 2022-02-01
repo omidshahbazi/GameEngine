@@ -45,14 +45,14 @@ namespace Engine
 
 			virtual void GenerateMipMap(ResourceHandle Handle) = 0;
 
-			virtual void SetProgram(ResourceHandle Handle) = 0;
-			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
-			virtual void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
-			virtual void SetState(const RenderState& State) = 0;
-
 			virtual void SetRenderTarget(ResourceHandle Handle) = 0;
 			virtual void SetViewport(const Vector2I& Position, const Vector2I& Size) = 0;
 			virtual void Clear(ClearFlags Flags, const ColorUI8& Color) = 0;
+
+			virtual void SetState(const RenderState& State) = 0;
+			virtual void SetProgram(ResourceHandle Handle) = 0;
+			virtual void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
+			virtual void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) = 0;
 
 			virtual void SetMesh(ResourceHandle Handle) = 0;
 

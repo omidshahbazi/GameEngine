@@ -39,14 +39,14 @@ namespace Engine
 
 				void GenerateMipMap(ResourceHandle Handle) override;
 
-				void SetProgram(ResourceHandle Handle) override;
-				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
-				void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) override;
-				void SetState(const RenderState& State) override;
-
 				void SetRenderTarget(ResourceHandle Handle) override;
 				void SetViewport(const Vector2I& Position, const Vector2I& Size) override;
 				void Clear(ClearFlags Flags, const ColorUI8& Color) override;
+
+				void SetState(const RenderState& State) override;
+				void SetProgram(ResourceHandle Handle) override;
+				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
+				void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) override;
 
 				void SetMesh(ResourceHandle Handle) override;
 

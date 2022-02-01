@@ -7,6 +7,7 @@
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
 #include <WindowUtility\Window.h>
+//#include <Parallelizing\JobManager.h>
 
 namespace Engine
 {
@@ -15,6 +16,7 @@ namespace Engine
 	using namespace Platform;
 	using namespace RenderCommon::Private;
 	using namespace WindowUtility;
+	//using namespace Parallelizing;
 
 	namespace DirectX12RenderDevice
 	{
@@ -967,7 +969,6 @@ namespace Engine
 
 				if (Info->Indices.GetSize() != 0)
 				{
-
 					bufferSize = Helper::GetMeshIndexBufferSize(Info->Indices.GetSize());
 					if (!CHECK_CALL(m_BufferHeapAllocator.Allocate(bufferSize, state, false, &info->IndexBuffer.Resource)))
 						return false;
@@ -1040,10 +1041,9 @@ namespace Engine
 
 			bool DirectX12Device::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
 			{
-				//RENDERING
-				//TODO: must execute inside another thread
-				SubmitCommandBuffer(Buffers, Count);
+				//RunJob(Attach(&DirectX12Device::SubmitCommandBuffer, this), Buffers, Count);
 
+				//RENDERING
 				//m_AsyncCommandBuffers.Add()
 
 				return true;

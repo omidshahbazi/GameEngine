@@ -51,7 +51,7 @@ BEGIN_ENTRY_POINT
 
 	RenderManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(DeviceTypes::OpenGL);
+	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());

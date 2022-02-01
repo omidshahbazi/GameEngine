@@ -388,50 +388,6 @@ namespace Engine
 				m_Buffer.Append(data);
 			}
 
-			void OpenGLCommandBuffer::SetProgram(ResourceHandle Handle)
-			{
-				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
-
-				m_Buffer.Append(CommandTypes::SetProgram);
-
-				SetProgramCommandData data = {};
-				data.Program = ReinterpretCast(ProgramInfo*, Handle);
-
-				m_Buffer.Append(data);
-			}
-
-			void OpenGLCommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
-			{
-				m_Buffer.Append(CommandTypes::SetProgramConstantBuffer);
-
-				SetProgramConstantBufferCommandData data = {};
-				data.Handle = Handle;
-				data.Value = ReinterpretCast(BufferInfo*, Value);
-
-				m_Buffer.Append(data);
-			}
-
-			void OpenGLCommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
-			{
-				m_Buffer.Append(CommandTypes::SetProgramTexture);
-
-				SetProgramTextureCommandData data = {};
-				data.Handle = Handle;
-				data.Value = ReinterpretCast(TextureBufferInfo*, Value);
-
-				m_Buffer.Append(data);
-			}
-
-			void OpenGLCommandBuffer::SetState(const RenderState& State)
-			{
-				m_Buffer.Append(CommandTypes::SetState);
-
-				SetStateCommandData data = {};
-				data.State = State;
-
-				m_Buffer.Append(data);
-			}
-
 			void OpenGLCommandBuffer::SetRenderTarget(ResourceHandle Handle)
 			{
 				m_Buffer.Append(CommandTypes::SetRenderTarget);
@@ -463,6 +419,50 @@ namespace Engine
 				ClearCommandData data = {};
 				data.Flags = Flags;
 				data.Color = Color;
+
+				m_Buffer.Append(data);
+			}
+
+			void OpenGLCommandBuffer::SetState(const RenderState& State)
+			{
+				m_Buffer.Append(CommandTypes::SetState);
+
+				SetStateCommandData data = {};
+				data.State = State;
+
+				m_Buffer.Append(data);
+			}
+
+			void OpenGLCommandBuffer::SetProgram(ResourceHandle Handle)
+			{
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				m_Buffer.Append(CommandTypes::SetProgram);
+
+				SetProgramCommandData data = {};
+				data.Program = ReinterpretCast(ProgramInfo*, Handle);
+
+				m_Buffer.Append(data);
+			}
+
+			void OpenGLCommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
+			{
+				m_Buffer.Append(CommandTypes::SetProgramConstantBuffer);
+
+				SetProgramConstantBufferCommandData data = {};
+				data.Handle = Handle;
+				data.Value = ReinterpretCast(BufferInfo*, Value);
+
+				m_Buffer.Append(data);
+			}
+
+			void OpenGLCommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
+			{
+				m_Buffer.Append(CommandTypes::SetProgramTexture);
+
+				SetProgramTextureCommandData data = {};
+				data.Handle = Handle;
+				data.Value = ReinterpretCast(TextureBufferInfo*, Value);
 
 				m_Buffer.Append(data);
 			}
@@ -571,46 +571,39 @@ namespace Engine
 
 					} break;
 
-					case CommandTypes::SetProgram:
+					case CommandTypes::SetRenderTarget:
 					{
-						SetProgramCommandData data = {};
+						SetRenderTargetCommandData data = {};
 						m_Buffer.Read(data);
 
-						glUseProgram(data.Program->Handle);
+						ResourceHandle handle = 0;
+						if (data.RenderTarget != nullptr)
+							handle = data.RenderTarget->Handle;
+
+						glBindFramebuffer(GL_FRAMEBUFFER, handle);
 
 					} break;
 
-					case CommandTypes::SetProgramConstantBuffer:
+					case CommandTypes::SetViewport:
 					{
-						SetProgramConstantBufferCommandData data = {};
+						SetViewportCommandData data = {};
 						m_Buffer.Read(data);
 
-						uint32 valueHandle = 0;
-						if (data.Value != nullptr)
-							valueHandle = data.Value->Handle;
-
-						glBindBufferBase(GetBufferType(GPUBufferTypes::Constant), data.Handle, valueHandle);
+						glViewport(data.Position.X, data.Position.Y, data.Size.X, data.Size.Y);
 
 					} break;
 
-					case CommandTypes::SetProgramTexture:
+					case CommandTypes::Clear:
 					{
-						SetProgramTextureCommandData data = {};
+						ClearCommandData data = {};
 						m_Buffer.Read(data);
 
-						uint32 valueHandle = 0;
-						TextureTypes type = TextureTypes::TwoD;
-						if (data.Value != nullptr)
-						{
-							valueHandle = data.Value->Handle;
-							type = data.Value->TextureType;
-						}
+						Vector4F col;
+						Helper::GetNormalizedColor(data.Color, col);
 
-						glActiveTexture(GL_TEXTURE0 + data.Handle);
+						glClearColor(col.X, col.Y, col.Z, col.W);
 
-						glBindTexture(GetTextureType(type), valueHandle);
-
-						glUniform1i(data.Handle, data.Handle);
+						glClear(GetClearingFlags(data.Flags));
 
 					} break;
 
@@ -670,39 +663,46 @@ namespace Engine
 #undef SET_STATE_FOR_CULL
 					} break;
 
-					case CommandTypes::SetRenderTarget:
+					case CommandTypes::SetProgram:
 					{
-						SetRenderTargetCommandData data = {};
+						SetProgramCommandData data = {};
 						m_Buffer.Read(data);
 
-						ResourceHandle handle = 0;
-						if (data.RenderTarget != nullptr)
-							handle = data.RenderTarget->Handle;
-
-						glBindFramebuffer(GL_FRAMEBUFFER, handle);
+						glUseProgram(data.Program->Handle);
 
 					} break;
 
-					case CommandTypes::SetViewport:
+					case CommandTypes::SetProgramConstantBuffer:
 					{
-						SetViewportCommandData data = {};
+						SetProgramConstantBufferCommandData data = {};
 						m_Buffer.Read(data);
 
-						glViewport(data.Position.X, data.Position.Y, data.Size.X, data.Size.Y);
+						uint32 valueHandle = 0;
+						if (data.Value != nullptr)
+							valueHandle = data.Value->Handle;
+
+						glBindBufferBase(GetBufferType(GPUBufferTypes::Constant), data.Handle, valueHandle);
 
 					} break;
 
-					case CommandTypes::Clear:
+					case CommandTypes::SetProgramTexture:
 					{
-						ClearCommandData data = {};
+						SetProgramTextureCommandData data = {};
 						m_Buffer.Read(data);
 
-						Vector4F col;
-						Helper::GetNormalizedColor(data.Color, col);
+						uint32 valueHandle = 0;
+						TextureTypes type = TextureTypes::TwoD;
+						if (data.Value != nullptr)
+						{
+							valueHandle = data.Value->Handle;
+							type = data.Value->TextureType;
+						}
 
-						glClearColor(col.X, col.Y, col.Z, col.W);
+						glActiveTexture(GL_TEXTURE0 + data.Handle);
 
-						glClear(GetClearingFlags(data.Flags));
+						glBindTexture(GetTextureType(type), valueHandle);
+
+						glUniform1i(data.Handle, data.Handle);
 
 					} break;
 

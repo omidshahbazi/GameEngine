@@ -11,19 +11,16 @@ namespace Engine
 			SINGLETON_DEFINITION(DirectX12DebugInfo);
 
 			DirectX12DebugInfo::DirectX12DebugInfo(void) :
-				m_InfoQueue(nullptr),
-				m_DebugCallback(nullptr)
+				m_Device(nullptr),
+				m_InfoQueue(nullptr)
 			{
 			}
 
 			bool DirectX12DebugInfo::Initialize(DirectX12Device* Device)
 			{
-				if (!DirectX12Wrapper::Debugging::GetInfoQueue(Device->GetDevice(), &m_InfoQueue))
-					return false;
+				m_Device = Device;
 
-				m_DebugCallback = Device->GetDebugCallback();
-
-				return true;
+				return DirectX12Wrapper::Debugging::GetInfoQueue(Device->GetDevice(), &m_InfoQueue);
 			}
 
 			bool DirectX12DebugInfo::Deinitialize(void)
@@ -33,7 +30,7 @@ namespace Engine
 
 			bool RaiseDebugMessages(DirectX12DebugInfo* Info)
 			{
-				IDevice::DebugFunction procedure = Info->m_DebugCallback;
+				IDevice::DebugFunction procedure = Info->m_Device->GetDebugCallback();
 				if (procedure == nullptr)
 					return true;
 

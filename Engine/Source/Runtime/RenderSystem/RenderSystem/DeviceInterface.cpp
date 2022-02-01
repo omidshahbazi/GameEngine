@@ -106,10 +106,6 @@ namespace Engine
 			{
 				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)
 				{
-					static int counter = 0;
-
-					++counter;
-
 					StringStream stream;
 					stream << "In [";
 
@@ -142,6 +138,9 @@ namespace Engine
 					case IDevice::DebugSeverities::Medium: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
 					case IDevice::DebugSeverities::High: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
 					}
+
+					printf(stream.GetBuffer());
+					printf("\n");
 				};
 
 				CHECK_CALL_STRONG(m_ThreadedDevice->SetDebugCallback(debugCallback));

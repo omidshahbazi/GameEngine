@@ -1106,7 +1106,7 @@ namespace Engine
 
 			bool DirectX12Device::WaitForAsyncCommandBuffers(void)
 			{
-				return false;
+				return true;
 			}
 
 			bool DirectX12Device::CreateBufferInternal(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, BufferInfo* Buffer)

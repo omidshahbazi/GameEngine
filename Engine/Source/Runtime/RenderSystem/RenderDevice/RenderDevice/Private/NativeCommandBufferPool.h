@@ -66,12 +66,12 @@ namespace Engine
 					{
 						commandBuffer = RenderSystemAllocators::ResourceAllocator_Allocate<NativeCommandBufferType>();
 						Construct(commandBuffer, Device, Type);
-
-						return commandBuffer;
 					}
-
-					stack.Pop(&commandBuffer);
-					commandBuffer->Clear();
+					else
+					{
+						stack.Pop(&commandBuffer);
+						commandBuffer->Clear();
+					}
 
 					return commandBuffer;
 				}

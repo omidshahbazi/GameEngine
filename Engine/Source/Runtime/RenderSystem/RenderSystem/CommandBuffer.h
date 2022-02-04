@@ -56,9 +56,9 @@ namespace Engine
 				m_Name = Name;
 			}
 
-			INLINE void Clear(void)
+			void Clear(void)
 			{
-				return m_Buffer.Clear();
+				m_Buffer.Clear();
 			}
 
 			INLINE uint32 GetSize(void)
@@ -81,11 +81,10 @@ namespace Engine
 			void SetMarker(const String& Label);
 			void SetMarker(const WString& Label);
 
-			//RENDERING
-			//public GPUFence CreateGPUFence();
-			//Blit
-			//copy texture
-			//Dispatch Compute
+			//CreateGPUFence
+			//BlitTexture
+			//CopyTexture
+			//Dispatch
 
 		private:
 			void PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);

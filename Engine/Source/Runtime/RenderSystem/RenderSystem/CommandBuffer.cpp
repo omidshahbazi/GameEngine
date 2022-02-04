@@ -28,6 +28,7 @@ namespace Engine
 			m_Name(Name),
 			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
+			Clear();
 		}
 
 		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
@@ -151,15 +152,20 @@ namespace Engine
 			CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
 			CoreDebugAssert(Categories::RenderSystem, ConstantBuffers != nullptr, "ConstantBuffers cannot be null");
 
+#define SET_RENDER_TARGET(RenderTarget) \
+			m_LastRenderTarget = RenderTarget; \
+			currentCB->SetRenderTarget(m_LastRenderTarget);
+
 #define SET_VIEWPORT(Position, Size) \
 			m_LastViewportPosition = Position; \
 			m_LastViewportSize = Size; \
-			currentCB->SetViewport(Position, Size);
+			currentCB->SetViewport(m_LastViewportPosition, m_LastViewportSize);
 
 			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
 
 			const WString name = m_Name.ChangeType<char16>();
 
+			ResourceHandle m_LastRenderTarget = 0;
 			Vector2I m_LastViewportPosition;
 			Vector2I m_LastViewportSize;
 
@@ -182,9 +188,7 @@ namespace Engine
 
 					NativeCommandBuffers.Add(currentCB);
 
-					//RENDERING
-					//Set prev bounded render-target
-
+					SET_RENDER_TARGET(m_LastRenderTarget);
 					SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
 				}
 
@@ -207,8 +211,7 @@ namespace Engine
 						size = data.RenderTarget->GetTexture(0)->GetDimension();
 					}
 
-					currentCB->SetRenderTarget(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
-
+					SET_RENDER_TARGET(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
 					SET_VIEWPORT(Vector2I::Zero, size);
 				} break;
 

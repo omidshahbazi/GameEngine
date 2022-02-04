@@ -23,6 +23,7 @@ namespace Engine
 			public:
 				ID3D12RootSignature* RootSignature;
 				Map<uint32, ID3D12PipelineState*> Pipelines;
+				WString PipelineName;
 			};
 
 			struct ResourceInfo

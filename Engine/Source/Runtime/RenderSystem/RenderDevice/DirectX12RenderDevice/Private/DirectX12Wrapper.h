@@ -673,10 +673,10 @@ namespace Engine
 					{
 						D3D12_RESOURCE_DESC desc = Source->GetDesc();
 
-						D3D12_TEXTURE_COPY_LOCATION srceLoc = {};
-						srceLoc.pResource = Source;
-						srceLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-						srceLoc.SubresourceIndex = 0;
+						D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
+						srcLoc.pResource = Source;
+						srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+						srcLoc.SubresourceIndex = 0;
 
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
 						destLoc.pResource = Destination;
@@ -688,21 +688,21 @@ namespace Engine
 						Support::GetCopyableFootprint(device, Source, &destLoc.PlacedFootprint);
 						ReleaseInstance(device);
 
-						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
+						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srcLoc, nullptr);
 					}
 
 					INLINE static void AddCopyBufferToTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Destination->GetDesc();
 
-						D3D12_TEXTURE_COPY_LOCATION srceLoc = {};
-						srceLoc.pResource = Source;
-						srceLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+						D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
+						srcLoc.pResource = Source;
+						srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
 
 						ID3D12Device5* device = nullptr;
 						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
 							return;
-						Support::GetCopyableFootprint(device, Destination, &srceLoc.PlacedFootprint);
+						Support::GetCopyableFootprint(device, Destination, &srcLoc.PlacedFootprint);
 						ReleaseInstance(device);
 
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
@@ -710,7 +710,7 @@ namespace Engine
 						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
 						destLoc.SubresourceIndex = 0;
 
-						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srceLoc, nullptr);
+						CommandList->CopyTextureRegion(&destLoc, 0, 0, 0, &srcLoc, nullptr);
 					}
 
 					INLINE static void AddSetViewportCommand(ID3D12GraphicsCommandList4* CommandList, const D3D12_VIEWPORT* Viewport)

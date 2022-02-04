@@ -1067,9 +1067,7 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(programInfos->RootSignature, (tempName + L"_RootSignature").GetValue())))
 						return false;
 
-					for (auto& item : programInfos->Pipelines)
-						if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(item.GetSecond(), (tempName + L"_Pipeline").GetValue())))
-							return false;
+					programInfos->PipelineName = tempName;
 				}
 				else if (Type == ResourceTypes::Mesh)
 				{

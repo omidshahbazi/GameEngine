@@ -488,6 +488,9 @@ namespace Engine
 						CHECK_CALL(DirectX12Wrapper::PipelineStateObject::Create(m_NativeDevice, &desc, &pipelineState));
 					}
 
+					if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(pipelineState, programInfos->PipelineName.GetValue())))
+						return;
+
 					programInfos->Pipelines[stateHash] = pipelineState;
 				}
 

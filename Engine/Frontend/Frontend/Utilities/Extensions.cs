@@ -13,7 +13,7 @@ namespace Engine.Frontend.Utilities
 	{
 		public static string ToHHMMSS(this TimeSpan a)
 		{
-			return a.ToString(@"hh\:mm\:ss");
+			return $"{a.Minutes.ToString("D2")}:{a.Seconds.ToString("D2")}";
 		}
 
 		public static void AppendIndent(this StringBuilder Builder, uint Indent = 0)

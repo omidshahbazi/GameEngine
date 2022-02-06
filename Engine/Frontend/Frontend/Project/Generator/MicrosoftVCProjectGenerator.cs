@@ -16,7 +16,8 @@ namespace Engine.Frontend.Project.Generator
 		{
 			v14_0,
 			v14_1,
-			v14_2
+			v14_2,
+			v14_3
 		}
 
 		public ToolsVersions ToolsVersion

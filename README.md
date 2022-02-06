@@ -1,6 +1,6 @@
 # Game Engine
 
-This is an experimental open-source game engine. It wrote from scratch purpose to be cross-platform.
+This is an experimental open-source game engine from scratch. It's still under development and gonna be a cross-plaform engine.
 
 ## Project Showcase
 

@@ -61,7 +61,7 @@ namespace Engine.Frontend.System.Build
 			CSProject csproj = new CSProject();
 			CSProject.Profile profile = (CSProject.Profile)csproj.CreateProfile();
 
-			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v4_5;
+			profile.FrameworkVersion = CSProject.Profile.FrameworkVersions.v3_5;
 			profile.AssemblyName = ModuleName;
 			profile.OutputPath = IntermediateOutputPath;
 			profile.IntermediateDirectory = ModuleName.GetIntermediateDirectory();

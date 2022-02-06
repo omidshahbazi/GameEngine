@@ -67,6 +67,7 @@ namespace Engine.Frontend.System.Compile
 				//Visual Studio 2015 - 14.0
 				//Visual Studio 2017 - 15.0
 				//Visual Studio 2019 - 16.0
+				//Visual Studio 2022 - 17.0
 
 				const string VS_WHERE_PATH = "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe";
 
@@ -108,6 +109,10 @@ namespace Engine.Frontend.System.Compile
 
 					case 16:
 						ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_2;
+						break;
+
+					case 17:
+						ToolsVersion = MicrosoftVCProjectGenerator.ToolsVersions.v14_3;
 						break;
 
 					default:

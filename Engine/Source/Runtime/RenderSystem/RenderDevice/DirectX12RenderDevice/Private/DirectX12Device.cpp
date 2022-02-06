@@ -514,6 +514,7 @@ namespace Engine
 				RenderContextInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
 				PlatformMemory::Set(info, 0, 1);
 
+				info->WindowHandle = WindowHandle;
 				info->Queue = queue;
 				info->SwapChain = swapChain;
 				info->BackBufferCount = BACK_BUFFER_COUNT;
@@ -579,8 +580,9 @@ namespace Engine
 
 				RenderContextInfo* info = m_Contexts[Handle];
 
-				Window* window = ReinterpretCast(Window*, Handle);
-				if (!UpdateSwapChainBufferSize(info, window->GetClientSize()))
+				uint16 width, height;
+				PlatformWindow::GetClientSize(info->WindowHandle, width, height);
+				if (!UpdateSwapChainBufferSize(info, Vector2I(width, height)))
 					return false;
 
 				m_CurrentContextHandle = Handle;

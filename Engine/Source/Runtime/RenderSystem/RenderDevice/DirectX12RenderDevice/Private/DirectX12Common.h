@@ -91,6 +91,7 @@ namespace Engine
 					return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
 				}
 
+				PlatformWindow::WindowHandle WindowHandle;
 				ID3D12CommandQueue* Queue;
 				IDXGISwapChain4* SwapChain;
 

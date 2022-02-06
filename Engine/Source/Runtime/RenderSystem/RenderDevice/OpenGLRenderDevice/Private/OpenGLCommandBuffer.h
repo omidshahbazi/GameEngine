@@ -44,6 +44,7 @@ namespace Engine
 				void Clear(ClearFlags Flags, const ColorUI8& Color) override;
 
 				void SetState(const RenderState& State) override;
+
 				void SetProgram(ResourceHandle Handle) override;
 				void SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value) override;
 				void SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value) override;

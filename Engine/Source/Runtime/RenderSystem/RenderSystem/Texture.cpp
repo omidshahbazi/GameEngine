@@ -82,7 +82,7 @@ namespace Engine
 
 		void Texture::GenerateBuffer(void)
 		{
-			const uint32 bufferSize = GetBufferSize();
+			const uint32 bufferSize = GetBufferSize() * 2;//RENDERING
 			if (bufferSize == 0)
 				return;
 

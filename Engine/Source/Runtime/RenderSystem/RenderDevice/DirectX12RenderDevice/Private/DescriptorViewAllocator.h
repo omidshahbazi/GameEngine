@@ -30,7 +30,8 @@ namespace Engine
 				if (result) \
 				{ \
 					info->AllocatedStatus[index] = true; \
-					Handle->GPUHandle.ptr = info->DescriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + increment; \
+					if (info->IsShaderVisible) \
+						Handle->GPUHandle.ptr = info->DescriptorHeap->GetGPUDescriptorHandleForHeapStart().ptr + increment; \
 				} \
 				return result;
 
@@ -41,9 +42,10 @@ namespace Engine
 				{
 				public:
 					ID3D12DescriptorHeap* DescriptorHeap;
+					bool IsShaderVisible;
 					bool* AllocatedStatus;
-					D3D12_GPU_DESCRIPTOR_HANDLE StartHandle;
-					D3D12_GPU_DESCRIPTOR_HANDLE EndHandle;
+					//D3D12_GPU_DESCRIPTOR_HANDLE StartHandle;
+					//D3D12_GPU_DESCRIPTOR_HANDLE EndHandle;
 				};
 
 			public:
@@ -221,8 +223,10 @@ namespace Engine
 					if (!DirectX12Wrapper::Resource::CreateDescriptorHeap(m_Device, m_Type, descriptorCount, m_Flags, &info.DescriptorHeap))
 						return false;
 
-					info.StartHandle = info.DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
-					info.EndHandle.ptr = info.StartHandle.ptr + (descriptorCount * m_HandleIncrementSize);
+					info.IsShaderVisible = BitwiseUtils::IsEnabled(m_Flags, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+					//RENDERING
+					//info.StartHandle = info.DescriptorHeap->GetGPUDescriptorHandleForHeapStart();
+					//info.EndHandle.ptr = info.StartHandle.ptr + (descriptorCount * m_HandleIncrementSize);
 
 					info.AllocatedStatus = RenderSystemAllocators::RenderSystemAllocator_AllocateArray<bool>(descriptorCount);
 					PlatformMemory::Set(info.AllocatedStatus, 0, descriptorCount);

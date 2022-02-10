@@ -11,15 +11,15 @@ namespace Engine
 		namespace Private
 		{
 #define FILL_RENDER_VIEWS_USING_CONTEXT() \
+			{ \
+				auto currentContex = m_Device->GetCurrentContext(); \
+				if (currentContex != nullptr && currentContex->Initialized) \
 				{ \
-					auto currentContex = m_Device->GetCurrentContext(); \
-					if (currentContex != nullptr && currentContex->Initialized) \
-					{ \
-						m_CurrentRenderTargetViews[0] = currentContex->GetRenderTargetViews(); \
-						m_CurrentRenderTargetViewCount = 1; \
-						m_CurrentDepthStencilView = currentContex->GetDepthStencilViews(); \
-					} \
-				}
+					m_CurrentRenderTargetViews[0] = currentContex->GetRenderTargetViews(); \
+					m_CurrentRenderTargetViewCount = 1; \
+					m_CurrentDepthStencilView = currentContex->GetDepthStencilViews(); \
+				} \
+			}
 
 #ifdef DEBUG_MODE
 #define ADD_TRANSITION_STATE(Info, AfterState) \
@@ -216,7 +216,6 @@ namespace Engine
 				m_FenceEvent(0),
 				m_InputLayout(Device->GetInputLayout()),
 				m_InputLayoutCount(Device->GetInputLayoutCount()),
-				m_CurrentRenderTarget(nullptr),
 				m_CurrentRenderTargetViewCount(0),
 				m_CurrentDepthStencilView(nullptr),
 				m_CurrentDescriptorHeapCount(0)
@@ -325,8 +324,8 @@ namespace Engine
 						type = GPUBufferTypes::Index;
 				}
 
-				D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
-				D3D12_RESOURCE_STATES destinationState = destInfo->State;
+				//D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
+				//D3D12_RESOURCE_STATES destinationState = destInfo->State;
 
 				ADD_TRANSITION_STATE(sourceInfo, D3D12_RESOURCE_STATE_COPY_SOURCE);
 				ADD_TRANSITION_STATE(destInfo, D3D12_RESOURCE_STATE_COPY_DEST);
@@ -343,8 +342,36 @@ namespace Engine
 						DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_List, sourceInfo->Resource.Resource, destInfo->Resource.Resource);
 				}
 
-				ADD_TRANSITION_STATE(sourceInfo, sourceState);
-				ADD_TRANSITION_STATE(destInfo, destinationState);
+				//ADD_TRANSITION_STATE(sourceInfo, sourceState);
+				//ADD_TRANSITION_STATE(destInfo, destinationState);
+			}
+
+			void DirectX12CommandBuffer::CopyTexture(ResourceHandle SourceHandle, const Vector2I& SourcePosition, ResourceHandle DestinationHandle, const Vector2I& DestinationPosition, const Vector2I& Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
+				CoreDebugAssert(Categories::RenderSystem, SourceHandle != 0, "SourceHandle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, SourcePosition >= Vector2I::Zero, "SourcePosition is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationHandle != 0, "DestinationHandle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationPosition >= Vector2I::Zero, "SourcePosition is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Size > Vector2I::Zero, "Size is invalid");
+
+				TextureResourceInfo* sourceInfo = ReinterpretCast(TextureResourceInfo*, SourceHandle);
+				TextureResourceInfo* destInfo = ReinterpretCast(TextureResourceInfo*, DestinationHandle);
+
+				CoreDebugAssert(Categories::RenderSystem, sourceInfo->Format != destInfo->Format, "Texture formats are not the same");
+				CoreDebugAssert(Categories::RenderSystem, SourcePosition + Size <= Vector2I(sourceInfo->Width, sourceInfo->Height), "SourcePosition+Size is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationPosition + Size <= Vector2I(destInfo->Width, destInfo->Height), "DestinationPosition+Size is invalid");
+
+				//D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
+				//D3D12_RESOURCE_STATES destinationState = destInfo->State;
+
+				ADD_TRANSITION_STATE(sourceInfo, D3D12_RESOURCE_STATE_COPY_SOURCE);
+				ADD_TRANSITION_STATE(destInfo, D3D12_RESOURCE_STATE_COPY_DEST);
+
+				DirectX12Wrapper::Command::AddCopyTextureCommand(m_List, sourceInfo->Resource.Resource, SourcePosition.X, SourcePosition.Y, destInfo->Resource.Resource, DestinationPosition.X, DestinationPosition.Y, Size.X, Size.Y);
+
+				//ADD_TRANSITION_STATE(sourceInfo, sourceState);
+				//ADD_TRANSITION_STATE(destInfo, destinationState);
 			}
 
 			void DirectX12CommandBuffer::GenerateMipMap(ResourceHandle Handle)
@@ -367,9 +394,9 @@ namespace Engine
 				}
 				else
 				{
-					m_CurrentRenderTarget = ReinterpretCast(RenderTargetInfos*, Handle);
+					RenderTargetInfos* renderTarget = ReinterpretCast(RenderTargetInfos*, Handle);
 
-					for (auto& viewInfo : m_CurrentRenderTarget->Views)
+					for (auto& viewInfo : renderTarget->Views)
 					{
 						uint8 colorPointIndex = (uint8)viewInfo.Point - (uint8)AttachmentPoints::Color0;
 

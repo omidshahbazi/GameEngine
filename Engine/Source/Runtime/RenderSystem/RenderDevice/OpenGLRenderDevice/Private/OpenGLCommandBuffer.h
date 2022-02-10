@@ -36,6 +36,7 @@ namespace Engine
 				}
 
 				void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) override;
+				void CopyTexture(ResourceHandle SourceHandle, const Vector2I& SourcePosition, ResourceHandle DestinationHandle, const Vector2I& DestinationPosition, const Vector2I& Size) override;
 
 				void GenerateMipMap(ResourceHandle Handle) override;
 

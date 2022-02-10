@@ -23,6 +23,7 @@ namespace Engine
 			enum class CommandTypes
 			{
 				CopyBuffer = 0,
+				CopyTexture,
 				GenerateMipMap,
 				SetRenderTarget,
 				SetViewport,
@@ -42,8 +43,18 @@ namespace Engine
 			struct CopyBufferCommandData
 			{
 			public:
-				ResourceHandle Source;
-				ResourceHandle Destination;
+				BufferInfo* Source;
+				BufferInfo* Destination;
+			};
+
+			struct CopyTextureCommandData
+			{
+			public:
+				TextureBufferInfo* Source;
+				Vector2I SourcePosition;
+				TextureBufferInfo* Destination;
+				Vector2I DestinationPosition;
+				Vector2I Size;
 			};
 
 			struct GenerateMipMapCommandData

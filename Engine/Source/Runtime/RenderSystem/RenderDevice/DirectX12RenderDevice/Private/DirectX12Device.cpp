@@ -503,19 +503,17 @@ namespace Engine
 					if (item.GetFirst() == (ResourceHandle)WindowHandle)
 						return false;
 
-				ID3D12CommandQueue* queue = nullptr;
-				if (!CHECK_CALL(DirectX12Wrapper::Command::CreateCommandQueue(m_Device, D3D12_COMMAND_LIST_TYPE_DIRECT, &queue)))
-					return false;
+				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get(this, ICommandBuffer::Types::Graphics);
 
 				IDXGISwapChain4* swapChain = nullptr;
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, queue, BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, commandBuffer->GetQueue(), BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
 					return false;
 
 				RenderContextInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
 				PlatformMemory::Set(info, 0, 1);
 
 				info->WindowHandle = WindowHandle;
-				info->Queue = queue;
+				info->CommandBuffer = commandBuffer;
 				info->SwapChain = swapChain;
 				info->BackBufferCount = BACK_BUFFER_COUNT;
 
@@ -548,8 +546,7 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->SwapChain)))
 					return false;
 
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(info->Queue)))
-					return false;
+				m_CommandBufferPool.Back(info->CommandBuffer);
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(info);
 
@@ -582,8 +579,10 @@ namespace Engine
 
 				uint16 width, height;
 				PlatformWindow::GetClientSize(info->WindowHandle, width, height);
-				if (!UpdateSwapChainBufferSize(info, Vector2I(width, height)))
-					return false;
+
+				if (!info->Initialized || info->Size.X != width || info->Size.Y != height)
+					if (!UpdateSwapChainBufferSize(info, Vector2I(width, height)))
+						return false;
 
 				m_CurrentContextHandle = Handle;
 				m_CurrentContext = info;
@@ -745,17 +744,19 @@ namespace Engine
 			{
 				D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
 
-				DXGI_FORMAT format = GetTextureFormat(Info->Format);
 				D3D12_RESOURCE_DIMENSION dimension = GetTextureType(Info->Type);
 
 				TextureResourceInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<TextureResourceInfo>();
 				INITIALIZE_RESOURCE_INFO(info, state);
 				info->Type = GPUBufferTypes::Pixel;
 				info->IsIntermediate = false;
+				info->Format = GetTextureFormat(Info->Format);
+				info->Width = Info->Dimension.X;
+				info->Height = Info->Dimension.Y;
 
 				if (Info->Type == TextureTypes::TwoD)
 				{
-					if (!CHECK_CALL(m_TextureHeapAllocator.Allocate(Info->Dimension.X, Info->Dimension.Y, format, dimension, state, false, &info->Resource)))
+					if (!CHECK_CALL(m_TextureHeapAllocator.Allocate(Info->Dimension.X, Info->Dimension.Y, info->Format, dimension, state, false, &info->Resource)))
 						return false;
 				}
 				else
@@ -781,7 +782,7 @@ namespace Engine
 					END_UPLOAD(info);
 				}
 
-				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(info->Resource.Resource, format, dimension, &info->View)))
+				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(info->Resource.Resource, info->Format, dimension, &info->View)))
 					return false;
 
 				Handle = (ResourceHandle)info;
@@ -873,6 +874,8 @@ namespace Engine
 								return false; \
 							view->Point = textureInfo.Point; \
 							view->Format = format; \
+							view->Width = textureInfo.Dimension.X; \
+							view->Height = textureInfo.Dimension.Y; \
 							if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(view->Resource.Resource, GetShaderResourceViewFormat(textureInfo.Format), D3D12_RESOURCE_DIMENSION_TEXTURE2D, &view->View))) \
 								return false; \
 							if (IsColored) \
@@ -1133,9 +1136,6 @@ namespace Engine
 
 			bool DirectX12Device::UpdateSwapChainBufferSize(RenderContextInfo* Info, const Vector2I& Size)
 			{
-				if (Info->Initialized && Info->Size == Size)
-					return true;
-
 				if (!WaitForAsyncCommandBuffers())
 					return false;
 
@@ -1159,7 +1159,7 @@ namespace Engine
 
 				for (uint8 i = 0; i < Info->BackBufferCount; ++i)
 				{
-					ViewInfo& renderTargetView = Info->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+					ViewInfo& renderTargetView = Info->ViewsSWAPCHAIN[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
 					INITIALIZE_RESOURCE_INFO(&renderTargetView, D3D12_RESOURCE_STATE_PRESENT);
 					renderTargetView.Resource.Resource = backBuffers[i];
 
@@ -1168,7 +1168,7 @@ namespace Engine
 					if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetView.Resource.Resource, &renderTargetView.TargetView)))
 						return false;
 
-					ViewInfo& depthStencilView = Info->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
+					ViewInfo& depthStencilView = Info->ViewsSWAPCHAIN[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
 					INITIALIZE_RESOURCE_INFO(&depthStencilView, depthStencilBufferState);
 					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(Info->Size.X, Info->Size.Y, depthStencilFormat, false, depthStencilBufferState, false, &depthStencilView.Resource)))
 						return false;
@@ -1178,6 +1178,30 @@ namespace Engine
 					if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(depthStencilView.Resource.Resource, depthStencilFormat, D3D12_DSV_FLAG_NONE, &depthStencilView.TargetView)))
 						return false;
 				}
+
+				DXGI_FORMAT format = Info->ViewsSWAPCHAIN[0][RenderContextInfo::RENDER_TARGET_VIEW_INDEX].Format;
+				ViewInfo* view = &Info->Views[RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+				INITIALIZE_RESOURCE_INFO(view, D3D12_RESOURCE_STATE_COMMON);
+				view->Type = GPUBufferTypes::Pixel;
+				view->IsIntermediate = false;
+				if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(textureInfo.Dimension.X, textureInfo.Dimension.Y, format, IsColored, CurrnetState, false, &view->Resource)))
+					return false;
+				if (!AllocateSampler(view))
+					return false;
+				view->Point = textureInfo.Point;
+				view->Format = format;
+				view->Width = textureinf
+					view->Height = textureinf
+				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(view->Resource.Resource, GetShaderResourceViewFormat(textureInfo.Format), D3D12_RESOURCE_DIMENSION_TEXTURE2D, &view->View)))
+					return false;
+				if (IsColored)
+				{
+					if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(view->Resource.Resource, &view->TargetView)))
+						return false;
+				}
+				else if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(view->Resource.Resource, format, D3D12_DSV_FLAG_NONE, &view->TargetView)))
+					return false;
+				Textures.Add((ResourceHandle)ReinterpretCast(TextureResourceInfo*, view));
 
 				Info->CurrentBackBufferIndex = 0;
 				Info->Initialized = true;
@@ -1192,7 +1216,7 @@ namespace Engine
 
 				for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
 				{
-					ViewInfo& renderTargetView = ContextInfo->Views[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+					ViewInfo& renderTargetView = ContextInfo->ViewsSWAPCHAIN[i][RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
 
 					if (!DirectX12Wrapper::ReleaseInstance(renderTargetView.Resource.Resource))
 						return false;
@@ -1200,7 +1224,7 @@ namespace Engine
 					if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(renderTargetView.TargetView)))
 						return false;
 
-					ViewInfo& depthStencilView = ContextInfo->Views[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
+					ViewInfo& depthStencilView = ContextInfo->ViewsSWAPCHAIN[i][RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
 					if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView(depthStencilView.TargetView)))
 						return false;
 

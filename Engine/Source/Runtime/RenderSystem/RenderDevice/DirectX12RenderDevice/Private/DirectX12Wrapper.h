@@ -669,6 +669,36 @@ namespace Engine
 						CommandList->CopyBufferRegion(Destination, 0, Source, 0, Size);
 					}
 
+					INLINE static void AddCopyTextureCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, uint32 SourcePositionX, uint32 SourcePositionY, ID3D12Resource1* Destination, uint32 DestinationPositionX, uint32 DestinationPositionY, uint32 Width, uint32 Height)
+					{
+						D3D12_RESOURCE_DESC desc = Source->GetDesc();
+
+						D3D12_TEXTURE_COPY_LOCATION srcLoc = {};
+						srcLoc.pResource = Source;
+						srcLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+						srcLoc.SubresourceIndex = 0;
+
+						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
+						destLoc.pResource = Destination;
+						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
+
+						ID3D12Device5* device = nullptr;
+						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
+							return;
+						Support::GetCopyableFootprint(device, Source, &destLoc.PlacedFootprint);
+						ReleaseInstance(device);
+
+						D3D12_BOX sourceRegion;
+						sourceRegion.left = SourcePositionX;
+						sourceRegion.top = SourcePositionY;
+						sourceRegion.right = SourcePositionX + Width;
+						sourceRegion.bottom = SourcePositionY + Height;
+						sourceRegion.front = 0;
+						sourceRegion.back = 1;
+
+						CommandList->CopyTextureRegion(&destLoc, DestinationPositionX, DestinationPositionY, 0, &srcLoc, &sourceRegion);
+					}
+
 					INLINE static void AddCopyTextureToBufferCommand(ID3D12GraphicsCommandList4* CommandList, ID3D12Resource1* Source, ID3D12Resource1* Destination)
 					{
 						D3D12_RESOURCE_DESC desc = Source->GetDesc();

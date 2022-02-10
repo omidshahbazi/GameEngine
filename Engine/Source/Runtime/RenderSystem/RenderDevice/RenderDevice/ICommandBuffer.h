@@ -42,6 +42,7 @@ namespace Engine
 			virtual void Clear(void) = 0;
 
 			virtual void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) = 0;
+			virtual void CopyTexture(ResourceHandle SourceHandle, const Vector2I& SourcePosition, ResourceHandle DestinationHandle, const Vector2I& DestinationPosition, const Vector2I& Size) = 0;
 
 			virtual void GenerateMipMap(ResourceHandle Handle) = 0;
 

@@ -18,6 +18,8 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class DirectX12CommandBuffer;
+
 			struct ProgramInfos : public IDevice::CompiledShaders
 			{
 			public:
@@ -48,6 +50,9 @@ namespace Engine
 			public:
 				D3D12_SAMPLER_DESC SamplerDescription;
 				DescriptorViewAllocator::ViewHandle SamplerView;
+				DXGI_FORMAT Format;
+				uint32 Width;
+				uint32 Height;
 			};
 
 			struct ViewInfo : public TextureResourceInfo
@@ -55,7 +60,6 @@ namespace Engine
 			public:
 				DescriptorViewAllocator::ViewHandle TargetView;
 				AttachmentPoints Point;
-				DXGI_FORMAT Format;
 			};
 
 			struct RenderTargetInfos
@@ -83,22 +87,26 @@ namespace Engine
 			public:
 				INLINE ViewInfo* GetRenderTargetViews(void)
 				{
-					return &Views[CurrentBackBufferIndex][RENDER_TARGET_VIEW_INDEX];
+					//return &Views[CurrentBackBufferIndex][RENDER_TARGET_VIEW_INDEX];
+					return &Views[RENDER_TARGET_VIEW_INDEX];
 				}
 
 				INLINE ViewInfo* GetDepthStencilViews(void)
 				{
-					return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
+					//return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
+					return &Views[DEPTH_STENCIL_VIEW_INDEX];
 				}
 
 				PlatformWindow::WindowHandle WindowHandle;
-				ID3D12CommandQueue* Queue;
+				DirectX12CommandBuffer* CommandBuffer;
 				IDXGISwapChain4* SwapChain;
 
-				ViewInfo Views[MAX_BACK_BUFFER_COUNT][2];
+				bool Initialized;
+
+				ViewInfo ViewsSWAPCHAIN[MAX_BACK_BUFFER_COUNT][2];
 				uint8 BackBufferCount;
 				uint8 CurrentBackBufferIndex;
-				bool Initialized;
+				ViewInfo Views[2];
 				Vector2I Size;
 			};
 

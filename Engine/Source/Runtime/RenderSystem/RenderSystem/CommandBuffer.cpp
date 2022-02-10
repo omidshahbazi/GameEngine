@@ -28,7 +28,68 @@ namespace Engine
 			m_Name(Name),
 			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
-			Clear();
+		}
+
+		bool CommandBuffer::CopyTexture(const Texture* Source, const Texture* Destination)
+		{
+			if (Source == nullptr)
+				return false;
+
+			return CopyTexture(Source, Vector2I::Zero, Destination, Vector2I::Zero, Source->GetDimension());
+		}
+
+		bool CommandBuffer::CopyTexture(const Texture* Source, const Texture* Destination, const Vector2I& Position, const Vector2I& Size)
+		{
+			return CopyTexture(Source, Position, Destination, Position, Size);
+		}
+
+		bool CommandBuffer::CopyTexture(const Texture* Source, const Vector2I& SourcePosition, const Texture* Destination, const Vector2I& DestinationPosition, const Vector2I& Size)
+		{
+			if (Source == nullptr)
+				return false;
+
+			if (SourcePosition < Vector2I::Zero)
+				return false;
+
+			if (Destination == nullptr)
+				return false;
+
+			if (DestinationPosition < Vector2I::Zero)
+				return false;
+
+			if (Size <= Vector2I::Zero)
+				return false;
+
+			if (Source->GetFormat() != Destination->GetFormat())
+				return false;
+
+			m_Buffer.Append(CommandTypes::CopyTexture);
+
+			CopyTextureCommandData data = {};
+			data.Source = ConstCast(Texture*, Source);
+			data.SourcePosition = SourcePosition;
+			data.Destination = ConstCast(Texture*, Destination);
+			data.DestinationPosition = DestinationPosition;
+			data.Size = Size;
+
+			m_Buffer.Append(data);
+
+			return true;
+		}
+
+		bool CommandBuffer::GenerateMipMap(const Texture* Texture)
+		{
+			if (Texture == nullptr)
+				return false;
+
+			m_Buffer.Append(CommandTypes::GenerateMipMap);
+
+			GenerateMipMapCommandData data = {};
+			data.Texture = ConstCast(RenderSystem::Texture*, Texture);
+
+			m_Buffer.Append(data);
+
+			return true;
 		}
 
 		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
@@ -161,7 +222,18 @@ namespace Engine
 			m_LastViewportSize = Size; \
 			currentCB->SetViewport(m_LastViewportPosition, m_LastViewportSize);
 
-			static const ICommandBuffer::Types TypePerCommand[] = { ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics, ICommandBuffer::Types::Graphics };
+			static const ICommandBuffer::Types TypePerCommand[] =
+			{
+				ICommandBuffer::Types::Copy,		// CopyTexture
+				ICommandBuffer::Types::Compute,		// GenerateMipMap
+				ICommandBuffer::Types::Graphics,	// SetRenderTarget
+				ICommandBuffer::Types::Graphics,	// SetViewport
+				ICommandBuffer::Types::Graphics,	// Clear
+				ICommandBuffer::Types::Graphics,	// Draw
+				(ICommandBuffer::Types)-1,			// BeginEvent
+				(ICommandBuffer::Types)-1,			// EndEvent
+				(ICommandBuffer::Types)-1			// SetMarker
+			};
 
 			const WString name = m_Name.ChangeType<char16>();
 
@@ -178,7 +250,9 @@ namespace Engine
 			CommandTypes commandType;
 			while (m_Buffer.Read(commandType))
 			{
-				const ICommandBuffer::Types desiredType = TypePerCommand[(uint8)commandType];
+				ICommandBuffer::Types desiredType = TypePerCommand[(uint8)commandType];
+				if (desiredType == (ICommandBuffer::Types)-1 && currentCB != nullptr)
+					desiredType = currentCB->GetType();
 
 				if (currentCB == nullptr || currentCB->GetType() != desiredType)
 				{
@@ -194,6 +268,22 @@ namespace Engine
 
 				switch (commandType)
 				{
+				case CommandTypes::CopyTexture:
+				{
+					CopyTextureCommandData data = {};
+					m_Buffer.Read(data);
+
+					currentCB->CopyTexture(data.Source->GetHandle(), data.SourcePosition, data.Destination->GetHandle(), data.DestinationPosition, data.Size);
+				} break;
+
+				case CommandTypes::GenerateMipMap:
+				{
+					GenerateMipMapCommandData data = {};
+					m_Buffer.Read(data);
+
+					currentCB->GenerateMipMap(data.Texture->GetHandle());
+				} break;
+
 				case CommandTypes::SetRenderTarget:
 				{
 					SetRenderTargetCommandData data = {};

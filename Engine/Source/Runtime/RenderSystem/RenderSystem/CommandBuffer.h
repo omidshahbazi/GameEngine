@@ -66,6 +66,12 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
+			bool CopyTexture(const Texture* Source, const Texture* Destination);
+			bool CopyTexture(const Texture* Source, const Texture* Destination, const Vector2I& Position, const Vector2I& Size);
+			bool CopyTexture(const Texture* Source, const Vector2I& SourcePosition, const Texture* Destination, const Vector2I& DestinationPosition, const Vector2I& Size);
+
+			bool GenerateMipMap(const Texture* Texture);
+
 			void SetRenderTarget(const RenderTarget* RenderTarget);
 			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
@@ -83,8 +89,8 @@ namespace Engine
 
 			//CreateGPUFence
 			//BlitTexture
-			//CopyTexture
 			//Dispatch
+			//RenderTargetPool
 
 		private:
 			void PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);

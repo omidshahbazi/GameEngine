@@ -273,14 +273,11 @@ namespace Engine
 
 			void ExecuteCopy(const CopyBufferCommandData& Data)
 			{
-				BufferInfo* sourceInfo = ReinterpretCast(BufferInfo*, Data.Source);
-				BufferInfo* destInfo = ReinterpretCast(BufferInfo*, Data.Destination);
+				GPUBufferTypes type = Data.Source->Type;
 
-				GPUBufferTypes type = sourceInfo->Type;
-
-				if (sourceInfo->Type == GPUBufferTypes::Vertex)
+				if (Data.Source->Type == GPUBufferTypes::Vertex)
 				{
-					if (destInfo->Type == GPUBufferTypes::Index)
+					if (Data.Destination->Type == GPUBufferTypes::Index)
 						type = GPUBufferTypes::Index;
 				}
 
@@ -289,31 +286,31 @@ namespace Engine
 				case GPUBufferTypes::Constant:
 				case GPUBufferTypes::Vertex:
 				{
-					CopyBufferToBuffer(sourceInfo, destInfo);
+					CopyBufferToBuffer(Data.Source, Data.Destination);
 
 				} break;
 
 				case GPUBufferTypes::Index:
 				{
-					if (sourceInfo->IsIntermediate)
-						CopyBufferToBuffer(sourceInfo, ReinterpretCast(MeshBufferInfo*, destInfo)->IndexBufferObject);
+					if (Data.Source->IsIntermediate)
+						CopyBufferToBuffer(Data.Source, ReinterpretCast(MeshBufferInfo*, Data.Destination)->IndexBufferObject);
 					else
-						CopyBufferToBuffer(ReinterpretCast(MeshBufferInfo*, sourceInfo)->IndexBufferObject, destInfo);
+						CopyBufferToBuffer(ReinterpretCast(MeshBufferInfo*, Data.Source)->IndexBufferObject, Data.Destination);
 
 				} break;
 
 				case GPUBufferTypes::Pixel:
 				{
-					if (sourceInfo->IsIntermediate)
+					if (Data.Source->IsIntermediate)
 					{
-						TextureBufferInfo* destTexInfo = ReinterpretCast(TextureBufferInfo*, destInfo);
+						TextureBufferInfo* destTexInfo = ReinterpretCast(TextureBufferInfo*, Data.Destination);
 
 						uint32 target = GetBufferType(GPUBufferTypes::Pixel);
 						uint32 type = GetTextureType(destTexInfo->TextureType);
 
 						glBindTexture(type, destTexInfo->Handle);
 
-						glBindBuffer(target, sourceInfo->Handle);
+						glBindBuffer(target, Data.Source->Handle);
 
 						glTexSubImage2D(type, 0, 0, 0, destTexInfo->Width, destTexInfo->Height, GetTextureFormat(destTexInfo->Format), GetTexturePixelType(destTexInfo->Format), 0);
 
@@ -323,14 +320,14 @@ namespace Engine
 					}
 					else
 					{
-						TextureBufferInfo* sourceTexInfo = ReinterpretCast(TextureBufferInfo*, sourceInfo);
+						TextureBufferInfo* sourceTexInfo = ReinterpretCast(TextureBufferInfo*, Data.Source);
 
 						uint32 target = GL_PIXEL_PACK_BUFFER;
 						uint32 type = GetTextureType(sourceTexInfo->TextureType);
 
-						glBindBuffer(target, destInfo->Handle);
+						glBindBuffer(target, Data.Destination->Handle);
 
-						glBufferData(target, destInfo->Size, nullptr, GL_STATIC_COPY);
+						glBufferData(target, Data.Destination->Size, nullptr, GL_STATIC_COPY);
 
 						glActiveTexture(GL_TEXTURE0);
 
@@ -370,8 +367,32 @@ namespace Engine
 				m_Buffer.Append(CommandTypes::CopyBuffer);
 
 				CopyBufferCommandData data = {};
-				data.Source = SourceHandle;
-				data.Destination = DestinationHandle;
+				data.Source = ReinterpretCast(BufferInfo*, SourceHandle);
+				data.Destination = ReinterpretCast(BufferInfo*, DestinationHandle);
+
+				m_Buffer.Append(data);
+			}
+
+			void OpenGLCommandBuffer::CopyTexture(ResourceHandle SourceHandle, const Vector2I& SourcePosition, ResourceHandle DestinationHandle, const Vector2I& DestinationPosition, const Vector2I& Size)
+			{
+				CoreDebugAssert(Categories::RenderSystem, SourceHandle != 0, "SourceHandle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, SourcePosition >= Vector2I::Zero, "SourcePosition is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationHandle != 0, "DestinationHandle is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationPosition >= Vector2I::Zero, "SourcePosition is invalid");
+				CoreDebugAssert(Categories::RenderSystem, Size > Vector2I::Zero, "Size is invalid");
+
+				m_Buffer.Append(CommandTypes::CopyTexture);
+
+				CopyTextureCommandData data = {};
+				data.Source = ReinterpretCast(TextureBufferInfo*, SourceHandle);
+				data.SourcePosition = SourcePosition;
+				data.Destination = ReinterpretCast(TextureBufferInfo*, DestinationHandle);
+				data.DestinationPosition = DestinationPosition;
+				data.Size = Size;
+
+				CoreDebugAssert(Categories::RenderSystem, data.Source->Format != data.Destination->Format, "Texture formats are not the same");
+				CoreDebugAssert(Categories::RenderSystem, data.SourcePosition + data.Size <= Vector2I(data.Source->Width, data.Source->Height), "SourcePosition+Size is invalid");
+				CoreDebugAssert(Categories::RenderSystem, data.DestinationPosition + data.Size <= Vector2I(data.Destination->Width, data.Destination->Height), "DestinationPosition+Size is invalid");
 
 				m_Buffer.Append(data);
 			}
@@ -553,6 +574,18 @@ namespace Engine
 						m_Buffer.Read(data);
 
 						ExecuteCopy(data);
+
+					} break;
+
+					case CommandTypes::CopyTexture:
+					{
+						CopyTextureCommandData data = {};
+						m_Buffer.Read(data);
+
+						glCopyImageSubData(
+							data.Source->Handle, GetTextureType(data.Source->TextureType), 0, data.SourcePosition.X, data.SourcePosition.Y, 0,
+							data.Destination->Handle, GetTextureType(data.Destination->TextureType), 0, data.DestinationPosition.X, data.DestinationPosition.Y, 0,
+							data.Size.X, data.Size.Y, 1);
 
 					} break;
 

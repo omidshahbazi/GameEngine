@@ -40,6 +40,7 @@ namespace Engine
 				void Clear(void) override;
 
 				void CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle) override;
+				void CopyTexture(ResourceHandle SourceHandle, const Vector2I& SourcePosition, ResourceHandle DestinationHandle, const Vector2I& DestinationPosition, const Vector2I& Size) override;
 
 				void GenerateMipMap(ResourceHandle Handle) override;
 
@@ -64,6 +65,11 @@ namespace Engine
 
 				bool Execute(void) override;
 
+				ID3D12CommandQueue* GetQueue(void) const
+				{
+					return m_Queue;
+				}
+
 			private:
 				void FillGraphicsPipelineState(DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc);
 
@@ -87,8 +93,6 @@ namespace Engine
 				uint8 m_InputLayoutCount;
 
 				RenderState m_State;
-
-				RenderTargetInfos* m_CurrentRenderTarget;
 
 				ViewInfo* m_CurrentRenderTargetViews[(uint8)AttachmentPoints::Color8 - (uint8)AttachmentPoints::Color0];
 				uint8 m_CurrentRenderTargetViewCount;

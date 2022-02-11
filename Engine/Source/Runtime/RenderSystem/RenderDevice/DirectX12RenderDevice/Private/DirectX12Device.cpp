@@ -74,6 +74,24 @@ namespace Engine
 							return false; \
 					}
 
+#define DESTROY_VIEW(ViewPtr) \
+				{ \
+					if (Helper::IsColorPoint((ViewPtr)->Point)) \
+					{ \
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView((ViewPtr)->TargetView))) \
+							return false; \
+					} \
+					else if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView((ViewPtr)->TargetView))) \
+						return false; \
+					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView((ViewPtr)->View))) \
+						return false; \
+					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView((ViewPtr)->SamplerView))) \
+						return false; \
+					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Deallocate((ViewPtr)->Resource))) \
+						return false; \
+				}
+
+
 			const uint8 BACK_BUFFER_COUNT = 2;
 			const uint32 UPLAOD_BUFFER_SIZE = 8 * MegaByte;
 
@@ -855,23 +873,6 @@ namespace Engine
 
 			bool DirectX12Device::DestroyRenderTarget(ResourceHandle Handle)
 			{
-#define DESTROY_VIEW(ViewPtr) \
-				{ \
-					if (Helper::IsColorPoint((ViewPtr)->Point)) \
-					{ \
-						if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView((ViewPtr)->TargetView))) \
-							return false; \
-					} \
-					else if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView((ViewPtr)->TargetView))) \
-						return false; \
-					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView((ViewPtr)->View))) \
-						return false; \
-					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView((ViewPtr)->SamplerView))) \
-						return false; \
-					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Deallocate((ViewPtr)->Resource))) \
-						return false; \
-				}
-
 				if (Handle == 0)
 					return false;
 
@@ -1097,12 +1098,6 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(Info->SwapChain, Info->BackBufferCount, backBuffers)))
 					return false;
 
-				const D3D12_RESOURCE_STATES depthStencilBufferState = D3D12_RESOURCE_STATE_DEPTH_WRITE;
-				const DXGI_FORMAT depthStencilFormat = GetTextureFormat(Formats::Depth24);
-				const D3D12_RESOURCE_DIMENSION dimension = GetTextureType(TextureTypes::TwoD);
-
-				static int index = 0;
-
 				for (uint8 i = 0; i < Info->BackBufferCount; ++i)
 				{
 					ViewInfo& renderTargetView = Info->ViewsSWAPCHAIN[i];
@@ -1117,9 +1112,11 @@ namespace Engine
 
 				ViewInfo* view = &Info->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
 				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::Color0, Info->ViewsSWAPCHAIN[0].Format, true, D3D12_RESOURCE_STATE_COMMON, false);
+				DirectX12Wrapper::Debugging::SetObjectName(view->Resource.Resource, L"Intermediate Render Target");
 
 				view = &Info->IntermediateViews[RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
 				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::DepthStencil, DXGI_FORMAT_D24_UNORM_S8_UINT, false, D3D12_RESOURCE_STATE_DEPTH_WRITE, false);
+				DirectX12Wrapper::Debugging::SetObjectName(view->Resource.Resource, L"Intermediate Depth/Stencil");
 
 				Info->CurrentBackBufferIndex = 0;
 				Info->Initialized = true;
@@ -1171,6 +1168,7 @@ namespace Engine
 #undef BEGIN_UPLOAD
 #undef END_UPLOAD
 #undef CREATE_VIEW
+#undef DESTROY_VIEW
 		}
 	}
 }

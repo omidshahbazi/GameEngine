@@ -73,6 +73,8 @@ namespace Engine
 						commandBuffer->Clear();
 					}
 
+					commandBuffer->SetName(L"Command Buffer");
+
 					return commandBuffer;
 				}
 

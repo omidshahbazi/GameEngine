@@ -15,9 +15,9 @@ namespace Engine
 				auto currentContex = m_Device->GetCurrentContext(); \
 				if (currentContex != nullptr && currentContex->Initialized) \
 				{ \
-					m_CurrentRenderTargetViews[0] = currentContex->GetRenderTargetViews(); \
+					m_CurrentRenderTargetViews[0] = &currentContex->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX]; \
 					m_CurrentRenderTargetViewCount = 1; \
-					m_CurrentDepthStencilView = currentContex->GetDepthStencilViews(); \
+					m_CurrentDepthStencilView = &currentContex->IntermediateViews[RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX]; \
 				} \
 			}
 

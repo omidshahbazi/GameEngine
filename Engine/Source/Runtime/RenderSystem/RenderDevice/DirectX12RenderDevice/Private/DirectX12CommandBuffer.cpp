@@ -359,8 +359,8 @@ namespace Engine
 				TextureResourceInfo* destInfo = ReinterpretCast(TextureResourceInfo*, DestinationHandle);
 
 				CoreDebugAssert(Categories::RenderSystem, sourceInfo->Format != destInfo->Format, "Texture formats are not the same");
-				CoreDebugAssert(Categories::RenderSystem, SourcePosition + Size <= Vector2I(sourceInfo->Width, sourceInfo->Height), "SourcePosition+Size is invalid");
-				CoreDebugAssert(Categories::RenderSystem, DestinationPosition + Size <= Vector2I(destInfo->Width, destInfo->Height), "DestinationPosition+Size is invalid");
+				CoreDebugAssert(Categories::RenderSystem, SourcePosition + Size <= sourceInfo->Dimension, "SourcePosition+Size is invalid");
+				CoreDebugAssert(Categories::RenderSystem, DestinationPosition + Size <= destInfo->Dimension, "DestinationPosition+Size is invalid");
 
 				//D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
 				//D3D12_RESOURCE_STATES destinationState = destInfo->State;

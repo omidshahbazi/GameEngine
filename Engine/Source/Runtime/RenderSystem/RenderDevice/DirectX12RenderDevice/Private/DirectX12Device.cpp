@@ -60,8 +60,7 @@ namespace Engine
 							return false; \
 						ViewPtr->Point = AttachPoint; \
 						ViewPtr->Format = BufferFormat; \
-						ViewPtr->Width = BufferWidth; \
-						ViewPtr->Height = BufferHeight; \
+						ViewPtr->Dimension = Vector2I(BufferWidth, BufferHeight); \
 						if (ShaderVisible) \
 							if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(ViewPtr->Resource.Resource, BufferFormat, D3D12_RESOURCE_DIMENSION_TEXTURE2D, &ViewPtr->View))) \
 								return false; \
@@ -733,8 +732,7 @@ namespace Engine
 				info->Type = GPUBufferTypes::Pixel;
 				info->IsIntermediate = false;
 				info->Format = GetTextureFormat(Info->Format);
-				info->Width = Info->Dimension.X;
-				info->Height = Info->Dimension.Y;
+				info->Dimension = Info->Dimension;
 
 				if (Info->Type == TextureTypes::TwoD)
 				{

@@ -312,7 +312,7 @@ namespace Engine
 
 						glBindBuffer(target, Data.Source->Handle);
 
-						glTexSubImage2D(type, 0, 0, 0, destTexInfo->Width, destTexInfo->Height, GetTextureFormat(destTexInfo->Format), GetTexturePixelType(destTexInfo->Format), 0);
+						glTexSubImage2D(type, 0, 0, 0, destTexInfo->Dimension.X, destTexInfo->Dimension.Y, GetTextureFormat(destTexInfo->Format), GetTexturePixelType(destTexInfo->Format), 0);
 
 						glBindBuffer(target, 0);
 
@@ -391,8 +391,8 @@ namespace Engine
 				data.Size = Size;
 
 				CoreDebugAssert(Categories::RenderSystem, data.Source->Format != data.Destination->Format, "Texture formats are not the same");
-				CoreDebugAssert(Categories::RenderSystem, data.SourcePosition + data.Size <= Vector2I(data.Source->Width, data.Source->Height), "SourcePosition+Size is invalid");
-				CoreDebugAssert(Categories::RenderSystem, data.DestinationPosition + data.Size <= Vector2I(data.Destination->Width, data.Destination->Height), "DestinationPosition+Size is invalid");
+				CoreDebugAssert(Categories::RenderSystem, data.SourcePosition + data.Size <= data.Source->Dimension, "SourcePosition+Size is invalid");
+				CoreDebugAssert(Categories::RenderSystem, data.DestinationPosition + data.Size <= data.Destination->Dimension, "DestinationPosition+Size is invalid");
 
 				m_Buffer.Append(data);
 			}

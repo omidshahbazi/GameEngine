@@ -31,8 +31,7 @@ namespace Engine
 			{
 			public:
 				TextureTypes TextureType;
-				uint32 Width;
-				uint32 Height;
+				Vector2I Dimension;
 				Formats Format;
 			};
 

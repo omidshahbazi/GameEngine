@@ -51,8 +51,7 @@ namespace Engine
 				D3D12_SAMPLER_DESC SamplerDescription;
 				DescriptorViewAllocator::ViewHandle SamplerView;
 				DXGI_FORMAT Format;
-				uint32 Width;
-				uint32 Height;
+				Vector2I Dimension;
 			};
 
 			struct ViewInfo : public TextureResourceInfo

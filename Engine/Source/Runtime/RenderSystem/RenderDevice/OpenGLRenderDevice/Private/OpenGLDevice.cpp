@@ -591,8 +591,7 @@ namespace Engine
 
 				INITIALIZE_BUFFER_INFO(info, handle, Helper::GetTextureBufferSize(Info->Format, Info->Dimension), GPUBufferTypes::Pixel, false);
 				info->TextureType = Info->Type;
-				info->Width = Info->Dimension.X;
-				info->Height = Info->Dimension.Y;
+				info->Dimension = Info->Dimension;
 				info->Format = Info->Format;
 
 				uint32 type = GetTextureType(Info->Type);

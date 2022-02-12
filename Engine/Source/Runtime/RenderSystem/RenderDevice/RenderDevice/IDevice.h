@@ -9,7 +9,6 @@
 #include <RenderDevice\TextureInfo.h>
 #include <RenderDevice\RenderTargetInfo.h>
 #include <RenderDevice\MeshInfo.h>
-#include <RenderDevice\ICommandBuffer.h>
 #include <Platform\PlatformWindow.h>
 #include <Common\BitwiseUtils.h>
 
@@ -22,6 +21,8 @@ namespace Engine
 
 	namespace RenderDevice
 	{
+		class ICommandBuffer;
+
 		class IDevice
 		{
 		public:
@@ -135,7 +136,7 @@ namespace Engine
 			virtual bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) = 0;
 			virtual bool DestroyMesh(ResourceHandle Handle) = 0;
 
-			virtual bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) = 0;
+			virtual bool CreateCommandBuffer(ICommandBuffer*& Buffer) = 0;
 			virtual bool DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count) = 0;
 			virtual bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) = 0;
 			virtual bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) = 0;

@@ -73,7 +73,7 @@ namespace Engine
 				Promise<bool> CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle);
 				Promise<bool> DestroyMesh(ResourceHandle Handle);
 
-				Promise<bool> CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer);
+				Promise<bool> CreateCommandBuffer(ICommandBuffer*& Buffer);
 				Promise<bool> DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count);
 				Promise<bool> SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count);
 				Promise<bool> SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count);

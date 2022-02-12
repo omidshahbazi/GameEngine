@@ -344,9 +344,8 @@ namespace Engine
 				}
 			}
 
-			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device, Types Type) :
+			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device) :
 				m_Device(Device),
-				m_Type(Type),
 				m_Name{},
 				m_NameLength(0),
 				m_Buffer(RenderSystemAllocators::CommandBufferAllocator)

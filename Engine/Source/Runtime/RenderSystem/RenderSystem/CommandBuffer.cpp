@@ -208,34 +208,22 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		void CommandBuffer::PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers)
+		bool CommandBuffer::PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext)
 		{
-			CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, CommandBuffer != nullptr, "CommandBuffer cannot be null");
 			CoreDebugAssert(Categories::RenderSystem, ConstantBuffers != nullptr, "ConstantBuffers cannot be null");
+
+			if (m_Buffer.GetSize() == 0)
+				return false;
 
 #define SET_RENDER_TARGET(RenderTarget) \
 			m_LastRenderTarget = RenderTarget; \
-			currentCB->SetRenderTarget(m_LastRenderTarget);
+			CommandBuffer->SetRenderTarget(m_LastRenderTarget);
 
 #define SET_VIEWPORT(Position, Size) \
 			m_LastViewportPosition = Position; \
 			m_LastViewportSize = Size; \
-			currentCB->SetViewport(m_LastViewportPosition, m_LastViewportSize);
-
-			static const ICommandBuffer::Types TypePerCommand[] =
-			{
-				ICommandBuffer::Types::Copy,		// CopyTexture
-				ICommandBuffer::Types::Compute,		// GenerateMipMap
-				ICommandBuffer::Types::Graphics,	// SetRenderTarget
-				ICommandBuffer::Types::Graphics,	// SetViewport
-				ICommandBuffer::Types::Graphics,	// Clear
-				ICommandBuffer::Types::Graphics,	// Draw
-				(ICommandBuffer::Types)-1,			// BeginEvent
-				(ICommandBuffer::Types)-1,			// EndEvent
-				(ICommandBuffer::Types)-1			// SetMarker
-			};
-
-			const WString name = m_Name.ChangeType<char16>();
+			CommandBuffer->SetViewport(m_LastViewportPosition, m_LastViewportSize);
 
 			ResourceHandle m_LastRenderTarget = 0;
 			Vector2I m_LastViewportPosition;
@@ -244,28 +232,15 @@ namespace Engine
 			if (RenderContext != nullptr)
 				m_LastViewportSize = RenderContext->GetWindow()->GetClientSize();
 
-			ICommandBuffer* currentCB = nullptr;
+			CommandBuffer->SetName(m_Name.ChangeType<char16>().GetValue());
+
+			SET_RENDER_TARGET(m_LastRenderTarget);
+			SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
 
 			m_Buffer.ResetRead();
 			CommandTypes commandType;
 			while (m_Buffer.Read(commandType))
 			{
-				ICommandBuffer::Types desiredType = TypePerCommand[(uint8)commandType];
-				if (desiredType == (ICommandBuffer::Types)-1 && currentCB != nullptr)
-					desiredType = currentCB->GetType();
-
-				if (currentCB == nullptr || currentCB->GetType() != desiredType)
-				{
-					CoreDebugAssert(Categories::RenderSystem, Device->CreateCommandBuffer(desiredType, currentCB).Wait(), "Couldn't create a native command buffer");
-
-					currentCB->SetName(name.GetValue());
-
-					NativeCommandBuffers.Add(currentCB);
-
-					SET_RENDER_TARGET(m_LastRenderTarget);
-					SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
-				}
-
 				switch (commandType)
 				{
 				case CommandTypes::CopyTexture:
@@ -273,7 +248,7 @@ namespace Engine
 					CopyTextureCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->CopyTexture(data.Source->GetHandle(), data.SourcePosition, data.Destination->GetHandle(), data.DestinationPosition, data.Size);
+					CommandBuffer->CopyTexture(data.Source->GetHandle(), data.SourcePosition, data.Destination->GetHandle(), data.DestinationPosition, data.Size);
 				} break;
 
 				case CommandTypes::GenerateMipMap:
@@ -281,7 +256,7 @@ namespace Engine
 					GenerateMipMapCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->GenerateMipMap(data.Texture->GetHandle());
+					CommandBuffer->GenerateMipMap(data.Texture->GetHandle());
 				} break;
 
 				case CommandTypes::SetRenderTarget:
@@ -318,7 +293,7 @@ namespace Engine
 					ClearCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->Clear(data.Flags, data.Color);
+					CommandBuffer->Clear(data.Flags, data.Color);
 				} break;
 
 				case CommandTypes::Draw:
@@ -326,7 +301,7 @@ namespace Engine
 					DrawCommandData data = {};
 					m_Buffer.Read(data);
 
-					InsertDrawCommand(ConstantBuffers, currentCB, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
+					InsertDrawCommand(CommandBuffer, ConstantBuffers, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
 				case CommandTypes::BeginEvent:
@@ -334,7 +309,7 @@ namespace Engine
 					BeginEventCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->BeginEvent(data.Label.GetValue());
+					CommandBuffer->BeginEvent(data.Label.GetValue());
 				} break;
 
 				case CommandTypes::EndEvent:
@@ -342,7 +317,7 @@ namespace Engine
 					EndEventCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->EndEvent();
+					CommandBuffer->EndEvent();
 				} break;
 
 				case CommandTypes::SetMarker:
@@ -350,7 +325,7 @@ namespace Engine
 					SetMarkerCommandData data = {};
 					m_Buffer.Read(data);
 
-					currentCB->SetMarker(data.Label.GetValue());
+					CommandBuffer->SetMarker(data.Label.GetValue());
 				} break;
 
 				default:
@@ -358,10 +333,12 @@ namespace Engine
 				}
 			}
 
+			return true;
+
 #undef SET_VIEWPORT
 		}
 
-		void CommandBuffer::InsertDrawCommand(FrameConstantBuffers* ConstantBuffers, ICommandBuffer* CommandBuffer, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;

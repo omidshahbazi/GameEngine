@@ -3,10 +3,12 @@
 #include <RenderSystem\PixelBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
+#include <RenderDevice\ICommandBuffer.h>
 
 namespace Engine
 {
 	using namespace RenderCommon::Private;
+	using namespace RenderDevice;
 
 	namespace RenderSystem
 	{
@@ -69,7 +71,7 @@ namespace Engine
 		bool Texture::GenerateMipMaps(void)
 		{
 			ICommandBuffer* cb = nullptr;
-			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Compute, cb).Wait())
+			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return false;
 
 			cb->GenerateMipMap(GetHandle());
@@ -91,7 +93,7 @@ namespace Engine
 				return;
 
 			ICommandBuffer* cb = nullptr;
-			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return;
 
 			cb->CopyBuffer(GetHandle(), bufferHandle);

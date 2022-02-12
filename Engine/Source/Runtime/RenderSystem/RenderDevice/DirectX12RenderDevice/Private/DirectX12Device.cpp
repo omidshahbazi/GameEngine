@@ -42,7 +42,7 @@ namespace Engine
 #define END_UPLOAD(MainResourceInfo) \
 					if (!CHECK_CALL(DirectX12Wrapper::Resource::Unmap(m_UploadBuffer.Resource.Resource))) \
 						return false; \
-					DirectX12CommandBuffer *cb = m_CommandBufferPool.Get(this, ICommandBuffer::Types::Copy); \
+					DirectX12CommandBuffer *cb = m_CommandBufferPool.Get(this); \
 					m_UploadBuffer.Type = (MainResourceInfo)->Type; \
 					cb->CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
 					if (!cb->Execute()) \
@@ -410,10 +410,6 @@ namespace Engine
 					layout = (VertexLayouts)((int32)layout << 1);
 				}
 
-				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Copy);
-				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Graphics);
-				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Compute);
-
 				m_Initialized = true;
 
 				return true;
@@ -485,7 +481,7 @@ namespace Engine
 					if (item.GetFirst() == (ResourceHandle)WindowHandle)
 						return false;
 
-				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get(this, ICommandBuffer::Types::Graphics);
+				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get(this);
 
 				IDXGISwapChain4* swapChain = nullptr;
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, commandBuffer->GetQueue(), BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
@@ -971,9 +967,9 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
+			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
-				Buffer = m_CommandBufferPool.Get(this, Type);
+				Buffer = m_CommandBufferPool.Get(this);
 
 				return true;
 			}

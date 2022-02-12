@@ -4,10 +4,12 @@
 #include <RenderSystem\IndexBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
+#include <RenderDevice\ICommandBuffer.h>
 
 namespace Engine
 {
 	using namespace RenderCommon::Private;
+	using namespace RenderDevice;
 
 	namespace RenderSystem
 	{
@@ -50,7 +52,7 @@ namespace Engine
 		void SubMesh::GenerateBuffers(void)
 		{
 			ICommandBuffer* cb = nullptr;
-			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return;
 
 			uint32 bufferSize = GetVertexBufferSize();

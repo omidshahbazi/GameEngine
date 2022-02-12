@@ -262,10 +262,6 @@ namespace Engine
 				glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, true);
 #endif
 
-				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Copy);
-				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Graphics);
-				m_CommandBufferPool.InitializeType(ICommandBuffer::Types::Compute);
-
 				m_Initialized = true;
 
 				return true;
@@ -842,9 +838,9 @@ namespace Engine
 				return true;
 			}
 
-			bool OpenGLDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
+			bool OpenGLDevice::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
-				Buffer = m_CommandBufferPool.Get(this, Type);
+				Buffer = m_CommandBufferPool.Get(this);
 
 				return true;
 			}

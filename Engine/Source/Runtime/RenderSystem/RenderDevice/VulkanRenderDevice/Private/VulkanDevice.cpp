@@ -123,7 +123,7 @@ namespace Engine
 			{
 				return true;
 			}
-			bool VulkanDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
+			bool VulkanDevice::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
 				return false;
 			}

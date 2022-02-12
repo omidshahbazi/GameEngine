@@ -265,11 +265,11 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer)
+			Promise<bool> ThreadedDevice::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
-				BEGIN_CALL(bool, &, promise, Type);
+				BEGIN_CALL(bool, &, promise);
 
-				promise->SetValue(m_Device->CreateCommandBuffer(Type, Buffer));
+				promise->SetValue(m_Device->CreateCommandBuffer(Buffer));
 
 				END_CALL();
 			}

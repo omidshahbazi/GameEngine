@@ -55,7 +55,7 @@ namespace Engine
 				bool CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyMesh(ResourceHandle Handle) override;
 
-				bool CreateCommandBuffer(ICommandBuffer::Types Type, ICommandBuffer*& Buffer) override;
+				bool CreateCommandBuffer(ICommandBuffer*& Buffer) override;
 				bool DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count) override;
 				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
 				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override;

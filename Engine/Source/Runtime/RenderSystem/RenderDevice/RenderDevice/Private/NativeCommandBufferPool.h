@@ -5,7 +5,6 @@
 
 #include <RenderDevice\IDevice.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <Containers\Map.h>
 #include <Containers\Stack.h>
 #include <Debugging\CoreDebug.h>
 
@@ -24,7 +23,6 @@ namespace Engine
 			{
 			private:
 				typedef Stack<NativeCommandBufferType*> CommandStack;
-				typedef Map<ICommandBuffer::Types, CommandStack> CommandMap;
 
 			public:
 				NativeCommandBufferPool(void) :
@@ -34,41 +32,26 @@ namespace Engine
 
 				~NativeCommandBufferPool(void)
 				{
-					for (auto& pair : m_Commands)
-					{
-						for (auto& command : pair.GetSecond())
-							RenderSystemAllocators::ResourceAllocator_Deallocate(command);
-
-						pair.GetSecond().Clear();
-					}
+					for (auto& command : m_Commands)
+						RenderSystemAllocators::ResourceAllocator_Deallocate(command);
 
 					m_Commands.Clear();
 				}
 
-				void InitializeType(ICommandBuffer::Types Type)
-				{
-					if (m_Commands.Contains(Type))
-						return;
-
-					m_Commands[Type] = CommandStack(RenderSystemAllocators::ContainersAllocator);
-				}
-
 				template<typename DeviceType>
-				NativeCommandBufferType* Get(DeviceType* Device, ICommandBuffer::Types Type)
+				NativeCommandBufferType* Get(DeviceType* Device)
 				{
-					CoreDebugAssert(Categories::RenderSystem, m_Commands.Contains(Type), "Command pool for this type didn't initialized");
-
-					CommandStack& stack = m_Commands[Type];
+					CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
 
 					NativeCommandBufferType* commandBuffer = nullptr;
 
-					if (stack.GetSize() == 0)
+					if (m_Commands.GetSize() == 0)
 					{
 						commandBuffer = RenderSystemAllocators::ResourceAllocator_Allocate<NativeCommandBufferType>();
-						Construct(commandBuffer, Device, Type);
+						Construct(commandBuffer, Device);
 					}
 					else
-						stack.Pop(&commandBuffer);
+						m_Commands.Pop(&commandBuffer);
 
 					commandBuffer->SetName(L"Command Buffer");
 					commandBuffer->Clear();
@@ -80,15 +63,11 @@ namespace Engine
 				{
 					CoreDebugAssert(Categories::RenderSystem, NativeCommandBuffer != nullptr, "NativeCommandBuffer cannot be null");
 
-					ICommandBuffer::Types type = NativeCommandBuffer->GetType();
-
-					CoreDebugAssert(Categories::RenderSystem, m_Commands.Contains(type), "Command pool for this type didn't initialized");
-
-					m_Commands[type].Push(ReinterpretCast(NativeCommandBufferType*, NativeCommandBuffer));
+					m_Commands.Push(ReinterpretCast(NativeCommandBufferType*, NativeCommandBuffer));
 				}
 
 			private:
-				CommandMap m_Commands;
+				CommandStack m_Commands;
 			};
 		}
 	}

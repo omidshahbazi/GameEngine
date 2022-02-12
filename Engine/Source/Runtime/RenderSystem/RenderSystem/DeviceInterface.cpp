@@ -380,47 +380,45 @@ namespace Engine
 
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
+			ICommandBuffer* commandBuffer = nullptr;
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
 			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
 
-			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, buffers, m_LastContext, nativeBuffers);
+			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_LastContext))
+				return;
 
-			if (nativeBuffers.GetSize() != 0)
 			{
-				{
-					//RENDERING
-					//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
-					CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
-				}
+				//RENDERING
+				//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
+				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
+			}
 
-				{
-					CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
-				}
+			{
+				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(&commandBuffer, 1));
+			}
 
-				{
-					CHECK_CALL_WEAK(m_ThreadedDevice->DestroyCommandBuffer(nativeBuffers.GetData(), nativeBuffers.GetSize()));
-				}
+			{
+				CHECK_CALL_WEAK(m_ThreadedDevice->DestroyCommandBuffer(&commandBuffer, 1));
 			}
 		}
 
 		void DeviceInterface::SubmitCommandBufferAsync(const CommandBuffer* Buffer)
 		{
+			ICommandBuffer* commandBuffer = nullptr;
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
 			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
 
-			Vector<ICommandBuffer*> nativeBuffers(RenderSystemAllocators::ContainersAllocator);
-			ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(m_ThreadedDevice, buffers, m_LastContext, nativeBuffers);
+			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_LastContext))
+				return;
 
-			if (nativeBuffers.GetSize() != 0)
 			{
-				{
-					//RENDERING
-					//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
-					CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
-				}
+				//RENDERING
+				//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
+				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
+			}
 
-				{
-					CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBufferAsync(nativeBuffers.GetData(), nativeBuffers.GetSize()));
-				}
+			{
+				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBufferAsync(&commandBuffer, 1));
 			}
 		}
 

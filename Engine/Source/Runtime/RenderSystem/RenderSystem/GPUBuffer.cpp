@@ -1,9 +1,12 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\GPUBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
+#include <RenderDevice\ICommandBuffer.h>
 
 namespace Engine
 {
+	using namespace RenderDevice;
+
 	namespace RenderSystem
 	{
 		GPUBuffer::GPUBuffer(ThreadedDevice* Device, ResourceHandle Handle, uint32 Size) :
@@ -83,7 +86,7 @@ namespace Engine
 		void GPUBuffer::CopyTo(ResourceHandle Handle)
 		{
 			ICommandBuffer* cb = nullptr;
-			if (!GetDevice()->CreateCommandBuffer(ICommandBuffer::Types::Copy, cb).Wait())
+			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return;
 
 			cb->CopyBuffer(GetHandle(), Handle);

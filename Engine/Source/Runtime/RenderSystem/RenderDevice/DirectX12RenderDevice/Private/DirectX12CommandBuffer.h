@@ -27,15 +27,10 @@ namespace Engine
 				static const uint8 MAX_DESCRIPTOR_HEAP_COUNT = 8;
 
 			public:
-				DirectX12CommandBuffer(DirectX12Device* Device, Types Type);
+				DirectX12CommandBuffer(DirectX12Device* Device);
 				~DirectX12CommandBuffer(void);
 
 				void SetName(cwstr Name) override;
-
-				Types GetType(void) const override
-				{
-					return m_Type;
-				}
 
 				void Clear(void) override;
 
@@ -76,7 +71,6 @@ namespace Engine
 			private:
 				DirectX12Device* m_Device;
 				ID3D12Device5* m_NativeDevice;
-				Types m_Type;
 
 				char16 m_Name[64];
 				uint16 m_NameLength;

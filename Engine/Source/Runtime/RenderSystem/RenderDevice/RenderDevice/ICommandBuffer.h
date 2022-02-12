@@ -23,21 +23,11 @@ namespace Engine
 			friend class IDevice;
 
 		public:
-			enum class Types
-			{
-				Graphics = 0,
-				Compute,
-				Copy
-			};
-
-		public:
 			virtual ~ICommandBuffer(void)
 			{
 			}
 
 			virtual void SetName(cwstr Name) = 0;
-
-			virtual Types GetType(void) const = 0;
 
 			virtual void Clear(void) = 0;
 

@@ -20,7 +20,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class ThreadedDevice;
 			class FrameConstantBuffers;
 		}
 
@@ -93,9 +92,9 @@ namespace Engine
 			//RenderTargetPool
 
 		private:
-			void PrepareNativeBuffers(ThreadedDevice* Device, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext, NativeCommandBufferList& NativeCommandBuffers);
+			bool PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext);
 
-			static void InsertDrawCommand(FrameConstantBuffers* ConstantBuffers, ICommandBuffer* CommandBuffer, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			static void InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 		private:
 			String m_Name;

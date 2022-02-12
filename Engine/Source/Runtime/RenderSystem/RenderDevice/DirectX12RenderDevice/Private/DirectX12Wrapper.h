@@ -677,13 +677,8 @@ namespace Engine
 
 						D3D12_TEXTURE_COPY_LOCATION destLoc = {};
 						destLoc.pResource = Destination;
-						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT;
-
-						ID3D12Device5* device = nullptr;
-						if (!SUCCEEDED(CommandList->GetDevice(IID_PPV_ARGS(&device))))
-							return;
-						Support::GetCopyableFootprint(device, Source, &destLoc.PlacedFootprint);
-						ReleaseInstance(device);
+						destLoc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+						destLoc.SubresourceIndex = 0;
 
 						D3D12_BOX sourceRegion;
 						sourceRegion.left = SourcePositionX;

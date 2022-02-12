@@ -77,6 +77,10 @@ namespace Engine
 				DirectX12Device* m_Device;
 				ID3D12Device5* m_NativeDevice;
 				Types m_Type;
+
+				char16 m_Name[64];
+				uint16 m_NameLength;
+
 				ID3D12CommandQueue* m_Queue;
 				ID3D12CommandAllocator* m_Allocator;
 				ID3D12GraphicsCommandList4* m_List;
@@ -88,9 +92,6 @@ namespace Engine
 				ID3D12Fence* m_Fence;
 				uint64 m_FenceValue;
 				HANDLE m_FenceEvent;
-
-				D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
-				uint8 m_InputLayoutCount;
 
 				RenderState m_State;
 

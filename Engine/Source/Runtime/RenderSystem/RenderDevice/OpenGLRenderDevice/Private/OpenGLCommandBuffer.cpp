@@ -390,7 +390,7 @@ namespace Engine
 				data.DestinationPosition = DestinationPosition;
 				data.Size = Size;
 
-				CoreDebugAssert(Categories::RenderSystem, data.Source->Format != data.Destination->Format, "Texture formats are not the same");
+				CoreDebugAssert(Categories::RenderSystem, data.Source->Format == data.Destination->Format, "Texture formats are not the same");
 				CoreDebugAssert(Categories::RenderSystem, data.SourcePosition + data.Size <= data.Source->Dimension, "SourcePosition+Size is invalid");
 				CoreDebugAssert(Categories::RenderSystem, data.DestinationPosition + data.Size <= data.Destination->Dimension, "DestinationPosition+Size is invalid");
 

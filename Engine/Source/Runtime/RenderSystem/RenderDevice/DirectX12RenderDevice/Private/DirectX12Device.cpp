@@ -42,36 +42,37 @@ namespace Engine
 #define END_UPLOAD(MainResourceInfo) \
 					if (!CHECK_CALL(DirectX12Wrapper::Resource::Unmap(m_UploadBuffer.Resource.Resource))) \
 						return false; \
-					DirectX12CommandBuffer cb(this, ICommandBuffer::Types::Copy); \
+					DirectX12CommandBuffer *cb = m_CommandBufferPool.Get(this, ICommandBuffer::Types::Copy); \
 					m_UploadBuffer.Type = (MainResourceInfo)->Type; \
-					cb.CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
-					if (!cb.Execute()) \
+					cb->CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
+					if (!cb->Execute()) \
 						return false; \
+					m_CommandBufferPool.Back(cb); \
 				}
 
 #define CREATE_VIEW(ViewPtr, BufferWidth, BufferHeight, AttachPoint, BufferFormat, IsColored, CurrentState, ShaderVisible) \
+				{ \
+					INITIALIZE_RESOURCE_INFO(ViewPtr, CurrentState); \
+					ViewPtr->Type = GPUBufferTypes::Pixel; \
+					ViewPtr->IsIntermediate = false; \
+					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(BufferWidth, BufferHeight, BufferFormat, IsColored, CurrentState, false, &ViewPtr->Resource))) \
+						return false; \
+					if (!AllocateSampler(ViewPtr)) \
+						return false; \
+					ViewPtr->Point = AttachPoint; \
+					ViewPtr->Format = BufferFormat; \
+					ViewPtr->Dimension = Vector2I(BufferWidth, BufferHeight); \
+					if (ShaderVisible) \
+						if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(ViewPtr->Resource.Resource, BufferFormat, D3D12_RESOURCE_DIMENSION_TEXTURE2D, &ViewPtr->View))) \
+							return false; \
+					if (IsColored) \
 					{ \
-						INITIALIZE_RESOURCE_INFO(ViewPtr, CurrentState); \
-						ViewPtr->Type = GPUBufferTypes::Pixel; \
-						ViewPtr->IsIntermediate = false; \
-						if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(BufferWidth, BufferHeight, BufferFormat, IsColored, CurrentState, false, &ViewPtr->Resource))) \
+						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(ViewPtr->Resource.Resource, &ViewPtr->TargetView))) \
 							return false; \
-						if (!AllocateSampler(ViewPtr)) \
-							return false; \
-						ViewPtr->Point = AttachPoint; \
-						ViewPtr->Format = BufferFormat; \
-						ViewPtr->Dimension = Vector2I(BufferWidth, BufferHeight); \
-						if (ShaderVisible) \
-							if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(ViewPtr->Resource.Resource, BufferFormat, D3D12_RESOURCE_DIMENSION_TEXTURE2D, &ViewPtr->View))) \
-								return false; \
-						if (IsColored) \
-						{ \
-							if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(ViewPtr->Resource.Resource, &ViewPtr->TargetView))) \
-								return false; \
-						} \
-						else if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(ViewPtr->Resource.Resource, BufferFormat, D3D12_DSV_FLAG_NONE, &ViewPtr->TargetView))) \
-							return false; \
-					}
+					} \
+					else if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(ViewPtr->Resource.Resource, BufferFormat, D3D12_DSV_FLAG_NONE, &ViewPtr->TargetView))) \
+						return false; \
+				}
 
 #define DESTROY_VIEW(ViewPtr) \
 				{ \
@@ -496,7 +497,7 @@ namespace Engine
 				info->WindowHandle = WindowHandle;
 				info->CommandBuffer = commandBuffer;
 				info->SwapChain = swapChain;
-				info->BackBufferCount = BACK_BUFFER_COUNT;
+				info->ViewCount = BACK_BUFFER_COUNT;
 
 				Handle = (ResourceHandle)WindowHandle;
 
@@ -561,7 +562,7 @@ namespace Engine
 				uint16 width, height;
 				PlatformWindow::GetClientSize(info->WindowHandle, width, height);
 
-				if (!info->Initialized || info->Size.X != width || info->Size.Y != height)
+				if (!info->Initialized || info->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX].Dimension != Vector2I(width, height))
 					if (!UpdateSwapChainBufferSize(info, Vector2I(width, height)))
 						return false;
 
@@ -582,6 +583,14 @@ namespace Engine
 				if (m_CurrentContext == nullptr)
 					return false;
 
+				ViewInfo& rt = m_CurrentContext->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
+				ViewInfo* view = m_CurrentContext->GetSwapChainView();
+
+				DirectX12CommandBuffer& cb = *m_CurrentContext->CommandBuffer;
+				cb.Clear();
+				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, ReinterpretCast(ResourceHandle, view), Vector2I::Zero, rt.Dimension);
+				cb.Execute();
+
 				//RENDERING
 				//ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
@@ -590,7 +599,7 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain, false)))
 					return false;
 
-				m_CurrentContext->CurrentBackBufferIndex = swapChain->GetCurrentBackBufferIndex();
+				m_CurrentContext->CurrentViewIndex = swapChain->GetCurrentBackBufferIndex();
 
 				//RENDERING
 				//if (m_CurrentRenderTarget == nullptr)
@@ -1087,36 +1096,37 @@ namespace Engine
 					if (!DestroySwapChainBuffers(Info))
 						return false;
 
-				Info->Size = Size;
-
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(Info->SwapChain, Info->BackBufferCount, Info->Size.X, Info->Size.Y)))
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(Info->SwapChain, Info->ViewCount, Size.X, Size.Y)))
 					return false;
 
 				ID3D12Resource1* backBuffers[BACK_BUFFER_COUNT];
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(Info->SwapChain, Info->BackBufferCount, backBuffers)))
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::GetBuffers(Info->SwapChain, Info->ViewCount, backBuffers)))
 					return false;
 
-				for (uint8 i = 0; i < Info->BackBufferCount; ++i)
+				for (uint8 i = 0; i < Info->ViewCount; ++i)
 				{
-					ViewInfo& renderTargetView = Info->ViewsSWAPCHAIN[i];
+					ViewInfo& renderTargetView = Info->Views[i];
 					INITIALIZE_RESOURCE_INFO(&renderTargetView, D3D12_RESOURCE_STATE_PRESENT);
 					renderTargetView.Resource.Resource = backBuffers[i];
-
+					renderTargetView.Type = GPUBufferTypes::Pixel;
+					renderTargetView.IsIntermediate = false;
 					renderTargetView.Point = AttachmentPoints::Color0;
 					renderTargetView.Format = renderTargetView.Resource.Resource->GetDesc().Format;
+					renderTargetView.Dimension = Size;
+
 					if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetView.Resource.Resource, &renderTargetView.TargetView)))
 						return false;
 				}
 
 				ViewInfo* view = &Info->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
-				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::Color0, Info->ViewsSWAPCHAIN[0].Format, true, D3D12_RESOURCE_STATE_COMMON, false);
+				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::Color0, Info->Views[0].Format, true, D3D12_RESOURCE_STATE_COMMON, false);
 				DirectX12Wrapper::Debugging::SetObjectName(view->Resource.Resource, L"Intermediate Render Target");
 
 				view = &Info->IntermediateViews[RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
 				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::DepthStencil, DXGI_FORMAT_D24_UNORM_S8_UINT, false, D3D12_RESOURCE_STATE_DEPTH_WRITE, false);
 				DirectX12Wrapper::Debugging::SetObjectName(view->Resource.Resource, L"Intermediate Depth/Stencil");
 
-				Info->CurrentBackBufferIndex = 0;
+				Info->CurrentViewIndex = 0;
 				Info->Initialized = true;
 
 				return true;
@@ -1130,9 +1140,9 @@ namespace Engine
 				DESTROY_VIEW(&ContextInfo->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX]);
 				DESTROY_VIEW(&ContextInfo->IntermediateViews[RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX]);
 
-				for (uint8 i = 0; i < ContextInfo->BackBufferCount; ++i)
+				for (uint8 i = 0; i < ContextInfo->ViewCount; ++i)
 				{
-					ViewInfo& renderTargetView = ContextInfo->ViewsSWAPCHAIN[i];
+					ViewInfo& renderTargetView = ContextInfo->Views[i];
 
 					if (!DirectX12Wrapper::ReleaseInstance(renderTargetView.Resource.Resource))
 						return false;

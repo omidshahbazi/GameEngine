@@ -68,12 +68,10 @@ namespace Engine
 						Construct(commandBuffer, Device, Type);
 					}
 					else
-					{
 						stack.Pop(&commandBuffer);
-						commandBuffer->Clear();
-					}
 
 					commandBuffer->SetName(L"Command Buffer");
+					commandBuffer->Clear();
 
 					return commandBuffer;
 				}

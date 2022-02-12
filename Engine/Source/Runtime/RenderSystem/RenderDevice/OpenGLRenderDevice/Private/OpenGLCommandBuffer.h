@@ -64,8 +64,10 @@ namespace Engine
 			private:
 				OpenGLDevice* m_Device;
 				Types m_Type;
+
 				char8 m_Name[64];
 				uint16 m_NameLength;
+
 				CommandBufferContainer m_Buffer;
 			};
 		}

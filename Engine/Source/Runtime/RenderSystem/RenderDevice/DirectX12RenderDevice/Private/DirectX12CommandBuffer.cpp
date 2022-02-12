@@ -208,14 +208,14 @@ namespace Engine
 				m_Device(Device),
 				m_NativeDevice(Device->GetDevice()),
 				m_Type(Type),
+				m_Name{},
+				m_NameLength(0),
 				m_Queue(nullptr),
 				m_Allocator(nullptr),
 				m_List(nullptr),
 				m_Fence(nullptr),
 				m_FenceValue(0),
 				m_FenceEvent(0),
-				m_InputLayout(Device->GetInputLayout()),
-				m_InputLayoutCount(Device->GetInputLayoutCount()),
 				m_CurrentRenderTargetViewCount(0),
 				m_CurrentDepthStencilView(nullptr),
 				m_CurrentDescriptorHeapCount(0)
@@ -289,13 +289,18 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetName(cwstr Name)
 			{
-				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Queue, Name)))
+				m_NameLength = CharacterUtility::GetLength(Name);
+				PlatformMemory::Copy(Name, m_Name, m_NameLength);
+
+				WString tempName(m_Name, m_NameLength);
+
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Queue, (tempName + L"_Queue").GetValue())))
 					return;
 
-				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Allocator, Name)))
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Allocator, (tempName + L"_Allocator").GetValue())))
 					return;
 
-				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_List, Name)))
+				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_List, (tempName + L"_List").GetValue())))
 					return;
 			}
 
@@ -304,7 +309,12 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(m_Allocator)))
 					return;
 
-				CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator));
+				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator)))
+					return;
+
+				//RENDERING
+				//if (m_NameLength != 0)
+				//	BeginEvent(m_Name);
 			}
 
 			void DirectX12CommandBuffer::CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle)
@@ -324,9 +334,6 @@ namespace Engine
 						type = GPUBufferTypes::Index;
 				}
 
-				//D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
-				//D3D12_RESOURCE_STATES destinationState = destInfo->State;
-
 				ADD_TRANSITION_STATE(sourceInfo, D3D12_RESOURCE_STATE_COPY_SOURCE);
 				ADD_TRANSITION_STATE(destInfo, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -341,14 +348,12 @@ namespace Engine
 					else if (!sourceInfo->IsIntermediate && destInfo->IsIntermediate)
 						DirectX12Wrapper::Command::AddCopyTextureToBufferCommand(m_List, sourceInfo->Resource.Resource, destInfo->Resource.Resource);
 				}
-
-				//ADD_TRANSITION_STATE(sourceInfo, sourceState);
-				//ADD_TRANSITION_STATE(destInfo, destinationState);
 			}
 
 			void DirectX12CommandBuffer::CopyTexture(ResourceHandle SourceHandle, const Vector2I& SourcePosition, ResourceHandle DestinationHandle, const Vector2I& DestinationPosition, const Vector2I& Size)
 			{
-				CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
+				//RENDERING
+				//CoreDebugAssert(Categories::RenderSystem, m_Type == Types::Copy, "Command buffer type is not Copy");
 				CoreDebugAssert(Categories::RenderSystem, SourceHandle != 0, "SourceHandle is invalid");
 				CoreDebugAssert(Categories::RenderSystem, SourcePosition >= Vector2I::Zero, "SourcePosition is invalid");
 				CoreDebugAssert(Categories::RenderSystem, DestinationHandle != 0, "DestinationHandle is invalid");
@@ -358,20 +363,14 @@ namespace Engine
 				TextureResourceInfo* sourceInfo = ReinterpretCast(TextureResourceInfo*, SourceHandle);
 				TextureResourceInfo* destInfo = ReinterpretCast(TextureResourceInfo*, DestinationHandle);
 
-				CoreDebugAssert(Categories::RenderSystem, sourceInfo->Format != destInfo->Format, "Texture formats are not the same");
+				CoreDebugAssert(Categories::RenderSystem, sourceInfo->Format == destInfo->Format, "Texture formats are not the same");
 				CoreDebugAssert(Categories::RenderSystem, SourcePosition + Size <= sourceInfo->Dimension, "SourcePosition+Size is invalid");
 				CoreDebugAssert(Categories::RenderSystem, DestinationPosition + Size <= destInfo->Dimension, "DestinationPosition+Size is invalid");
-
-				//D3D12_RESOURCE_STATES sourceState = sourceInfo->State;
-				//D3D12_RESOURCE_STATES destinationState = destInfo->State;
 
 				ADD_TRANSITION_STATE(sourceInfo, D3D12_RESOURCE_STATE_COPY_SOURCE);
 				ADD_TRANSITION_STATE(destInfo, D3D12_RESOURCE_STATE_COPY_DEST);
 
 				DirectX12Wrapper::Command::AddCopyTextureCommand(m_List, sourceInfo->Resource.Resource, SourcePosition.X, SourcePosition.Y, destInfo->Resource.Resource, DestinationPosition.X, DestinationPosition.Y, Size.X, Size.Y);
-
-				//ADD_TRANSITION_STATE(sourceInfo, sourceState);
-				//ADD_TRANSITION_STATE(destInfo, destinationState);
 			}
 
 			void DirectX12CommandBuffer::GenerateMipMap(ResourceHandle Handle)
@@ -640,6 +639,10 @@ namespace Engine
 
 			bool DirectX12CommandBuffer::Execute(void)
 			{
+				//RENDERING
+				//if (m_NameLength != 0)
+				//	EndEvent();
+
 				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(m_List)))
 					return false;
 
@@ -706,10 +709,13 @@ namespace Engine
 					Desc.BlendState = blendDesc;
 				}
 
+				static D3D12_INPUT_ELEMENT_DESC* inputLayout = m_Device->GetInputLayout();
+				static uint8 inputLayoutCount = m_Device->GetInputLayoutCount();
+
 				D3D12_INPUT_LAYOUT_DESC inputLayoutDesc = {};
 				{
-					inputLayoutDesc.NumElements = m_InputLayoutCount;
-					inputLayoutDesc.pInputElementDescs = m_InputLayout;
+					inputLayoutDesc.NumElements = inputLayoutCount;
+					inputLayoutDesc.pInputElementDescs = inputLayout;
 
 					Desc.InputLayout = inputLayoutDesc;
 				}

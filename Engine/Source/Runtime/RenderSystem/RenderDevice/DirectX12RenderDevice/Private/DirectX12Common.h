@@ -84,17 +84,10 @@ namespace Engine
 				static const uint8 DEPTH_STENCIL_VIEW_INDEX = 1;
 
 			public:
-				//INLINE ViewInfo* GetIntermediateRenderTargetViews(void)
-				//{
-				//	//return &Views[CurrentBackBufferIndex][RENDER_TARGET_VIEW_INDEX];
-				//	return &IntermediateViews[RENDER_TARGET_VIEW_INDEX];
-				//}
-
-				//INLINE ViewInfo* GetIntermediateDepthStencilViews(void)
-				//{
-				//	//return &Views[CurrentBackBufferIndex][DEPTH_STENCIL_VIEW_INDEX];
-				//	return &IntermediateViews[DEPTH_STENCIL_VIEW_INDEX];
-				//}
+				INLINE ViewInfo* GetSwapChainView(void)
+				{
+					return &Views[CurrentViewIndex];
+				}
 
 				PlatformWindow::WindowHandle WindowHandle;
 				DirectX12CommandBuffer* CommandBuffer;
@@ -102,11 +95,10 @@ namespace Engine
 
 				bool Initialized;
 
-				ViewInfo ViewsSWAPCHAIN[MAX_BACK_BUFFER_COUNT];
-				uint8 BackBufferCount;
-				uint8 CurrentBackBufferIndex;
+				ViewInfo Views[MAX_BACK_BUFFER_COUNT];
+				uint8 ViewCount;
+				uint8 CurrentViewIndex;
 				ViewInfo IntermediateViews[2];
-				Vector2I Size;
 			};
 
 			typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;

@@ -50,7 +50,7 @@ namespace Engine
 			public:
 				D3D12_SAMPLER_DESC SamplerDescription;
 				DescriptorViewAllocator::ViewHandle SamplerView;
-				DXGI_FORMAT Format;
+				Formats Format;
 				Vector2I Dimension;
 			};
 
@@ -129,6 +129,67 @@ namespace Engine
 				case TestFunctions::Always:
 					return D3D12_COMPARISON_FUNC_ALWAYS;
 				}
+			}
+
+			INLINE DXGI_FORMAT GetTextureFormat(Formats Format)
+			{
+				switch (Format)
+				{
+				case Formats::R8:
+					return DXGI_FORMAT_R8_UNORM;
+				case Formats::R16:
+					return DXGI_FORMAT_R16_UNORM;
+				case Formats::R32:
+					return DXGI_FORMAT_R32_UINT;
+				case Formats::R16F:
+					return DXGI_FORMAT_R16_FLOAT;
+				case Formats::R32F:
+					return DXGI_FORMAT_R32_FLOAT;
+				case Formats::RG8:
+					return DXGI_FORMAT_R8G8_UNORM;
+				case Formats::RG16:
+					return DXGI_FORMAT_R16G16_UNORM;
+				case Formats::RG32:
+					return DXGI_FORMAT_R32G32_UINT;
+				case Formats::RG16F:
+					return DXGI_FORMAT_R16G16_FLOAT;
+				case Formats::RG32F:
+					return DXGI_FORMAT_R32G32_FLOAT;
+				case Formats::RGB8:
+					return DXGI_FORMAT_R8G8B8A8_UNORM;
+				case Formats::RGB16:
+					return DXGI_FORMAT_R16G16B16A16_UNORM;
+				case Formats::RGB32:
+					return DXGI_FORMAT_R32G32B32A32_UINT;
+				case Formats::RGB16F:
+					return DXGI_FORMAT_R16G16B16A16_FLOAT;
+				case Formats::RGB32F:
+					return DXGI_FORMAT_R32G32B32A32_FLOAT;
+				case Formats::RGBA8:
+					return DXGI_FORMAT_R8G8B8A8_UNORM;
+				case Formats::RGBA16:
+					return DXGI_FORMAT_R16G16B16A16_UNORM;
+				case Formats::RGBA32:
+					return DXGI_FORMAT_R32G32B32A32_UINT;
+				case Formats::RGBA16F:
+					return DXGI_FORMAT_R16G16B16A16_FLOAT;
+				case Formats::RGBA32F:
+					return DXGI_FORMAT_R32G32B32A32_FLOAT;
+				case Formats::Depth16:
+					return DXGI_FORMAT_R16_UNORM;
+				case Formats::Depth24:
+					return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+				case Formats::Depth32:
+					return DXGI_FORMAT_R32_UINT;
+				case Formats::Depth32F:
+					return DXGI_FORMAT_R32_FLOAT;
+				case Formats::DepthStencil24F:
+					return DXGI_FORMAT_D24_UNORM_S8_UINT;
+				case Formats::DepthStencil32F:
+					return DXGI_FORMAT_R32G32_UINT;
+				}
+
+				return DXGI_FORMAT_UNKNOWN;
 			}
 		}
 	}

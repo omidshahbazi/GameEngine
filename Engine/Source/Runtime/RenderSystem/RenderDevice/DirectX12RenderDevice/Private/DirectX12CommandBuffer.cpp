@@ -447,10 +447,10 @@ namespace Engine
 				{
 					stateHash = Helper::GetRenderStateHash(m_State);
 
-					stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : m_CurrentDepthStencilView->Format);
+					stateHash += (m_CurrentDepthStencilView == nullptr ? 0 : (uint32)m_CurrentDepthStencilView->Format);
 
 					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-						stateHash += m_CurrentRenderTargetViews[i]->Format;
+						stateHash += (uint32)m_CurrentRenderTargetViews[i]->Format;
 				}
 
 				ID3D12PipelineState* pipelineState = nullptr;
@@ -673,18 +673,18 @@ namespace Engine
 
 				Desc.PrimitiveToplogy = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
-				if (m_CurrentDepthStencilView != nullptr)
-					Desc.DepthStencilFormat = m_CurrentDepthStencilView->Format;
-
 				D3D12_RT_FORMAT_ARRAY rtvFormats = {};
 				{
 					rtvFormats.NumRenderTargets = m_CurrentRenderTargetViewCount;
 
 					for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
-						rtvFormats.RTFormats[i] = m_CurrentRenderTargetViews[i]->Format;
+						rtvFormats.RTFormats[i] = GetTextureFormat(m_CurrentRenderTargetViews[i]->Format);
 
 					Desc.RenderTargetFormats = rtvFormats;
 				}
+
+				if (m_CurrentDepthStencilView != nullptr)
+					Desc.DepthStencilFormat = GetTextureFormat(m_CurrentDepthStencilView->Format);
 			}
 
 #undef FILL_RENDER_VIEWS_USING_CONTEXT

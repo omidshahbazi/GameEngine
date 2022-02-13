@@ -232,12 +232,12 @@ namespace Engine
 				class SwapChain
 				{
 				public:
-					INLINE static bool Create(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, uint8 BackBufferCount, PlatformWindow::WindowHandle Handle, IDXGISwapChain4** SwapChain)
+					INLINE static bool Create(IDXGIFactory5* Factory, ID3D12CommandQueue* CommandQueue, DXGI_FORMAT Format, uint8 BackBufferCount, PlatformWindow::WindowHandle Handle, IDXGISwapChain4** SwapChain)
 					{
 						DXGI_SWAP_CHAIN_DESC1 desc = {};
 						desc.Width = 0;
 						desc.Height = 0;
-						desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+						desc.Format = Format;
 						desc.Stereo = false;
 
 						desc.SampleDesc.Quality = 0;

@@ -54,10 +54,11 @@ namespace Engine
 
 #define CREATE_VIEW(ViewPtr, BufferWidth, BufferHeight, AttachPoint, BufferFormat, IsColored, CurrentState, ShaderVisible) \
 				{ \
+					DXGI_FORMAT format = GetTextureFormat(BufferFormat); \
 					INITIALIZE_RESOURCE_INFO(ViewPtr, CurrentState); \
 					ViewPtr->Type = GPUBufferTypes::Pixel; \
 					ViewPtr->IsIntermediate = false; \
-					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(BufferWidth, BufferHeight, BufferFormat, IsColored, CurrentState, false, &ViewPtr->Resource))) \
+					if (!CHECK_CALL(m_RenderTargetHeapAllocator.Allocate(BufferWidth, BufferHeight, format, IsColored, CurrentState, false, &ViewPtr->Resource))) \
 						return false; \
 					if (!AllocateSampler(ViewPtr)) \
 						return false; \
@@ -65,14 +66,14 @@ namespace Engine
 					ViewPtr->Format = BufferFormat; \
 					ViewPtr->Dimension = Vector2I(BufferWidth, BufferHeight); \
 					if (ShaderVisible) \
-						if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(ViewPtr->Resource.Resource, BufferFormat, D3D12_RESOURCE_DIMENSION_TEXTURE2D, &ViewPtr->View))) \
+						if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(ViewPtr->Resource.Resource, format, D3D12_RESOURCE_DIMENSION_TEXTURE2D, &ViewPtr->View))) \
 							return false; \
 					if (IsColored) \
 					{ \
 						if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(ViewPtr->Resource.Resource, &ViewPtr->TargetView))) \
 							return false; \
 					} \
-					else if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(ViewPtr->Resource.Resource, BufferFormat, D3D12_DSV_FLAG_NONE, &ViewPtr->TargetView))) \
+					else if (!CHECK_CALL(m_DepthStencilViewAllocator.AllocateDepthStencilView(ViewPtr->Resource.Resource, format, D3D12_DSV_FLAG_NONE, &ViewPtr->TargetView))) \
 						return false; \
 				}
 
@@ -94,6 +95,7 @@ namespace Engine
 				}
 
 
+			const Formats BACK_BUFFER_FORMAT = Formats::RGB8;
 			const uint8 BACK_BUFFER_COUNT = 2;
 			const uint32 UPLAOD_BUFFER_SIZE = 8 * MegaByte;
 
@@ -108,7 +110,7 @@ namespace Engine
 				return D3D12_RESOURCE_DIMENSION_UNKNOWN;
 			}
 
-			DXGI_FORMAT GetFormat(Formats Format)
+			DXGI_FORMAT GetBufferFormat(Formats Format)
 			{
 				switch (Format)
 				{
@@ -169,85 +171,16 @@ namespace Engine
 				return DXGI_FORMAT_UNKNOWN;
 			}
 
-			DXGI_FORMAT GetTextureFormat(Formats Format)
+			uint8 GetTextureFormatPadding(Formats Format)
 			{
 				switch (Format)
 				{
-				case Formats::R8:
-					return DXGI_FORMAT_R8_UNORM;
-				case Formats::R16:
-					return DXGI_FORMAT_R16_UNORM;
-				case Formats::R32:
-					return DXGI_FORMAT_R32_UINT;
-				case Formats::R16F:
-					return DXGI_FORMAT_R16_FLOAT;
-				case Formats::R32F:
-					return DXGI_FORMAT_R32_FLOAT;
-				case Formats::RG8:
-					return DXGI_FORMAT_R8G8_UNORM;
-				case Formats::RG16:
-					return DXGI_FORMAT_R16G16_UNORM;
-				case Formats::RG32:
-					return DXGI_FORMAT_R32G32_UINT;
-				case Formats::RG16F:
-					return DXGI_FORMAT_R16G16_FLOAT;
-				case Formats::RG32F:
-					return DXGI_FORMAT_R32G32_FLOAT;
 				case Formats::RGB8:
-					return DXGI_FORMAT_R8G8B8A8_UNORM;
 				case Formats::RGB16:
-					return DXGI_FORMAT_R16G16B16A16_UNORM;
-				case Formats::RGB32:
-					return DXGI_FORMAT_R32G32B32A32_UINT;
 				case Formats::RGB16F:
-					return DXGI_FORMAT_R16G16B16A16_FLOAT;
+				case Formats::RGB32:
 				case Formats::RGB32F:
-					return DXGI_FORMAT_R32G32B32A32_FLOAT;
-				case Formats::RGBA8:
-					return DXGI_FORMAT_R8G8B8A8_UNORM;
-				case Formats::RGBA16:
-					return DXGI_FORMAT_R16G16B16A16_UNORM;
-				case Formats::RGBA32:
-					return DXGI_FORMAT_R32G32B32A32_UINT;
-				case Formats::RGBA16F:
-					return DXGI_FORMAT_R16G16B16A16_FLOAT;
-				case Formats::RGBA32F:
-					return DXGI_FORMAT_R32G32B32A32_FLOAT;
-				case Formats::Depth16:
-					return DXGI_FORMAT_R16_UNORM;
-				case Formats::Depth24:
-					return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-				case Formats::Depth32:
-					return DXGI_FORMAT_R32_UINT;
-				case Formats::Depth32F:
-					return DXGI_FORMAT_R32_FLOAT;
-				case Formats::DepthStencil24F:
-					return DXGI_FORMAT_D24_UNORM_S8_UINT;
-				case Formats::DepthStencil32F:
-					return DXGI_FORMAT_R32G32_UINT;
-				}
-
-				return DXGI_FORMAT_UNKNOWN;
-			}
-
-			uint8 GetTextureFormatPadding(DXGI_FORMAT Format) ??????????
-			{
-				switch (Format)
-				{
-				case DXGI_FORMAT_R8G8B8A8_UNORM:
-					return Helper::GetTextureChannelSize(Formats::RGB8);
-
-				case DXGI_FORMAT_R16G16B16A16_UNORM:
-					return Helper::GetTextureChannelSize(Formats::RGB16);
-
-				case DXGI_FORMAT_R16G16B16A16_FLOAT:
-					return Helper::GetTextureChannelSize(Formats::RGB16F);
-
-				case DXGI_FORMAT_R32G32B32A32_UINT:
-					return Helper::GetTextureChannelSize(Formats::RGB32);
-
-				case DXGI_FORMAT_R32G32B32A32_FLOAT:
-					return Helper::GetTextureChannelSize(Formats::RGB32F);
+					return Helper::GetTextureChannelSize(Format);
 				}
 
 				return 0;
@@ -392,7 +325,7 @@ namespace Engine
 
 					desc.SemanticName = SubMeshInfo::GetLayoutName(layout);
 					desc.SemanticIndex = 0;
-					desc.Format = GetFormat(SubMeshInfo::GetLayoutFormat(layout));
+					desc.Format = GetBufferFormat(SubMeshInfo::GetLayoutFormat(layout));
 					desc.InputSlot = 0;
 					desc.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 					desc.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
@@ -472,7 +405,7 @@ namespace Engine
 				commandBuffer->SetName(L"RenderContextCommandBuffer");
 
 				IDXGISwapChain4* swapChain = nullptr;
-				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, commandBuffer->GetQueue(), BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
+				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, commandBuffer->GetQueue(), GetTextureFormat(BACK_BUFFER_FORMAT), BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
 					return false;
 
 				RenderContextInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
@@ -697,12 +630,14 @@ namespace Engine
 				INITIALIZE_RESOURCE_INFO(info, state);
 				info->Type = GPUBufferTypes::Pixel;
 				info->IsIntermediate = false;
-				info->Format = GetTextureFormat(Info->Format);
+				info->Format = Info->Format;
 				info->Dimension = Info->Dimension;
+
+				DXGI_FORMAT format = GetTextureFormat(Info->Format);
 
 				if (Info->Type == TextureTypes::TwoD)
 				{
-					if (!CHECK_CALL(m_TextureHeapAllocator.Allocate(Info->Dimension.X, Info->Dimension.Y, info->Format, dimension, state, false, &info->Resource)))
+					if (!CHECK_CALL(m_TextureHeapAllocator.Allocate(Info->Dimension.X, Info->Dimension.Y, format, dimension, state, false, &info->Resource)))
 						return false;
 				}
 				else
@@ -719,7 +654,7 @@ namespace Engine
 					uint8 pixelSize = Helper::GetTexturePixelSize(Info->Format);
 
 					uint32 resourcePitch = DirectX12Wrapper::Support::GetResourceRowPitch(m_Device, info->Resource.Resource);
-					uint8 padding = GetTextureFormatPadding(info->Format);
+					uint8 padding = GetTextureFormatPadding(Info->Format);
 
 					for (int32 y = 0; y < Info->Dimension.Y; ++y)
 						for (int32 x = 0; x < Info->Dimension.X; ++x)
@@ -728,7 +663,7 @@ namespace Engine
 					END_UPLOAD(info);
 				}
 
-				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(info->Resource.Resource, info->Format, dimension, &info->View)))
+				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(info->Resource.Resource, format, dimension, &info->View)))
 					return false;
 
 				Handle = ReinterpretCast(ResourceHandle, info);
@@ -764,7 +699,7 @@ namespace Engine
 
 				TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
 
-				Footprint.Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, textureResourceInfo->Dimension.X, textureResourceInfo->Dimension.Y, textureResourceInfo->Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
+				Footprint.Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, textureResourceInfo->Dimension.X, textureResourceInfo->Dimension.Y, GetTextureFormat(textureResourceInfo->Format), D3D12_TEXTURE_LAYOUT_UNKNOWN);
 				Footprint.RowPitch = DirectX12Wrapper::Support::GetResourceRowPitch(m_Device, textureResourceInfo->Resource.Resource);
 				Footprint.ElementPadding = GetTextureFormatPadding(textureResourceInfo->Format);
 
@@ -823,9 +758,8 @@ namespace Engine
 						{ \
 							if (!Helper::IsColorPoint(textureInfo.Point) == IsColored) \
 								continue; \
-							DXGI_FORMAT format = GetTextureFormat(textureInfo.Format); \
 							ViewInfo* view = &renderTargetInfos->Views[index++]; \
-							CREATE_VIEW(view, textureInfo.Dimension.X, textureInfo.Dimension.Y, textureInfo.Point, format, IsColored, CurrentState, true); \
+							CREATE_VIEW(view, textureInfo.Dimension.X, textureInfo.Dimension.Y, textureInfo.Point, textureInfo.Format, IsColored, CurrentState, true); \
 							Textures.Add(ReinterpretCast(ResourceHandle, ReinterpretCast(TextureResourceInfo*, view))); \
 						} \
 					}
@@ -1082,7 +1016,7 @@ namespace Engine
 					renderTargetView.Type = GPUBufferTypes::Pixel;
 					renderTargetView.IsIntermediate = false;
 					renderTargetView.Point = AttachmentPoints::Color0;
-					renderTargetView.Format = renderTargetView.Resource.Resource->GetDesc().Format;
+					renderTargetView.Format = BACK_BUFFER_FORMAT;
 					renderTargetView.Dimension = Size;
 
 					if (!CHECK_CALL(m_RenderTargetViewAllocator.AllocateRenderTargetView(renderTargetView.Resource.Resource, &renderTargetView.TargetView)))
@@ -1094,7 +1028,7 @@ namespace Engine
 				DirectX12Wrapper::Debugging::SetObjectName(view->Resource.Resource, L"Intermediate Render Target");
 
 				view = &Info->IntermediateViews[RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX];
-				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::DepthStencil, DXGI_FORMAT_D24_UNORM_S8_UINT, false, D3D12_RESOURCE_STATE_DEPTH_WRITE, false);
+				CREATE_VIEW(view, Size.X, Size.Y, AttachmentPoints::DepthStencil, Formats::DepthStencil24F, false, D3D12_RESOURCE_STATE_DEPTH_WRITE, false);
 				DirectX12Wrapper::Debugging::SetObjectName(view->Resource.Resource, L"Intermediate Depth/Stencil");
 
 				Info->CurrentViewIndex = 0;

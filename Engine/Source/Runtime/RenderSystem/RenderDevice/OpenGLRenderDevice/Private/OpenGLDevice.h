@@ -98,9 +98,8 @@ namespace Engine
 				ResourceHandle m_BaseContextHandle;
 				Window* m_BaseContextWindow;
 
-				RenderContextMap m_Contexts;
+				RenderContextList m_Contexts;
 				RenderContextInfo* m_BaseContext;
-				ResourceHandle m_CurrentContextHandle;
 				RenderContextInfo* m_CurrentContext;
 
 				CommandBufferPool m_CommandBufferPool;

@@ -324,7 +324,6 @@ namespace Engine
 				m_AdapterDesc({}),
 				m_Device(nullptr),
 				m_UploadBuffer({}),
-				m_CurrentContextHandle(0),
 				m_CurrentContext(nullptr),
 				m_InputLayout(nullptr),
 				m_InputLayoutCount(0),
@@ -479,10 +478,6 @@ namespace Engine
 				if (WindowHandle == 0)
 					return false;
 
-				for (auto& item : m_Contexts)
-					if (item.GetFirst() == (ResourceHandle)WindowHandle)
-						return false;
-
 				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get(this);
 				commandBuffer->SetName(L"RenderContextCommandBuffer");
 
@@ -498,9 +493,7 @@ namespace Engine
 				info->SwapChain = swapChain;
 				info->ViewCount = BACK_BUFFER_COUNT;
 
-				Handle = (ResourceHandle)WindowHandle;
-
-				m_Contexts[Handle] = info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 			}
@@ -510,12 +503,9 @@ namespace Engine
 				if (Handle == 0)
 					return true;
 
-				if (!m_Contexts.Contains(Handle))
-					return false;
+				RenderContextInfo* info = ReinterpretCast(RenderContextInfo*, Handle);
 
-				RenderContextInfo* info = m_Contexts[Handle];
-
-				if (m_CurrentContextHandle == Handle)
+				if (m_CurrentContext == info)
 					SetContext(0);
 
 				if (!WaitForAsyncCommandBuffers())
@@ -531,32 +521,22 @@ namespace Engine
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(info);
 
-				m_Contexts.Remove(Handle);
-
 				return true;
 			}
 
 			bool DirectX12Device::SetContext(ResourceHandle Handle)
 			{
-				if (m_CurrentContextHandle == Handle)
+				if (ReinterpretCast(ResourceHandle, m_CurrentContext) == Handle)
 					return true;
 
 				if (Handle == 0)
 				{
-					m_CurrentContextHandle = 0;
 					m_CurrentContext = nullptr;
-
-					//RENDERING
-					//m_CurrentRenderTargetViewCount = 0;
-					//m_CurrentDepthStencilView = nullptr;
 
 					return true;
 				}
 
-				if (!m_Contexts.Contains(Handle))
-					return false;
-
-				RenderContextInfo* info = m_Contexts[Handle];
+				RenderContextInfo* info = ReinterpretCast(RenderContextInfo*, Handle);
 
 				uint16 width, height;
 				PlatformWindow::GetClientSize(info->WindowHandle, width, height);
@@ -565,7 +545,6 @@ namespace Engine
 					if (!UpdateSwapChainBufferSize(info, Vector2I(width, height)))
 						return false;
 
-				m_CurrentContextHandle = Handle;
 				m_CurrentContext = info;
 
 				//RENDERING
@@ -620,7 +599,7 @@ namespace Engine
 					return false;
 
 
-				Handle = (ResourceHandle)info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 			}
@@ -695,7 +674,7 @@ namespace Engine
 				IMPLEMENT(FragmentShader);
 				IMPLEMENT(ComputeShader);
 
-				Handle = (ResourceHandle)programInfos;
+				Handle = ReinterpretCast(ResourceHandle, programInfos);
 
 				return true;
 #undef IMPLEMENT
@@ -704,8 +683,8 @@ namespace Engine
 			bool DirectX12Device::DestroyProgram(ResourceHandle Handle)
 			{
 #define IMPLEMENT(StageName) \
-					if (programInfos->StageName.Buffer != nullptr) \
-						RenderSystemAllocators::ResourceAllocator_Deallocate(programInfos->StageName.Buffer); \
+				if (programInfos->StageName.Buffer != nullptr) \
+					RenderSystemAllocators::ResourceAllocator_Deallocate(programInfos->StageName.Buffer); \
 
 				if (Handle == 0)
 					return false;
@@ -775,7 +754,7 @@ namespace Engine
 				if (!CHECK_CALL(m_ResourceViewAllocator.AllocateTextureShaderResourceView(info->Resource.Resource, info->Format, dimension, &info->View)))
 					return false;
 
-				Handle = (ResourceHandle)info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 			}
@@ -856,7 +835,7 @@ namespace Engine
 							DXGI_FORMAT format = GetTextureFormat(textureInfo.Format); \
 							ViewInfo* view = &renderTargetInfos->Views[index++]; \
 							CREATE_VIEW(view, textureInfo.Dimension.X, textureInfo.Dimension.Y, textureInfo.Point, format, IsColored, CurrentState, true); \
-							Textures.Add((ResourceHandle)ReinterpretCast(TextureResourceInfo*, view)); \
+							Textures.Add(ReinterpretCast(ResourceHandle, ReinterpretCast(TextureResourceInfo*, view))); \
 						} \
 					}
 
@@ -872,7 +851,7 @@ namespace Engine
 				CREATE_VIEWS(true, D3D12_RESOURCE_STATE_COMMON);
 				CREATE_VIEWS(false, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-				Handle = (ResourceHandle)renderTargetInfos;
+				Handle = ReinterpretCast(ResourceHandle, renderTargetInfos);
 
 				return true;
 
@@ -946,7 +925,7 @@ namespace Engine
 					}
 				}
 
-				Handle = (ResourceHandle)info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 			}

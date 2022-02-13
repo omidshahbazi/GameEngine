@@ -179,7 +179,7 @@ namespace Engine
 
 				INITIALIZE_BUFFER_INFO(info, handle, Size, Type, IsIntermediate);
 
-				Handle = (ResourceHandle)info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 			}
@@ -233,7 +233,6 @@ namespace Engine
 				m_BaseContextHandle(0),
 				m_BaseContextWindow(nullptr),
 				m_BaseContext(nullptr),
-				m_CurrentContextHandle(0),
 				m_CurrentContext(nullptr)
 			{
 			}
@@ -304,10 +303,6 @@ namespace Engine
 				if (WindowHandle == 0)
 					return false;
 
-				for (auto& item : m_Contexts)
-					if (item.GetFirst() == (ResourceHandle)WindowHandle)
-						return false;
-
 				PlatformGL::ContextHandle contextHandle = PlatformGL::GetDeviceContext(WindowHandle);
 
 				if (contextHandle == 0)
@@ -347,8 +342,6 @@ namespace Engine
 				if (wglContextHandle == 0)
 					return false;
 
-				Handle = (ResourceHandle)WindowHandle;
-
 				RenderContextInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<RenderContextInfo>();
 				Construct(info);
 
@@ -356,10 +349,12 @@ namespace Engine
 				info->WGLContextHandle = wglContextHandle;
 				info->IsActive = false;
 
-				m_Contexts[Handle] = info;
+				m_Contexts.Add(info);
 
 				if (m_BaseContext == nullptr)
 					m_BaseContext = info;
+
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 			}
@@ -369,26 +364,23 @@ namespace Engine
 				if (Handle == 0)
 					return true;
 
-				if (!m_Contexts.Contains(Handle))
-					return false;
+				RenderContextInfo* info = ReinterpretCast(RenderContextInfo*, Handle);
 
-				RenderContextInfo* info = m_Contexts[Handle];
-
-				if (m_CurrentContextHandle == Handle)
+				if (m_CurrentContext == info)
 					SetContext(0);
 
 				PlatformGL::DestroyWGLContext(info->WGLContextHandle);
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(info);
 
-				m_Contexts.Remove(Handle);
+				m_Contexts.Remove(info);
 
 				return true;
 			}
 
 			bool OpenGLDevice::SetContext(ResourceHandle Handle)
 			{
-				if (m_CurrentContextHandle == Handle)
+				if (ReinterpretCast(ResourceHandle, m_CurrentContext) == Handle)
 					return true;
 
 				if (m_CurrentContext != nullptr)
@@ -396,18 +388,13 @@ namespace Engine
 
 				if (Handle == 0)
 				{
-					m_CurrentContextHandle = 0;
 					m_CurrentContext = nullptr;
 					PlatformGL::MakeCurrentWGLContext(0, 0);
 					return true;
 				}
 
-				if (!m_Contexts.Contains(Handle))
-					return false;
+				RenderContextInfo* info = ReinterpretCast(RenderContextInfo*, Handle);
 
-				RenderContextInfo* info = m_Contexts[Handle];
-
-				m_CurrentContextHandle = Handle;
 				m_CurrentContext = info;
 
 				PlatformGL::MakeCurrentWGLContext(info->ContextHandle, info->WGLContextHandle);
@@ -556,7 +543,7 @@ namespace Engine
 				if (ComputeShaderID != 0)
 					glDetachShader(handle, ComputeShaderID);
 
-				Handle = (ResourceHandle)info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;
 
@@ -583,7 +570,7 @@ namespace Engine
 				glGenTextures(1, &handle);
 
 				TextureBufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<TextureBufferInfo>();
-				Handle = (ResourceHandle)info;
+				Handle = ReinterpretCast(ResourceHandle, info);
 
 				INITIALIZE_BUFFER_INFO(info, handle, Helper::GetTextureBufferSize(Info->Format, Info->Dimension), GPUBufferTypes::Pixel, false);
 				info->TextureType = Info->Type;
@@ -697,7 +684,7 @@ namespace Engine
 				glGenFramebuffers(1, &handle);
 				renderTargetInfo->Handle = handle;
 
-				Handle = (ResourceHandle)renderTargetInfo;
+				Handle = ReinterpretCast(ResourceHandle, renderTargetInfo);
 
 				glBindFramebuffer(GL_FRAMEBUFFER, handle);
 
@@ -793,7 +780,7 @@ namespace Engine
 					meshBufferInfo->IndexBufferObject = ReinterpretCast(BufferInfo*, ebo);
 				meshBufferInfo->Layout = Info->Layout;
 
-				Handle = (ResourceHandle)meshBufferInfo;
+				Handle = ReinterpretCast(ResourceHandle, meshBufferInfo);
 
 				return true;
 
@@ -808,18 +795,16 @@ namespace Engine
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
 				if (meshBufferInfo->IndexBufferObject != nullptr)
-					DestroyBuffer((ResourceHandle)meshBufferInfo->IndexBufferObject);
+					DestroyBuffer(ReinterpretCast(ResourceHandle, meshBufferInfo->IndexBufferObject));
 
-				DestroyBuffer((ResourceHandle)meshBufferInfo);
+				DestroyBuffer(ReinterpretCast(ResourceHandle, meshBufferInfo));
 
 				RenderContextInfo* currentInfo = m_CurrentContext;
 
-				for (auto& item : m_Contexts)
+				for (auto& context : m_Contexts)
 				{
-					auto* context = item.GetSecond();
-
 					if (!context->IsActive)
-						SetContext(item.GetFirst());
+						SetContext(ReinterpretCast(ResourceHandle, context));
 
 					if (!context->VertexArrays.Contains(meshBufferInfo))
 						continue;
@@ -831,7 +816,7 @@ namespace Engine
 				}
 
 				if (m_CurrentContext != currentInfo)
-					SetContext(m_CurrentContextHandle);
+					SetContext(ReinterpretCast(ResourceHandle, m_CurrentContext));
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(meshBufferInfo);
 

@@ -69,7 +69,7 @@ namespace Engine
 				bool IsActive;
 			};
 
-			typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;
+			typedef Vector<RenderContextInfo*> RenderContextList;
 
 			INLINE uint32 GetBufferType(GPUBufferTypes Type)
 			{

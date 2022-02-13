@@ -10,6 +10,8 @@ namespace Engine
 	{
 		namespace Private
 		{
+			//https://docs.microsoft.com/en-us/windows/win32/direct3d12/recording-command-lists-and-bundles
+
 #define FILL_RENDER_VIEWS_USING_CONTEXT() \
 			{ \
 				auto currentContex = m_Device->GetCurrentContext(); \
@@ -594,13 +596,7 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(m_List)))
 					return false;
 
-				//RENDERING
-				//if (Set.SkipFrameCount != 0)
-				//	--Set.SkipFrameCount;
-				//else
-				{
-					DirectX12Wrapper::Command::ExecuteCommandList(m_Queue, m_List);
-				}
+				DirectX12Wrapper::Command::ExecuteCommandList(m_Queue, m_List);
 
 				return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(m_Queue, m_Fence, m_FenceEvent, m_FenceValue));
 			}

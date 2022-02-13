@@ -101,8 +101,6 @@ namespace Engine
 				ViewInfo IntermediateViews[2];
 			};
 
-			typedef Map<ResourceHandle, RenderContextInfo*> RenderContextMap;
-
 			INLINE D3D12_COMPARISON_FUNC GetComparisonFunction(TestFunctions TestFunction)
 			{
 				switch (TestFunction)

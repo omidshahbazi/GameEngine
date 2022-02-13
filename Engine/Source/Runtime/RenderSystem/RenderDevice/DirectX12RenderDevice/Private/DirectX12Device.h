@@ -151,8 +151,6 @@ namespace Engine
 				D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
 				uint8 m_InputLayoutCount;
 
-				RenderContextMap m_Contexts;
-				ResourceHandle m_CurrentContextHandle;
 				RenderContextInfo* m_CurrentContext;
 
 				CommandBufferPool m_CommandBufferPool;

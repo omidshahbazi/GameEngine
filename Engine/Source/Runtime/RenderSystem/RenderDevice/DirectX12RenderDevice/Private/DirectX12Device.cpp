@@ -556,12 +556,13 @@ namespace Engine
 					return false;
 
 				ViewInfo& rt = m_CurrentContext->IntermediateViews[RenderContextInfo::RENDER_TARGET_VIEW_INDEX];
-				ViewInfo* view = m_CurrentContext->GetSwapChainView();
+				ResourceHandle view = ReinterpretCast(ResourceHandle, m_CurrentContext->GetSwapChainView());
 
 				DirectX12CommandBuffer& cb = *m_CurrentContext->CommandBuffer;
 				cb.Clear();
 				cb.BeginEvent(L"CopyToBackBuffer");
-				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, ReinterpretCast(ResourceHandle, view), Vector2I::Zero, rt.Dimension);
+				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, view, Vector2I::Zero, rt.Dimension);
+				cb.MoveTextureToPresentState(view);
 				cb.EndEvent();
 				cb.Execute();
 

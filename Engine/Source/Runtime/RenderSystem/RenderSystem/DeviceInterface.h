@@ -109,11 +109,6 @@ namespace Engine
 			}
 
 		private:
-			FrameDataChain* GetFrameDataChain(void)
-			{
-				return m_FrameDataChain;
-			}
-
 			void DestroyContextInternal(RenderContext* Context);
 
 		public:
@@ -128,6 +123,8 @@ namespace Engine
 			ThreadedDevice* m_ThreadedDevice;
 			const RenderContext* m_LastContext;
 			FrameDataChain* m_FrameDataChain;
+
+			Texture* m_DefaultTexture;
 
 			//UNDONE:RENDERING -> IPipeline
 			//Should be per camera

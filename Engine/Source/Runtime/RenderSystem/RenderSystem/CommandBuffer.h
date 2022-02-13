@@ -92,9 +92,9 @@ namespace Engine
 			//RenderTargetPool
 
 		private:
-			bool PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext);
+			bool PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const RenderContext* RenderContext);
 
-			static void InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			static void InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 		private:
 			WString m_Name;

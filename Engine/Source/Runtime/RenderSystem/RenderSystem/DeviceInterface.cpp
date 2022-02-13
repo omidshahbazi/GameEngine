@@ -43,6 +43,8 @@ namespace Engine
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
 			m_ThreadedDevice(nullptr),
+			m_FrameDataChain(nullptr),
+			m_DefaultTexture(nullptr),
 			m_LastContext(nullptr),
 			m_Pipeline(nullptr)
 		{
@@ -55,6 +57,8 @@ namespace Engine
 		{
 			if (m_Pipeline != nullptr)
 				m_Pipeline->Uninitialize();
+
+			DestroyTexture(m_DefaultTexture);
 
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_FrameDataChain);
 
@@ -102,6 +106,12 @@ namespace Engine
 			Construct(m_FrameDataChain, m_ThreadedDevice);
 
 			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());
+
+			TextureInfo info;
+			info.Dimension = Vector2I::One;
+			info.Format = Formats::R8;
+			info.Type = TextureTypes::TwoD;
+			m_DefaultTexture = CreateTexture(&info);
 
 			{
 				auto debugCallback = [&](int32 ID, IDevice::DebugSources Source, cstr Message, IDevice::DebugTypes Type, IDevice::DebugSeverities Severity)
@@ -384,7 +394,7 @@ namespace Engine
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
 			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
 
-			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_LastContext))
+			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_DefaultTexture, m_LastContext))
 				return;
 
 			{
@@ -408,7 +418,7 @@ namespace Engine
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
 			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
 
-			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_LastContext))
+			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_DefaultTexture, m_LastContext))
 				return;
 
 			{

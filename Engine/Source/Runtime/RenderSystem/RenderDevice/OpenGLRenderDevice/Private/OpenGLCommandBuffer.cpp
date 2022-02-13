@@ -459,6 +459,8 @@ namespace Engine
 
 			void OpenGLCommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
+
 				m_Buffer.Append(CommandTypes::SetProgramConstantBuffer);
 
 				SetProgramConstantBufferCommandData data = {};
@@ -470,6 +472,8 @@ namespace Engine
 
 			void OpenGLCommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
+
 				m_Buffer.Append(CommandTypes::SetProgramTexture);
 
 				SetProgramTextureCommandData data = {};
@@ -698,11 +702,7 @@ namespace Engine
 						SetProgramConstantBufferCommandData data = {};
 						m_Buffer.Read(data);
 
-						uint32 valueHandle = 0;
-						if (data.Value != nullptr)
-							valueHandle = data.Value->Handle;
-
-						glBindBufferBase(GetBufferType(GPUBufferTypes::Constant), data.Handle, valueHandle);
+						glBindBufferBase(GetBufferType(GPUBufferTypes::Constant), data.Handle, data.Value->Handle);
 
 					} break;
 
@@ -711,17 +711,9 @@ namespace Engine
 						SetProgramTextureCommandData data = {};
 						m_Buffer.Read(data);
 
-						uint32 valueHandle = 0;
-						TextureTypes type = TextureTypes::TwoD;
-						if (data.Value != nullptr)
-						{
-							valueHandle = data.Value->Handle;
-							type = data.Value->TextureType;
-						}
-
 						glActiveTexture(GL_TEXTURE0 + data.Handle);
 
-						glBindTexture(GetTextureType(type), valueHandle);
+						glBindTexture(GetTextureType(data.Value->TextureType), data.Value->Handle);
 
 						glUniform1i(data.Handle, data.Handle);
 

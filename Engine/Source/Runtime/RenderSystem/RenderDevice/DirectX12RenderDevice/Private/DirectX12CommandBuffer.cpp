@@ -500,8 +500,7 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetProgramConstantBuffer(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
-				if (Value == 0)
-					return;
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
 
 				BufferInfo* bufferInfo = ReinterpretCast(BufferInfo*, Value);
 
@@ -510,8 +509,7 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetProgramTexture(ProgramConstantHandle Handle, ResourceHandle Value)
 			{
-				if (Value == 0)
-					return;
+				CoreDebugAssert(Categories::RenderSystem, Value != 0, "Value is invalid");
 
 				TextureResourceInfo* resourceInfo = ReinterpretCast(TextureResourceInfo*, Value);
 
@@ -599,6 +597,15 @@ namespace Engine
 				DirectX12Wrapper::Command::ExecuteCommandList(m_Queue, m_List);
 
 				return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(m_Queue, m_Fence, m_FenceEvent, m_FenceValue));
+			}
+
+			void DirectX12CommandBuffer::MoveTextureToPresentState(ResourceHandle Handle)
+			{
+				CoreDebugAssert(Categories::RenderSystem, Handle != 0, "Handle is invalid");
+
+				TextureResourceInfo* info = ReinterpretCast(TextureResourceInfo*, Handle);
+
+				ADD_TRANSITION_STATE(info, D3D12_RESOURCE_STATE_PRESENT);
 			}
 
 			void DirectX12CommandBuffer::FillGraphicsPipelineState(DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc& Desc)

@@ -60,6 +60,8 @@ namespace Engine
 
 				bool Execute(void) override;
 
+				void MoveTextureToPresentState(ResourceHandle Handle);
+
 				ID3D12CommandQueue* GetQueue(void) const
 				{
 					return m_Queue;

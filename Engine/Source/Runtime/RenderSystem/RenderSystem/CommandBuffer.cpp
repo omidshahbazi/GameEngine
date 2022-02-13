@@ -208,7 +208,7 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		bool CommandBuffer::PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const RenderContext* RenderContext)
+		bool CommandBuffer::PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const RenderContext* RenderContext)
 		{
 			CoreDebugAssert(Categories::RenderSystem, CommandBuffer != nullptr, "CommandBuffer cannot be null");
 			CoreDebugAssert(Categories::RenderSystem, ConstantBuffers != nullptr, "ConstantBuffers cannot be null");
@@ -302,7 +302,7 @@ namespace Engine
 					DrawCommandData data = {};
 					m_Buffer.Read(data);
 
-					InsertDrawCommand(CommandBuffer, ConstantBuffers, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
+					InsertDrawCommand(CommandBuffer, ConstantBuffers, DefaultTexture, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
 				case CommandTypes::BeginEvent:
@@ -341,7 +341,7 @@ namespace Engine
 #undef SET_VIEWPORT
 		}
 
-		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;
@@ -386,11 +386,9 @@ namespace Engine
 
 					ResourceHandle texHandle = 0;
 					if (constant.Value != nullptr && !constant.Value->IsNull())
-					{
-						Texture* tex = constant.Value->GetPointer();
-
-						texHandle = tex->GetHandle();
-					}
+						texHandle = constant.Value->GetPointer()->GetHandle();
+					else
+						texHandle = DefaultTexture->GetHandle();
 
 					CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
 				}

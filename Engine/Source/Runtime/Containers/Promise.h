@@ -73,7 +73,7 @@ namespace Engine
 
 			bool GetIsDone(void) const
 			{
-				return (m_DoneCount == m_MustDoneCount);
+				return (m_DoneCount.load(std::memory_order::memory_order_acquire) == m_MustDoneCount);
 			}
 
 			void SetThen(const CallbackType& Callback)

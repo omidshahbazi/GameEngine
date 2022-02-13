@@ -24,6 +24,7 @@ namespace Engine.Test
 			PrivateDependencyModuleNames.Add("Debugging");
 			PrivateDependencyModuleNames.Add("JSON");
 			PrivateDependencyModuleNames.Add("DynamicModuleSystem");
+			PrivateDependencyModuleNames.Add("EntryPointUtility");
 
 			GenerateRenderDocSettings = true;
 		}

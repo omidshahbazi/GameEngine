@@ -598,7 +598,6 @@ namespace Engine
 				if (!CreateBufferInternal(Type, Size, true, info))
 					return false;
 
-
 				Handle = ReinterpretCast(ResourceHandle, info);
 
 				return true;

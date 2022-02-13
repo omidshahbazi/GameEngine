@@ -12,6 +12,7 @@
 #include <FileUtility\FileSystem.h>
 #include <Debugging\LogManager.h>
 #include <Platform\PlatformGL.h>
+#include <EntryPointUtility\ArgumentParser.h>
 
 #include <iostream>
 
@@ -32,11 +33,14 @@ using namespace Engine::EditorGUI;
 using namespace Engine::EditorGUI::Private;
 using namespace Engine::Debugging;
 using namespace Engine::DynamicModuleSystem;
+using namespace Engine::EntryPointUtility;
 
 BEGIN_ENTRY_POINT
 {
 	DefaultAllocator::Create();
 	RootAllocator::Create(DefaultAllocator::GetInstance());
+
+	ArgumentParser args(ArgumentCount, Arguments, true);
 
 	FileSystem::Initialize();
 
@@ -51,7 +55,16 @@ BEGIN_ENTRY_POINT
 
 	RenderManager::Create(RootAllocator::GetInstance());
 
-	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(DeviceTypes::DirectX12);
+	DeviceTypes deviceType;
+	const String deviceTypeString = args.GetAsString("DeviceType");
+	if (deviceTypeString == "OpenGL")
+		deviceType = DeviceTypes::OpenGL;
+	else if (deviceTypeString == "DirectX12")
+		deviceType = DeviceTypes::DirectX12;
+	else
+		deviceType = DeviceTypes::Vulkan;
+
+	DeviceInterface* device = RenderManager::GetInstance()->CreateDevice(deviceType);
 	device->Initialize();
 
 	FontManager::Create(RootAllocator::GetInstance());

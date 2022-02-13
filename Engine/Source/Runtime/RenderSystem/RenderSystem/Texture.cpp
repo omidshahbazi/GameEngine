@@ -74,7 +74,9 @@ namespace Engine
 			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return false;
 
+			cb->BeginEvent(L"GenerateMipMapCommandBuffer");
 			cb->GenerateMipMap(GetHandle());
+			cb->EndEvent();
 
 			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
 				return false;
@@ -96,7 +98,9 @@ namespace Engine
 			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return;
 
+			cb->BeginEvent(L"CopyCommandBuffer");
 			cb->CopyBuffer(GetHandle(), bufferHandle);
+			cb->EndEvent();
 
 			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
 				return;

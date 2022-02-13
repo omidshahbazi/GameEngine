@@ -43,8 +43,10 @@ namespace Engine
 					if (!CHECK_CALL(DirectX12Wrapper::Resource::Unmap(m_UploadBuffer.Resource.Resource))) \
 						return false; \
 					DirectX12CommandBuffer *cb = m_CommandBufferPool.Get(this); \
+					cb->BeginEvent(L"UploadCommandBuffer"); \
 					m_UploadBuffer.Type = (MainResourceInfo)->Type; \
 					cb->CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
+					cb->EndEvent(); \
 					if (!cb->Execute()) \
 						return false; \
 					m_CommandBufferPool.Back(cb); \
@@ -482,6 +484,7 @@ namespace Engine
 						return false;
 
 				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get(this);
+				commandBuffer->SetName(L"RenderContextCommandBuffer");
 
 				IDXGISwapChain4* swapChain = nullptr;
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Create(m_Factory, commandBuffer->GetQueue(), BACK_BUFFER_COUNT, WindowHandle, &swapChain)))
@@ -584,7 +587,9 @@ namespace Engine
 
 				DirectX12CommandBuffer& cb = *m_CurrentContext->CommandBuffer;
 				cb.Clear();
+				cb.BeginEvent(L"CopyToBackBuffer");
 				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, ReinterpretCast(ResourceHandle, view), Vector2I::Zero, rt.Dimension);
+				cb.EndEvent();
 				cb.Execute();
 
 				//RENDERING

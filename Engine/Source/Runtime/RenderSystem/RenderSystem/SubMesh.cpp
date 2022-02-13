@@ -55,6 +55,8 @@ namespace Engine
 			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return;
 
+			cb->BeginEvent(L"CopyCommandBuffer");
+
 			uint32 bufferSize = GetVertexBufferSize();
 			if (bufferSize != 0)
 			{
@@ -80,6 +82,8 @@ namespace Engine
 				m_IndexBuffer = RenderSystemAllocators::RenderSystemAllocator_Allocate<IndexBuffer>();
 				ConstructMacro(IndexBuffer, m_IndexBuffer, this, bufferHandle);
 			}
+
+			cb->EndEvent();
 
 			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
 				return;

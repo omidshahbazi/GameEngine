@@ -89,7 +89,9 @@ namespace Engine
 			if (!GetDevice()->CreateCommandBuffer(cb).Wait())
 				return;
 
+			cb->BeginEvent(L"CopyCommandBuffer");
 			cb->CopyBuffer(GetHandle(), Handle);
+			cb->EndEvent();
 
 			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
 				return;

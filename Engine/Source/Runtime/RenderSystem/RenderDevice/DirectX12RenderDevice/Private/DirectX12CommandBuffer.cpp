@@ -207,8 +207,6 @@ namespace Engine
 			DirectX12CommandBuffer::DirectX12CommandBuffer(DirectX12Device* Device) :
 				m_Device(Device),
 				m_NativeDevice(Device->GetDevice()),
-				m_Name{},
-				m_NameLength(0),
 				m_Queue(nullptr),
 				m_Allocator(nullptr),
 				m_List(nullptr),
@@ -270,10 +268,7 @@ namespace Engine
 
 			void DirectX12CommandBuffer::SetName(cwstr Name)
 			{
-				m_NameLength = CharacterUtility::GetLength(Name);
-				PlatformMemory::Copy(Name, m_Name, m_NameLength);
-
-				WString tempName(m_Name, m_NameLength);
+				WString tempName(Name);
 
 				if (!CHECK_CALL(DirectX12Wrapper::Debugging::SetObjectName(m_Queue, (tempName + L"_Queue").GetValue())))
 					return;
@@ -292,10 +287,6 @@ namespace Engine
 
 				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandList(m_List, m_Allocator)))
 					return;
-
-				//RENDERING
-				//if (m_NameLength != 0)
-				//	BeginEvent(m_Name);
 			}
 
 			void DirectX12CommandBuffer::CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle)
@@ -600,10 +591,6 @@ namespace Engine
 
 			bool DirectX12CommandBuffer::Execute(void)
 			{
-				//RENDERING
-				//if (m_NameLength != 0)
-				//	EndEvent();
-
 				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(m_List)))
 					return false;
 

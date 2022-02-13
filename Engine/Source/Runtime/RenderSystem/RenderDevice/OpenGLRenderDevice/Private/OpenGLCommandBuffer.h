@@ -23,7 +23,9 @@ namespace Engine
 			public:
 				OpenGLCommandBuffer(OpenGLDevice* Device);
 
-				void SetName(cwstr Name) override;
+				void SetName(cwstr Name) override
+				{
+				}
 
 				void Clear(void) override
 				{
@@ -58,9 +60,6 @@ namespace Engine
 
 			private:
 				OpenGLDevice* m_Device;
-
-				char8 m_Name[64];
-				uint16 m_NameLength;
 
 				CommandBufferContainer m_Buffer;
 			};

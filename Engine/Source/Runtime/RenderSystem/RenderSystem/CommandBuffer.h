@@ -46,13 +46,13 @@ namespace Engine
 
 			CommandBuffer(const String& Name);
 
-			const String& GetName(void) const
+			String GetName(void) const
 			{
-				return m_Name;
+				return m_Name.ChangeType<char8>();
 			}
 			void SetName(const String& Name)
 			{
-				m_Name = Name;
+				m_Name = Name.ChangeType<char16>();
 			}
 
 			void Clear(void)
@@ -97,7 +97,7 @@ namespace Engine
 			static void InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
 
 		private:
-			String m_Name;
+			WString m_Name;
 			CommandBufferContainer m_Buffer;
 		};
 	}

@@ -346,16 +346,8 @@ namespace Engine
 
 			OpenGLCommandBuffer::OpenGLCommandBuffer(OpenGLDevice* Device) :
 				m_Device(Device),
-				m_Name{},
-				m_NameLength(0),
 				m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 			{
-			}
-
-			void OpenGLCommandBuffer::SetName(cwstr Name)
-			{
-				m_NameLength = CharacterUtility::GetLength(Name);
-				CharacterUtility::ChangeType(Name, m_Name, m_NameLength);
 			}
 
 			void OpenGLCommandBuffer::CopyBuffer(ResourceHandle SourceHandle, ResourceHandle DestinationHandle)
@@ -558,9 +550,6 @@ namespace Engine
 
 			bool OpenGLCommandBuffer::Execute(void)
 			{
-				if (m_NameLength != 0)
-					glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, m_NameLength, m_Name);
-
 				m_Buffer.ResetRead();
 				CommandTypes commandType;
 				while (m_Buffer.Read(commandType))
@@ -814,9 +803,6 @@ namespace Engine
 						CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
 					}
 				}
-
-				if (m_NameLength != 0)
-					glPopDebugGroup();
 
 				return true;
 			}

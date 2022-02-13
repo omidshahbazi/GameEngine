@@ -25,9 +25,9 @@ namespace Engine
 		using namespace WindowUtility;
 
 		CommandBuffer::CommandBuffer(const String& Name) :
-			m_Name(Name),
 			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
+			SetName(Name);
 		}
 
 		bool CommandBuffer::CopyTexture(const Texture* Source, const Texture* Destination)
@@ -232,7 +232,8 @@ namespace Engine
 			if (RenderContext != nullptr)
 				m_LastViewportSize = RenderContext->GetWindow()->GetClientSize();
 
-			CommandBuffer->SetName(m_Name.ChangeType<char16>().GetValue());
+			CommandBuffer->SetName(m_Name.GetValue());
+			CommandBuffer->BeginEvent(m_Name.GetValue());
 
 			SET_RENDER_TARGET(m_LastRenderTarget);
 			SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
@@ -332,6 +333,8 @@ namespace Engine
 					CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
 				}
 			}
+
+			CommandBuffer->EndEvent();
 
 			return true;
 

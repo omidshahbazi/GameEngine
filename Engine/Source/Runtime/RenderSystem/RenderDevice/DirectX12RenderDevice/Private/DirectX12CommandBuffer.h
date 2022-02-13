@@ -72,9 +72,6 @@ namespace Engine
 				DirectX12Device* m_Device;
 				ID3D12Device5* m_NativeDevice;
 
-				char16 m_Name[64];
-				uint16 m_NameLength;
-
 				ID3D12CommandQueue* m_Queue;
 				ID3D12CommandAllocator* m_Allocator;
 				ID3D12GraphicsCommandList4* m_List;

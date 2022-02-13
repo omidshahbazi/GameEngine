@@ -129,7 +129,7 @@ namespace Engine
 			const RenderContext* m_LastContext;
 			FrameDataChain* m_FrameDataChain;
 
-			//RENDERING
+			//UNDONE:RENDERING -> IPipeline
 			//Should be per camera
 			IPipeline* m_Pipeline;
 		};

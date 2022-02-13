@@ -547,12 +547,6 @@ namespace Engine
 
 				m_CurrentContext = info;
 
-				//RENDERING
-				//if (m_CurrentRenderTarget == nullptr)
-				//	BindRenderTarget(0);
-
-				//ResetState();
-
 				return true;
 			}
 
@@ -571,19 +565,12 @@ namespace Engine
 				cb.EndEvent();
 				cb.Execute();
 
-				//RENDERING
-				//ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-
 				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain, false)))
 					return false;
 
 				m_CurrentContext->CurrentViewIndex = swapChain->GetCurrentBackBufferIndex();
-
-				//RENDERING
-				//if (m_CurrentRenderTarget == nullptr)
-				//	FILL_RENDER_VIEWS_USING_CONTEXT();
 
 				return true;
 			}
@@ -980,7 +967,7 @@ namespace Engine
 			{
 				//RunJob(Attach(&DirectX12Device::SubmitCommandBuffer, this), Buffers, Count);
 
-				//RENDERING
+				//UNDONE:RENDERING -> SubmitAsync
 				//m_AsyncCommandBuffers.Add()
 
 				return true;

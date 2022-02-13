@@ -388,7 +388,7 @@ namespace Engine
 				return;
 
 			{
-				//RENDERING
+				//UNDONE:RENDERING -> ConstantBufferSyncing
 				//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
 				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
 			}
@@ -412,7 +412,7 @@ namespace Engine
 				return;
 
 			{
-				//RENDERING
+				//UNDONE:RENDERING -> ConstantBufferSyncing
 				//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
 				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
 			}

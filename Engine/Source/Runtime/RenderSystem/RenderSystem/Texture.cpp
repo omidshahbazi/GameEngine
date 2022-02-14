@@ -86,12 +86,12 @@ namespace Engine
 
 		void Texture::GenerateBuffer(void)
 		{
-			const uint32 bufferSize = GetBufferSize() * 2;//UNDONE:RENDERING -> PixelBufferSize
-			if (bufferSize == 0)
+			IDevice::BufferFootprintInfo footprint;
+			if (!GetDevice()->GetTextureFootprint(GetHandle(), footprint).Wait())
 				return;
 
 			ResourceHandle bufferHandle;
-			if (!GetDevice()->CreateBuffer(GPUBufferTypes::Pixel, bufferSize, bufferHandle).Wait())
+			if (!GetDevice()->CreateBuffer(GPUBufferTypes::Pixel, footprint.Size, bufferHandle).Wait())
 				return;
 
 			ICommandBuffer* cb = nullptr;

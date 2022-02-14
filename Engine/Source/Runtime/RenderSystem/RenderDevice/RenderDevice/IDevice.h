@@ -68,16 +68,6 @@ namespace Engine
 
 			typedef std::function<void(int32 ID, DebugSources Source, cstr Message, DebugTypes Type, DebugSeverities Severity)> DebugFunction;
 
-			struct Shaders
-			{
-			public:
-				cstr VertexShader;
-				cstr TessellationShader;
-				cstr GeometryShader;
-				cstr FragmentShader;
-				cstr ComputeShader;
-			};
-
 			struct CompiledShaders
 			{
 			public:
@@ -93,6 +83,14 @@ namespace Engine
 				CompiledShader GeometryShader;
 				CompiledShader FragmentShader;
 				CompiledShader ComputeShader;
+			};
+
+			struct BufferFootprintInfo
+			{
+			public:
+				uint32 Size;
+				uint32 RowPitch;
+				uint8 ElementPadding;
 			};
 
 			typedef Vector<ResourceHandle> TextureList;
@@ -125,6 +123,7 @@ namespace Engine
 
 			virtual bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) = 0;
 			virtual bool DestroyTexture(ResourceHandle Handle) = 0;
+			virtual bool GetTextureFootprint(ResourceHandle Handle, BufferFootprintInfo& Footprint) = 0;
 			virtual bool SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode) = 0;
 			virtual bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode) = 0;
 			virtual bool SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter) = 0;

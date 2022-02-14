@@ -44,6 +44,7 @@ namespace Engine
 
 				bool CreateTexture(const TextureInfo* Info, ResourceHandle& Handle) override;
 				bool DestroyTexture(ResourceHandle Handle) override;
+				bool GetTextureFootprint(ResourceHandle Handle, BufferFootprintInfo& Footprint) override;
 				bool SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode) override;
 				bool SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode) override;
 				bool SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter) override;

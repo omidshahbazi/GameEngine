@@ -230,34 +230,24 @@ namespace Engine
 				return DXGI_FORMAT_UNKNOWN;
 			}
 
-			uint8 GetTextureFormatPadding(Formats Format)
+			uint8 GetTextureFormatPadding(DXGI_FORMAT Format) ??????????
 			{
 				switch (Format)
 				{
-				case Formats::R8:
-				case Formats::R16:
-				case Formats::R16F:
-				case Formats::Depth16:
-				case Formats::Depth24:
-				case Formats::DepthStencil24F:
-				case Formats::R32:
-				case Formats::R32F:
-				case Formats::Depth32:
-				case Formats::Depth32F:
-				case Formats::DepthStencil32F:
-				case Formats::RG8:
-				case Formats::RG16:
-				case Formats::RG16F:
-				case Formats::RG32:
-				case Formats::RG32F:
-					return 0;
+				case DXGI_FORMAT_R8G8B8A8_UNORM:
+					return Helper::GetTextureChannelSize(Formats::RGB8);
 
-				case Formats::RGB8:
-				case Formats::RGB16:
-				case Formats::RGB16F:
-				case Formats::RGB32:
-				case Formats::RGB32F:
-					return Helper::GetTextureChannelSize(Format);
+				case DXGI_FORMAT_R16G16B16A16_UNORM:
+					return Helper::GetTextureChannelSize(Formats::RGB16);
+
+				case DXGI_FORMAT_R16G16B16A16_FLOAT:
+					return Helper::GetTextureChannelSize(Formats::RGB16F);
+
+				case DXGI_FORMAT_R32G32B32A32_UINT:
+					return Helper::GetTextureChannelSize(Formats::RGB32);
+
+				case DXGI_FORMAT_R32G32B32A32_FLOAT:
+					return Helper::GetTextureChannelSize(Formats::RGB32F);
 				}
 
 				return 0;
@@ -729,7 +719,7 @@ namespace Engine
 					uint8 pixelSize = Helper::GetTexturePixelSize(Info->Format);
 
 					uint32 resourcePitch = DirectX12Wrapper::Support::GetResourceRowPitch(m_Device, info->Resource.Resource);
-					uint8 padding = GetTextureFormatPadding(Info->Format);
+					uint8 padding = GetTextureFormatPadding(info->Format);
 
 					for (int32 y = 0; y < Info->Dimension.Y; ++y)
 						for (int32 x = 0; x < Info->Dimension.X; ++x)
@@ -763,6 +753,20 @@ namespace Engine
 					return false;
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(textureResourceInfo);
+
+				return true;
+			}
+
+			bool DirectX12Device::GetTextureFootprint(ResourceHandle Handle, BufferFootprintInfo& Footprint)
+			{
+				if (Handle == 0)
+					return false;
+
+				TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
+
+				Footprint.Size = DirectX12Wrapper::Support::GetRequiredBufferSize(m_Device, D3D12_RESOURCE_DIMENSION_TEXTURE2D, textureResourceInfo->Dimension.X, textureResourceInfo->Dimension.Y, textureResourceInfo->Format, D3D12_TEXTURE_LAYOUT_UNKNOWN);
+				Footprint.RowPitch = DirectX12Wrapper::Support::GetResourceRowPitch(m_Device, textureResourceInfo->Resource.Resource);
+				Footprint.ElementPadding = GetTextureFormatPadding(textureResourceInfo->Format);
 
 				return true;
 			}

@@ -193,6 +193,15 @@ namespace Engine
 				END_CALL();
 			}
 
+			Promise<bool> ThreadedDevice::GetTextureFootprint(ResourceHandle Handle, IDevice::BufferFootprintInfo& Footprint)
+			{
+				BEGIN_CALL(bool, &, promise, Handle);
+
+				promise->SetValue(m_Device->GetTextureFootprint(Handle, Footprint));
+
+				END_CALL();
+			}
+
 			Promise<bool> ThreadedDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				BEGIN_CALL(bool, &, promise, Handle, Mode);

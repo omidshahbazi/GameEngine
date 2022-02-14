@@ -608,6 +608,20 @@ namespace Engine
 				return true;
 			}
 
+			bool OpenGLDevice::GetTextureFootprint(ResourceHandle Handle, BufferFootprintInfo& Footprint)
+			{
+				if (Handle == 0)
+					return false;
+
+				TextureBufferInfo* info = ReinterpretCast(TextureBufferInfo*, Handle);
+
+				Footprint.Size = Helper::GetTextureBufferSize(info->Format, info->Dimension);
+				Footprint.RowPitch = Helper::GetTextureRowPitch(info->Format, info->Dimension.X);
+				Footprint.ElementPadding = 0;
+
+				return true;
+			}
+
 			bool OpenGLDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				if (Handle == 0)

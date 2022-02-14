@@ -91,6 +91,10 @@ namespace Engine
 			{
 				return true;
 			}
+			bool VulkanDevice::GetTextureFootprint(ResourceHandle Handle, BufferFootprintInfo& Footprint)
+			{
+				return true;
+			}
 			bool VulkanDevice::SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode)
 			{
 				return true;

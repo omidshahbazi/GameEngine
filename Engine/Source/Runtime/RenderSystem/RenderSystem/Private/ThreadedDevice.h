@@ -62,6 +62,7 @@ namespace Engine
 
 				Promise<bool> CreateTexture(const TextureInfo* Info, ResourceHandle& Handle);
 				Promise<bool> DestroyTexture(ResourceHandle Handle);
+				Promise<bool> GetTextureFootprint(ResourceHandle Handle, IDevice::BufferFootprintInfo& Footprint);
 				Promise<bool> SetTextureVerticalWrapping(ResourceHandle Handle, TextureWrapModes Mode);
 				Promise<bool> SetTextureHorizontalWrapping(ResourceHandle Handle, TextureWrapModes Mode);
 				Promise<bool> SetTextureMinifyFilter(ResourceHandle Handle, TextureMinifyFilters Filter);

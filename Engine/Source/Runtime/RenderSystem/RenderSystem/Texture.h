@@ -88,7 +88,7 @@ namespace Engine
 
 			INLINE uint32 GetBufferSize(void) const
 			{
-				return Helper::GetTextureBufferSize(m_Format, m_Dimension);
+				return Helper::GetTextureBufferSize(m_Format, m_Dimension);//UNDONE:RENDERING -> BufferSize
 			}
 
 		private:

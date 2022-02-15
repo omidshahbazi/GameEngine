@@ -166,6 +166,8 @@ namespace Engine
 			VariableTypeMap m_Variables;
 
 			FunctionType* m_LastFunction;
+
+			bool m_ReturnValueAlreadyBuilt;
 		};
 	}
 }

@@ -59,6 +59,7 @@ namespace Engine
 		void ASTCompilerBase::BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			m_LastFunction = nullptr;
+			m_ReturnValueAlreadyBuilt = false;
 
 			ResetPerStageValues(Stage);
 
@@ -453,8 +454,13 @@ namespace Engine
 
 		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			bool isArray = IsAssignableFrom(Statement, ArrayStatement);
 			uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
+
+			if (m_ReturnValueAlreadyBuilt)
+				return elementCount;
+			m_ReturnValueAlreadyBuilt = true;
+
+			bool isArray = IsAssignableFrom(Statement, ArrayStatement);
 
 			if (elementCount > 1 && !isArray)
 			{

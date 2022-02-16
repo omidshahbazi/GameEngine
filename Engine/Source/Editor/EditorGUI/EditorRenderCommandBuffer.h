@@ -20,10 +20,13 @@ namespace Engine
 		public:
 			EditorRenderCommandBuffer(void);
 
-		public:
-			void DrawMesh(Mesh* Mesh, const Matrix4F& Model, const Material* Material);
+			void Clear(void);
+
+			void DrawText(Mesh* Mesh, const Matrix4F& Model, const Material& Material);
 
 			void DrawQuad(const Vector2I& Position, float32 Rotation, const Vector2I& Scale, const Material* Material);
+
+			void DrawMesh(Mesh* Mesh, const Matrix4F& Transform, const Material* Material);
 
 			void SetProjectionSize(const Vector2I& Size)
 			{
@@ -46,6 +49,8 @@ namespace Engine
 		private:
 			Matrix4F m_ProjMat;
 			Matrix4F m_PivotMat;
+
+			Vector<Material> m_CopiedMaterials;
 
 			Mesh* m_QuadMesh;
 		};

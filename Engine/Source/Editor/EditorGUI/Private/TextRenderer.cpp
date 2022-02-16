@@ -44,7 +44,7 @@ namespace Engine
 
 					renderer->GetMaterial().SetBuffer(ConstantHash_data, &m_Data);
 
-					CommandBuffer->DrawMesh(Character->GetMesh(), Model, &GetMaterial());
+					CommandBuffer->DrawText(Character->GetMesh(), Model, GetMaterial());
 				};
 
 				static StringRenderer::Info info;

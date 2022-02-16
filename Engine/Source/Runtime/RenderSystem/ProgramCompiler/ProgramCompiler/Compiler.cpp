@@ -94,7 +94,7 @@ namespace Engine
 						compiledProgrm.StageName.Size = 0; \
 					} \
 					else \
-						compiler->Compile(deviceType, StageType, outputInfo.StageName.GetValue(), Constants::ENTRY_POINT_NAME, false, compiledProgrm.StageName.Buffer, compiledProgrm.StageName.Size);
+						compiler->Compile(deviceType, StageType, outputInfo.StageName.GetValue(), Constants::ENTRY_POINT_NAME, true, compiledProgrm.StageName.Buffer, compiledProgrm.StageName.Size);
 
 					IMPLEMENT_COMPILE(Stages::Vertex, VertexShader);
 					IMPLEMENT_COMPILE(Stages::Tessellation, TessellationShader);

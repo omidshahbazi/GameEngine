@@ -75,7 +75,7 @@ BEGIN_ENTRY_POINT
 	{
 		PhysicalWindow physWindow(device);
 		physWindow.SetSize({ 1080, 920 });
-		physWindow.SetTitle("Test Window Title!");
+		physWindow.SetTitle("Test Window Title");
 
 		EditorRenderCommandBuffer cmd;
 

@@ -23,7 +23,7 @@ namespace Engine
 		public:
 			virtual void Reset(void)
 			{
-				m_CurrentBuffer = m_StartBuffer;
+				Seek(0);
 			}
 
 		protected:
@@ -58,6 +58,11 @@ namespace Engine
 			byte* Move(uint32 Count)
 			{
 				return (m_CurrentBuffer += Count);
+			}
+
+			byte* Seek(uint32 Index)
+			{
+				return (m_CurrentBuffer = m_StartBuffer + Index);
 			}
 
 			GPUBufferAccess GetLastLockAccess(void) const

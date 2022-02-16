@@ -24,6 +24,8 @@ namespace Engine
 
 			void Move(uint32 Count);
 
+			void Seek(uint32 Index);
+
 			uint32& Get(void);
 			const uint32& Get(void) const;
 

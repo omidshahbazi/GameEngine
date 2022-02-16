@@ -5,12 +5,14 @@
 
 #include <RenderCommon\RenderCommon.h>
 #include <RenderSystem\NativeType.h>
-#include <MathContainers\MathContainers.h>
+#include <RenderDevice\IDevice.h>
 #include <RenderCommon\Helper.h>
+#include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
 	using namespace MathContainers;
+	using namespace RenderDevice;
 	using namespace RenderCommon;
 
 	namespace RenderSystem
@@ -73,28 +75,29 @@ namespace Engine
 
 			INLINE uint8 GetChannelCount(void) const
 			{
-				return Helper::GetTextureChannelCount(m_Format);
+				return Helper::GetTextureChannelCount(m_Format) + m_Footprint.ElementPadding;
 			}
 
 			INLINE uint8 GetPixelSize(void) const
 			{
-				return Helper::GetTexturePixelSize(m_Format);
+				return GetChannelSize() * GetChannelCount();
 			}
 
 			INLINE uint32 GetRowPitch(void) const
 			{
-				return Helper::GetTextureRowPitch(m_Format, m_Dimension.X);
+				return m_Footprint.RowPitch;
 			}
 
 			INLINE uint32 GetBufferSize(void) const
 			{
-				return Helper::GetTextureBufferSize(m_Format, m_Dimension);//UNDONE:RENDERING -> BufferSize
+				return m_Footprint.Size;
 			}
 
 		private:
 			TextureTypes m_Type;
 			Formats m_Format;
 			Vector2I m_Dimension;
+			IDevice::BufferFootprintInfo m_Footprint;
 			PixelBuffer* m_Buffer;
 		};
 	}

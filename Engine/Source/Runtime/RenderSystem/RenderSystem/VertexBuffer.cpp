@@ -36,6 +36,11 @@ namespace Engine
 			GPUBuffer::Move(Helper::GetMeshVertexSize() * Count);
 		}
 
+		void VertexBuffer::Seek(uint32 Index)
+		{
+			GPUBuffer::Seek(Helper::GetMeshVertexSize() * Index);
+		}
+
 		Vertex& VertexBuffer::Get(void)
 		{
 			return *ReinterpretCast(Vertex*, GetCurrentBuffer());

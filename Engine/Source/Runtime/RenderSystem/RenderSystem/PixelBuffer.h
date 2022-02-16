@@ -20,11 +20,14 @@ namespace Engine
 			PixelBuffer(Texture* Texture, ResourceHandle Handle);
 
 		public:
+			void Reset(void) override;
+
 			void Lock(GPUBufferAccess Access = GPUBufferAccess::ReadOnly);
 			void Unlock(void);
 
-			void Move(uint32 X, uint32 Y);
 			void Move(uint32 Count);
+
+			void Seek(uint32 X, uint32 Y);
 
 			ColorUI8& GetColorUI8Pixel(void);
 			const ColorUI8& GetColorUI8Pixel(void) const;
@@ -37,6 +40,7 @@ namespace Engine
 
 		private:
 			Texture* m_Texture;
+			uint32 m_CurrentMoveIndex;
 		};
 	}
 }

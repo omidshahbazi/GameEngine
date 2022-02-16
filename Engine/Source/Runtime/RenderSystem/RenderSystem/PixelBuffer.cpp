@@ -13,9 +13,18 @@ namespace Engine
 		{
 		}
 
+		void PixelBuffer::Reset(void)
+		{
+			GPUBuffer::Reset();
+
+			m_CurrentMoveIndex = 0;
+		}
+
 		void PixelBuffer::Lock(GPUBufferAccess Access)
 		{
 			GPUBuffer::Lock(Access);
+
+			m_CurrentMoveIndex = 0;
 		}
 
 		void PixelBuffer::Unlock(void)
@@ -28,16 +37,21 @@ namespace Engine
 			CopyTo(m_Texture->GetHandle());
 		}
 
-		void PixelBuffer::Move(uint32 X, uint32 Y)
-		{
-			const auto& dimension = m_Texture->GetDimension();
-
-			Move(X + (Y * dimension.X));
-		}
-
 		void PixelBuffer::Move(uint32 Count)
 		{
-			GPUBuffer::Move(m_Texture->GetPixelSize() * Count);
+			const Vector2I dimension = m_Texture->GetDimension();
+
+			uint32 index = m_CurrentMoveIndex + Count;
+
+			Seek(index % dimension.X, index / dimension.X);
+		}
+
+		void PixelBuffer::Seek(uint32 X, uint32 Y)
+		{
+			const Vector2I dimension = m_Texture->GetDimension();
+			m_CurrentMoveIndex = X + (Y * dimension.X);
+
+			GPUBuffer::Seek((m_Texture->GetRowPitch() * (m_CurrentMoveIndex / dimension.X)) + (m_Texture->GetPixelSize() * (m_CurrentMoveIndex % dimension.X)));
 		}
 
 		ColorUI8& PixelBuffer::GetColorUI8Pixel(void)

@@ -36,6 +36,11 @@ namespace Engine
 			GPUBuffer::Move(Helper::GetMeshIndexSize() * Count);
 		}
 
+		void IndexBuffer::Seek(uint32 Index)
+		{
+			GPUBuffer::Seek(Helper::GetMeshIndexSize() * Index);
+		}
+
 		uint32& IndexBuffer::Get(void)
 		{
 			return *ReinterpretCast(uint32*, GetCurrentBuffer());

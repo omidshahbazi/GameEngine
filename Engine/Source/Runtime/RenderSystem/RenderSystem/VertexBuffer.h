@@ -24,6 +24,7 @@ namespace Engine
 			void Unlock(void);
 
 			void Move(uint32 Count);
+			void Seek(uint32 Index);
 
 			Vertex& Get(void);
 			const Vertex& Get(void) const;

@@ -21,6 +21,9 @@ namespace Engine
 			m_Dimension(Dimension),
 			m_Buffer(nullptr)
 		{
+			if (!GetDevice()->GetTextureFootprint(GetHandle(), m_Footprint).Wait())
+				return;
+
 			GenerateBuffer();
 
 			SetName("Texture");
@@ -86,12 +89,12 @@ namespace Engine
 
 		void Texture::GenerateBuffer(void)
 		{
-			IDevice::BufferFootprintInfo footprint;
-			if (!GetDevice()->GetTextureFootprint(GetHandle(), footprint).Wait())
+			const uint32 bufferSize = GetBufferSize();
+			if (bufferSize == 0)
 				return;
 
 			ResourceHandle bufferHandle;
-			if (!GetDevice()->CreateBuffer(GPUBufferTypes::Pixel, footprint.Size, bufferHandle).Wait())
+			if (!GetDevice()->CreateBuffer(GPUBufferTypes::Pixel, bufferSize, bufferHandle).Wait())
 				return;
 
 			ICommandBuffer* cb = nullptr;

@@ -5,6 +5,7 @@
 
 #include <RenderDevice\IDevice.h>
 #include <RenderSystem\Sprite.h>
+#include <RenderSystem\Private\ConstantData.h>
 #include <ResourceCommon\Resource.h>
 
 namespace Engine
@@ -14,8 +15,17 @@ namespace Engine
 
 	namespace RenderSystem
 	{
+		using namespace Private;
+
 		class RENDERSYSTEM_API Pass
 		{
+		public:
+			typedef MetaConstantData<ConstantBuffer*> BufferConstantData;
+			typedef MetaConstantData<TextureResource*> TextureConstantData;
+
+			typedef Map<ProgramConstantHash, BufferConstantData> BufferMetaDataMap;
+			typedef Map<ProgramConstantHash, TextureConstantData> TextureMetaDataMap;
+
 		public:
 			Pass(void);
 			Pass(ProgramResource* Program);
@@ -86,12 +96,12 @@ namespace Engine
 			void CreateTextureData(ProgramConstantHandle Handle, const String& Name);
 			void SyncData(const Pass& Other);
 
-			INLINE const BufferDataMap& GetBuffers(void) const
+			INLINE const BufferMetaDataMap& GetBuffers(void) const
 			{
 				return m_Buffers;
 			}
 
-			INLINE const TextureDataMap& GetTextures(void) const
+			INLINE const TextureMetaDataMap& GetTextures(void) const
 			{
 				return m_Textures;
 			}
@@ -101,8 +111,8 @@ namespace Engine
 
 		private:
 			ProgramResource* m_Program;
-			BufferDataMap m_Buffers;
-			TextureDataMap m_Textures;
+			BufferMetaDataMap m_Buffers;
+			TextureMetaDataMap m_Textures;
 			RenderQueues m_Queue;
 			RenderState m_RenderState;
 		};

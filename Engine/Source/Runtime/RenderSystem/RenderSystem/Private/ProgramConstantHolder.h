@@ -26,6 +26,7 @@ namespace Engine
 		{
 			class RENDERSYSTEM_API ProgramConstantHolder
 			{
+				friend class ProgramConstantSupplier;
 				friend class CommandBuffer;
 
 
@@ -34,12 +35,6 @@ namespace Engine
 
 				typedef Map<ConstantHash, BufferConstantDataBase> BufferDataBaseMap;
 				typedef Map<ConstantHash, TextureConstantDataBase> TextureDataBaseMap;
-
-				typedef ConstantData<ConstantBuffer*> BufferConstantData;
-				typedef ConstantData<TextureResource*> TextureConstantData;
-
-				typedef Map<ConstantHash, BufferConstantData> BufferDataMap;
-				typedef Map<ConstantHash, TextureConstantData> TextureDataMap;
 
 			protected:
 				INLINE const BufferDataMap& GetBuffers(void) const

@@ -2,7 +2,6 @@
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderDevice\IDevice.h>
 #include <RenderSystem\Private\GPUConstantBuffer.h>
-#include <RenderSystem\Private\ProgramConstantHolder.h>
 
 namespace Engine
 {
@@ -10,8 +9,6 @@ namespace Engine
 
 	namespace RenderSystem
 	{
-		using namespace Private;
-
 		SINGLETON_DEFINITION(ProgramConstantSupplier);
 
 		ProgramConstantSupplier::~ProgramConstantSupplier(void)
@@ -20,14 +17,14 @@ namespace Engine
 			m_TextureConstants.Clear();
 		}
 
-		void ProgramConstantSupplier::RegisterBufferConstant(const String& Name, FetchBufferFunction Function)
+		void ProgramConstantSupplier::RegisterConstantBuffer(const String& Name, FetchBufferFunction Function)
 		{
-			m_BufferConstants[ProgramConstantHolder::GetHash(Name)] = std::make_shared<FetchBufferFunction>(Function);
+			m_BufferConstants[Pass::GetHash(Name)] = std::make_shared<FetchBufferFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::RegisterTextureConstant(const String& Name, FetchTexturetFunction Function)
+		void ProgramConstantSupplier::RegisterTexture(const String& Name, FetchTexturetFunction Function)
 		{
-			m_TextureConstants[ProgramConstantHolder::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
+			m_TextureConstants[Pass::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
 		void ProgramConstantSupplier::SupplyConstants(GPUBufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const

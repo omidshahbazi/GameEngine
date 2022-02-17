@@ -4,7 +4,6 @@
 #define PROGRAM_H
 
 #include <RenderSystem\NativeType.h>
-#include <RenderSystem\Private\ProgramConstantHolder.h>
 #include <ProgramCompilerCommon\OutputInfo.h>
 
 namespace Engine
@@ -15,20 +14,20 @@ namespace Engine
 	{
 		class DeviceInterface;
 
-		using namespace Private;
-
-		class RENDERSYSTEM_API Program : public NativeType, public ProgramConstantHolder
+		class RENDERSYSTEM_API Program : public NativeType
 		{
 			friend class DeviceInterface;
+			friend class Pass;
 
 		private:
 			Program(ThreadedDevice* Device, ResourceHandle Handle, const MetaInfo& Meta);
 
 			void SetNameInternal(const WString& Name) override;
 
-			const StructMetaInfo* GetStructInfoOf(const String& VariableName) const;
-
-			void GenerateConstantData(void);
+			const MetaInfo& GetMetaInfo(void) const
+			{
+				return m_MetaInfo;
+			}
 
 		private:
 			MetaInfo m_MetaInfo;

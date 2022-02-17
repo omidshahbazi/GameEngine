@@ -18,6 +18,7 @@ namespace Engine
 #endif
 
 		typedef uint32 ProgramConstantHandle;
+		typedef int32 ProgramConstantHash;
 	}
 }
 

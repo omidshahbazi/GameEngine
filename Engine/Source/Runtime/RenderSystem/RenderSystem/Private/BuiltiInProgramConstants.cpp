@@ -39,22 +39,22 @@ namespace Engine
 			{
 				m_DeviceInterface = DeviceInterface;
 
-				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TransformData", [this]()
+				ProgramConstantSupplier::GetInstance()->RegisterConstantBuffer("_TransformData", [this]()
 					{
 						return &m_TransformDataBuffer;
 					});
 
-				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_InverseTransformData", [this]()
+				ProgramConstantSupplier::GetInstance()->RegisterConstantBuffer("_InverseTransformData", [this]()
 					{
 						return &m_InverseTransformDataBuffer;
 					});
 
-				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_ViewportData", [this]()
+				ProgramConstantSupplier::GetInstance()->RegisterConstantBuffer("_ViewportData", [this]()
 					{
 						return &m_ViewportDataBuffer;
 					});
 
-				ProgramConstantSupplier::GetInstance()->RegisterBufferConstant("_TimeData", [this]()
+				ProgramConstantSupplier::GetInstance()->RegisterConstantBuffer("_TimeData", [this]()
 					{
 						static HighResolutionTime timer;
 

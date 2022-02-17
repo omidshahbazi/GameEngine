@@ -30,12 +30,7 @@ namespace Engine
 
 				m_ShouldRender = true;
 
-				for (int8 i = 0; i < (int8)RenderQueues::COUNT; ++i)
-				{
-					Context& context = m_Context[m_FrontContextIndex];
-
-					context.Buffers.Reset();
-				}
+				m_Context[m_FrontContextIndex].Buffers.Reset();
 			}
 		}
 	}

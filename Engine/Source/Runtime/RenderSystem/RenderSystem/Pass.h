@@ -5,16 +5,16 @@
 
 #include <RenderDevice\IDevice.h>
 #include <RenderSystem\Sprite.h>
-#include <RenderSystem\Private\ProgramConstantHolder.h>
+#include <ResourceCommon\Resource.h>
 
 namespace Engine
 {
-	using namespace ResourceSystem;
+	using namespace ResourceCommon;
 	using namespace RenderDevice;
 
 	namespace RenderSystem
 	{
-		class RENDERSYSTEM_API Pass : public ProgramConstantHolder
+		class RENDERSYSTEM_API Pass
 		{
 		public:
 			Pass(void);
@@ -30,14 +30,41 @@ namespace Engine
 
 			bool SetProgram(ProgramResource* Program);
 
-			INLINE void SetQueue(RenderQueues Queue)
+			ConstantBuffer* GetConstantBuffer(ProgramConstantHash Hash);
+			ConstantBuffer* GetConstantBuffer(const String& Name);
+
+			bool SetBuffer(ProgramConstantHash Hash, const byte* Data, uint16 Size);
+			bool SetBuffer(const String& Name, const byte* Data, uint16 Size)
 			{
-				m_Queue = Queue;
+				return SetBuffer(GetHash(Name), Data, Size);
 			}
+
+			template<typename T, int Size = sizeof(T)>
+			void SetBuffer(ProgramConstantHash Hash, const T* Data)
+			{
+				SetBuffer(Hash, ReinterpretCast(const byte*, Data), Size);
+			}
+
+			template<typename T, int Size = sizeof(T)>
+			void SetBuffer(const String& Name, const T* Data)
+			{
+				SetBuffer(Name, ReinterpretCast(const byte*, Data), Size);
+			}
+
+			bool SetTexture(ProgramConstantHash Hash, const TextureResource* Value);
+			bool SetTexture(const String& Name, const TextureResource* Value);
+
+			bool SetSprite(ProgramConstantHash Hash, const SpriteResource* Value);
+			bool SetSprite(const String& Name, const SpriteResource* Value);
 
 			INLINE RenderQueues GetQueue(void) const
 			{
 				return m_Queue;
+			}
+
+			INLINE void SetQueue(RenderQueues Queue)
+			{
+				m_Queue = Queue;
 			}
 
 			INLINE RenderState& GetRenderState(void)
@@ -55,7 +82,27 @@ namespace Engine
 			INLINE Pass& operator=(const Pass& Other);
 
 		private:
+			void CreateBufferData(ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size);
+			void CreateTextureData(ProgramConstantHandle Handle, const String& Name);
+			void SyncData(const Pass& Other);
+
+			INLINE const BufferDataMap& GetBuffers(void) const
+			{
+				return m_Buffers;
+			}
+
+			INLINE const TextureDataMap& GetTextures(void) const
+			{
+				return m_Textures;
+			}
+
+		public:
+			static ProgramConstantHash GetHash(const String& Name);
+
+		private:
 			ProgramResource* m_Program;
+			BufferDataMap m_Buffers;
+			TextureDataMap m_Textures;
 			RenderQueues m_Queue;
 			RenderState m_RenderState;
 		};

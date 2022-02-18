@@ -20,7 +20,8 @@ namespace Engine
 			{
 			public:
 				ConstantData(void) :
-					Handle(0)
+					Handle(0),
+					Value(nullptr)
 				{
 				}
 

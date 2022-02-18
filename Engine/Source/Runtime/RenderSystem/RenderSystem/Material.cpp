@@ -26,11 +26,9 @@ namespace Engine
 		m_Textures[Hash].Value = Pointer; \
 		return true;
 
-		const StructMetaInfo* FindStructInfoOf(const MetaInfo& MetaInfo, const String& VariableName)
+		const StructMetaInfo* FindStructInfoOf(const MetaInfo& MetaInfo, ProgramConstantHash VariableHash)
 		{
-			ProgramConstantHash hash = Material::GetHash(VariableName);
-
-			int32 index = MetaInfo.Variables.FindIf([hash](auto& item) { return Material::GetHash(item.Name) == hash; });
+			int32 index = MetaInfo.Variables.FindIf([VariableHash](auto& item) { return Material::GetHash(item.Name) == VariableHash; });
 			if (index == -1)
 				return nullptr;
 
@@ -41,6 +39,41 @@ namespace Engine
 				return nullptr;
 
 			return &MetaInfo.Structs[index];
+		}
+
+		void CreateBufferData(Material::BufferMetaDataMap& Map, ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size)
+		{
+			ConstantBuffer* buffer = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
+			Construct(buffer, Size);
+
+			ProgramConstantHash hash = Material::GetHash(Name);
+
+			CoreDebugAssert(Categories::RenderSystem, !Map.Contains(hash), "Attempt to add duplicate constant is forbidden");
+
+			Map[hash] = Material::BufferMetaConstantData(Handle, Name, hash, UserDefinedType, buffer);
+		}
+
+		void CreateTextureData(Material::TextureMetaDataMap& Map, ProgramConstantHandle Handle, const String& Name)
+		{
+			ProgramConstantHash hash = Material::GetHash(Name);
+
+			CoreDebugAssert(Categories::RenderSystem, !Map.Contains(hash), "Attempt to add duplicate constant is forbidden");
+
+			Map[hash] = Material::TextureMetaConstantData(Handle, Name, hash, nullptr);
+		}
+
+		template<typename T>
+		void Remove(Map<ProgramConstantHash, T> Map, std::function<bool(ProgramConstantHash)> Condition, bool DeallocateValue)
+		{
+			Map.RemoveIf([&](auto Item)
+				{
+					bool goingToRemove = Condition(Item.GetFirst());
+
+					if (goingToRemove && DeallocateValue)
+						RenderSystemAllocators::ContainersAllocator_Deallocate(Item.GetSecond().Value);
+
+					return goingToRemove;
+				});
 		}
 
 		Material::Material(void) :
@@ -88,27 +121,42 @@ namespace Engine
 
 			CoreDebugAssert(Categories::RenderSystem, !m_Program->IsNull(), "Program cannot be null to initialize a Pass");
 
-			//UNDONE:RENDERING -> just sync not from scratch
-
 			auto& metaInfo = (*m_Program)->GetMetaInfo();
 
 			for (auto& constant : metaInfo.Variables)
 			{
+				ProgramConstantHash hash = GetHash(constant.Name);
+
 				if (constant.DataType == ProgramDataTypes::Unknown)
 				{
-					const StructMetaInfo* structInfo = FindStructInfoOf(metaInfo, constant.Name);
+					const StructMetaInfo* structInfo = FindStructInfoOf(metaInfo, hash);
 					if (structInfo == nullptr)
 						return false;
 
-					CreateBufferData(constant.Handle, constant.Name, constant.UserDefinedType, structInfo->Size);
+					if (m_Buffers.Contains(hash))
+					{
+						const BufferMetaConstantData& data = m_Buffers[hash];
+						if (data.Value->GetSize() == structInfo->Size)
+							continue;
+
+						RenderSystemAllocators::ContainersAllocator_Deallocate(data.Value);
+					}
+
+					CreateBufferData(m_Buffers, constant.Handle, constant.Name, constant.UserDefinedType, structInfo->Size);
 
 					continue;
 				}
+				else
+				{
+					if (m_Textures.Contains(hash))
+						continue;
 
-				CreateTextureData(constant.Handle, constant.Name);
+					CreateTextureData(m_Textures, constant.Handle, constant.Name);
+				}
 			}
 
-			return true;
+			Remove(m_Buffers, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, true);
+			Remove(m_Textures, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, false);
 		}
 
 		ConstantBuffer* Material::GetConstantBuffer(ProgramConstantHash Hash)
@@ -168,34 +216,6 @@ namespace Engine
 			m_Queue = Other.m_Queue;
 			m_RenderState = Other.m_RenderState;
 
-			SyncData(Other);
-
-			return *this;
-		}
-
-		void Material::CreateBufferData(ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size)
-		{
-			ConstantBuffer* buffer = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
-			Construct(buffer, Size);
-
-			ProgramConstantHash hash = GetHash(Name);
-
-			CoreDebugAssert(Categories::RenderSystem, !m_Buffers.Contains(hash), "Attempt to add duplicate constant is forbidden");
-
-			m_Buffers[hash] = BufferMetaConstantData(Handle, Name, hash, UserDefinedType, buffer);
-		}
-
-		void Material::CreateTextureData(ProgramConstantHandle Handle, const String& Name)
-		{
-			ProgramConstantHash hash = GetHash(Name);
-
-			CoreDebugAssert(Categories::RenderSystem, !m_Buffers.Contains(hash), "Attempt to add duplicate constant is forbidden");
-
-			m_Textures[hash] = TextureMetaConstantData(Handle, Name, hash, nullptr);
-		}
-
-		void Material::SyncData(const Material& Other)
-		{
 			for (auto& bufferInfo : Other.m_Buffers)
 			{
 				auto& otherData = bufferInfo.GetSecond();
@@ -218,15 +238,7 @@ namespace Engine
 					RenderSystemAllocators::ContainersAllocator_Deallocate(selfValue);
 			}
 
-			m_Buffers.RemoveIf([&Other](auto Item)
-				{
-					bool goingToRemove = !Other.m_Buffers.Contains(Item.GetFirst());
-
-					if (goingToRemove)
-						RenderSystemAllocators::ContainersAllocator_Deallocate(Item.GetSecond().Value);
-
-					return goingToRemove;
-				});
+			Remove(m_Buffers, [&Other](ProgramConstantHash Hash) { return !Other.m_Buffers.Contains(Hash); }, true);
 
 			for (auto& textureInfo : Other.m_Textures)
 			{
@@ -241,7 +253,10 @@ namespace Engine
 				selfData = otherData;
 				selfData.Value = value;
 			}
-			m_Textures.RemoveIf([&Other](auto Item) { return !Other.m_Textures.Contains(Item.GetFirst()); });
+
+			Remove(m_Textures, [&Other](ProgramConstantHash Hash) { return !Other.m_Textures.Contains(Hash); }, false);
+
+			return *this;
 		}
 
 		ProgramConstantHash Material::GetHash(const String& Name)

@@ -98,10 +98,6 @@ namespace Engine
 			INLINE Material& operator=(const Material& Other);
 
 		private:
-			void CreateBufferData(ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size);
-			void CreateTextureData(ProgramConstantHandle Handle, const String& Name);
-			void SyncData(const Material& Other);
-
 			INLINE const BufferMetaDataMap& GetBuffers(void) const
 			{
 				return m_Buffers;

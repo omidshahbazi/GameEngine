@@ -88,7 +88,7 @@ namespace Engine
 
 			CoreDebugAssert(Categories::RenderSystem, !m_Program->IsNull(), "Program cannot be null to initialize a Pass");
 
-			//just sync not from scratch
+			//UNDONE:RENDERING -> just sync not from scratch
 
 			auto& metaInfo = (*m_Program)->GetMetaInfo();
 

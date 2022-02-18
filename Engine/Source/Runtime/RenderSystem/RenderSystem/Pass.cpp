@@ -205,7 +205,7 @@ namespace Engine
 				auto selfValue = selfData.Value;
 
 				auto value = otherData.Value;
-				if (contains && !IncludingValues)
+				if (contains)
 					value = selfValue;
 
 				selfData = otherData;
@@ -235,7 +235,7 @@ namespace Engine
 				auto& selfData = m_Textures[otherData.Hash];
 
 				auto value = otherData.Value;
-				if (contains && !IncludingValues)
+				if (contains)
 					value = selfData.Value;
 
 				selfData = otherData;

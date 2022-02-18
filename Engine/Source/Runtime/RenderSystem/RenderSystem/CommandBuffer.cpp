@@ -356,7 +356,7 @@ namespace Engine
 
 				CommandBuffer->SetProgram(pass.GetProgram()->GetPointer()->GetHandle());
 
-				ProgramConstantSupplier::GPUBufferDataBaseMap buffers;
+				ProgramConstantSupplier::GPUBufferDataMap buffers;
 				for (auto& info : pass.GetBuffers())
 				{
 					auto& constantInfo = info.GetSecond();
@@ -367,7 +367,7 @@ namespace Engine
 					localConstantInfo.Value->Copy(constantInfo.Value);
 				}
 
-				ProgramConstantHolder::TextureDataBaseMap textures;
+				ProgramConstantSupplier::TextureDataMap textures;
 				for (auto& info : pass.GetTextures())
 					textures[info.GetFirst()] = info.GetSecond();
 

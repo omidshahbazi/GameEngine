@@ -7,24 +7,30 @@
 #include <RenderSystem\Sprite.h>
 #include <RenderSystem\Private\ConstantData.h>
 #include <ResourceCommon\Resource.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
 	using namespace ResourceCommon;
 	using namespace RenderDevice;
+	using namespace Containers;
 
 	namespace RenderSystem
 	{
 		using namespace Private;
 
+		class CommandBuffer;
+		class ConstantBuffer;
+
 		class RENDERSYSTEM_API Pass
 		{
-		public:
-			typedef MetaConstantData<ConstantBuffer*> BufferConstantData;
-			typedef MetaConstantData<TextureResource*> TextureConstantData;
+			friend class CommandBuffer;
 
-			typedef Map<ProgramConstantHash, BufferConstantData> BufferMetaDataMap;
-			typedef Map<ProgramConstantHash, TextureConstantData> TextureMetaDataMap;
+		public:
+			typedef MetaConstantData<ConstantBuffer*> BufferMetaConstantData;
+			typedef MetaConstantData<TextureResource*> TextureMetaConstantData;
+			typedef Map<ProgramConstantHash, BufferMetaConstantData> BufferMetaDataMap;
+			typedef Map<ProgramConstantHash, TextureMetaConstantData> TextureMetaDataMap;
 
 		public:
 			Pass(void);

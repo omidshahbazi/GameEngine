@@ -5,6 +5,7 @@
 
 #include <MemoryManagement\Singleton.h>
 #include <RenderSystem\Pass.h>
+#include <RenderSystem\Private\ConstantData.h>
 #include <ResourceCommon\Resource.h>
 #include <Containers\Strings.h>
 #include <Containers\Map.h>
@@ -40,10 +41,12 @@ namespace Engine
 			typedef std::function<const TextureResource* (void)> FetchTexturetFunction;
 
 		private:
-			typedef Map<Pass::ConstantHash, std::shared_ptr<FetchBufferFunction>> BufferConstantMap;
-			typedef Map<Pass::ConstantHash, std::shared_ptr<FetchTexturetFunction>> TextureConstantMap;
-			typedef Pass::ConstantData<GPUConstantBuffer*> GPUBufferConstantDataBase;
-			typedef Map<Pass::ConstantHash, GPUBufferConstantDataBase> GPUBufferDataBaseMap;
+			typedef Map<ProgramConstantHash, std::shared_ptr<FetchBufferFunction>> FetchBufferConstantMap;
+			typedef Map<ProgramConstantHash, std::shared_ptr<FetchTexturetFunction>> FetchTextureConstantMap;
+			typedef ConstantData<GPUConstantBuffer*> GPUBufferConstantData;
+			typedef ConstantData<TextureResource*> TextureConstantData;
+			typedef Map<ProgramConstantHash, GPUBufferConstantData> GPUBufferDataMap;
+			typedef Map<ProgramConstantHash, TextureConstantData> TextureDataMap;
 
 		private:
 			ProgramConstantSupplier(void)
@@ -57,11 +60,11 @@ namespace Engine
 			void RegisterTexture(const String& Name, FetchTexturetFunction Function);
 
 		private:
-			void SupplyConstants(GPUBufferDataBaseMap& Buffers, ProgramConstantHolder::TextureDataBaseMap& Textures) const;
+			void SupplyConstants(GPUBufferDataMap& Buffers, TextureDataMap& Textures) const;
 
 		private:
-			BufferConstantMap m_BufferConstants;
-			TextureConstantMap m_TextureConstants;
+			FetchBufferConstantMap m_FetchBufferConstants;
+			FetchTextureConstantMap m_FetchTextureConstants;
 		};
 	}
 }

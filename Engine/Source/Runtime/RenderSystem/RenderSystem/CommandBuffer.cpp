@@ -350,61 +350,60 @@ namespace Engine
 			data.MVP = MVP;
 			BuiltiInProgramConstants::GetInstance()->SetTransfomData(data);
 
-			for (auto& pass : Material->GetPasses())
+			auto& material = *Material;
+
+			CommandBuffer->SetState(material.GetRenderState());
+
+			CommandBuffer->SetProgram(material.GetProgram()->GetPointer()->GetHandle());
+
+			ProgramConstantSupplier::GPUBufferDataMap buffers;
+			for (auto& info : material.GetBuffers())
 			{
-				CommandBuffer->SetState(pass.GetRenderState());
+				auto& constantInfo = info.GetSecond();
+				auto& localConstantInfo = buffers[info.GetFirst()];
 
-				CommandBuffer->SetProgram(pass.GetProgram()->GetPointer()->GetHandle());
+				localConstantInfo.Handle = constantInfo.Handle;
+				localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
+				localConstantInfo.Value->Copy(constantInfo.Value);
+			}
 
-				ProgramConstantSupplier::GPUBufferDataMap buffers;
-				for (auto& info : pass.GetBuffers())
-				{
-					auto& constantInfo = info.GetSecond();
-					auto& localConstantInfo = buffers[info.GetFirst()];
+			ProgramConstantSupplier::TextureDataMap textures;
+			for (auto& info : material.GetTextures())
+				textures[info.GetFirst()] = info.GetSecond();
 
-					localConstantInfo.Handle = constantInfo.Handle;
-					localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
-					localConstantInfo.Value->Copy(constantInfo.Value);
-				}
+			ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
 
-				ProgramConstantSupplier::TextureDataMap textures;
-				for (auto& info : pass.GetTextures())
-					textures[info.GetFirst()] = info.GetSecond();
+			for (auto& info : buffers)
+			{
+				auto& constant = info.GetSecond();
 
-				ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
+				CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+			}
 
-				for (auto& info : buffers)
-				{
-					auto& constant = info.GetSecond();
+			for (auto& info : textures)
+			{
+				auto& constant = info.GetSecond();
 
-					CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
-				}
+				ResourceHandle texHandle = 0;
+				if (constant.Value != nullptr && !constant.Value->IsNull())
+					texHandle = constant.Value->GetPointer()->GetHandle();
+				else
+					texHandle = DefaultTexture->GetHandle();
 
-				for (auto& info : textures)
-				{
-					auto& constant = info.GetSecond();
+				CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
+			}
 
-					ResourceHandle texHandle = 0;
-					if (constant.Value != nullptr && !constant.Value->IsNull())
-						texHandle = constant.Value->GetPointer()->GetHandle();
-					else
-						texHandle = DefaultTexture->GetHandle();
+			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
+			{
+				SubMesh& subMesh = Mesh->GetSubMeshes()[i];
 
-					CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
-				}
+				CommandBuffer->SetMesh(subMesh.GetHandle());
 
-				for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
-				{
-					SubMesh& subMesh = Mesh->GetSubMeshes()[i];
-
-					CommandBuffer->SetMesh(subMesh.GetHandle());
-
-					const uint16 idxCount = subMesh.GetIndexCount();
-					if (idxCount == 0)
-						CommandBuffer->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
-					else
-						CommandBuffer->DrawIndexed(subMesh.GetPolygonType(), idxCount);
-				}
+				const uint16 idxCount = subMesh.GetIndexCount();
+				if (idxCount == 0)
+					CommandBuffer->DrawArray(subMesh.GetPolygonType(), subMesh.GetVertexCount());
+				else
+					CommandBuffer->DrawIndexed(subMesh.GetPolygonType(), idxCount);
 			}
 		}
 	}

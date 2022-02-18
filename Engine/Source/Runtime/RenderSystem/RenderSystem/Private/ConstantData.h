@@ -52,22 +52,22 @@ namespace Engine
 				{
 				}
 
-				MetaConstantData(ProgramConstantHandle Handle, const String& Name, const T& Value) :
-					ConstantDataBase<T>(Handle, Value),
+				MetaConstantData(ProgramConstantHandle Handle, const String& Name, ProgramConstantHash Hash, const T& Value) :
+					ConstantData<T>(Handle, Value),
 					Name(Name),
-					Hash(GetHash(Name))
+					Hash(Hash)
 				{
 				}
 
-				MetaConstantData(ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, const T& Value) :
-					ConstantDataBase<T>(Handle, Value),
+				MetaConstantData(ProgramConstantHandle Handle, const String& Name, ProgramConstantHash Hash, const String& UserDefinedType, const T& Value) :
+					ConstantData<T>(Handle, Value),
 					Name(Name),
-					Hash(GetHash(Name)),
+					Hash(Hash),
 					UserDefinedType(UserDefinedType)
 				{
 				}
 
-				INLINE ConstantData& operator =(const ConstantData& Other)
+				INLINE MetaConstantData& operator =(const MetaConstantData& Other)
 				{
 					ConstantData<T>::operator=(Other);
 

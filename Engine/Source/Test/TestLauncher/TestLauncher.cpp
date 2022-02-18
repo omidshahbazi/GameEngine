@@ -67,12 +67,10 @@ BEGIN_ENTRY_POINT
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
 		ProgramResource* shader = resources->Load<Program>("Shader.program");
 
-		Material mat;
 		shader->Wait();
-		Pass pass(shader);
-		pass.SetQueue(RenderQueues::Geometry);
-		pass.SetTexture("DiffuseTexture", brickTex);
-		mat.AddPass(pass);
+		Material mat(shader);
+		mat.SetQueue(RenderQueues::Geometry);
+		mat.SetTexture("DiffuseTexture", brickTex);
 		MaterialResource matRes(&mat);
 
 		Scene scene = sceneMgr->CreateScene();

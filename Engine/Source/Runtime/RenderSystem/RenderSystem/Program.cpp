@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\Program.h>
-#include <RenderSystem\Pass.h>
+#include <RenderSystem\Material.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 
 namespace Engine

@@ -145,7 +145,7 @@ namespace Engine
 				if (size == 0)
 					return;
 
-				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 				SceneData* sceneData = GetSceneData();
 
@@ -275,23 +275,14 @@ namespace Engine
 					break;
 				}
 
-				if (ColdData.Material.GetPasses().GetSize() == 0)
-				{
-					Pass p(program);
-					p.SetQueue(RenderQueues::Lighting);
-					auto state = p.GetRenderState();
-					state.CullMode = CullModes::None;
-					state.DepthTestFunction = TestFunctions::Never;
-					state.BlendEquation = BlendEquations::Add;
-					state.BlendFunctionDestinationFactor = BlendFunctions::One;
-					state.BlendFunctionSourceFactor = BlendFunctions::One;
-					p.SetRenderState(state);
-					ColdData.Material.AddPass(p);
-				}
-				else
-				{
-					ColdData.Material.GetPasses()[0].SetProgram(program);
-				}
+				ColdData.Material.SetProgram(program);
+				ColdData.Material.SetQueue(RenderQueues::Lighting);
+				auto& state = ColdData.Material.GetRenderState();
+				state.CullMode = CullModes::None;
+				state.DepthTestFunction = TestFunctions::Never;
+				state.BlendEquation = BlendEquations::Add;
+				state.BlendFunctionDestinationFactor = BlendFunctions::One;
+				state.BlendFunctionSourceFactor = BlendFunctions::One;
 			}
 		}
 	}

@@ -1,100 +1,126 @@
-// Copyright 2016-2020 ?????????????. All Rights Reserved.
+// Copyright 2013-2020 ?????????????. All Rights Reserved.
 #pragma once
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include <RenderSystem\Pass.h>
+#include <RenderDevice\IDevice.h>
+#include <RenderSystem\Sprite.h>
+#include <RenderSystem\Private\ConstantData.h>
+#include <ResourceCommon\Resource.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
+	using namespace ResourceCommon;
+	using namespace RenderDevice;
+	using namespace Containers;
+
 	namespace RenderSystem
 	{
+		using namespace Private;
+
+		class CommandBuffer;
+		class ConstantBuffer;
+
 		class RENDERSYSTEM_API Material
 		{
+			friend class CommandBuffer;
+
 		public:
-			typedef Vector<Pass> PassList;
+			typedef MetaConstantData<ConstantBuffer*> BufferMetaConstantData;
+			typedef MetaConstantData<TextureResource*> TextureMetaConstantData;
+			typedef Map<ProgramConstantHash, BufferMetaConstantData> BufferMetaDataMap;
+			typedef Map<ProgramConstantHash, TextureMetaConstantData> TextureMetaDataMap;
 
 		public:
 			Material(void);
-
+			Material(ProgramResource* Program);
 			Material(const Material& Other);
+			Material(Material&& Other);
+			~Material(void);
 
-			INLINE void AddPass(const Pass& Pass)
+			const ProgramResource* GetProgram(void) const
 			{
-				m_Passes.Add(Pass);
+				return m_Program;
 			}
 
-			INLINE void AddPass(Pass&& Pass)
-			{
-				m_Passes.Add({});
+			bool SetProgram(ProgramResource* Program);
 
-				Engine::RenderSystem::Pass& newPass = m_Passes[m_Passes.GetSize() - 1];
-				newPass = Pass;
-			}
+			ConstantBuffer* GetConstantBuffer(ProgramConstantHash Hash);
+			ConstantBuffer* GetConstantBuffer(const String& Name);
 
-			INLINE void RemovePass(uint8 Index)
-			{
-				m_Passes.RemoveAt(Index);
-			}
-
-			INLINE PassList& GetPasses(void)
-			{
-				return m_Passes;
-			}
-
-			INLINE const PassList& GetPasses(void) const
-			{
-				return m_Passes;
-			}
-
-			INLINE Material& operator=(const Material& Other)
-			{
-				m_Passes = Other.m_Passes;
-
-				return *this;
-			}
-
-			void SetQueue(RenderQueues Queue);
-
-			bool SetBuffer(Pass::ConstantHash Hash, const byte* Data, uint16 Size);
-			INLINE bool SetBuffer(const String& Name, const byte* Data, uint16 Size)
+			bool SetBuffer(ProgramConstantHash Hash, const byte* Data, uint16 Size);
+			bool SetBuffer(const String& Name, const byte* Data, uint16 Size)
 			{
 				return SetBuffer(GetHash(Name), Data, Size);
 			}
 
 			template<typename T, int Size = sizeof(T)>
-			INLINE void SetBuffer(Pass::ConstantHash Hash, const T* Data)
+			void SetBuffer(ProgramConstantHash Hash, const T* Data)
 			{
 				SetBuffer(Hash, ReinterpretCast(const byte*, Data), Size);
 			}
 
 			template<typename T, int Size = sizeof(T)>
-			INLINE void SetBuffer(const String& Name, const T* Data)
+			void SetBuffer(const String& Name, const T* Data)
 			{
 				SetBuffer(Name, ReinterpretCast(const byte*, Data), Size);
 			}
 
-			bool SetTexture(Pass::ConstantHash Hash, const TextureResource* Value);
-			bool SetTexture(const String& Name, const TextureResource* Value)
+			bool SetTexture(ProgramConstantHash Hash, const TextureResource* Value);
+			bool SetTexture(const String& Name, const TextureResource* Value);
+
+			bool SetSprite(ProgramConstantHash Hash, const SpriteResource* Value);
+			bool SetSprite(const String& Name, const SpriteResource* Value);
+
+			INLINE RenderQueues GetQueue(void) const
 			{
-				return SetTexture(GetHash(Name), Value);
+				return m_Queue;
 			}
 
-			bool SetSprite(Pass::ConstantHash Hash, const SpriteResource* Value);
-			bool SetSprite(const String& Name, const SpriteResource* Value)
+			INLINE void SetQueue(RenderQueues Queue)
 			{
-				return SetSprite(GetHash(Name), Value);
+				m_Queue = Queue;
+			}
+
+			INLINE RenderState& GetRenderState(void)
+			{
+				return m_RenderState;
+			}
+
+			INLINE const RenderState& GetRenderState(void) const
+			{
+				return m_RenderState;
 			}
 
 			void SetRenderState(const RenderState& State);
 
-			static Pass::ConstantHash GetHash(const String& Name)
-			{
-				return Pass::GetHash(Name);
-			}
+			INLINE Material& operator=(const Material& Other);
 
 		private:
-			PassList m_Passes;
+			void CreateBufferData(ProgramConstantHandle Handle, const String& Name, const String& UserDefinedType, uint16 Size);
+			void CreateTextureData(ProgramConstantHandle Handle, const String& Name);
+			void SyncData(const Material& Other);
+
+			INLINE const BufferMetaDataMap& GetBuffers(void) const
+			{
+				return m_Buffers;
+			}
+
+			INLINE const TextureMetaDataMap& GetTextures(void) const
+			{
+				return m_Textures;
+			}
+
+		public:
+			static ProgramConstantHash GetHash(const String& Name);
+
+		private:
+			ProgramResource* m_Program;
+			BufferMetaDataMap m_Buffers;
+			TextureMetaDataMap m_Textures;
+			RenderQueues m_Queue;
+			RenderState m_RenderState;
 		};
 	}
 }

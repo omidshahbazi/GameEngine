@@ -4,7 +4,6 @@
 #define PROGRAM_CONSTANT_SUPPLIER_H
 
 #include <MemoryManagement\Singleton.h>
-#include <RenderSystem\Pass.h>
 #include <RenderSystem\Private\ConstantData.h>
 #include <ResourceCommon\Resource.h>
 #include <Containers\Strings.h>

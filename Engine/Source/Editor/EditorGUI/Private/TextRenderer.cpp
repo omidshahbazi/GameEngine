@@ -31,8 +31,8 @@ namespace Engine
 				if (m_Text.GetLength() == 0)
 					return;
 
-				static const Pass::ConstantHash ConstantHash_FontTexture = Pass::GetHash("FontTexture");
-				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				static const ProgramConstantHash ConstantHash_FontTexture = Material::GetHash("FontTexture");
+				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
@@ -66,7 +66,7 @@ namespace Engine
 
 			void TextRenderer::SetColor(const ColorUI8& Value)
 			{
-				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 				RendererBase::SetColor(Value);
 

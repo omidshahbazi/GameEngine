@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\ProgramConstantSupplier.h>
+#include <RenderSystem\Material.h>
 #include <RenderDevice\IDevice.h>
 #include <RenderSystem\Private\GPUConstantBuffer.h>
 
@@ -19,12 +20,12 @@ namespace Engine
 
 		void ProgramConstantSupplier::RegisterConstantBuffer(const String& Name, FetchBufferFunction Function)
 		{
-			m_FetchBufferConstants[Pass::GetHash(Name)] = std::make_shared<FetchBufferFunction>(Function);
+			m_FetchBufferConstants[Material::GetHash(Name)] = std::make_shared<FetchBufferFunction>(Function);
 		}
 
 		void ProgramConstantSupplier::RegisterTexture(const String& Name, FetchTexturetFunction Function)
 		{
-			m_FetchTextureConstants[Pass::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
+			m_FetchTextureConstants[Material::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
 		void ProgramConstantSupplier::SupplyConstants(GPUBufferDataMap& Buffers, TextureDataMap& Textures) const

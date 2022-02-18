@@ -26,8 +26,8 @@ namespace Engine
 			{
 				if (m_IsDirty)
 				{
-					static const Pass::ConstantHash ConstantHash_DiffuseTexture = Pass::GetHash("DiffuseTexture");
-					static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+					static const ProgramConstantHash ConstantHash_DiffuseTexture = Material::GetHash("DiffuseTexture");
+					static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 					GetMaterial().SetSprite(ConstantHash_DiffuseTexture, m_Sprite);
 
@@ -53,7 +53,7 @@ namespace Engine
 
 			void SpriteRenderer::SetColor(const ColorUI8& Value)
 			{
-				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 				RendererBase::SetColor(Value);
 
@@ -64,7 +64,7 @@ namespace Engine
 
 			void SpriteRenderer::SetDrawMode(DrawModes Value)
 			{
-				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 				m_DrawMode = Value;
 
@@ -82,7 +82,7 @@ namespace Engine
 
 			void SpriteRenderer::SetDimension(const Vector2I& Value)
 			{
-				static const Pass::ConstantHash ConstantHash_data = Pass::GetHash("data");
+				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
 				RendererBase::SetDimension(Value);
 

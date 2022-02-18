@@ -3,7 +3,6 @@
 #include <RenderDevice\ProgramInfo.h>
 #include <RenderSystem\DeviceInterface.h>
 #include <RenderSystem\RenderContext.h>
-#include <RenderSystem\Pass.h>
 #include <RenderSystem\Material.h>
 #include <RenderSystem\RenderTarget.h>
 
@@ -310,9 +309,9 @@ namespace Engine
 
 			void DeferredRendering::SetPassConstants(Material* Material)
 			{
-				static const Pass::ConstantHash ConstantHash_PositionTexture = Pass::GetHash("PositionTexture");
-				static const Pass::ConstantHash ConstantHash_NormalTexture = Pass::GetHash("NormalTexture");
-				static const Pass::ConstantHash ConstantHash_AlbedoSpecTexture = Pass::GetHash("AlbedoSpecTexture");
+				static const ProgramConstantHash ConstantHash_PositionTexture = Material::GetHash("PositionTexture");
+				static const ProgramConstantHash ConstantHash_NormalTexture = Material::GetHash("NormalTexture");
+				static const ProgramConstantHash ConstantHash_AlbedoSpecTexture = Material::GetHash("AlbedoSpecTexture");
 
 				Material->SetTexture(ConstantHash_PositionTexture, &m_ActiveInfo->PositionTexture);
 				Material->SetTexture(ConstantHash_NormalTexture, &m_ActiveInfo->NormalTexture);

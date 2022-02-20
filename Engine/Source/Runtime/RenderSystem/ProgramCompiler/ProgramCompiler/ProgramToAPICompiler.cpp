@@ -61,11 +61,10 @@ namespace Engine
 			};
 			preprocessParameters.Defines = Info->Defines;
 
-#ifdef DEBUG_MODE
-			preprocessParameters.Defines.Add("DEBUG_MODE");
-#elif RELEASE_MODE
-			preprocessParameters.Defines.Add("RELASE_MODE");
-#endif
+			if (Info->DebugMode)
+				preprocessParameters.Defines.Add("DEBUG_MODE");
+			else
+				preprocessParameters.Defines.Add("RELASE_MODE");
 
 			preprocessorParser.Process(preprocessParameters);
 

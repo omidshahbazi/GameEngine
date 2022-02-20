@@ -22,6 +22,7 @@ namespace Engine
 		public:
 			String Source;
 			DefineList Defines;
+			bool DebugMode;
 		};
 	}
 }

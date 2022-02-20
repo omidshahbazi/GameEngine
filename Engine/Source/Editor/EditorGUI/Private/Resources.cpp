@@ -91,6 +91,10 @@ namespace Engine
 				ProgramInfo programInfo;
 				programInfo.Source = Source;
 
+#ifdef DEBUG_MODE
+				programInfo.DebugMode = true;
+#endif
+
 				Program* program = RenderManager::GetInstance()->GetDevice()->CreateProgram(&programInfo);
 
 				return m_ResourceHolder->AddFromMemory(GUID::Create(), program);

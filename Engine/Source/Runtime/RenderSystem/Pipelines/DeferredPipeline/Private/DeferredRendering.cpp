@@ -193,6 +193,11 @@ namespace Engine
 				m_DeviceInterface = DeviceInterface;
 
 				ProgramInfo info;
+
+#ifdef DEBUG_MODE
+				info.DebugMode = true;
+#endif
+
 				info.Source = AmbientLightShader;
 				m_AmbientLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
 

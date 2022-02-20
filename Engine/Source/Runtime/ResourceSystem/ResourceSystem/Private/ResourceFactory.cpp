@@ -111,6 +111,9 @@ namespace Engine
 				ProgramInfo info;
 				ProgramParser::Parse(InBuffer, info);
 
+				info.Defines.AddRange(Settings.Defines);
+				info.DebugMode = Settings.DebugMode;
+
 				CompiledProgramInfo compiledInfos[DEVICE_TYPE_COUNT] = {};
 				for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 				{

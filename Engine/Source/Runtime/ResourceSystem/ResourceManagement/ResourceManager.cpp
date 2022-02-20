@@ -28,8 +28,11 @@ namespace Engine
 		cwstr INTERNAL_ASSETS_DIRECTORY_PATH(L"../../Contents/Resources");
 		cwstr INTERNAL_LIBRARY_DIRECTORY_PATH(L"../../Contents/Resources/Library");
 
-		Program* CreateProgram(const ProgramInfo* ProgramInfo)
+		Program* CreateProgram(ProgramInfo* ProgramInfo)
 		{
+#ifdef DEBUG_MODE
+			ProgramInfo->DebugMode = true;
+#endif
 			return RenderManager::GetInstance()->GetDevice()->CreateProgram(ProgramInfo);
 		}
 

@@ -18,7 +18,7 @@ namespace Engine
 	namespace ResourceImportExport
 	{
 		REFLECTION_STRUCT()
-		class RESOURCEIMPORTEXPORT_API ImporterExporter
+			class RESOURCEIMPORTEXPORT_API ImporterExporter
 		{
 			IMPORTEREXPORTER_OBJECT()
 
@@ -28,7 +28,7 @@ namespace Engine
 
 		public:
 			REFLECTION_STRUCT()
-			struct RESOURCEIMPORTEXPORT_API Settings
+				struct RESOURCEIMPORTEXPORT_API Settings
 			{
 				SETTINGS_OBJECT()
 
@@ -139,6 +139,13 @@ namespace Engine
 				ProgramSettings(void)
 				{
 				}
+
+			public:
+				REFLECTION_PROPERTY()
+					Vector<String> Defines;
+
+				REFLECTION_PROPERTY()
+					bool DebugMode;
 			};
 
 			REFLECTION_STRUCT()
@@ -209,51 +216,6 @@ namespace Engine
 				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings);
 
 				return true;
-			}
-
-			static bool ImportText(const WString& FilePath, TextSettings* Settings)
-			{
-				return Import(FilePath, Settings);
-			}
-			static bool ExportText(const WString& FilePath, TextSettings* Settings)
-			{
-				return Export(FilePath, Settings);
-			}
-
-			static bool ImportTexture(const WString& FilePath, TextureSettings* Settings)
-			{
-				return Import(FilePath, Settings);
-			}
-			static bool ExportTexture(const WString& FilePath, TextureSettings* Settings)
-			{
-				return Export(FilePath, Settings);
-			}
-
-			static bool ImportProgram(const WString& FilePath, ProgramSettings* Settings)
-			{
-				return Import(FilePath, Settings);
-			}
-			static bool ExportProgram(const WString& FilePath, ProgramSettings* Settings)
-			{
-				return Export(FilePath, Settings);
-			}
-
-			static bool ImportMesh(const WString& FilePath, MeshSettings* Settings)
-			{
-				return Import(FilePath, Settings);
-			}
-			static bool ExportMesh(const WString& FilePath, MeshSettings* Settings)
-			{
-				return Export(FilePath, Settings);
-			}
-
-			static bool ImportFont(const WString& FilePath, FontSettings* Settings)
-			{
-				return Import(FilePath, Settings);
-			}
-			static bool ExportFont(const WString& FilePath, FontSettings* Settings)
-			{
-				return Export(FilePath, Settings);
 			}
 
 			static WString GetResourceFilePath(const WString& FilePath);

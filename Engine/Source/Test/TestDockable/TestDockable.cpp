@@ -113,6 +113,5 @@ END_ENTRY_POINT
 
 
 //UNDONE:RENDERING -> Issue #107
-//UNDONE:RENDERING -> Issue #105
 //UNDONE:RENDERING -> Issue #92
 //UNDONE:RENDERING -> Put guards in DeviceInterface

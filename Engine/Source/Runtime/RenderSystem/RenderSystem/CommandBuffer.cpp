@@ -11,6 +11,7 @@
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderSystem\Private\FrameConstantBuffers.h>
 #include <RenderSystem\Private\GPUConstantBuffer.h>
+#include <RenderSystem\Private\InternalRenderTargets.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderDevice\ICommandBuffer.h>
@@ -93,14 +94,31 @@ namespace Engine
 			return true;
 		}
 
-		void CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
+		bool CommandBuffer::SetRenderTarget(RenderTargets RenderTarget)
 		{
+			m_Buffer.Append(CommandTypes::SetRenderTarget);
+
+			SetRenderTargetCommandData data = {};
+			data.RenderTarget = ConstCast(RenderSystem::RenderTarget*, InternalRenderTargets::GetInstance()->Get(RenderTarget));
+
+			m_Buffer.Append(data);
+
+			return true;
+		}
+
+		bool CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
+		{
+			if (RenderTarget == nullptr)
+				return false;
+
 			m_Buffer.Append(CommandTypes::SetRenderTarget);
 
 			SetRenderTargetCommandData data = {};
 			data.RenderTarget = ConstCast(RenderSystem::RenderTarget*, RenderTarget);
 
 			m_Buffer.Append(data);
+
+			return true;
 		}
 
 		bool CommandBuffer::SetViewport(const Vector2I& Position, const Vector2I& Size)
@@ -316,7 +334,7 @@ namespace Engine
 						size = data.RenderTarget->GetTexture(0)->GetDimension();
 					}
 
-					SET_RENDER_TARGET(data.RenderTarget == nullptr ? 0 : data.RenderTarget->GetHandle());
+					SET_RENDER_TARGET(handle);
 					SET_VIEWPORT(Vector2I::Zero, size);
 				} break;
 

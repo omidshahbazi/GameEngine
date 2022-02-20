@@ -49,7 +49,7 @@ namespace Engine
 				m_Value = Value;
 
 				if (m_Value >= m_DesiredValue)
-					PlatformOS::WaitForSignalEvent(m_Event);
+					PlatformOS::SignalEvent(m_Event);
 			}
 		}
 	}

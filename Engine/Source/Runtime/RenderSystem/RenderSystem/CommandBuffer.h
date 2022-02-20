@@ -69,7 +69,8 @@ namespace Engine
 
 			bool GenerateMipMap(const Texture* Texture);
 
-			void SetRenderTarget(const RenderTarget* RenderTarget);
+			bool SetRenderTarget(RenderTargets RenderTarget);
+			bool SetRenderTarget(const RenderTarget* RenderTarget);
 			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
 

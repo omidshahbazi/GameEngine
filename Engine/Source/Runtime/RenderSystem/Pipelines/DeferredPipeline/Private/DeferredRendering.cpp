@@ -233,10 +233,10 @@ namespace Engine
 				m_CommandBufferGBuffer.Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black);
 
 				m_CommandBufferLighting.Clear();
-				m_CommandBufferLighting.SetRenderTarget(nullptr);
+				m_CommandBufferLighting.SetRenderTarget(RenderTargets::Context);
 
 				m_CommandBufferFinal.Clear();
-				m_CommandBufferFinal.SetRenderTarget(nullptr);
+				m_CommandBufferFinal.SetRenderTarget(RenderTargets::Context);
 				m_CommandBufferFinal.Clear(ClearFlags::ColorBuffer | ClearFlags::DepthBuffer, ColorUI8::Black);
 			}
 

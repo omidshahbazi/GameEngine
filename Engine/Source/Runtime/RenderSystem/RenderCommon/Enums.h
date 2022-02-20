@@ -217,6 +217,12 @@ namespace Engine
 			Line,
 			Fill
 		};
+
+		enum class RenderTargets
+		{
+			Context,
+			GBuffer
+		};
 	}
 }
 

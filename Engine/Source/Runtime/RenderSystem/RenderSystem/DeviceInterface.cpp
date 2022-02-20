@@ -13,6 +13,7 @@
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
+#include <RenderSystem\Private\InternalRenderTargets.h>
 #include <RenderSystem\Private\CommandBufferHelper.h>
 #include <RenderSystem\Material.h>
 #include <ProgramCompiler\ProgramToAPICompiler.h>
@@ -53,6 +54,7 @@ namespace Engine
 			ProgramToAPICompiler::Create(RenderSystemAllocators::RenderSystemAllocator);
 			ProgramConstantSupplier::Create(RenderSystemAllocators::RenderSystemAllocator);
 			BuiltiInProgramConstants::Create(RenderSystemAllocators::RenderSystemAllocator);
+			InternalRenderTargets::Create(RenderSystemAllocators::RenderSystemAllocator);
 		}
 
 		DeviceInterface::~DeviceInterface(void)
@@ -68,6 +70,7 @@ namespace Engine
 
 			ProgramConstantSupplier::Destroy();
 			BuiltiInProgramConstants::Destroy();
+			InternalRenderTargets::Destroy();
 			ProgramToAPICompiler::Destroy();
 
 			ModuleManager::GetInstance()->Unload(m_Device).Wait();

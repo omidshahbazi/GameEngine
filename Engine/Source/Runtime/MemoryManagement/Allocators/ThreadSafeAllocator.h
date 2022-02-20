@@ -3,7 +3,7 @@
 #ifndef THREAD_SAFE_ALLOCATOR_H
 #define THREAD_SAFE_ALLOCATOR_H
 
-#include <Common\ScopeGaurd.h>
+#include <Common\ScopeGuard.h>
 
 namespace Engine
 {
@@ -27,7 +27,7 @@ namespace Engine
 			byte* Allocate(uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				ScopeGaurd gaurd(m_Lock);
+				ScopeGuard gaurd(m_Lock);
 #endif
 
 				return AllocatorType::Allocate(Amount, File, LineNumber, Function);
@@ -36,7 +36,7 @@ namespace Engine
 			byte* Allocate(uint64 Amount) override
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				ScopeGaurd gaurd(m_Lock);
+				ScopeGuard gaurd(m_Lock);
 #endif
 
 				return AllocatorType::Allocate(Amount);
@@ -47,7 +47,7 @@ namespace Engine
 			byte* Reallocate(byte* Address, uint64 Amount, cstr File, uint32 LineNumber, cstr Function) override
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				ScopeGaurd gaurd(m_Lock);
+				ScopeGuard gaurd(m_Lock);
 #endif
 				return AllocatorType::Reallocate(Address, Amount, File, LineNumber, Function);
 			}
@@ -55,7 +55,7 @@ namespace Engine
 			byte* Reallocate(byte* Address, uint64 Amount) override
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				ScopeGaurd gaurd(m_Lock);
+				ScopeGuard gaurd(m_Lock);
 #endif
 
 				return AllocatorType::Reallocate(Address, Amount);
@@ -65,7 +65,7 @@ namespace Engine
 			void Deallocate(byte* Address) override
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				ScopeGaurd gaurd(m_Lock);
+				ScopeGuard gaurd(m_Lock);
 #endif
 				AllocatorType::Deallocate(Address);
 			}
@@ -73,7 +73,7 @@ namespace Engine
 			bool TryDeallocate(byte* Address)  override
 			{
 #ifndef ONLY_USING_C_ALLOCATOR
-				ScopeGaurd gaurd(m_Lock);
+				ScopeGuard gaurd(m_Lock);
 #endif
 				return AllocatorType::TryDeallocate(Address);
 			}

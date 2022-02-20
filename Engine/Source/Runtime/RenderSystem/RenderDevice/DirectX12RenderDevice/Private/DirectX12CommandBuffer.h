@@ -58,6 +58,9 @@ namespace Engine
 				void EndEvent(void) override;
 				void SetMarker(cwstr Label) override;
 
+				void WaitForFences(IFence* const* Fences, uint8 Count) override;
+				void SignalFences(IFence* const* Fences, uint8 Count) override;
+
 				bool Execute(void) override;
 
 				void MoveTextureToPresentState(ResourceHandle Handle);
@@ -81,10 +84,6 @@ namespace Engine
 #ifdef DEBUG_MODE
 				ID3D12DebugCommandList2* m_DebugList;
 #endif
-
-				ID3D12Fence* m_Fence;
-				uint64 m_FenceValue;
-				HANDLE m_FenceEvent;
 
 				RenderState m_State;
 

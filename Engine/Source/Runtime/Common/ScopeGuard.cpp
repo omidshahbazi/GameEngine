@@ -1,5 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Common\ScopeGaurd.h>
+#include <Common\ScopeGuard.h>
 
 #include <iostream>
 #include <thread>
@@ -8,13 +8,13 @@ namespace Engine
 {
 	namespace Common
 	{
-		ScopeGaurd::ScopeGaurd(SpinLock& Gaurd) :
+		ScopeGuard::ScopeGuard(SpinLock& Gaurd) :
 			m_Lock(Gaurd)
 		{
 			m_Lock.Lock();
 		}
 
-		ScopeGaurd::~ScopeGaurd(void)
+		ScopeGuard::~ScopeGuard(void)
 		{
 			m_Lock.Release();
 		}

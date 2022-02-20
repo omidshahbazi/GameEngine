@@ -3,8 +3,8 @@
 #include <RenderSystem\VertexBuffer.h>
 #include <RenderSystem\IndexBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
+#include <RenderSystem\Private\CommandBufferHelper.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <RenderDevice\ICommandBuffer.h>
 
 namespace Engine
 {
@@ -85,10 +85,7 @@ namespace Engine
 
 			cb->EndEvent();
 
-			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
-				return;
-
-			GetDevice()->DestroyCommandBuffer(&cb, 1).Wait();
+			CommandBufferHelper::SubmitAndDestroy(GetDevice(), cb);
 		}
 	}
 }

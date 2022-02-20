@@ -9,6 +9,7 @@
 #include <RenderDevice\TextureInfo.h>
 #include <RenderDevice\RenderTargetInfo.h>
 #include <RenderDevice\MeshInfo.h>
+#include <RenderDevice\IFence.h>
 #include <Platform\PlatformWindow.h>
 #include <Common\BitwiseUtils.h>
 
@@ -136,9 +137,11 @@ namespace Engine
 			virtual bool DestroyMesh(ResourceHandle Handle) = 0;
 
 			virtual bool CreateCommandBuffer(ICommandBuffer*& Buffer) = 0;
-			virtual bool DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count) = 0;
-			virtual bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) = 0;
-			virtual bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) = 0;
+			virtual bool DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count) = 0;
+			virtual bool SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count) = 0;
+
+			virtual bool CreateFence(IFence*& Fence) = 0;
+			virtual bool DestroyFences(IFence** Fence, uint8 Count) = 0;
 
 			virtual bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) = 0;
 			virtual bool SetDebugCallback(DebugFunction Callback) = 0;

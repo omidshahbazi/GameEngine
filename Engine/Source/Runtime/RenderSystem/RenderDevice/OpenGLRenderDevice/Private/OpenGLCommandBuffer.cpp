@@ -552,8 +552,31 @@ namespace Engine
 				m_Buffer.Append(data);
 			}
 
+			void OpenGLCommandBuffer::WaitForFences(IFence* const* Fences, uint8 Count)
+			{
+			}
+
+			void OpenGLCommandBuffer::SignalFences(IFence* const* Fences, uint8 Count)
+			{
+				CoreDebugAssert(Categories::RenderSystem, Count != 0, "Count cannot be zero");
+
+				for (uint8 i = 0; i < Count; ++i)
+					CoreDebugAssert(Categories::RenderSystem, Fences[i] != nullptr, "A fence is null");
+
+				m_Buffer.Append(CommandTypes::SignalFences);
+
+				SignalFencesCommandData data = {};
+				data.Fences = ReinterpretCast(OpenGLFence**, ConstCast(IFence**, Fences));
+				data.Count = Count;
+
+				m_Buffer.Append(data);
+			}
+
 			bool OpenGLCommandBuffer::Execute(void)
 			{
+				Vector<OpenGLFence*> fences;
+				Vector<uint64> fencesValues;
+
 				m_Buffer.ResetRead();
 				CommandTypes commandType;
 				while (m_Buffer.Read(commandType))
@@ -791,10 +814,25 @@ namespace Engine
 
 					} break;
 
+					case CommandTypes::SignalFences:
+					{
+						SignalFencesCommandData data = {};
+						m_Buffer.Read(data);
+
+						for (uint8 i = 0; i < data.Count; ++i)
+						{
+							fences.Add(data.Fences[i]);
+							fencesValues.Add(data.Fences[i]->GetDesiredValue());
+						}
+					} break;
+
 					default:
 						CoreDebugAssert(Categories::RenderSystem, false, "CommandType is not recognized");
 					}
 				}
+
+				for (uint16 i = 0; i < fences.GetSize(); ++i)
+					fences[i]->SetValue(fencesValues[i]);
 
 				return true;
 			}

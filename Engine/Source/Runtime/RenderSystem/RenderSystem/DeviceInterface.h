@@ -25,6 +25,7 @@ namespace Engine
 		class RenderManager;
 		class IPipeline;
 		class CommandBuffer;
+		class CommandBufferFence;
 		class RenderContext;
 		class RenderTarget;
 		class Texture;
@@ -92,7 +93,9 @@ namespace Engine
 			void DestroyMesh(Mesh* Mesh);
 
 			void SubmitCommandBuffer(const CommandBuffer* Buffer);
-			void SubmitCommandBufferAsync(const CommandBuffer* Buffer);
+
+			CommandBufferFence* CreateFence(void);
+			void DestroyFence(CommandBufferFence* Fence);
 
 			void BeginFrame(const RenderContext* Context);
 			void EndFrame(void);

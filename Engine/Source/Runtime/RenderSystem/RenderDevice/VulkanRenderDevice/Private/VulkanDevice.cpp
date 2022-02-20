@@ -131,15 +131,19 @@ namespace Engine
 			{
 				return false;
 			}
-			bool VulkanDevice::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
+			bool VulkanDevice::DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count)
 			{
 				return false;
 			}
-			bool VulkanDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
+			bool VulkanDevice::SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count)
 			{
 				return false;
 			}
-			bool VulkanDevice::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
+			bool VulkanDevice::CreateFence(IFence*& Fence)
+			{
+				return false;
+			}
+			bool VulkanDevice::DestroyFences(IFence** Fence, uint8 Count)
 			{
 				return false;
 			}

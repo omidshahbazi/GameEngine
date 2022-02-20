@@ -2,12 +2,12 @@
 #include <DirectX12RenderDevice\Private\DirectX12Device.h>
 #include <DirectX12RenderDevice\Private\DirectX12DebugInfo.h>
 #include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
+#include <DirectX12RenderDevice\Private\DirectX12Fence.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderCommon\Helper.h>
 #include <Containers\StringUtility.h>
 #include <Debugging\CoreDebug.h>
 #include <WindowUtility\Window.h>
-//#include <Parallelizing\JobManager.h>
 
 namespace Engine
 {
@@ -16,7 +16,6 @@ namespace Engine
 	using namespace Platform;
 	using namespace RenderCommon::Private;
 	using namespace WindowUtility;
-	//using namespace Parallelizing;
 
 	namespace DirectX12RenderDevice
 	{
@@ -32,6 +31,15 @@ namespace Engine
 					return false; \
 				return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(TextureResourcePtr->SamplerDescription, &TextureResourcePtr->SamplerView));
 
+#define EXECUTE_AND_WAIT(CommandBuffer) \
+				if (!(CommandBuffer)->Execute()) \
+					return false; \
+				IFence* fence = m_FencePool.Get(); \
+				(CommandBuffer)->SignalFences(&fence, 1); \
+				if (!fence->Wait()) \
+					return false; \
+				m_FencePool.Back(fence);
+
 #define BEGIN_UPLOAD() \
 				{ \
 					byte* buffer = nullptr; \
@@ -42,14 +50,12 @@ namespace Engine
 #define END_UPLOAD(MainResourceInfo) \
 					if (!CHECK_CALL(DirectX12Wrapper::Resource::Unmap(m_UploadBuffer.Resource.Resource))) \
 						return false; \
-					DirectX12CommandBuffer *cb = m_CommandBufferPool.Get(this); \
-					cb->BeginEvent(L"UploadCommandBuffer"); \
+					m_UploadCommandBuffer->Clear(); \
+					m_UploadCommandBuffer->BeginEvent(L"UploadCommandBuffer"); \
 					m_UploadBuffer.Type = (MainResourceInfo)->Type; \
-					cb->CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
-					cb->EndEvent(); \
-					if (!cb->Execute()) \
-						return false; \
-					m_CommandBufferPool.Back(cb); \
+					m_UploadCommandBuffer->CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
+					m_UploadCommandBuffer->EndEvent(); \
+					EXECUTE_AND_WAIT(m_UploadCommandBuffer); \
 				}
 
 #define CREATE_VIEW(ViewPtr, BufferWidth, BufferHeight, AttachPoint, BufferFormat, IsColored, CurrentState, ShaderVisible) \
@@ -247,10 +253,12 @@ namespace Engine
 				m_AdapterDesc({}),
 				m_Device(nullptr),
 				m_UploadBuffer({}),
-				m_CurrentContext(nullptr),
+				m_UploadCommandBuffer(nullptr),
 				m_InputLayout(nullptr),
 				m_InputLayoutCount(0),
-				m_AsyncCommandBuffers(RenderSystemAllocators::ContainersAllocator)
+				m_CurrentContext(nullptr),
+				m_CommandBufferPool(this),
+				m_FencePool(this)
 			{
 			}
 
@@ -314,6 +322,8 @@ namespace Engine
 
 				if (!CreateBufferInternal(GPUBufferTypes::Pixel, UPLAOD_BUFFER_SIZE, true, &m_UploadBuffer))
 					return false;
+
+				m_UploadCommandBuffer = m_CommandBufferPool.Get();
 
 				m_InputLayoutCount = SubMeshInfo::GetLayoutCount();
 				m_InputLayout = RenderSystemAllocators::ResourceAllocator_AllocateArray<D3D12_INPUT_ELEMENT_DESC>(m_InputLayoutCount);
@@ -401,7 +411,7 @@ namespace Engine
 				if (WindowHandle == 0)
 					return false;
 
-				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get(this);
+				DirectX12CommandBuffer* commandBuffer = m_CommandBufferPool.Get();
 				commandBuffer->SetName(L"RenderContextCommandBuffer");
 
 				IDXGISwapChain4* swapChain = nullptr;
@@ -487,7 +497,7 @@ namespace Engine
 				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, view, Vector2I::Zero, rt.Dimension);
 				cb.MoveTextureToPresentState(view);
 				cb.EndEvent();
-				cb.Execute();
+				EXECUTE_AND_WAIT(&cb);
 
 				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 
@@ -803,6 +813,7 @@ namespace Engine
 
 			bool DirectX12Device::CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle)
 			{
+				m_DebugCallback(0, DebugSources::API, "CreateMesh", DebugTypes::Error, DebugSeverities::High);
 				if (Info->Vertices.GetSize() == 0)
 					return false;
 
@@ -878,36 +889,41 @@ namespace Engine
 
 			bool DirectX12Device::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
-				Buffer = m_CommandBufferPool.Get(this);
+				Buffer = m_CommandBufferPool.Get();
 
 				return true;
 			}
 
-			bool DirectX12Device::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
+			bool DirectX12Device::DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count)
 			{
-				for (uint16 i = 0; i < Count; ++i)
+				for (uint8 i = 0; i < Count; ++i)
 					m_CommandBufferPool.Back(Buffers[i]);
 
 				return true;
 			}
 
-			bool DirectX12Device::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
+			bool DirectX12Device::SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count)
 			{
 				DirectX12CommandBuffer** buffers = ReinterpretCast(DirectX12CommandBuffer**, ConstCast(ICommandBuffer**, Buffers));
 
-				for (uint16 i = 0; i < Count; ++i)
+				for (uint8 i = 0; i < Count; ++i)
 					if (!buffers[i]->Execute())
 						return false;
 
 				return true;
 			}
 
-			bool DirectX12Device::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
+			bool DirectX12Device::CreateFence(IFence*& Fence)
 			{
-				//RunJob(Attach(&DirectX12Device::SubmitCommandBuffer, this), Buffers, Count);
+				Fence = m_FencePool.Get();
 
-				//UNDONE:RENDERING -> SubmitAsync
-				//m_AsyncCommandBuffers.Add()
+				return true;
+			}
+
+			bool DirectX12Device::DestroyFences(IFence** Fence, uint8 Count)
+			{
+				for (uint16 i = 0; i < Count; ++i)
+					m_FencePool.Back(Fence[i]);
 
 				return true;
 			}

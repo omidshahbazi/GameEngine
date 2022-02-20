@@ -6,7 +6,7 @@
 #include <Containers\Map.h>
 #include <RenderDevice\IDevice.h>
 #include <RenderDevice\Private\NativeCommandBufferPool.h>
-#include <OpenGLRenderDevice\Private\OpenGLCommandBuffer.h>
+#include <RenderDevice\Private\NativeFencePool.h>
 #include <OpenGLRenderDevice\Private\OpenGLCommon.h>
 #include <WindowUtility\Window.h>
 
@@ -21,10 +21,14 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class OpenGLCommandBuffer;
+			class OpenGLFence;
+
 			class OpenGLDevice : public IDevice
 			{
 			private:
-				typedef NativeCommandBufferPool<OpenGLCommandBuffer> CommandBufferPool;
+				typedef NativeCommandBufferPool<OpenGLDevice, OpenGLCommandBuffer> CommandBufferPool;
+				typedef NativeFencePool<OpenGLDevice, OpenGLFence> FencePool;
 
 			public:
 				OpenGLDevice(void);
@@ -66,12 +70,11 @@ namespace Engine
 				bool DestroyMesh(ResourceHandle Handle) override;
 
 				bool CreateCommandBuffer(ICommandBuffer*& Buffer) override;
-				bool DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count) override;
-				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
-				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override
-				{
-					return SubmitCommandBuffer(Buffers, Count);
-				}
+				bool DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count) override;
+				bool SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count) override;
+
+				bool CreateFence(IFence*& Fence) override;
+				bool DestroyFences(IFence** Fence, uint8 Count) override;
 
 				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
 				bool SetDebugCallback(DebugFunction Callback) override
@@ -104,6 +107,7 @@ namespace Engine
 				RenderContextInfo* m_CurrentContext;
 
 				CommandBufferPool m_CommandBufferPool;
+				FencePool m_FencePool;
 
 				DebugFunction m_DebugCallback;
 			};

@@ -49,6 +49,11 @@ namespace Engine
 
 			static void GetRoamingPath(wstr Path);
 
+			static Handle CreateSignalEvent(void);
+			static void DestroySignalEvent(Handle Handle);
+			static void WaitForSignalEvent(Handle Handle);
+			static void SignalEvent(Handle Handle);
+
 			static bool IsDebuggerAttached(void);
 		};
 	}

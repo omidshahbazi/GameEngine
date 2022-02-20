@@ -2,8 +2,8 @@
 #include <RenderSystem\Texture.h>
 #include <RenderSystem\PixelBuffer.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
+#include <RenderSystem\Private\CommandBufferHelper.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
-#include <RenderDevice\ICommandBuffer.h>
 
 namespace Engine
 {
@@ -81,10 +81,7 @@ namespace Engine
 			cb->GenerateMipMap(GetHandle());
 			cb->EndEvent();
 
-			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
-				return false;
-
-			return GetDevice()->DestroyCommandBuffer(&cb, 1).Wait();
+			return CommandBufferHelper::SubmitAndDestroy(GetDevice(), cb);
 		}
 
 		void Texture::GenerateBuffer(void)
@@ -105,10 +102,7 @@ namespace Engine
 			cb->CopyBuffer(GetHandle(), bufferHandle);
 			cb->EndEvent();
 
-			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
-				return;
-
-			if (!GetDevice()->DestroyCommandBuffer(&cb, 1).Wait())
+			if (!CommandBufferHelper::SubmitAndDestroy(GetDevice(), cb))
 				return;
 
 			m_Buffer = RenderSystemAllocators::RenderSystemAllocator_Allocate<PixelBuffer>();

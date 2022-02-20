@@ -808,23 +808,14 @@ namespace Engine
 						return SUCCEEDED(Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(Fence)));
 					}
 
-					INLINE static bool SignalAndWait(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, HANDLE Event, uint64& Value)
+					INLINE static bool Signal(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64 Value)
 					{
-						uint64 value = Value;
-						++Value;
+						return SUCCEEDED(CommandQueue->Signal(Fence, Value));
+					}
 
-						if (!SUCCEEDED(CommandQueue->Signal(Fence, value)))
-							return false;
-
-						if (Fence->GetCompletedValue() >= value)
-							return true;
-
-						if (!SUCCEEDED(Fence->SetEventOnCompletion(value, Event)))
-							return false;
-
-						::WaitForSingleObject(Event, INFINITE);
-
-						return true;
+					INLINE static bool Wait(ID3D12CommandQueue* CommandQueue, ID3D12Fence* Fence, uint64 Value)
+					{
+						return SUCCEEDED(CommandQueue->Wait(Fence, Value));
 					}
 				};
 

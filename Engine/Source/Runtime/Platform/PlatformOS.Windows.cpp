@@ -109,6 +109,26 @@ namespace Engine
 			Path[wPath.length()] = '\0';
 		}
 
+		PlatformOS::Handle PlatformOS::CreateSignalEvent(void)
+		{
+			return (PlatformOS::Handle)CreateEvent(nullptr, false, false, nullptr);
+		}
+
+		void PlatformOS::DestroySignalEvent(Handle Handle)
+		{
+			CloseHandle((HANDLE)Handle);
+		}
+
+		void PlatformOS::WaitForSignalEvent(Handle Handle)
+		{
+			WaitForSingleObject((HANDLE)Handle, INFINITE);
+		}
+
+		void PlatformOS::SignalEvent(Handle Handle)
+		{
+			SetEvent((HANDLE)Handle);
+		}
+
 		bool PlatformOS::IsDebuggerAttached(void)
 		{
 			return IsDebuggerPresent();

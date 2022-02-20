@@ -30,7 +30,7 @@ namespace Engine
 				static DynamicSizeAllocator programCompilerAllocator("Program Compiler Allocator", &renderSystemAllocator, 32 * MegaByte);
 				ProgramCompilerAllocator = &programCompilerAllocator;
 
-				static DynamicSizeAllocator commandBufferAllocator("Command Buffer Allocator", &renderSystemAllocator, 32 * MegaByte);
+				static DynamicSizeAllocator commandBufferAllocator("Command Buffer Allocator", &renderSystemAllocator, 256 * MegaByte);
 				CommandBufferAllocator = &commandBufferAllocator;
 			}
 		}

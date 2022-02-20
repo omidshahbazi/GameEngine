@@ -25,6 +25,7 @@ namespace Engine
 
 		using namespace Private;
 
+		class CommandBufferFence;
 		class RenderContext;
 		class RenderTarget;
 		class Mesh;
@@ -34,9 +35,6 @@ namespace Engine
 		class RENDERSYSTEM_API CommandBuffer
 		{
 			friend class DeviceInterface;
-
-		public:
-			typedef Vector<ICommandBuffer*> NativeCommandBufferList;
 
 		public:
 			CommandBuffer(void) :
@@ -86,10 +84,21 @@ namespace Engine
 			void SetMarker(const String& Label);
 			void SetMarker(const WString& Label);
 
+			bool WaitForFence(CommandBufferFence* const Fence)
+			{
+				return WaitForFences(&Fence, 1);
+			}
+			bool WaitForFences(CommandBufferFence* const* Fences, uint16 Count);
+
+			bool SignalFence(CommandBufferFence* const Fence)
+			{
+				return SignalFences(&Fence, 1);
+			}
+			bool SignalFences(CommandBufferFence* const* Fences, uint16 Count);
+
 			//Dispatch
 
 			//UNDONE:RENDERING -> Features
-			//CreateGPUFence
 			//BlitTexture
 			//RenderTargetPool
 

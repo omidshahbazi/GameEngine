@@ -18,6 +18,8 @@ namespace Engine
 
 	namespace RenderDevice
 	{
+		class IFence;
+
 		class ICommandBuffer
 		{
 			friend class IDevice;
@@ -54,6 +56,9 @@ namespace Engine
 			virtual void BeginEvent(cwstr Label) = 0;
 			virtual void EndEvent(void) = 0;
 			virtual void SetMarker(cwstr Label) = 0;
+
+			virtual void WaitForFences(IFence* const* Fences, uint8 Count) = 0;
+			virtual void SignalFences(IFence* const* Fences, uint8 Count) = 0;
 
 		private:
 			virtual bool Execute(void) = 0;

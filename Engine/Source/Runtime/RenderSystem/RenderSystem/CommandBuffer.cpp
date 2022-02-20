@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\CommandBuffer.h>
+#include <RenderSystem\CommandBufferFence.h>
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\RenderTarget.h>
 #include <RenderSystem\Mesh.h>
@@ -208,6 +209,42 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
+		bool CommandBuffer::WaitForFences(CommandBufferFence* const* Fences, uint16 Count)
+		{
+			if (Count == 0)
+				return false;
+
+			for (uint8 i = 0; i < Count; ++i)
+				if (Fences[i] == nullptr)
+					return false;
+
+			m_Buffer.Append(CommandTypes::WaitForFences);
+
+			WaitForFencesCommandData data = {};
+			data.Fences = Fences;
+			data.Count = Count;
+
+			m_Buffer.Append(data);
+		}
+
+		bool CommandBuffer::SignalFences(CommandBufferFence* const* Fences, uint16 Count)
+		{
+			if (Count == 0)
+				return false;
+
+			for (uint8 i = 0; i < Count; ++i)
+				if (Fences[i] == nullptr)
+					return false;
+
+			m_Buffer.Append(CommandTypes::SignalFences);
+
+			SignalFencesCommandData data = {};
+			data.Fences = Fences;
+			data.Count = Count;
+
+			m_Buffer.Append(data);
+		}
+
 		bool CommandBuffer::PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const RenderContext* RenderContext)
 		{
 			CoreDebugAssert(Categories::RenderSystem, CommandBuffer != nullptr, "CommandBuffer cannot be null");
@@ -237,6 +274,8 @@ namespace Engine
 
 			SET_RENDER_TARGET(m_LastRenderTarget);
 			SET_VIEWPORT(m_LastViewportPosition, m_LastViewportSize);
+
+			IFence* fences[1 << (sizeof(uint8) * 8) + 1];
 
 			m_Buffer.ResetRead();
 			CommandTypes commandType;
@@ -327,6 +366,28 @@ namespace Engine
 					m_Buffer.Read(data);
 
 					CommandBuffer->SetMarker(data.Label.GetValue());
+				} break;
+
+				case CommandTypes::WaitForFences:
+				{
+					WaitForFencesCommandData data = {};
+					m_Buffer.Read(data);
+
+					for (uint8 i = 0; i < data.Count; ++i)
+						fences[i] = data.Fences[i]->GetFence();
+
+					CommandBuffer->WaitForFences(fences, data.Count);
+				} break;
+
+				case CommandTypes::SignalFences:
+				{
+					SignalFencesCommandData data = {};
+					m_Buffer.Read(data);
+
+					for (uint8 i = 0; i < data.Count; ++i)
+						fences[i] = data.Fences[i]->GetFence();
+
+					CommandBuffer->SignalFences(fences, data.Count);
 				} break;
 
 				default:

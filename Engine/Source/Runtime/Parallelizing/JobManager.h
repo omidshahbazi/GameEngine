@@ -69,14 +69,14 @@ namespace Engine
 
 				INLINE void Enqueue(T& Value)
 				{
-					ScopeGaurd gaurd(m_Lock);
+					ScopeGuard gaurd(m_Lock);
 
 					Queue<T>::Enqueue(Value);
 				}
 
 				INLINE bool Dequeue(T* Value)
 				{
-					ScopeGaurd gaurd(m_Lock);
+					ScopeGuard gaurd(m_Lock);
 
 					if (Queue<T>::GetSize() == 0)
 						return false;

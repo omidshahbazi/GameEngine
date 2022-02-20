@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <DirectX12RenderDevice\Private\DirectX12CommandBuffer.h>
+#include <DirectX12RenderDevice\Private\DirectX12Fence.h>
 #include <DirectX12RenderDevice\Private\DirectX12DebugInfo.h>
 #include <RenderCommon\Helper.h>
 #include <pix.h>
@@ -212,9 +213,6 @@ namespace Engine
 				m_Queue(nullptr),
 				m_Allocator(nullptr),
 				m_List(nullptr),
-				m_Fence(nullptr),
-				m_FenceValue(0),
-				m_FenceEvent(0),
 				m_CurrentRenderTargetViewCount(0),
 				m_CurrentDepthStencilView(nullptr),
 				m_CurrentDescriptorHeapCount(0)
@@ -238,21 +236,10 @@ namespace Engine
 				if (!CHECK_CALL(DirectX12Wrapper::Debugging::GetDebugCommandList(m_List, &m_DebugList)))
 					return;
 #endif
-
-				if (!CHECK_CALL(DirectX12Wrapper::Fence::Create(m_NativeDevice, &m_Fence)))
-					return;
-
-				m_FenceValue = 1;
-				m_FenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 			}
 
 			DirectX12CommandBuffer::~DirectX12CommandBuffer(void)
 			{
-				CloseHandle(m_FenceEvent);
-
-				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_Fence)))
-					return;
-
 #ifdef DEBUG_MODE
 				if (!CHECK_CALL(DirectX12Wrapper::DestroyInstance(m_DebugList)))
 					return;
@@ -589,6 +576,42 @@ namespace Engine
 				PIXSetMarker(m_List, 0, Label);
 			}
 
+			void DirectX12CommandBuffer::WaitForFences(IFence* const* Fences, uint8 Count)
+			{
+				CoreDebugAssert(Categories::RenderSystem, Count != 0, "Count cannot be zero");
+
+				DirectX12Fence** fences = ReinterpretCast(DirectX12Fence**, ConstCast(IFence**, Fences));
+
+				for (uint8 i = 0; i < Count; ++i)
+				{
+					DirectX12Fence* fence = fences[i];
+
+					CoreDebugAssert(Categories::RenderSystem, fence != nullptr, "A fence is null");
+
+					bool result = fence->Wait(m_Queue);
+
+					CoreDebugAssert(Categories::RenderSystem, result, "Faild to Wait");
+				}
+			}
+
+			void DirectX12CommandBuffer::SignalFences(IFence* const* Fences, uint8 Count)
+			{
+				CoreDebugAssert(Categories::RenderSystem, Count != 0, "Count cannot be zero");
+
+				DirectX12Fence** fences = ReinterpretCast(DirectX12Fence**, ConstCast(IFence**, Fences));
+
+				for (uint8 i = 0; i < Count; ++i)
+				{
+					DirectX12Fence* fence = fences[i];
+
+					CoreDebugAssert(Categories::RenderSystem, fence != nullptr, "A fence is null");
+
+					bool result = fence->Signal(m_Queue);
+
+					CoreDebugAssert(Categories::RenderSystem, result, "Faild to Signal");
+				}
+			}
+
 			bool DirectX12CommandBuffer::Execute(void)
 			{
 				if (!CHECK_CALL(DirectX12Wrapper::Command::CloseCommandList(m_List)))
@@ -596,7 +619,7 @@ namespace Engine
 
 				DirectX12Wrapper::Command::ExecuteCommandList(m_Queue, m_List);
 
-				return CHECK_CALL(DirectX12Wrapper::Fence::SignalAndWait(m_Queue, m_Fence, m_FenceEvent, m_FenceValue));
+				return true;
 			}
 
 			void DirectX12CommandBuffer::MoveTextureToPresentState(ResourceHandle Handle)

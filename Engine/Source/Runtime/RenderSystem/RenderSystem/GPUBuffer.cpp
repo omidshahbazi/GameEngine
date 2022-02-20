@@ -93,10 +93,10 @@ namespace Engine
 			cb->CopyBuffer(GetHandle(), Handle);
 			cb->EndEvent();
 
-			if (!GetDevice()->SubmitCommandBuffer(&cb, 1).Wait())
+			if (!GetDevice()->SubmitCommandBuffers(&cb, 1).Wait())
 				return;
 
-			GetDevice()->DestroyCommandBuffer(&cb, 1).Wait();
+			GetDevice()->DestroyCommandBuffers(&cb, 1).Wait();
 		}
 	}
 }

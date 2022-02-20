@@ -4,7 +4,7 @@
 #include <Platform\PlatformDirectory.h>
 #include <Common\BitwiseUtils.h>
 #include <Common\CharacterUtility.h>
-#include <Common\ScopeGaurd.h>
+#include <Common\ScopeGuard.h>
 #include <fstream>
 #include <map>
 #include <stdarg.h>
@@ -28,7 +28,7 @@ namespace Engine
 
 		PlatformFile::Handle PushFile(FILE* FILE)
 		{
-			ScopeGaurd gaurd(fileLock);
+			ScopeGuard gaurd(fileLock);
 
 			static uint32 handleNumber = 0;
 
@@ -47,7 +47,7 @@ namespace Engine
 
 		FILE* PullFile(PlatformFile::Handle Handle)
 		{
-			ScopeGaurd gaurd(fileLock);
+			ScopeGuard gaurd(fileLock);
 
 			FILE* file = GetFile(Handle);
 

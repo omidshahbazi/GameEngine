@@ -18,16 +18,18 @@ namespace Engine
 	{
 		namespace Private
 		{
-			template<typename NativeCommandBufferType>
+			template<typename DeviceType, typename CommandBufferType>
 			class NativeCommandBufferPool
 			{
 			private:
-				typedef Stack<NativeCommandBufferType*> CommandStack;
+				typedef Stack<CommandBufferType*> CommandStack;
 
 			public:
-				NativeCommandBufferPool(void) :
+				NativeCommandBufferPool(DeviceType* Device) :
+					m_Device(Device),
 					m_Commands(RenderSystemAllocators::ContainersAllocator)
 				{
+					CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
 				}
 
 				~NativeCommandBufferPool(void)
@@ -38,17 +40,14 @@ namespace Engine
 					m_Commands.Clear();
 				}
 
-				template<typename DeviceType>
-				NativeCommandBufferType* Get(DeviceType* Device)
+				CommandBufferType* Get(void)
 				{
-					CoreDebugAssert(Categories::RenderSystem, Device != nullptr, "Device cannot be null");
-
-					NativeCommandBufferType* commandBuffer = nullptr;
+					CommandBufferType* commandBuffer = nullptr;
 
 					if (m_Commands.GetSize() == 0)
 					{
-						commandBuffer = RenderSystemAllocators::ResourceAllocator_Allocate<NativeCommandBufferType>();
-						Construct(commandBuffer, Device);
+						commandBuffer = RenderSystemAllocators::ResourceAllocator_Allocate<CommandBufferType>();
+						Construct(commandBuffer, m_Device);
 					}
 					else
 						m_Commands.Pop(&commandBuffer);
@@ -63,10 +62,11 @@ namespace Engine
 				{
 					CoreDebugAssert(Categories::RenderSystem, NativeCommandBuffer != nullptr, "NativeCommandBuffer cannot be null");
 
-					m_Commands.Push(ReinterpretCast(NativeCommandBufferType*, NativeCommandBuffer));
+					m_Commands.Push(ReinterpretCast(CommandBufferType*, NativeCommandBuffer));
 				}
 
 			private:
+				DeviceType* m_Device;
 				CommandStack m_Commands;
 			};
 		}

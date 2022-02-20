@@ -5,6 +5,7 @@
 
 #include <RenderDevice\IDevice.h>
 #include <RenderDevice\Private\NativeCommandBufferPool.h>
+#include <RenderDevice\Private\NativeFencePool.h>
 #include <DirectX12RenderDevice\Private\HeapAllocatorsCollection.h>
 #include <DirectX12RenderDevice\Private\DescriptorViewAllocator.h>
 #include <DirectX12RenderDevice\Private\DirectX12Common.h>
@@ -21,30 +22,13 @@ namespace Engine
 		namespace Private
 		{
 			class DirectX12CommandBuffer;
+			class DirectX12Fence;
 
 			class DirectX12Device : public IDevice
 			{
 			private:
-				typedef NativeCommandBufferPool<DirectX12CommandBuffer> CommandBufferPool;
-
-				class AsyncCommandBufferList : public Vector<ICommandBuffer*>
-				{
-				public:
-					AsyncCommandBufferList(AllocatorBase* Allocator) :
-						Vector<ICommandBuffer*>(Allocator)
-					{
-					}
-
-					INLINE void Add(ICommandBuffer* Value)
-					{
-						ScopeGaurd gaurd(m_Lock);
-
-						Vector<ICommandBuffer*>::Add(Value);
-					}
-
-				private:
-					SpinLock m_Lock;
-				};
+				typedef NativeCommandBufferPool<DirectX12Device, DirectX12CommandBuffer> CommandBufferPool;
+				typedef NativeFencePool<DirectX12Device, DirectX12Fence> FencePool;
 
 			public:
 				DirectX12Device(void);
@@ -86,9 +70,11 @@ namespace Engine
 				bool DestroyMesh(ResourceHandle Handle) override;
 
 				bool CreateCommandBuffer(ICommandBuffer*& Buffer) override;
-				bool DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count) override;
-				bool SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count) override;
-				bool SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count) override;
+				bool DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count) override;
+				bool SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count) override;
+
+				bool CreateFence(IFence*& Fence) override;
+				bool DestroyFences(IFence** Fence, uint8 Count) override;
 
 				bool SetResourceName(ResourceHandle Handle, ResourceTypes Type, cwstr Name) override;
 				bool SetDebugCallback(DebugFunction Callback) override
@@ -147,7 +133,9 @@ namespace Engine
 				DescriptorViewAllocator m_DepthStencilViewAllocator;
 				DescriptorViewAllocator m_ResourceViewAllocator;
 				DescriptorViewAllocator m_SamplerViewAllocator;
+
 				BufferInfo m_UploadBuffer;
+				DirectX12CommandBuffer* m_UploadCommandBuffer;
 
 				D3D12_INPUT_ELEMENT_DESC* m_InputLayout;
 				uint8 m_InputLayoutCount;
@@ -155,7 +143,7 @@ namespace Engine
 				RenderContextInfo* m_CurrentContext;
 
 				CommandBufferPool m_CommandBufferPool;
-				AsyncCommandBufferList m_AsyncCommandBuffers;
+				FencePool m_FencePool;
 
 				DebugFunction m_DebugCallback;
 			};

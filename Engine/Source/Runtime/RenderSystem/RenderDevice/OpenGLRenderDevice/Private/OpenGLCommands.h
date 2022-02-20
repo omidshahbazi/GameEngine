@@ -8,6 +8,7 @@
 #include <MathContainers\MathContainers.h>
 #include <RenderCommon\Enums.h>
 #include <OpenGLRenderDevice\Private\OpenGLCommon.h>
+#include <OpenGLRenderDevice\Private\OpenGLFence.h>
 
 namespace Engine
 {
@@ -37,7 +38,8 @@ namespace Engine
 				DrawArray,
 				BeginEvent,
 				EndEvent,
-				SetMarker
+				SetMarker,
+				SignalFences
 			};
 
 			struct CopyBufferCommandData
@@ -145,6 +147,13 @@ namespace Engine
 			public:
 				char8 Label[256];
 				uint8 Length;
+			};
+
+			struct SignalFencesCommandData
+			{
+			public:
+				OpenGLFence** Fences;
+				uint8 Count;
 			};
 		}
 	}

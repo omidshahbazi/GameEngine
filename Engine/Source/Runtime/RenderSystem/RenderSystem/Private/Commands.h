@@ -35,7 +35,9 @@ namespace Engine
 				Draw,
 				BeginEvent,
 				EndEvent,
-				SetMarker
+				SetMarker,
+				WaitForFences,
+				SignalFences
 			};
 
 			struct CopyTextureCommandData
@@ -99,6 +101,20 @@ namespace Engine
 			{
 			public:
 				WString Label;
+			};
+
+			struct SignalFencesCommandData
+			{
+			public:
+				CommandBufferFence* const* Fences;
+				uint8 Count;
+			};
+
+			struct WaitForFencesCommandData
+			{
+			public:
+				CommandBufferFence* const* Fences;
+				uint8 Count;
 			};
 		}
 	}

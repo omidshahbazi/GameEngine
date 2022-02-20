@@ -1,5 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <OpenGLRenderDevice\Private\OpenGLDevice.h>
+#include <OpenGLRenderDevice\Private\OpenGLCommandBuffer.h>
+#include <OpenGLRenderDevice\Private\OpenGLFence.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <ProgramCompilerCommon\Common.h>
 #include <RenderCommon\Helper.h>
@@ -233,7 +235,9 @@ namespace Engine
 				m_BaseContextHandle(0),
 				m_BaseContextWindow(nullptr),
 				m_BaseContext(nullptr),
-				m_CurrentContext(nullptr)
+				m_CurrentContext(nullptr),
+				m_CommandBufferPool(this),
+				m_FencePool(this)
 			{
 			}
 
@@ -839,26 +843,41 @@ namespace Engine
 
 			bool OpenGLDevice::CreateCommandBuffer(ICommandBuffer*& Buffer)
 			{
-				Buffer = m_CommandBufferPool.Get(this);
+				Buffer = m_CommandBufferPool.Get();
 
 				return true;
 			}
 
-			bool OpenGLDevice::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
+			bool OpenGLDevice::DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count)
 			{
-				for (uint16 i = 0; i < Count; ++i)
+				for (uint8 i = 0; i < Count; ++i)
 					m_CommandBufferPool.Back(Buffers[i]);
 
 				return true;
 			}
 
-			bool OpenGLDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
+			bool OpenGLDevice::SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count)
 			{
 				OpenGLCommandBuffer** buffers = ReinterpretCast(OpenGLCommandBuffer**, ConstCast(ICommandBuffer**, Buffers));
 
-				for (uint16 i = 0; i < Count; ++i)
+				for (uint8 i = 0; i < Count; ++i)
 					if (!buffers[i]->Execute())
 						return false;
+
+				return true;
+			}
+
+			bool OpenGLDevice::CreateFence(IFence*& Fence)
+			{
+				Fence = m_FencePool.Get();
+
+				return true;
+			}
+
+			bool OpenGLDevice::DestroyFences(IFence** Fence, uint8 Count)
+			{
+				for (uint8 i = 0; i < Count; ++i)
+					m_FencePool.Back(Fence[i]);
 
 				return true;
 			}

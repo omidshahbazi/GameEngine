@@ -283,29 +283,38 @@ namespace Engine
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count)
+			Promise<bool> ThreadedDevice::DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count)
 			{
-				BEGIN_CALL(bool, &, promise, Count);
+				BEGIN_CALL(bool, &, promise, Buffers, Count);
 
-				promise->SetValue(m_Device->DestroyCommandBuffer(Buffers, Count));
+				promise->SetValue(m_Device->DestroyCommandBuffers(Buffers, Count));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count)
+			Promise<bool> ThreadedDevice::SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count)
 			{
 				BEGIN_CALL(bool, &, promise, Buffers, Count);
 
-				promise->SetValue(m_Device->SubmitCommandBuffer(Buffers, Count));
+				promise->SetValue(m_Device->SubmitCommandBuffers(Buffers, Count));
 
 				END_CALL();
 			}
 
-			Promise<bool> ThreadedDevice::SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count)
+			Promise<bool> ThreadedDevice::CreateFence(IFence*& Fence)
 			{
-				BEGIN_CALL(bool, &, promise, Buffers, Count);
+				BEGIN_CALL(bool, &, promise);
 
-				promise->SetValue(m_Device->SubmitCommandBufferAsync(Buffers, Count));
+				promise->SetValue(m_Device->CreateFence(Fence));
+
+				END_CALL();
+			}
+
+			Promise<bool> ThreadedDevice::DestroyFences(IFence** Fences, uint8 Count)
+			{
+				BEGIN_CALL(bool, &, promise, Fences, Count);
+
+				promise->SetValue(m_Device->DestroyFences(Fences, Count));
 
 				END_CALL();
 			}

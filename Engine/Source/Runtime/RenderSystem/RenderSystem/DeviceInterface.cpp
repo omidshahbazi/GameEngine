@@ -7,11 +7,13 @@
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\RenderTarget.h>
 #include <RenderSystem\CommandBuffer.h>
+#include <RenderSystem\CommandBufferFence.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderSystem\Private\FrameDataChain.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
+#include <RenderSystem\Private\CommandBufferHelper.h>
 #include <RenderSystem\Material.h>
 #include <ProgramCompiler\ProgramToAPICompiler.h>
 #include <ProgramCompiler\Compiler.h>
@@ -403,33 +405,26 @@ namespace Engine
 				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
 			}
 
-			{
-				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBuffer(&commandBuffer, 1));
-			}
-
-			{
-				CHECK_CALL_WEAK(m_ThreadedDevice->DestroyCommandBuffer(&commandBuffer, 1));
-			}
+			CommandBufferHelper::SubmitAndDestroy(m_ThreadedDevice, commandBuffer);
 		}
 
-		void DeviceInterface::SubmitCommandBufferAsync(const CommandBuffer* Buffer)
+		CommandBufferFence* DeviceInterface::CreateFence(void)
 		{
-			ICommandBuffer* commandBuffer = nullptr;
-			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
-			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
+			IFence* nativeFence = nullptr;
+			CHECK_CALL_WEAK(m_ThreadedDevice->CreateFence(nativeFence));
 
-			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_DefaultTexture, m_LastContext))
-				return;
+			CommandBufferFence* fence = RenderSystemAllocators::ResourceAllocator_Allocate<CommandBufferFence>();
+			ConstructMacro(CommandBufferFence, fence, nativeFence);
 
-			{
-				//UNDONE:RENDERING -> ConstantBufferSyncing
-				//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
-				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
-			}
+			return fence;
+		}
 
-			{
-				CHECK_CALL_WEAK(m_ThreadedDevice->SubmitCommandBufferAsync(&commandBuffer, 1));
-			}
+		void DeviceInterface::DestroyFence(CommandBufferFence* Fence)
+		{
+			IFence* nativeFence = Fence->GetFence();
+			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyFences(&nativeFence, 1));
+
+			RenderSystemAllocators::ResourceAllocator_Deallocate(Fence);
 		}
 
 		void DeviceInterface::BeginFrame(const RenderContext* Context)

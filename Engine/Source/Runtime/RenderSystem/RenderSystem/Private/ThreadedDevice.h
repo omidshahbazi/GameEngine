@@ -75,9 +75,11 @@ namespace Engine
 				Promise<bool> DestroyMesh(ResourceHandle Handle);
 
 				Promise<bool> CreateCommandBuffer(ICommandBuffer*& Buffer);
-				Promise<bool> DestroyCommandBuffer(ICommandBuffer** Buffers, uint16 Count);
-				Promise<bool> SubmitCommandBuffer(ICommandBuffer* const* Buffers, uint16 Count);
-				Promise<bool> SubmitCommandBufferAsync(ICommandBuffer* const* Buffers, uint16 Count);
+				Promise<bool> DestroyCommandBuffers(ICommandBuffer** Buffers, uint8 Count);
+				Promise<bool> SubmitCommandBuffers(ICommandBuffer* const* Buffers, uint8 Count);
+
+				Promise<bool> CreateFence(IFence*& Fence);
+				Promise<bool> DestroyFences(IFence** Fences, uint8 Count);
 
 				Promise<bool> SyncConstantBuffers(const FrameConstantBuffers* Buffers);
 

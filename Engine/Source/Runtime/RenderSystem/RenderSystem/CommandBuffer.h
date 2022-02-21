@@ -63,14 +63,17 @@ namespace Engine
 				return m_Buffer.GetSize();
 			}
 
-			bool CopyTexture(const Texture* Source, const Texture* Destination);
-			bool CopyTexture(const Texture* Source, const Texture* Destination, const Vector2I& Position, const Vector2I& Size);
-			bool CopyTexture(const Texture* Source, const Vector2I& SourcePosition, const Texture* Destination, const Vector2I& DestinationPosition, const Vector2I& Size);
+			bool CopyTexture(const Texture* Source, Texture* Destination);
+			bool CopyTexture(const Texture* Source, Texture* Destination, const Vector2I& Position, const Vector2I& Size);
+			bool CopyTexture(const Texture* Source, const Vector2I& SourcePosition, Texture* Destination, const Vector2I& DestinationPosition, const Vector2I& Size);
 
-			bool GenerateMipMap(const Texture* Texture);
+			bool BlitMaterial(const Material* Material, RenderTargets RenderTarget);
+			bool BlitMaterial(const Material* Material, RenderTarget* RenderTarget);
+
+			bool GenerateMipMap(Texture* Texture);
 
 			bool SetRenderTarget(RenderTargets RenderTarget);
-			bool SetRenderTarget(const RenderTarget* RenderTarget);
+			bool SetRenderTarget(RenderTarget* RenderTarget);
 			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
 
@@ -100,7 +103,7 @@ namespace Engine
 			//Dispatch
 
 			//UNDONE:RENDERING -> Features
-			//BlitTexture
+			//BlitTexture -> to render target
 			//RenderTargetPool
 
 			//private void RenderSourceToMask(ScriptableRenderContext context, ILOSSource losSource, RenderTexture normaldepthBuffer, ref RenderTexture maskRenderTexture)

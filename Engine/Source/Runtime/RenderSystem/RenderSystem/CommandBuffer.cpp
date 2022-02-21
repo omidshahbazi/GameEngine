@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <RenderSystem\CommandBuffer.h>
+#include <RenderSystem\RenderManager.h>
 #include <RenderSystem\CommandBufferFence.h>
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\RenderTarget.h>
@@ -26,13 +27,44 @@ namespace Engine
 		using namespace RenderCommon::Private;
 		using namespace WindowUtility;
 
+		Mesh* GetQuadMesh(void)
+		{
+			static Mesh* mesh = nullptr;
+
+			if (mesh == nullptr)
+			{
+				SubMeshInfo subMeshInfo;
+
+				subMeshInfo.Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
+				subMeshInfo.Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
+				subMeshInfo.Vertices.Add({ Vector3F(0.5F, 0.5F, 0), Vector2F(1, 1) });
+				subMeshInfo.Vertices.Add({ Vector3F(0.5F, -0.5F, 0), Vector2F(1, 0) });
+				subMeshInfo.Indices.Add(0);
+				subMeshInfo.Indices.Add(1);
+				subMeshInfo.Indices.Add(2);
+				subMeshInfo.Indices.Add(2);
+				subMeshInfo.Indices.Add(1);
+				subMeshInfo.Indices.Add(3);
+				subMeshInfo.Type = PolygonTypes::Triangles;
+				subMeshInfo.Layout = VertexLayouts::Position | VertexLayouts::TexCoord;
+
+				MeshInfo meshInfo;
+				meshInfo.SubMeshes.Add(&subMeshInfo);
+
+				mesh = RenderManager::GetInstance()->GetDevice()->CreateMesh(&meshInfo);
+				mesh->SetName("CommandBufferQuadMesh");
+			}
+
+			return mesh;
+		}
+
 		CommandBuffer::CommandBuffer(const String& Name) :
 			m_Buffer(RenderSystemAllocators::CommandBufferAllocator)
 		{
 			SetName(Name);
 		}
 
-		bool CommandBuffer::CopyTexture(const Texture* Source, const Texture* Destination)
+		bool CommandBuffer::CopyTexture(const Texture* Source, Texture* Destination)
 		{
 			if (Source == nullptr)
 				return false;
@@ -40,12 +72,12 @@ namespace Engine
 			return CopyTexture(Source, Vector2I::Zero, Destination, Vector2I::Zero, Source->GetDimension());
 		}
 
-		bool CommandBuffer::CopyTexture(const Texture* Source, const Texture* Destination, const Vector2I& Position, const Vector2I& Size)
+		bool CommandBuffer::CopyTexture(const Texture* Source, Texture* Destination, const Vector2I& Position, const Vector2I& Size)
 		{
 			return CopyTexture(Source, Position, Destination, Position, Size);
 		}
 
-		bool CommandBuffer::CopyTexture(const Texture* Source, const Vector2I& SourcePosition, const Texture* Destination, const Vector2I& DestinationPosition, const Vector2I& Size)
+		bool CommandBuffer::CopyTexture(const Texture* Source, const Vector2I& SourcePosition, Texture* Destination, const Vector2I& DestinationPosition, const Vector2I& Size)
 		{
 			if (Source == nullptr)
 				return false;
@@ -68,9 +100,9 @@ namespace Engine
 			m_Buffer.Append(CommandTypes::CopyTexture);
 
 			CopyTextureCommandData data = {};
-			data.Source = ConstCast(Texture*, Source);
+			data.Source = Source;
 			data.SourcePosition = SourcePosition;
-			data.Destination = ConstCast(Texture*, Destination);
+			data.Destination = Destination;
 			data.DestinationPosition = DestinationPosition;
 			data.Size = Size;
 
@@ -79,7 +111,38 @@ namespace Engine
 			return true;
 		}
 
-		bool CommandBuffer::GenerateMipMap(const Texture* Texture)
+		bool CommandBuffer::BlitMaterial(const Material* Material, RenderTargets RenderTarget)
+		{
+			if (Material == nullptr)
+				return false;
+
+			SetRenderTarget(RenderTarget);
+
+			DrawMesh(GetQuadMesh(), Matrix4F::Identity, Material);
+
+			SetRenderTarget(RenderTargets::Context);
+
+			return true;
+		}
+
+		bool CommandBuffer::BlitMaterial(const Material* Material, RenderTarget* RenderTarget)
+		{
+			if (Material == nullptr)
+				return false;
+
+			if (RenderTarget == nullptr)
+				return false;
+
+			SetRenderTarget(RenderTarget);
+
+			DrawMesh(GetQuadMesh(), Matrix4F::Identity, Material);
+
+			SetRenderTarget(RenderTargets::Context);
+
+			return true;
+		}
+
+		bool CommandBuffer::GenerateMipMap(Texture* Texture)
 		{
 			if (Texture == nullptr)
 				return false;
@@ -87,7 +150,7 @@ namespace Engine
 			m_Buffer.Append(CommandTypes::GenerateMipMap);
 
 			GenerateMipMapCommandData data = {};
-			data.Texture = ConstCast(RenderSystem::Texture*, Texture);
+			data.Texture = Texture;
 
 			m_Buffer.Append(data);
 
@@ -106,7 +169,7 @@ namespace Engine
 			return true;
 		}
 
-		bool CommandBuffer::SetRenderTarget(const RenderTarget* RenderTarget)
+		bool CommandBuffer::SetRenderTarget(RenderTarget* RenderTarget)
 		{
 			if (RenderTarget == nullptr)
 				return false;
@@ -114,7 +177,7 @@ namespace Engine
 			m_Buffer.Append(CommandTypes::SetRenderTarget);
 
 			SetRenderTargetCommandData data = {};
-			data.RenderTarget = ConstCast(RenderSystem::RenderTarget*, RenderTarget);
+			data.RenderTarget = RenderTarget;
 
 			m_Buffer.Append(data);
 
@@ -176,12 +239,12 @@ namespace Engine
 			m_Buffer.Append(CommandTypes::Draw);
 
 			DrawCommandData data = {};
-			data.Mesh = ConstCast(RenderSystem::Mesh*, Mesh);
+			data.Mesh = Mesh;
 			data.Model = Model;
 			data.View = View;
 			data.Projection = Projection;
 			data.MVP = MVP;
-			data.Material = ConstCast(RenderSystem::Material*, Material);
+			data.Material = Material;
 
 			m_Buffer.Append(data);
 

@@ -220,19 +220,30 @@ namespace Engine.Frontend.System
 		{
 			ModuleNameStack.Push(Module.Name);
 
-			foreach (string dependency in Module.PrivateDependencyModuleNames)
-			{
-				if (ModuleNameStack.Contains(dependency))
-					throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
-			}
-
-			foreach (string dependency in Module.PublicDependencyModuleNames)
+			string[] dependencies = Module.GetAllDependencies();
+			foreach (string dependency in dependencies)
 			{
 				if (ModuleNameStack.Contains(dependency))
 					throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
 
 				CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
 			}
+
+			//foreach (string dependency in Module.PrivateDependencyModuleNames)
+			//{
+			//	if (ModuleNameStack.Contains(dependency))
+			//		throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
+
+			//	CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
+			//}
+
+			//foreach (string dependency in Module.PublicDependencyModuleNames)
+			//{
+			//	if (ModuleNameStack.Contains(dependency))
+			//		throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
+
+			//	CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
+			//}
 
 			ModuleNameStack.Pop();
 		}

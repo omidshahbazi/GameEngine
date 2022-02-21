@@ -43,7 +43,7 @@ namespace Engine
 			struct CopyTextureCommandData
 			{
 			public:
-				Texture* Source;
+				const Texture* Source;
 				Vector2I SourcePosition;
 				Texture* Destination;
 				Vector2I DestinationPosition;
@@ -79,12 +79,12 @@ namespace Engine
 			struct DrawCommandData
 			{
 			public:
-				Mesh* Mesh;
+				const Mesh* Mesh;
 				Matrix4F Model;
 				Matrix4F View;
 				Matrix4F Projection;
 				Matrix4F MVP;
-				Material* Material;
+				const Material* Material;
 			};
 
 			struct BeginEventCommandData

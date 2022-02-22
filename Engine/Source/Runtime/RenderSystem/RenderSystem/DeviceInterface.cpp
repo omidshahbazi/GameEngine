@@ -2,20 +2,21 @@
 #include <RenderSystem\DeviceInterface.h>
 #include <RenderSystem\IPipeline.h>
 #include <RenderSystem\Sprite.h>
+#include <RenderSystem\Material.h>
 #include <RenderSystem\Program.h>
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\RenderTarget.h>
+#include <RenderSystem\RenderTargetPool.h>
 #include <RenderSystem\CommandBuffer.h>
 #include <RenderSystem\CommandBufferFence.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
 #include <RenderSystem\Private\FrameDataChain.h>
-#include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderSystem\Private\InternalRenderTargets.h>
 #include <RenderSystem\Private\CommandBufferHelper.h>
-#include <RenderSystem\Material.h>
+#include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <ProgramCompiler\ProgramToAPICompiler.h>
 #include <ProgramCompiler\Compiler.h>
 #include <DynamicModuleSystem\ModuleManager.h>
@@ -54,6 +55,7 @@ namespace Engine
 			ProgramToAPICompiler::Create(RenderSystemAllocators::RenderSystemAllocator);
 			ProgramConstantSupplier::Create(RenderSystemAllocators::RenderSystemAllocator);
 			BuiltiInProgramConstants::Create(RenderSystemAllocators::RenderSystemAllocator);
+			RenderTargetPool::Create(RenderSystemAllocators::RenderSystemAllocator);
 			InternalRenderTargets::Create(RenderSystemAllocators::RenderSystemAllocator);
 		}
 
@@ -68,9 +70,10 @@ namespace Engine
 
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_ThreadedDevice);
 
-			ProgramConstantSupplier::Destroy();
-			BuiltiInProgramConstants::Destroy();
 			InternalRenderTargets::Destroy();
+			RenderTargetPool::Destroy();
+			BuiltiInProgramConstants::Destroy();
+			ProgramConstantSupplier::Destroy();
 			ProgramToAPICompiler::Destroy();
 
 			ModuleManager::GetInstance()->Unload(m_Device).Wait();
@@ -162,6 +165,7 @@ namespace Engine
 			}
 
 			BuiltiInProgramConstants::GetInstance()->Initialize(this);
+			RenderTargetPool::GetInstance()->Initialize(this);
 
 			m_Initialized = true;
 		}

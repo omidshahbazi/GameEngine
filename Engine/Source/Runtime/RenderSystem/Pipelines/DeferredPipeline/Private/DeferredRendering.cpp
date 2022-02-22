@@ -2,6 +2,7 @@
 #include <DeferredPipeline\Private\DeferredRendering.h>
 #include <RenderDevice\ProgramInfo.h>
 #include <RenderSystem\DeviceInterface.h>
+#include <RenderSystem\RenderTargetPool.h>
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\Material.h>
 #include <RenderSystem\RenderTarget.h>
@@ -275,7 +276,7 @@ namespace Engine
 					return;
 
 				if (info.RenderTarget != nullptr)
-					m_DeviceInterface->DestroyRenderTarget(info.RenderTarget);
+					RenderTargetPool::GetInstance()->Back(info.RenderTarget);
 
 				info.Size = Size;
 
@@ -305,7 +306,7 @@ namespace Engine
 				depthTex.Dimension = { info.Size.X,info.Size.Y };
 				gbuffer.Textures.Add(depthTex);
 
-				info.RenderTarget = m_DeviceInterface->CreateRenderTarget(&gbuffer);
+				info.RenderTarget = RenderTargetPool::GetInstance()->Get(&gbuffer);
 				info.RenderTarget->SetName(L"GBuffer");
 				info.PositionTexture = TextureResource((*info.RenderTarget)[0]);
 				info.NormalTexture = TextureResource((*info.RenderTarget)[1]);

@@ -3,12 +3,13 @@
 #ifndef RENDER_TARGET_INFO_H
 #define RENDER_TARGET_INFO_H
 
+#include <RenderCommon\Enums.h>
 #include <Containers\Vector.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
 {
-	using namespace Common;
+	using namespace RenderCommon;
 	using namespace Containers;
 	using namespace MathContainers;
 

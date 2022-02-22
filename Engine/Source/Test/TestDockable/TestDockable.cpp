@@ -110,6 +110,3 @@ BEGIN_ENTRY_POINT
 	LogManager::Destroy();
 }
 END_ENTRY_POINT
-
-
-//UNDONE:RENDERING -> Put guards in DeviceInterface

@@ -200,6 +200,8 @@ namespace Engine
 
 		RenderContext* DeviceInterface::CreateContext(Window* Window)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Window != nullptr, "Window cannot be null");
+
 			ResourceHandle handle;
 			CHECK_CALL_STRONG(m_ThreadedDevice->CreateContext(Window->GetHandle(), handle));
 
@@ -211,11 +213,18 @@ namespace Engine
 
 		void DeviceInterface::DestroyContext(RenderContext* Context)
 		{
-			DestroyContextInternal(Context);
+			CoreDebugAssert(Categories::RenderSystem, Context != nullptr, "Context cannot be null");
+
+			CHECK_CALL_STRONG(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
+
+			RenderSystemAllocators::RenderSystemAllocator_Deallocate(Context);
 		}
 
 		Texture* DeviceInterface::CreateTexture(const TextureInfo* Info)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, Info->Dimension > Vector2I::Zero, "Dimension cannot be zero or negative");
+
 			ResourceHandle handle;
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateTexture(Info, handle));
 			if (!promise.GetValue())
@@ -229,6 +238,10 @@ namespace Engine
 
 		Sprite* DeviceInterface::CreateSprite(const TextureInfo* Info)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, Info->Dimension > Vector2I::Zero, "Dimension cannot be zero or negative");
+			CoreDebugAssert(Categories::RenderSystem, Info->Borders >= Vector4I::Zero, "Texture cannot be negative");
+
 			ResourceHandle handle;
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateTexture(Info, handle));
 			if (!promise.GetValue())
@@ -242,6 +255,8 @@ namespace Engine
 
 		void DeviceInterface::DestroyTexture(Texture* Texture)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Texture != nullptr, "Texture cannot be null");
+
 			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyTexture(Texture->GetHandle()));
 
 			RenderSystemAllocators::ResourceAllocator_Deallocate(Texture);
@@ -249,6 +264,14 @@ namespace Engine
 
 		RenderTarget* DeviceInterface::CreateRenderTarget(const RenderTargetInfo* Info)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, Info->Textures.GetSize() != 0, "Texture count cannot be 0");
+
+			for (const auto& texture : Info->Textures)
+			{
+				CoreDebugAssert(Categories::RenderSystem, texture.Dimension > Vector2I::Zero, "Dimension Count cannot be zero or negative");
+			}
+
 			ResourceHandle handle;
 			IDevice::TextureList texturesHandle;
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateRenderTarget(Info, handle, texturesHandle));
@@ -277,6 +300,8 @@ namespace Engine
 
 		void DeviceInterface::DestroyRenderTarget(RenderTarget* RenderTarget)
 		{
+			CoreDebugAssert(Categories::RenderSystem, RenderTarget != nullptr, "RenderTarget cannot be null");
+
 			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyRenderTarget(RenderTarget->GetHandle()));
 
 			auto textures = RenderTarget->GetTextures();
@@ -288,6 +313,10 @@ namespace Engine
 
 		bool DeviceInterface::CompileProgram(const ProgramInfo* Info, CompiledProgramInfo* CompiledInfo)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, Info->Source != String::Empty, "Source cannot be empty");
+			CoreDebugAssert(Categories::RenderSystem, CompiledInfo != nullptr, "CompiledInfo cannot be null");
+
 			if (Compiler::Compile(*Info, &m_DeviceType, 1, CompiledInfo))
 				return true;
 
@@ -298,6 +327,8 @@ namespace Engine
 
 		Program* DeviceInterface::CreateProgram(const ProgramInfo* Info)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+
 			static byte compiledVeretexShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledTessellationShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledGeometryShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
@@ -324,6 +355,8 @@ namespace Engine
 
 		Program* DeviceInterface::CreateProgram(const CompiledProgramInfo* Info)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+
 			IDevice::CompiledShaders compiledShaders = {};
 			compiledShaders.VertexShader.Buffer = Info->VertexShader.Buffer;
 			compiledShaders.VertexShader.Size = Info->VertexShader.Size;
@@ -354,6 +387,8 @@ namespace Engine
 
 		void DeviceInterface::DestroyProgram(Program* Program)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Program != nullptr, "Program cannot be null");
+
 			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyProgram(Program->GetHandle()));
 
 			RenderSystemAllocators::ResourceAllocator_Deallocate(Program);
@@ -361,6 +396,14 @@ namespace Engine
 
 		Mesh* DeviceInterface::CreateMesh(const MeshInfo* Info)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
+			CoreDebugAssert(Categories::RenderSystem, Info->SubMeshes.GetSize() != 0, "SubMesh count cannot be 0");
+
+			for (const auto& subMesh : Info->SubMeshes)
+			{
+				CoreDebugAssert(Categories::RenderSystem, subMesh->Vertices.GetSize() != 0, "Vertex Count cannot be 0");
+			}
+
 			SubMesh* subMeshes = RenderSystemAllocators::ResourceAllocator_AllocateArray<SubMesh>(Info->SubMeshes.GetSize());
 			uint16 subMeshIndex = 0;
 
@@ -387,6 +430,8 @@ namespace Engine
 
 		void DeviceInterface::DestroyMesh(Mesh* Mesh)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Mesh != nullptr, "Mesh cannot be null");
+
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
 			{
 				CHECK_CALL_WEAK(m_ThreadedDevice->DestroyMesh(Mesh->GetSubMeshes()[i].GetHandle()));
@@ -399,6 +444,8 @@ namespace Engine
 
 		void DeviceInterface::SubmitCommandBuffer(const CommandBuffer* Buffer)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Buffer != nullptr, "Buffer cannot be null");
+
 			ICommandBuffer* commandBuffer = nullptr;
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
 			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
@@ -428,6 +475,8 @@ namespace Engine
 
 		void DeviceInterface::DestroyFence(CommandBufferFence* Fence)
 		{
+			CoreDebugAssert(Categories::RenderSystem, Fence != nullptr, "Fence cannot be null");
+
 			IFence* nativeFence = Fence->GetFence();
 			CHECK_CALL_WEAK(m_ThreadedDevice->DestroyFences(&nativeFence, 1));
 
@@ -453,6 +502,8 @@ namespace Engine
 
 		void DeviceInterface::EndFrame(void)
 		{
+			CoreDebugAssert(Categories::RenderSystem, m_LastContext != nullptr, "BeginFrame must call before EndFrame");
+
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
 
@@ -474,13 +525,6 @@ namespace Engine
 
 			if (m_Pipeline != nullptr)
 				m_Pipeline->Initialize(this);
-		}
-
-		void DeviceInterface::DestroyContextInternal(RenderContext* Context)
-		{
-			CHECK_CALL_STRONG(m_ThreadedDevice->DestroyContext(Context->GetHandle()));
-
-			RenderSystemAllocators::RenderSystemAllocator_Deallocate(Context);
 		}
 	}
 }

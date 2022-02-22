@@ -33,7 +33,6 @@ namespace Engine
 		class Program;
 		class Material;
 		class Mesh;
-		struct Color;
 
 		namespace Private
 		{
@@ -110,9 +109,6 @@ namespace Engine
 			{
 				return m_Pipeline;
 			}
-
-		private:
-			void DestroyContextInternal(RenderContext* Context);
 
 		public:
 			ContextChangedEventHandler OnContextChangedEvent;

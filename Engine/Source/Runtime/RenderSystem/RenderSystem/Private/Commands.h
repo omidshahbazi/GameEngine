@@ -22,6 +22,7 @@ namespace Engine
 		class RenderTarget;
 		class Mesh;
 		class Material;
+		class ComputeProgram;
 
 		namespace Private
 		{
@@ -33,6 +34,7 @@ namespace Engine
 				SetViewport,
 				Clear,
 				Draw,
+				Dispatch,
 				BeginEvent,
 				EndEvent,
 				SetMarker,
@@ -85,6 +87,13 @@ namespace Engine
 				Matrix4F Projection;
 				Matrix4F MVP;
 				const Material* Material;
+			};
+
+			struct DispatchCommandData
+			{
+			public:
+				const ComputeProgram* ComputeProgram;
+				Vector3I ThreadGroupCount;
 			};
 
 			struct BeginEventCommandData

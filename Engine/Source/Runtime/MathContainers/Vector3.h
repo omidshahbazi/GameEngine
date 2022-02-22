@@ -120,6 +120,31 @@ namespace Engine
 				return (X == Other.X && Y == Other.Y && Z == Other.Z);
 			}
 
+			INLINE bool operator!=(const Vector3& Other) const
+			{
+				return !(*this == Other);
+			}
+
+			INLINE bool operator>(const Vector3& Other) const
+			{
+				return (X > Other.X && Y > Other.Y && Z > Other.Z);
+			}
+
+			INLINE bool operator<(const Vector3& Other) const
+			{
+				return (X < Other.X&& Y < Other.Y&& Z < Other.Z);
+			}
+
+			INLINE bool operator>=(const Vector3& Other) const
+			{
+				return (X >= Other.X && Y >= Other.Y && Z >= Other.Z);
+			}
+
+			INLINE bool operator<=(const Vector3& Other) const
+			{
+				return (X <= Other.X && Y <= Other.Y && Z <= Other.Z);
+			}
+
 		public:
 			T X, Y, Z;
 

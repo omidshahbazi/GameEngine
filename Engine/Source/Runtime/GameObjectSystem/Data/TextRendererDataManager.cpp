@@ -157,7 +157,7 @@ namespace Engine
 
 						data->FontTextureBound = Character->GetBounds();
 
-						m_CommandBuffer.DrawMesh(Character->GetMesh(), Model, material);
+						m_CommandBuffer.Draw(Character->GetMesh(), Model, material);
 					};
 
 					data = constantBuffer->Get<Data>();

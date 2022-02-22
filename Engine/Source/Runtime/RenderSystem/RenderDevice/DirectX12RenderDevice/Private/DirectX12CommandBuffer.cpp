@@ -561,6 +561,13 @@ namespace Engine
 				DirectX12Wrapper::Command::AddDrawCommand(m_List, VertexCount);
 			}
 
+			void DirectX12CommandBuffer::Dispatch(uint32 ThreadGroupCountX, uint32 ThreadGroupCountY, uint32 ThreadGroupCountZ)
+			{
+				CoreDebugAssert(Categories::RenderSystem, ThreadGroupCountX > 0 && ThreadGroupCountY > 0 && ThreadGroupCountZ > 0, "ThreadGroupCount cannot be zero or negative");
+
+
+			}
+
 			void DirectX12CommandBuffer::BeginEvent(cwstr Label)
 			{
 				PIXBeginEvent(m_List, 0, Label);

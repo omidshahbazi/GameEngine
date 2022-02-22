@@ -52,6 +52,8 @@ namespace Engine
 				void DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) override;
 				void DrawArray(PolygonTypes PolygonType, uint32 VertexCount) override;
 
+				void Dispatch(uint32 ThreadGroupCountX, uint32 ThreadGroupCountY, uint32 ThreadGroupCountZ) override;
+
 				void WaitForFences(IFence* const* Fences, uint8 Count) override;
 				void SignalFences(IFence* const* Fences, uint8 Count) override;
 

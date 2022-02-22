@@ -22,7 +22,7 @@ namespace Engine
 
 		using namespace Private;
 
-		class NativeType
+		class RENDERSYSTEM_API NativeType
 		{
 			friend class CommandBuffer;
 			friend class Program;

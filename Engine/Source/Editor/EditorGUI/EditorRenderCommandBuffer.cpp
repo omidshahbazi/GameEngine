@@ -63,7 +63,7 @@ namespace Engine
 		{
 			Matrix4F modelMat = m_PivotMat * Model;
 
-			CommandBuffer::DrawMesh(Mesh, modelMat, Matrix4F::Identity, m_ProjMat, Material);
+			CommandBuffer::Draw(Mesh, modelMat, Matrix4F::Identity, m_ProjMat, Material);
 		}
 	}
 }

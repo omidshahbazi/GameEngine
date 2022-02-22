@@ -6,6 +6,7 @@
 #include <RenderSystem\RenderTarget.h>
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\Material.h>
+#include <RenderSystem\ComputeProgram.h>
 #include <RenderSystem\Program.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\Commands.h>
@@ -116,9 +117,12 @@ namespace Engine
 			if (Material == nullptr)
 				return false;
 
+			if (Material->GetProgram() == nullptr)
+				return false;
+
 			SetRenderTarget(RenderTarget);
 
-			DrawMesh(GetQuadMesh(), Matrix4F::Identity, Material);
+			Draw(GetQuadMesh(), Matrix4F::Identity, Material);
 
 			SetRenderTarget(RenderTargets::Context);
 
@@ -133,9 +137,12 @@ namespace Engine
 			if (RenderTarget == nullptr)
 				return false;
 
+			if (Material->GetProgram() == nullptr)
+				return false;
+
 			SetRenderTarget(RenderTarget);
 
-			DrawMesh(GetQuadMesh(), Matrix4F::Identity, Material);
+			Draw(GetQuadMesh(), Matrix4F::Identity, Material);
 
 			SetRenderTarget(RenderTargets::Context);
 
@@ -214,26 +221,29 @@ namespace Engine
 			m_Buffer.Append(data);
 		}
 
-		bool CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material)
+		bool CommandBuffer::Draw(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material)
 		{
-			return DrawMesh(Mesh, Matrix4F::Identity, Matrix4F::Identity, Matrix4F::Identity, Transform, Material);
+			return Draw(Mesh, Matrix4F::Identity, Matrix4F::Identity, Matrix4F::Identity, Transform, Material);
 		}
 
-		bool CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material)
+		bool CommandBuffer::Draw(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material)
 		{
 			Matrix4F mvp = Projection;
 			mvp *= View;
 			mvp *= Model;
 
-			return DrawMesh(Mesh, Model, View, Projection, mvp, Material);
+			return Draw(Mesh, Model, View, Projection, mvp, Material);
 		}
 
-		bool CommandBuffer::DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		bool CommandBuffer::Draw(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
 		{
 			if (Mesh == nullptr)
 				return false;
 
 			if (Material == nullptr)
+				return false;
+
+			if (Material->GetProgram() == nullptr)
 				return false;
 
 			m_Buffer.Append(CommandTypes::Draw);
@@ -245,6 +255,28 @@ namespace Engine
 			data.Projection = Projection;
 			data.MVP = MVP;
 			data.Material = Material;
+
+			m_Buffer.Append(data);
+
+			return true;
+		}
+
+		bool CommandBuffer::Dispath(const ComputeProgram* ComputeProgram, const Vector3I& ThreadGroupCount)
+		{
+			if (ComputeProgram == nullptr)
+				return false;
+
+			if (ComputeProgram->GetProgram() == nullptr)
+				return false;
+
+			if (ThreadGroupCount <= Vector3I::Zero)
+				return false;
+
+			m_Buffer.Append(CommandTypes::Draw);
+
+			DispatchCommandData data = {};
+			data.ComputeProgram = ComputeProgram;
+			data.ThreadGroupCount = ThreadGroupCount;
 
 			m_Buffer.Append(data);
 
@@ -425,6 +457,14 @@ namespace Engine
 					InsertDrawCommand(CommandBuffer, ConstantBuffers, DefaultTexture, data.Mesh, data.Model, data.View, data.Projection, data.MVP, data.Material);
 				} break;
 
+				case CommandTypes::Dispatch:
+				{
+					DispatchCommandData data = {};
+					m_Buffer.Read(data);
+
+					InsertDispatchCommand(CommandBuffer, ConstantBuffers, DefaultTexture, data.ComputeProgram, data.ThreadGroupCount);
+				} break;
+
 				case CommandTypes::BeginEvent:
 				{
 					BeginEventCommandData data = {};
@@ -547,6 +587,52 @@ namespace Engine
 				else
 					CommandBuffer->DrawIndexed(subMesh.GetPolygonType(), idxCount);
 			}
+		}
+
+		void CommandBuffer::InsertDispatchCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const ComputeProgram* ComputeProgram, const Vector3I& ThreadGroupCount)
+		{
+			auto& computeProgram = *ComputeProgram;
+
+			CommandBuffer->SetProgram(computeProgram.GetProgram()->GetPointer()->GetHandle());
+
+			ProgramConstantSupplier::GPUBufferDataMap buffers;
+			for (auto& info : computeProgram.GetBuffers())
+			{
+				auto& constantInfo = info.GetSecond();
+				auto& localConstantInfo = buffers[info.GetFirst()];
+
+				localConstantInfo.Handle = constantInfo.Handle;
+				localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
+				localConstantInfo.Value->Copy(constantInfo.Value);
+			}
+
+			ProgramConstantSupplier::TextureDataMap textures;
+			for (auto& info : computeProgram.GetTextures())
+				textures[info.GetFirst()] = info.GetSecond();
+
+			ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
+
+			for (auto& info : buffers)
+			{
+				auto& constant = info.GetSecond();
+
+				CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+			}
+
+			for (auto& info : textures)
+			{
+				auto& constant = info.GetSecond();
+
+				ResourceHandle texHandle = 0;
+				if (constant.Value != nullptr && !constant.Value->IsNull())
+					texHandle = constant.Value->GetPointer()->GetHandle();
+				else
+					texHandle = DefaultTexture->GetHandle();
+
+				CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
+			}
+
+			CommandBuffer->Dispatch(ThreadGroupCount.X, ThreadGroupCount.Y, ThreadGroupCount.Z);
 		}
 	}
 }

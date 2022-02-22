@@ -221,7 +221,7 @@ namespace Engine
 
 					Matrix4F mvp = viewProjection * modelMat[i];
 
-					m_CommandBuffer.DrawMesh(**data.Mesh, mvp, &data.Material);
+					m_CommandBuffer.Draw(**data.Mesh, mvp, &data.Material);
 				}
 
 				RenderManager::GetInstance()->GetDevice()->SubmitCommandBuffer(&m_CommandBuffer);

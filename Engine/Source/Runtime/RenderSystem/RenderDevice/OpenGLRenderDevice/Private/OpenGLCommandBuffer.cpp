@@ -521,6 +521,20 @@ namespace Engine
 				m_Buffer.Append(data);
 			}
 
+			void OpenGLCommandBuffer::Dispatch(uint32 ThreadGroupCountX, uint32 ThreadGroupCountY, uint32 ThreadGroupCountZ)
+			{
+				CoreDebugAssert(Categories::RenderSystem, ThreadGroupCountX > 0 && ThreadGroupCountY > 0 && ThreadGroupCountZ > 0, "ThreadGroupCount cannot be zero or negative");
+
+				m_Buffer.Append(CommandTypes::Dispatch);
+
+				DispatchCommandData data = {};
+				data.ThreadGroupCount.X = ThreadGroupCountX;
+				data.ThreadGroupCount.Y = ThreadGroupCountY;
+				data.ThreadGroupCount.Z = ThreadGroupCountZ;
+
+				m_Buffer.Append(data);
+			}
+
 			void OpenGLCommandBuffer::BeginEvent(cwstr Label)
 			{
 				m_Buffer.Append(CommandTypes::BeginEvent);
@@ -784,6 +798,15 @@ namespace Engine
 						m_Buffer.Read(data);
 
 						glDrawArrays(GetPolygonType(data.PolygonType), 0, data.VertexCount);
+
+					} break;
+
+					case CommandTypes::Dispatch:
+					{
+						DispatchCommandData data = {};
+						m_Buffer.Read(data);
+
+						glDispatchCompute(data.ThreadGroupCount.X, data.ThreadGroupCount.Y, data.ThreadGroupCount.Z);
 
 					} break;
 

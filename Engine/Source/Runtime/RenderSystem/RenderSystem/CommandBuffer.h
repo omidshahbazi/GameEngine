@@ -30,6 +30,7 @@ namespace Engine
 		class RenderTarget;
 		class Mesh;
 		class Material;
+		class ComputeProgram;
 		class Texture;
 
 		class RENDERSYSTEM_API CommandBuffer
@@ -77,9 +78,11 @@ namespace Engine
 			bool SetViewport(const Vector2I& Position, const Vector2I& Size);
 			void Clear(ClearFlags Flags, const ColorUI8& Color);
 
-			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material);
-			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
-			bool DrawMesh(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			bool Draw(const Mesh* Mesh, const Matrix4F& Transform, const Material* Material);
+			bool Draw(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Material* Material);
+			bool Draw(const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+
+			bool Dispath(const ComputeProgram* ComputeProgram, const Vector3I& ThreadGroupCount);
 
 			void BeginEvent(const String& Label);
 			void BeginEvent(const WString& Label);
@@ -104,6 +107,7 @@ namespace Engine
 			bool PrepareNativeBuffers(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const RenderContext* RenderContext);
 
 			static void InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material);
+			static void InsertDispatchCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const ComputeProgram* ComputeProgram, const Vector3I& ThreadGroupCount);
 
 		private:
 			WString m_Name;

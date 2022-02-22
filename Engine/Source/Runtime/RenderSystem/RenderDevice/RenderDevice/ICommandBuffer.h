@@ -53,6 +53,8 @@ namespace Engine
 			virtual void DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) = 0;
 			virtual void DrawArray(PolygonTypes PolygonType, uint32 VertexCount) = 0;
 
+			virtual void Dispatch(uint32 ThreadGroupCountX, uint32 ThreadGroupCountY, uint32 ThreadGroupCountZ) = 0;
+
 			virtual void BeginEvent(cwstr Label) = 0;
 			virtual void EndEvent(void) = 0;
 			virtual void SetMarker(cwstr Label) = 0;

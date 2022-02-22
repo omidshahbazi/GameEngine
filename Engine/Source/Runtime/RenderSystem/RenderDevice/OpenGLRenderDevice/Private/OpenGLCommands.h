@@ -36,6 +36,7 @@ namespace Engine
 				SetState,
 				DrawIndexed,
 				DrawArray,
+				Dispatch,
 				BeginEvent,
 				EndEvent,
 				SetMarker,
@@ -129,6 +130,12 @@ namespace Engine
 			public:
 				PolygonTypes PolygonType;
 				uint32 VertexCount;
+			};
+
+			struct DispatchCommandData
+			{
+			public:
+				Vector3I ThreadGroupCount;
 			};
 
 			struct BeginEventCommandData

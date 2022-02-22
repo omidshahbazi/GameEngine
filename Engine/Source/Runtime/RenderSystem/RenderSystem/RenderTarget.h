@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef RENDER_TEXTURE_H
-#define RENDER_TEXTURE_H
+#ifndef RENDER_TARGET_H
+#define RENDER_TARGET_H
 
 #include <RenderSystem\Texture.h>
 #include <Containers\Vector.h>
@@ -12,7 +12,7 @@ namespace Engine
 
 	namespace RenderSystem
 	{
-		class RenderTarget : public NativeType
+		class RENDERSYSTEM_API RenderTarget : public NativeType
 		{
 			friend class DeviceInterface;
 

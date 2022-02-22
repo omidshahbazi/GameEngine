@@ -54,6 +54,8 @@ namespace Engine
 				void DrawIndexed(PolygonTypes PolygonType, uint32 IndexCount) override;
 				void DrawArray(PolygonTypes PolygonType, uint32 VertexCount) override;
 
+				void Dispatch(uint32 ThreadGroupCountX, uint32 ThreadGroupCountY, uint32 ThreadGroupCountZ) override;
+
 				void BeginEvent(cwstr Label) override;
 				void EndEvent(void) override;
 				void SetMarker(cwstr Label) override;

@@ -9,7 +9,7 @@ namespace Engine
 {
 	namespace RenderSystem
 	{
-		class Mesh
+		class RENDERSYSTEM_API Mesh
 		{
 		public:
 			Mesh(SubMesh* SubMeshes, uint16 SubMeshCount) :

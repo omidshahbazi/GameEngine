@@ -23,6 +23,7 @@ namespace Engine
 
 		typedef Vector3<float32> Vector3F;
 		typedef Vector3<float64> Vector3D;
+		typedef Vector3<int32> Vector3I;
 
 		typedef Quaternion<float32> QuaternionF;
 

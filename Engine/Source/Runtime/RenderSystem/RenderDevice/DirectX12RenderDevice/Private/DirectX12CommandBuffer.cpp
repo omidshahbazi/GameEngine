@@ -213,13 +213,13 @@ namespace Engine
 				m_Queue(nullptr),
 				m_Allocator(nullptr),
 				m_List(nullptr),
+#ifdef DEBUG_MODE
+				m_DebugList(nullptr),
+#endif
+				m_AlreadyClean(true),
 				m_CurrentRenderTargetViewCount(0),
 				m_CurrentDepthStencilView(nullptr),
 				m_CurrentDescriptorHeapCount(0)
-
-#ifdef DEBUG_MODE
-				, m_DebugList(nullptr)
-#endif
 			{
 				const D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
@@ -271,6 +271,11 @@ namespace Engine
 
 			void DirectX12CommandBuffer::Clear(void)
 			{
+				if (m_AlreadyClean)
+					return;
+
+				m_AlreadyClean = true;
+
 				if (!CHECK_CALL(DirectX12Wrapper::Command::ResetCommandAllocator(m_Allocator)))
 					return;
 
@@ -625,6 +630,8 @@ namespace Engine
 					return false;
 
 				DirectX12Wrapper::Command::ExecuteCommandList(m_Queue, m_List);
+
+				m_AlreadyClean = false;
 
 				return true;
 			}

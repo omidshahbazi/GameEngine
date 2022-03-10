@@ -87,6 +87,8 @@ namespace Engine
 				ID3D12DebugCommandList2* m_DebugList;
 #endif
 
+				bool m_AlreadyClean;
+
 				RenderState m_State;
 
 				ViewInfo* m_CurrentRenderTargetViews[(uint8)AttachmentPoints::Color8 - (uint8)AttachmentPoints::Color0];

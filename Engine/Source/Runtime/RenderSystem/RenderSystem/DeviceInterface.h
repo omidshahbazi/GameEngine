@@ -125,8 +125,6 @@ namespace Engine
 
 			Texture* m_DefaultTexture;
 
-			//UNDONE:RENDERING -> IPipeline
-			//Should be per camera
 			IPipeline* m_Pipeline;
 		};
 	}

@@ -448,6 +448,7 @@ namespace Engine
 
 			ICommandBuffer* commandBuffer = nullptr;
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
+
 			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
 
 			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_DefaultTexture, m_LastContext))

@@ -492,7 +492,7 @@ namespace Engine
 				ResourceHandle view = ReinterpretCast(ResourceHandle, m_CurrentContext->GetSwapChainView());
 
 				DirectX12CommandBuffer& cb = *m_CurrentContext->CommandBuffer;
-				cb.Clear(); //UNDONE:RENDERING -> Error about reset
+				cb.Clear();
 				cb.BeginEvent(L"CopyToBackBuffer");
 				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, view, Vector2I::Zero, rt.Dimension);
 				cb.MoveTextureToPresentState(view);
@@ -813,7 +813,6 @@ namespace Engine
 
 			bool DirectX12Device::CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle)
 			{
-				m_DebugCallback(0, DebugSources::API, "CreateMesh", DebugTypes::Error, DebugSeverities::High);
 				if (Info->Vertices.GetSize() == 0)
 					return false;
 

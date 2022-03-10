@@ -44,14 +44,6 @@ namespace Engine
 			}
 #endif
 
-#define ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(RenderTargetState, DepthStencilState) \
-			{ \
-				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i) \
-					ADD_TRANSITION_STATE(m_CurrentRenderTargetViews[i], RenderTargetState); \
-				if (m_CurrentDepthStencilView != nullptr) \
-					ADD_TRANSITION_STATE(m_CurrentDepthStencilView, DepthStencilState); \
-			}
-
 			D3D12_CULL_MODE GetCullMode(CullModes CullMode)
 			{
 				switch (CullMode)
@@ -369,7 +361,10 @@ namespace Engine
 					}
 				}
 
-				ADD_TRANSITION_STATE_FOR_TARGET_BUFFERS(D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)
+					ADD_TRANSITION_STATE(m_CurrentRenderTargetViews[i], D3D12_RESOURCE_STATE_RENDER_TARGET);
+				if (m_CurrentDepthStencilView != nullptr)
+					ADD_TRANSITION_STATE(m_CurrentDepthStencilView, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
 				D3D12_CPU_DESCRIPTOR_HANDLE renderTargetHandles[D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT];
 				for (uint8 i = 0; i < m_CurrentRenderTargetViewCount; ++i)

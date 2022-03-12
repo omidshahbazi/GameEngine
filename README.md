@@ -16,7 +16,11 @@ Here is as small shots:
 * **Container**
     * AnyDataType
     * Buffer
+    * Color
     * DynamicString and ConstantString
+    * Delegate
+    * Exception
+    * GUID
     * List
     * Map
     * Vector
@@ -30,6 +34,7 @@ Here is as small shots:
     * Vector3
     * Vector4
     * Matrix4
+    * Quaternion
 * **Memory Management**
     * SystemAllocator
     * DynamicSizeAllocator
@@ -43,7 +48,7 @@ Here is as small shots:
 * **Font System**
     * Font Compiler from **.ttf file format
 * **Game Object System**
-    * Data Oriented Object System with an Object Oriented wrapper
+    * Entity-Component System (Data Oriented Design) with an Object Oriented wrapper
     * Built-in components: Camera, Light, Renderer, TextRenderer
 * **Input System**
     * Mouse, Keyboard
@@ -57,6 +62,7 @@ Here is as small shots:
     * Deferred Shading pipeline
     * Programmable Material System
     * Built-in c-like shading language with code-to-code compiler to build glsl and/or hlsl
+	* Command Buffer and Fence
 * **Profiler**
     * Realtime profiler
 

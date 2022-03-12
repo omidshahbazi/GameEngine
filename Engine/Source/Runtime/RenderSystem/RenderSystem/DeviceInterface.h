@@ -39,8 +39,7 @@ namespace Engine
 			class ThreadedDevice;
 			class BuiltiInProgramConstants;
 			class ProgramConstantHolder;
-			class FrameDataChain;
-			class FrameConstantBuffers;
+			class FrameConstantBuffersPool;
 		}
 
 		using namespace Private;
@@ -51,7 +50,6 @@ namespace Engine
 			friend class ConstantBuffer;
 			friend class BuiltiInProgramConstants;
 			friend class ProgramConstantHolder;
-			friend class FrameConstantBuffers;
 			friend class CommandBuffer;
 
 		public:
@@ -121,7 +119,7 @@ namespace Engine
 			IDevice* m_Device;
 			ThreadedDevice* m_ThreadedDevice;
 			const RenderContext* m_LastContext;
-			FrameDataChain* m_FrameDataChain;
+			FrameConstantBuffersPool* m_FrameConstantBuffersPool;
 
 			Texture* m_DefaultTexture;
 

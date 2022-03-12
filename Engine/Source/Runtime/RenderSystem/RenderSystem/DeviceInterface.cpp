@@ -11,7 +11,7 @@
 #include <RenderSystem\CommandBuffer.h>
 #include <RenderSystem\CommandBufferFence.h>
 #include <RenderSystem\Private\ThreadedDevice.h>
-#include <RenderSystem\Private\FrameDataChain.h>
+#include <RenderSystem\Private\FrameConstantBuffersPool.h>
 #include <RenderSystem\ProgramConstantSupplier.h>
 #include <RenderSystem\Private\BuiltiInProgramConstants.h>
 #include <RenderSystem\Private\InternalRenderTargets.h>
@@ -47,7 +47,7 @@ namespace Engine
 			m_DeviceType(DeviceType),
 			m_Device(nullptr),
 			m_ThreadedDevice(nullptr),
-			m_FrameDataChain(nullptr),
+			m_FrameConstantBuffersPool(nullptr),
 			m_DefaultTexture(nullptr),
 			m_LastContext(nullptr),
 			m_Pipeline(nullptr)
@@ -66,7 +66,7 @@ namespace Engine
 
 			DestroyTexture(m_DefaultTexture);
 
-			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_FrameDataChain);
+			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_FrameConstantBuffersPool);
 
 			RenderSystemAllocators::RenderSystemAllocator_Deallocate(m_ThreadedDevice);
 
@@ -110,8 +110,8 @@ namespace Engine
 			m_ThreadedDevice = RenderSystemAllocators::RenderSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
 
-			m_FrameDataChain = RenderSystemAllocators::ContainersAllocator_Allocate<FrameDataChain>();
-			Construct(m_FrameDataChain, m_ThreadedDevice);
+			m_FrameConstantBuffersPool = RenderSystemAllocators::ContainersAllocator_Allocate<FrameConstantBuffersPool>();
+			Construct(m_FrameConstantBuffersPool, m_ThreadedDevice);
 
 			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());
 
@@ -156,9 +156,6 @@ namespace Engine
 					case IDevice::DebugSeverities::Medium: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
 					case IDevice::DebugSeverities::High: CoreDebugLogError(Categories::RenderSystem, stream.GetBuffer()); break;
 					}
-
-					printf(stream.GetBuffer());
-					printf("\n");
 				};
 
 				CHECK_CALL_STRONG(m_ThreadedDevice->SetDebugCallback(debugCallback));
@@ -449,18 +446,18 @@ namespace Engine
 			ICommandBuffer* commandBuffer = nullptr;
 			CHECK_CALL_WEAK(m_ThreadedDevice->CreateCommandBuffer(commandBuffer));
 
-			auto buffers = m_FrameDataChain->GetFrontConstantBuffers();
+			auto buffers = m_FrameConstantBuffersPool->Get();
 
 			if (!ConstCast(CommandBuffer*, Buffer)->PrepareNativeBuffers(commandBuffer, buffers, m_DefaultTexture, m_LastContext))
 				return;
 
 			{
-				//UNDONE:RENDERING -> ConstantBufferSyncing
-				//This would execute all buffers per cmd, not the buffers which are in use in the current cmd
 				CHECK_CALL_WEAK(m_ThreadedDevice->SyncConstantBuffers(buffers));
 			}
 
 			CommandBufferHelper::SubmitAndDestroy(m_ThreadedDevice, commandBuffer);
+
+			m_FrameConstantBuffersPool->Back(buffers);
 		}
 
 		CommandBufferFence* DeviceInterface::CreateFence(void)
@@ -507,8 +504,6 @@ namespace Engine
 
 			if (m_Pipeline != nullptr)
 				m_Pipeline->EndRender();
-
-			m_FrameDataChain->Swap();
 
 			m_ThreadedDevice->SwapBuffers();
 

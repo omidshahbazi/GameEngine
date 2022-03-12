@@ -6,6 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Private\ContainersAllocators.h>
+#include <functional>
 
 namespace Engine
 {

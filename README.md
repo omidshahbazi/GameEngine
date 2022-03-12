@@ -1,6 +1,6 @@
 # Game Engine
 
-This is an experimental open-source game engine. It wrote from scratch purpose to be cross-platform.
+This is an experimental open-source game engine from scratch. It's still under development and gonna be a cross-plaform engine.
 
 ## Project Showcase
 
@@ -242,7 +242,7 @@ void main()
 
 ## How to Build
 
-Ensure you have Visual Studio 2017 or 2019 (Community Edition is acceptable)
+Ensure you have Visual Studio 2017, 2019 or 2022 (Community Edition would be acceptable)
 
 Run GenerateSolution.bat to build solution and project files
 

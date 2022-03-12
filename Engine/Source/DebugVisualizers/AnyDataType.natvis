@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::AnyDataType">
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::VoidPointer">{m_Data.VoidPointer}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int8">{m_Data.Int8}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int16">{m_Data.Int16}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int32">{m_Data.Int32}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int64">{m_Data.Int64}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::UInt8">{m_Data.UInt8}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::UInt16">{m_Data.UInt16}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::UInt32">{m_Data.UInt32}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::UInt64">{m_Data.UInt64}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Float32">{m_Data.Float32}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Float64">{m_Data.Float64}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::String">{m_Data.String}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::WString">{m_Data.WString}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::ColorUI8">{m_Data.ColorUI8}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Vector2F">{m_Data.Vector2F}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Vector2I">{m_Data.Vector2I}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Vector3F">{m_Data.Vector3F}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Vector4F">{m_Data.Vector4F}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Matrix4F">{m_Data.Matrix4F}</DisplayString>
+    <Expand HideRawView="true">
+    </Expand>
+  </Type>
+</AutoVisualizer>

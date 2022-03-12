@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::Map&lt;*,*&gt;">
+    <DisplayString>Size: {m_Size}</DisplayString>
+    <Expand HideRawView="true">
+    <Item Name="Capacity">m_Capacity</Item>
+    <Item Name="Allocator">m_Allocator</Item>
+    <ArrayItems>
+      <Size>m_Size</Size>
+      <ValuePointer>m_Items</ValuePointer>
+    </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

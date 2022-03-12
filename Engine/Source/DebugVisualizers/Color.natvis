@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::Color&lt;*&gt;">
+    <DisplayString>({(float)R/255}, {(float)G/255}, {(float)B/255}, {(float)A/255})</DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="Red">(int)R</Item>
+      <Item Name="Green">(int)G</Item>
+      <Item Name="Blue">(int)B</Item>
+      <Item Name="Alpha">(int)A</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

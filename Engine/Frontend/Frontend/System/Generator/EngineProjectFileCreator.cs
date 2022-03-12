@@ -71,7 +71,10 @@ namespace Engine.Frontend.System.Generator
 					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileExtensions);
+			foreach (string file in files)
+				projectFile.AddExtraFile(file);
 
+			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.DebugVisualizerFileExtensions);
 			foreach (string file in files)
 				projectFile.AddExtraFile(file);
 

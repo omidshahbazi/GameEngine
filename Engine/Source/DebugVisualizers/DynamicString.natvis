@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::DynamicString&lt;*&gt;">
+    <DisplayString Encoding="Utf8">{m_String}</DisplayString>
+    <StringView Condition="sizeof(m_String[0])==1">m_String</StringView>
+    <StringView Condition="sizeof(m_String[0])==2">m_String, su</StringView>
+    <Expand HideRawView="true">
+      <Item Name="Length">m_Length</Item>
+      <Item Name="Capacity">m_Capacity</Item>
+      <Item Name="Allocator">m_Allocator</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::Exception">
+    <DisplayString Encoding="Utf8">{ToString()}</DisplayString>
+    <StringView>ToString</StringView>
+    <Expand>
+      <Item Name="Category">m_CategoryFlags</Item>
+      <Item Name="What">m_What</Item>
+      <Item Name="Info">m_Info</Item>
+      <Item Name="File">m_File</Item>
+      <Item Name="LineNumber">m_LineNumber</Item>
+      <Item Name="Function">m_Function</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

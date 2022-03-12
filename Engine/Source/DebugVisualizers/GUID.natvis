@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::GUID">
+    <DisplayString>
+{m_Data.Part1[0],nvoxb}{m_Data.Part1[1],nvoxb}{m_Data.Part1[2],nvoxb}{m_Data.Part1[3],nvoxb}-
+{m_Data.Part2[0],nvoxb}{m_Data.Part2[1],nvoxb}-
+{m_Data.Part3[0],nvoxb}{m_Data.Part3[1],nvoxb}-
+{m_Data.Part4[0],nvoxb}{m_Data.Part4[1],nvoxb}-
+{m_Data.Part5[0],nvoxb}{m_Data.Part5[1],nvoxb}{m_Data.Part5[2],nvoxb}{m_Data.Part5[3],nvoxb}{m_Data.Part5[5],nvoxb}
+    </DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="Part1">m_Data.Part1</Item>
+      <Item Name="Part2">m_Data.Part2</Item>
+      <Item Name="Part3">m_Data.Part3</Item>
+      <Item Name="Part4">m_Data.Part4</Item>
+      <Item Name="Part5">m_Data.Part5</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

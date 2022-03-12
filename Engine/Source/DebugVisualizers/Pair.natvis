@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::Pair&lt;*,*&gt;">
+    <DisplayString>{{{m_First}, {m_Second}}}</DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="First">m_First</Item>
+      <Item Name="Second">m_Second</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

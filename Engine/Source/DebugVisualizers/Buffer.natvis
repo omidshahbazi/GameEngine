@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::Containers::Buffer&lt;*&gt;">
+    <DisplayString>Total Size: {m_Buffer.m_Size}, Read Index: {m_ReadIndex}</DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="Read Index">m_ReadIndex</Item>
+      <Item Name="Buffer">m_Buffer</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

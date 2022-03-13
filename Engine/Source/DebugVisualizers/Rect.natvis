@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::MathContainers::Rect&lt;*&gt;">
+    <DisplayString>Position: {Position}, Size: {Size}</DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="Position">Position</Item>
+      <Item Name="Size">Size</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

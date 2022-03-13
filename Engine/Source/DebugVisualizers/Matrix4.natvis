@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::MathContainers::Matrix4&lt;*&gt;">
+    <DisplayString Condition="
+                   m_Cells[0]==1 &amp;&amp; m_Cells[1]==0 &amp;&amp; m_Cells[2]==0 &amp;&amp; m_Cells[3]==0 &amp;&amp;
+                   m_Cells[4]==0 &amp;&amp; m_Cells[5]==1 &amp;&amp; m_Cells[6]==0 &amp;&amp; m_Cells[7]==0 &amp;&amp;
+                   m_Cells[8]==0 &amp;&amp; m_Cells[9]==0 &amp;&amp; m_Cells[10]==1 &amp;&amp; m_Cells[11]==0 &amp;&amp;
+                   m_Cells[12]==0 &amp;&amp; m_Cells[13]==0 &amp;&amp; m_Cells[14]==0 &amp;&amp; m_Cells[15]==1
+                   ">Identity Matrix4</DisplayString>
+    <DisplayString>Matrix4</DisplayString>
+    <Expand HideRawView="true">
+      <Synthetic Name="Determinant">
+        <DisplayString>
+          {
+          (m_Cells[0] * m_Cells[5] - m_Cells[1] * m_Cells[4]) * (m_Cells[10] * m_Cells[15] - m_Cells[11] * m_Cells[14]) -
+          (m_Cells[0] * m_Cells[6] - m_Cells[2] * m_Cells[4]) * (m_Cells[9] * m_Cells[15] - m_Cells[11] * m_Cells[13]) +
+          (m_Cells[0] * m_Cells[7] - m_Cells[3] * m_Cells[4]) * (m_Cells[9] * m_Cells[14] - m_Cells[10] * m_Cells[13]) +
+          (m_Cells[1] * m_Cells[6] - m_Cells[2] * m_Cells[5]) * (m_Cells[8] * m_Cells[15] - m_Cells[11] * m_Cells[12]) -
+          (m_Cells[1] * m_Cells[7] - m_Cells[3] * m_Cells[5]) * (m_Cells[8] * m_Cells[14] - m_Cells[10] * m_Cells[12]) +
+          (m_Cells[1] * m_Cells[7] - m_Cells[3] * m_Cells[6]) * (m_Cells[8] * m_Cells[13] - m_Cells[9] * m_Cells[12])
+          }
+        </DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row1">
+        <DisplayString>{{{m_Cells[0]}, {m_Cells[1]}, {m_Cells[2]}, {m_Cells[3]}}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row2">
+        <DisplayString>{{{m_Cells[4]}, {m_Cells[5]}, {m_Cells[6]}, {m_Cells[7]}}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row3">
+        <DisplayString>{{{m_Cells[8]}, {m_Cells[9]}, {m_Cells[10]}, {m_Cells[11]}}}</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row4">
+        <DisplayString>{{{m_Cells[12]}, {m_Cells[13]}, {m_Cells[14]}, {m_Cells[15]}}}</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+</AutoVisualizer>

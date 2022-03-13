@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Engine::MathContainers::Vector2&lt;*&gt;">
+    <DisplayString>({X}, {Y})</DisplayString>
+    <Expand HideRawView="true">
+      <Item Name="X">X</Item>
+      <Item Name="Y">Y</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

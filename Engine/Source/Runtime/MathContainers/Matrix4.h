@@ -310,23 +310,6 @@ namespace Engine
 				return mat;
 			}
 
-			INLINE bool GetIsIdentity(void) const
-			{
-				if (!Math::EqualCheck(m_Cells[12], 0) || !Math::EqualCheck(m_Cells[13], 0) || !Math::EqualCheck(m_Cells[14], 0) || !Math::EqualCheck(m_Cells[15], 1))
-					return false;
-
-				if (!Math::EqualCheck(m_Cells[0], 1) || !Math::EqualCheck(m_Cells[1], 0) || !Math::EqualCheck(m_Cells[2], 0) || !Math::EqualCheck(m_Cells[3], 0))
-					return false;
-
-				if (!Math::EqualCheck(m_Cells[4], 0) || !Math::EqualCheck(m_Cells[5], 1) || !Math::EqualCheck(m_Cells[6], 0) || !Math::EqualCheck(m_Cells[7], 0))
-					return false;
-
-				if (!Math::EqualCheck(m_Cells[8], 0) || !Math::EqualCheck(m_Cells[9], 0) || !Math::EqualCheck(m_Cells[10], 1) || !Math::EqualCheck(m_Cells[11], 0))
-					return false;
-
-				return true;
-			}
-
 			INLINE T& operator[](uint8 Index)
 			{
 				return m_Cells[Index];

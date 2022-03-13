@@ -105,6 +105,13 @@ namespace Engine
 				}
 			}
 
+			INLINE Vector3<T> GetEuler(void) const
+			{
+				Vector3<T> euler;
+				ToEuler(euler);
+				return euler;
+			}
+
 			INLINE void SetFromAngleAxis(T Angle, const Vector3<T>& Axis)
 			{
 				Quaternion<T> quat;

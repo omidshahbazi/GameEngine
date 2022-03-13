@@ -92,8 +92,8 @@ namespace Engine
 
 			INLINE Pair<F, S>& operator=(Pair<F, S>&& Other)
 			{
-				m_First = Other.m_First;
-				m_Second = Other.m_Second;
+				m_First = std::move(Other.m_First);
+				m_Second = std::move(Other.m_Second);
 
 				return *this;
 			}

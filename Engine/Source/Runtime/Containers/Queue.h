@@ -222,6 +222,7 @@ namespace Engine
 			INLINE void Peek(T* Item)
 			{
 				HardAssert(m_Size > 0, "m_Size must be greater than 0");
+				HardAssert(Item != nullptr, "Item cannot be null");
 
 				*Item = m_Items[0];
 			}
@@ -230,12 +231,13 @@ namespace Engine
 			{
 				HardAssert(m_Size > 0, "m_Size must be greater than 0");
 
-				*Item = m_Items[0];
+				if (Item != nullptr)
+					*Item = std::move(m_Items[0]);
 
 				Destruct(&m_Items[0]);
 
-				if (m_Size > 1)
-					PlatformMemory::Copy(m_Items, 1, m_Items, 0, m_Size - 1);
+				for (uint32 i = 1; i < m_Size; ++i)
+					m_Items[i - 1] = std::move(m_Items[i]);
 
 				--m_Size;
 			}

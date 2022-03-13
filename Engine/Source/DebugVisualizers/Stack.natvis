@@ -2,7 +2,7 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Engine::Containers::Stack&lt;*&gt;">
     <DisplayString>Size: {m_Size}</DisplayString>
-    <Expand>
+    <Expand HideRawView="true">
     <Item Name="Capacity">m_Capacity</Item>
     <Item Name="Allocator">m_Allocator</Item>
     <ArrayItems>

@@ -37,7 +37,7 @@ namespace Engine
 
 			void Set(const byte* Data, uint16 Size);
 
-			template<typename T, int Size = sizeof(T)>
+			template<typename T, int32 Size = sizeof(T)>
 			void Set(const T* Data)
 			{
 				if (Size > GetSize())
@@ -46,7 +46,7 @@ namespace Engine
 				Set(ReinterpretCast(const byte*, Data), Size);
 			}
 
-			template<typename T, int Size = sizeof(T)>
+			template<typename T, int32 Size = sizeof(T)>
 			T* Get(void)
 			{
 				if (Size > GetSize())
@@ -55,7 +55,7 @@ namespace Engine
 				return ReinterpretCast(T*, m_CurrentCachedData);
 			}
 
-			template<typename T, int Size = sizeof(T)>
+			template<typename T, int32 Size = sizeof(T)>
 			const T* Get(void) const
 			{
 				if (Size > GetSize())

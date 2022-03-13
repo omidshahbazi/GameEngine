@@ -23,7 +23,7 @@ namespace Engine
 
 			bool FileSearch;
 			directory_iterator Iterator;
-			unsigned int ReferenceCount;
+			uint32 ReferenceCount;
 			cwstr SearchPattern;
 		};
 

@@ -269,11 +269,8 @@ namespace Engine
 
 				Extend(1);
 
-				int copyIndex = Index + 1;
-				int copySize = m_Size - copyIndex;
-
-				if (copySize != 0)
-					PlatformMemory::Copy(m_Items, Index, m_Items, copyIndex, copySize);
+				for (uint32 i = m_Size - 1; i != Index; --i)
+					m_Items[i] = std::move(m_Items[i - 1]);
 
 				m_Items[Index] = Item;
 			}
@@ -291,10 +288,8 @@ namespace Engine
 
 				Destruct(&m_Items[Index]);
 
-				int indexToMove = Index + 1;
-
-				if (indexToMove < m_Size)
-					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
+				for (uint32 i = Index; i < m_Size - 1; ++i)
+					m_Items[i] = std::move(m_Items[i + 1]);
 
 				--m_Size;
 			}

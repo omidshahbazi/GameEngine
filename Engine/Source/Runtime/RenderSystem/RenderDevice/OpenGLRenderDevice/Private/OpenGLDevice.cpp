@@ -708,7 +708,7 @@ namespace Engine
 
 				static uint32 drawBuffers[((int8)AttachmentPoints::Color8 - (int8)AttachmentPoints::Color0) + 1];
 
-				int drawBufferIndex = 0;
+				int32 drawBufferIndex = 0;
 
 				for (const auto& textureInfo : Info->Textures)
 				{

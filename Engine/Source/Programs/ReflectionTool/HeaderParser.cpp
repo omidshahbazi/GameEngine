@@ -206,7 +206,7 @@ namespace Engine
 
 				bool bracketPresent = false;
 				Token member;
-				for (int i = 0; true; i++)
+				for (int32 i = 0; true; i++)
 				{
 					if (MatchSymbol(COMMA))
 						break;

@@ -54,6 +54,8 @@ namespace Engine
 
 			if (ContainsType(FunctionType::Types::ComputeMain))
 				BuildComputeShader(Structs, Variables, Functions, Output.ComputeShader);
+
+			m_Variables.Clear();
 		}
 
 		void ASTCompilerBase::BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)

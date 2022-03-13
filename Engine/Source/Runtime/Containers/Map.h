@@ -369,9 +369,9 @@ namespace Engine
 
 				Destruct(&m_Items[Index]);
 
-				int indexToMove = Index + 1;
-				if (indexToMove < m_Size)
-					PlatformMemory::Copy(m_Items, indexToMove, m_Items, Index, m_Size - indexToMove);
+				for (uint32 i = Index; i < m_Size - 1; ++i)
+					m_Items[i] = std::move(m_Items[i + 1]);
+
 				--m_Size;
 			}
 
@@ -403,7 +403,6 @@ namespace Engine
 				}
 				else
 				{
-					//Reacllocate(m_Capacity + Count);
 					Reacllocate(m_Capacity + (Count - (m_Capacity - m_Size)));
 
 					m_Size = m_Capacity;

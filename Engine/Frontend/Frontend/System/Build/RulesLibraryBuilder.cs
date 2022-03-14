@@ -71,7 +71,7 @@ namespace Engine.Frontend.System.Build
 			profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
 			csproj.AddReferenceBinaryFile(EnvironmentHelper.FrontenddToolPath);
 
-			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, "*" + ModuleRules.FilePostfix, "*" + TargetRules.FilePostfix);
+			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, $"*{ModuleRules.FilePostfix}", $"*{TargetRules.FilePostfix}");
 
 			DateTime startTime = DateTime.Now;
 
@@ -84,7 +84,7 @@ namespace Engine.Frontend.System.Build
 			{
 				csproj.AddCompileFile(rules);
 
-				ConsoleHelper.WriteInfo("\t" + Path.GetFileName(rules));
+				ConsoleHelper.WriteInfo($"\t{Path.GetFileName(rules)}");
 			}
 
 			Compiler compiler = new Compiler();
@@ -93,7 +93,7 @@ namespace Engine.Frontend.System.Build
 			compiler.Build(profile);
 
 			Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
-			
+
 			moduleTypes.AddRange(rulesLibrary.GetTypes<ModuleRules>());
 			targetTypes.AddRange(rulesLibrary.GetTypes<TargetRules>());
 

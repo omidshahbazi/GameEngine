@@ -80,7 +80,7 @@ namespace Engine.Frontend.Project.Generator
 					type = "Library";
 					break;
 				default:
-					throw new FrontendException("[" + Profile.OutputType + "] doesn't supported by [" + GetType().Name + "]");
+					throw new FrontendException($"[{Profile.OutputType}] doesn't supported by [{GetType().Name}]");
 			}
 
 			return type;

@@ -8,15 +8,15 @@ namespace Engine.Frontend.Utilities
 	static class FileSystemUtilites
 	{
 		public static string[] GetAllFiles(string DirectoryAddress, params string[] SearchPatterns)
-        {
-            List<string> files = new List<string>();
+		{
+			List<string> files = new List<string>();
 
-            if (!Directory.Exists(DirectoryAddress))
+			if (!Directory.Exists(DirectoryAddress))
 				return files.ToArray();
 
 			if (SearchPatterns.Length == 0)
 				return Directory.GetFiles(DirectoryAddress, "*.*", SearchOption.AllDirectories);
-			
+
 			foreach (string pattern in SearchPatterns)
 				files.AddRange(Directory.GetFiles(DirectoryAddress, pattern, SearchOption.AllDirectories));
 
@@ -48,7 +48,7 @@ namespace Engine.Frontend.Utilities
 		{
 			Directory = PathSeperatorCorrection(Directory);
 
-			if (Directory.EndsWith("" + EnvironmentHelper.PathSeparator))
+			if (Directory.EndsWith(EnvironmentHelper.PathSeparator.ToString()))
 				Directory = Directory.Substring(0, Directory.Length - 1);
 
 			return Path.GetDirectoryName(Directory);

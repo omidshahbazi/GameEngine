@@ -2,6 +2,7 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Build;
 using Engine.Frontend.Utilities;
+using GameFramework.Common.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -207,6 +208,8 @@ namespace Engine.Frontend.System
 
 		private void CheckCircularDependencies(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
+			ConsoleHelper.WriteInfo($"Check for Circular Dependencies {Configuration} {Architecture}");
+
 			ModuleRules[] rules = moduleRules.Get(Configuration, Architecture);
 
 			foreach (ModuleRules builder in rules)
@@ -228,22 +231,6 @@ namespace Engine.Frontend.System
 
 				CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
 			}
-
-			//foreach (string dependency in Module.PrivateDependencyModuleNames)
-			//{
-			//	if (ModuleNameStack.Contains(dependency))
-			//		throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
-
-			//	CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
-			//}
-
-			//foreach (string dependency in Module.PublicDependencyModuleNames)
-			//{
-			//	if (ModuleNameStack.Contains(dependency))
-			//		throw new FrontendException($"A circular dependency between {Module.Name} and {dependency} has detected");
-
-			//	CheckCircularDependencies(GetModuleRules(dependency, Configuration, Architecture), Configuration, Architecture, ModuleNameStack);
-			//}
 
 			ModuleNameStack.Pop();
 		}

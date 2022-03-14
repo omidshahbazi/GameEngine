@@ -86,27 +86,27 @@ namespace Engine.Frontend.System
 
 		public static string RooDirectory
 		{
-			get { return Path.GetFullPath(BinariesDirectory + ".." + PathSeparator + ".." + PathSeparator); }
+			get { return Path.GetFullPath($"{BinariesDirectory}..{PathSeparator}..{PathSeparator}"); }
 		}
 
 		public static string EngineDirectory
 		{
-			get { return RooDirectory + "Engine" + PathSeparator; }
+			get { return $"{RooDirectory}Engine{PathSeparator}"; }
 		}
 
 		public static string SourceDirectory
 		{
-			get { return EngineDirectory + "Source" + PathSeparator; }
+			get { return $"{EngineDirectory}Source{PathSeparator}"; }
 		}
 
 		public static string IntermediateDirectory
 		{
-			get { return EngineDirectory + "Intermediate" + PathSeparator; }
+			get { return $"{EngineDirectory}Intermediate{PathSeparator}"; }
 		}
 
 		static EnvironmentHelper()
 		{
-			BinariesDirectory = Path.GetFullPath(FrontenddToolDirectory + ".." + PathSeparator + ".." + PathSeparator + BinariesPathName + PathSeparator);
+			BinariesDirectory = Path.GetFullPath($"{FrontenddToolDirectory}..{PathSeparator}..{PathSeparator}{BinariesPathName}{PathSeparator}");
 		}
 
 		public static string GetReflectionToolPath(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
@@ -116,7 +116,7 @@ namespace Engine.Frontend.System
 
 		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			return $"{Configuration} {Architecture.GetPrettyName()}" + PathSeparator;
+			return $"{Configuration} {Architecture.GetPrettyName()}{PathSeparator}";
 		}
 
 		public static string GetOutputDirectory(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

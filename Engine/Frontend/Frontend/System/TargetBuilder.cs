@@ -102,16 +102,12 @@ namespace Engine.Frontend.System
 			DateTime startTime = DateTime.Now;
 			ConsoleHelper.WriteInfo($"Building {targetRules.ModuleName} {Configuration} {Architecture.GetPrettyName()} starts");
 
-			bool forceToRebuild = false;
 			foreach (ModuleBuilder builder in moduleBuilders)
 			{
-				builder.Build(forceToRebuild);
+				builder.Build(false);
 
 				if (builder.State == BaseBuilder.States.Failed)
 					return;
-
-				if (builder.State != BaseBuilder.States.Built)
-					forceToRebuild = true;
 			}
 
 			ConsoleHelper.WriteInfo($"Building rules took {(DateTime.Now - startTime).ToHHMMSS()}");

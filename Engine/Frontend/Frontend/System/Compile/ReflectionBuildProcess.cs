@@ -17,7 +17,7 @@ namespace Engine.Frontend.System.Compile
 
 		public bool Build(string FilePath, string OutputBaseFileName)
 		{
-			Start("\"" + FilePath + "\" \"" + OutputBaseFileName + "\"");
+			Start($"\"{FilePath}\" \"{OutputBaseFileName}\"");
 
 			string error = "";
 

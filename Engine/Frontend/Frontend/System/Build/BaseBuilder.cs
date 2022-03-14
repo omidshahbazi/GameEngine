@@ -95,12 +95,11 @@ namespace Engine.Frontend.System.Build
 		protected void StartLoging()
 		{
 			LogHelper.DeleteLog(ModuleName);
-			ConsoleHelper.WriteInfo("	Building " + ModuleName);
 		}
 
 		protected void CopyAllFilesToFinalPath(string SourcePath, string Extension)
 		{
-			FileSystemUtilites.CopyAllFiles(SourcePath, FinalOutputDirectory, true, "*" + Extension);
+			FileSystemUtilites.CopyAllFiles(SourcePath, FinalOutputDirectory, true, $"*{Extension}");
 		}
 
 		protected static int GetHash(string Value)

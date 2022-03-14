@@ -37,9 +37,9 @@ namespace Engine.Frontend.System.Generator
 
 				string macroName = Path.GetFileName(filePath).ToUpper().Replace('.', '_');
 
-				string controlStatement = "#ifndef " + macroName;
-				string defineStatement = "#define " + macroName;
-				string endStatement = "#endif // " + macroName;
+				string controlStatement = $"#ifndef {macroName}";
+				string defineStatement = $"#define {macroName}";
+				string endStatement = $"#endif // {macroName}";
 
 				int i = Find(controlStatement, lines);
 				if (i != 1)

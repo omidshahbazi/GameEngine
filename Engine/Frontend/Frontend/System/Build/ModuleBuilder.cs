@@ -62,9 +62,13 @@ namespace Engine.Frontend.System.Build
 
 			if (!ForceToRebuild && !MustCompile())
 			{
+				ConsoleHelper.WriteInfo($"	{ModuleName} is Already Up-to-Date");
+
 				State = States.AlreadyUpdated;
 				return;
 			}
+
+			ConsoleHelper.WriteInfo($"	{ModuleName} is Going to Build");
 
 			try
 			{
@@ -134,6 +138,12 @@ namespace Engine.Frontend.System.Build
 
 			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
 				return true;
+
+			foreach(string moduleName in Module.GetAllDependencies())
+			{
+				if (targetBuilder.GetModuleBuilder(moduleName).State == States.Built)
+					return true;
+			}
 
 			string hashesFilePath = IntermediateTempPath + $"Hashes.cache";
 
@@ -330,7 +340,7 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(dependencyModule.GetAPIPreprocessor(type));
 				Profile.AddPreprocessorDefinition(dependencyModule.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(dependencyBuilder.IntermediateOutputPath, "*" + EnvironmentHelper.StaticLibraryExtentions);
+				string[] libFiles = FileSystemUtilites.GetAllFiles(dependencyBuilder.IntermediateOutputPath, $"*{EnvironmentHelper.StaticLibraryExtentions}");
 
 				foreach (string libFile in libFiles)
 					Profile.AddIncludeLibrary(libFile);

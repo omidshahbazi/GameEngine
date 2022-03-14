@@ -87,7 +87,7 @@ namespace Engine.Frontend.Utilities
 
 		public static string GetNamePreprocessor(this ModuleRules Module)
 		{
-			return "MODULE_NAME=\"" + (Module == null ? "" : Module.Name) + "\"";
+			return $"MODULE_NAME=\"{(Module == null ? "" : Module.Name)}\"";
 		}
 
 		public static string GetAPIPreprocessor(this ModuleRules Module, BuildSystemHelper.APIPreprocessorTypes Value)
@@ -97,7 +97,7 @@ namespace Engine.Frontend.Utilities
 
 		public static string GetExternPreprocessor(this ModuleRules Module, BuildSystemHelper.ExternPreprocessorTypes Value)
 		{
-			return Module.Name.ToUpper() + "_EXTERN=" + (Value == BuildSystemHelper.ExternPreprocessorTypes.Empty ? "" : "extern");
+			return $"{Module.Name.ToUpper()}_EXTERN={(Value == BuildSystemHelper.ExternPreprocessorTypes.Empty ? "" : "extern")}";
 		}
 
 		public static string GetIntermediateDirectory(this string ModuleName)
@@ -194,12 +194,12 @@ namespace Engine.Frontend.Utilities
 
 		public static string GetPreprocessorValue(this BuildSystemHelper.APIPreprocessorTypes Value)
 		{
-			return (Value == BuildSystemHelper.APIPreprocessorTypes.Empty ? "" : ("__declspec(dll" + (Value == BuildSystemHelper.APIPreprocessorTypes.Import ? "import" : "export") + ")"));
+			return (Value == BuildSystemHelper.APIPreprocessorTypes.Empty ? "" : $"__declspec(dll{(Value == BuildSystemHelper.APIPreprocessorTypes.Import ? "import" : "export")})");
 		}
 
 		public static string GetAPIPreprocessorRaw(this string Name, BuildSystemHelper.APIPreprocessorTypes Value)
 		{
-			return Name + "=" + Value.GetPreprocessorValue();
+			return $"{Name}={Value.GetPreprocessorValue()}";
 		}
 	}
 }

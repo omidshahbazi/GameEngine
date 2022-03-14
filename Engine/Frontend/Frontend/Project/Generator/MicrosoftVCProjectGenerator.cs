@@ -91,7 +91,7 @@ namespace Engine.Frontend.Project.Generator
 
 					XmlElement popertyGroup = CreateElement("PropertyGroup", projectElement);
 					{
-						popertyGroup.SetAttribute("Condition", "'$(Configuration)|$(Platform)'=='" + GetConfigurationAndPlatform(profile, WithBeutyConfigurationName) + "'");
+						popertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{GetConfigurationAndPlatform(profile, WithBeutyConfigurationName)}'");
 
 						XmlElement configurationType = CreateElement("ConfigurationType", popertyGroup);
 						configurationType.InnerText = GetOutputType(profile);
@@ -102,7 +102,7 @@ namespace Engine.Frontend.Project.Generator
 
 					popertyGroup = CreateElement("PropertyGroup", projectElement);
 					{
-						popertyGroup.SetAttribute("Condition", "'$(Configuration)|$(Platform)'=='" + GetConfigurationAndPlatform(profile, WithBeutyConfigurationName) + "'");
+						popertyGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{GetConfigurationAndPlatform(profile, WithBeutyConfigurationName)}'");
 
 						if (profile.OutputType == ProjectBase.ProfileBase.OutputTypes.Makefile)
 						{
@@ -125,7 +125,7 @@ namespace Engine.Frontend.Project.Generator
 							nmakePreprocessorDefinitions.InnerText = GetFlattenStringList(profile.PreprocessorDefinitions);
 
 							XmlElement additionalOptions = CreateElement("AdditionalOptions", popertyGroup);
-							additionalOptions.InnerText = "/std:" + profile.LanguageStandard.ToString().ToLower().Replace("pp", "++");
+							additionalOptions.InnerText = $"/std:{profile.LanguageStandard.ToString().ToLower().Replace("pp", "++")}";
 						}
 						else
 						{
@@ -153,7 +153,7 @@ namespace Engine.Frontend.Project.Generator
 
 					XmlElement itemDefinitionGroup = CreateElement("ItemDefinitionGroup", projectElement);
 					{
-						itemDefinitionGroup.SetAttribute("Condition", "'$(Configuration)|$(Platform)'=='" + GetConfigurationAndPlatform(profile, WithBeutyConfigurationName) + "'");
+						itemDefinitionGroup.SetAttribute("Condition", $"'$(Configuration)|$(Platform)'=='{GetConfigurationAndPlatform(profile, WithBeutyConfigurationName)}'");
 
 						XmlElement clCompile = CreateElement("ClCompile", itemDefinitionGroup);
 						{
@@ -177,7 +177,7 @@ namespace Engine.Frontend.Project.Generator
 							minimalRebuild.InnerText = profile.MinimalRebuild.ToString();
 
 							XmlElement languageStandard = CreateElement("LanguageStandard", clCompile);
-							languageStandard.InnerText = "std" + profile.LanguageStandard.ToString().ToLower();
+							languageStandard.InnerText = $"std{profile.LanguageStandard.ToString().ToLower()}";
 						}
 
 						XmlElement importTargets = CreateElement("Import", projectElement);
@@ -255,7 +255,7 @@ namespace Engine.Frontend.Project.Generator
 							filter.SetAttribute("Include", filterName);
 
 							XmlElement identifier = CreateElement("UniqueIdentifier", filter);
-							identifier.InnerText = "{" + Guid.NewGuid() + "}";
+							identifier.InnerText = $"{{{Guid.NewGuid()}}}";
 						}
 					}
 				}
@@ -291,14 +291,14 @@ namespace Engine.Frontend.Project.Generator
 		private static string GetConfiguration(CPPProject.Profile Profile, bool WithBeutyConfigurationName)
 		{
 			if (WithBeutyConfigurationName)
-				return Profile.BuildConfiguration + (string.IsNullOrEmpty(Profile.Name) ? "" : " " + Profile.Name);
+				return Profile.BuildConfiguration + (string.IsNullOrEmpty(Profile.Name) ? "" : $" {Profile.Name}");
 
 			return Profile.BuildConfiguration.ToString();
 		}
 
 		private static string GetConfigurationAndPlatform(CPPProject.Profile Profile, bool WithBeutyConfigurationName)
 		{
-			return GetConfiguration(Profile, WithBeutyConfigurationName) + "|" + GetPlatformType(Profile.PlatformArchitecture);
+			return $"{GetConfiguration(Profile, WithBeutyConfigurationName)}|{GetPlatformType(Profile.PlatformArchitecture)}";
 		}
 
 		private string GetOutputType(ProjectBase.ProfileBase Profile)

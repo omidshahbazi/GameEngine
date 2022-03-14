@@ -134,12 +134,13 @@ namespace Engine.Frontend.System.Build
 		private bool MustCompile()
 		{
 			if (Module.UseType == ModuleRules.UseTypes.UseOnly)
-				return true;
+				return false;
 
 			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
-				return true;
+				if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileExtension).Length != 0)
+					return true;
 
-			foreach(string moduleName in Module.GetAllDependencies())
+			foreach (string moduleName in Module.GetAllDependencies())
 			{
 				if (targetBuilder.GetModuleBuilder(moduleName).State == States.Built)
 					return true;

@@ -19,14 +19,14 @@ namespace Engine
 			public:
 				INLINE static bool SubmitAndDestroy(ThreadedDevice* Device, ICommandBuffer* CommandBuffer)
 				{
+					if (!Device->SubmitCommandBuffers(&CommandBuffer, 1).Wait())
+						return false;
+
 					IFence* fence = nullptr;
 					if (!Device->CreateFence(fence).Wait())
 						return false;
 
 					CommandBuffer->SignalFences(&fence, 1);
-
-					if (!Device->SubmitCommandBuffers(&CommandBuffer, 1).Wait())
-						return false;
 
 					if (!fence->Wait())
 						return false;

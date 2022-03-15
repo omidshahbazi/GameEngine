@@ -32,8 +32,8 @@ namespace Engine
 				{ \
 					DirectX12Wrapper::Command::AddTransitionResourceBarrier(m_List, Info->Resource.Resource, Info->State, AfterState); \
 					Info->State = AfterState; \
+					DirectX12Wrapper::Command::AddResourceStateAssertion(m_DebugList, Info->Resource.Resource, AfterState); \
 				} \
-				DirectX12Wrapper::Command::AddResourceStateAssertion(m_DebugList, Info->Resource.Resource, AfterState); \
 			}
 #else
 #define ADD_TRANSITION_STATE(ResourceInfo, AfterState) \

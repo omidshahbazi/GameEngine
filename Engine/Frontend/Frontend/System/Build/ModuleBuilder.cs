@@ -137,7 +137,7 @@ namespace Engine.Frontend.System.Build
 				return false;
 
 			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
-				if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileExtension).Length != 0)
+				if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern).Length != 0)
 					return true;
 
 			foreach (string moduleName in Module.GetAllDependencies())
@@ -159,9 +159,9 @@ namespace Engine.Frontend.System.Build
 			bool result = false;
 
 			List<string> extensions = new List<string>();
-			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
+			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
 			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
 			foreach (string file in files)
 			{
@@ -279,7 +279,7 @@ namespace Engine.Frontend.System.Build
 			foreach (string lib in Module.DependencyStaticLibraries)
 				profile.AddIncludeLibrary(lib);
 
-			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.HeaderFileExtensions);
+			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.HeaderFileSearchPattern);
 			foreach (string file in files)
 			{
 				cppProj.AddIncludeFile(file);
@@ -295,7 +295,7 @@ namespace Engine.Frontend.System.Build
 				}
 			}
 
-			files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileExtensions);
+			files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern);
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 

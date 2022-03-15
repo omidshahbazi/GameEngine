@@ -13,8 +13,8 @@ namespace Engine.Frontend.System.Generator
 		public static void Generate(string SearchPath)
 		{
 			List<string> extensions = new List<string>();
-			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
+			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
 
 			IncludeFilesCorrection(SearchPath, extensions.ToArray());
 

@@ -814,6 +814,16 @@ namespace Engine
 					{
 						return SUCCEEDED(CommandQueue->Wait(Fence, Value));
 					}
+
+					INLINE static uint64 GetValue(ID3D12Fence* Fence)
+					{
+						return Fence->GetCompletedValue();
+					}
+
+					INLINE static bool SetEvent(ID3D12Fence* Fence, uint64 Value, PlatformOS::Handle Event)
+					{
+						return SUCCEEDED(Fence->SetEventOnCompletion(Value, Event));
+					}
 				};
 
 			public:

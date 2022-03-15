@@ -29,7 +29,7 @@ namespace Engine
 
 			bool DirectX12Fence::GetIsPassed(void)
 			{
-				return (m_Fence->GetCompletedValue() >= m_Value);
+				return (DirectX12Wrapper::Fence::GetValue(m_Fence) >= m_Value);
 			}
 
 			bool DirectX12Fence::Wait(void)
@@ -37,7 +37,7 @@ namespace Engine
 				if (GetIsPassed())
 					return true;
 
-				if (!SUCCEEDED(m_Fence->SetEventOnCompletion(m_Value, m_Event)))
+				if (!DirectX12Wrapper::Fence::SetEvent(m_Fence, m_Value, m_Event))
 					return false;
 
 				PlatformOS::WaitForSignalEvent(m_Event);

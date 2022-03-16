@@ -16,6 +16,14 @@ namespace Engine
 			{
 			}
 
+			FrameConstantBuffersPool::~FrameConstantBuffersPool(void)
+			{
+				for (auto buffers : m_Buffers)
+					RenderSystemAllocators::ContainersAllocator_Deallocate(buffers);
+
+				m_Buffers.Clear();
+			}
+
 			FrameConstantBuffers* FrameConstantBuffersPool::Get(void)
 			{
 				m_Lock.Lock();

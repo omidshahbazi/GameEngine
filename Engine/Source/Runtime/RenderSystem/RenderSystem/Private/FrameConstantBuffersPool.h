@@ -24,6 +24,7 @@ namespace Engine
 
 			public:
 				FrameConstantBuffersPool(ThreadedDevice* Device);
+				~FrameConstantBuffersPool(void);
 
 				FrameConstantBuffers* Get(void);
 				void Back(FrameConstantBuffers* Buffers);

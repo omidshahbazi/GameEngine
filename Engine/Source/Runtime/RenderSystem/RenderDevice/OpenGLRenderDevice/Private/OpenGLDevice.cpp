@@ -812,11 +812,6 @@ namespace Engine
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
 
-				if (meshBufferInfo->IndexBufferObject != nullptr)
-					DestroyBuffer(ReinterpretCast(ResourceHandle, meshBufferInfo->IndexBufferObject));
-
-				DestroyBuffer(ReinterpretCast(ResourceHandle, meshBufferInfo));
-
 				RenderContextInfo* currentInfo = m_CurrentContext;
 
 				for (auto& context : m_Contexts)
@@ -836,7 +831,10 @@ namespace Engine
 				if (m_CurrentContext != currentInfo)
 					SetContext(ReinterpretCast(ResourceHandle, m_CurrentContext));
 
-				RenderSystemAllocators::ResourceAllocator_Deallocate(meshBufferInfo);
+				if (meshBufferInfo->IndexBufferObject != nullptr)
+					DestroyBuffer(ReinterpretCast(ResourceHandle, meshBufferInfo->IndexBufferObject));
+
+				DestroyBuffer(ReinterpretCast(ResourceHandle, meshBufferInfo));
 
 				return true;
 			}

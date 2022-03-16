@@ -134,14 +134,21 @@ namespace Engine
 			}
 			else
 			{
-				m_Lock.Lock();
-				m_TaskQueue.Enqueue(std::make_shared<Task::weak_type::element_type>([this, promise, Name, Info]()
-					{
-						promise->SetValue(UnloadInternal(Name, Info));
+				auto job = [this, promise, Name, Info]()
+				{
+					promise->SetValue(UnloadInternal(Name, Info));
 
-						promise->IncreaseDoneCount();
-					}));
-				m_Lock.Release();
+					promise->IncreaseDoneCount();
+				};
+
+				if (m_Thread.GetID() == PlatformThread::GetID())
+					job();
+				else
+				{
+					m_Lock.Lock();
+					m_TaskQueue.Enqueue(std::make_shared<Task::weak_type::element_type>(job));
+					m_Lock.Release();
+				}
 			}
 
 			return promise;

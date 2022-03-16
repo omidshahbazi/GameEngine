@@ -63,7 +63,7 @@ namespace Engine.Frontend.Utilities
 		public static string GetSourceRootDirectory(this ModuleRules Self)
 		{
 			if (CSharpFiles == null)
-				CSharpFiles = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileExtensions);
+				CSharpFiles = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileSearchPattern);
 
 			string fileName = Self.Name + ModuleRules.FilePostfix;
 

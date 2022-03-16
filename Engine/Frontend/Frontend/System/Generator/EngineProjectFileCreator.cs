@@ -70,19 +70,19 @@ namespace Engine.Frontend.System.Generator
 						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
 					}
 
-			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileExtensions);
+			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileSearchPattern);
 			foreach (string file in files)
 				projectFile.AddExtraFile(file);
 
-			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.DebugVisualizerFileExtensions);
+			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.DebugVisualizerFileSearchPattern);
 			foreach (string file in files)
 				projectFile.AddExtraFile(file);
 
-			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.HeaderFileExtensions);
+			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.HeaderFileSearchPattern);
 			foreach (string file in files)
 				projectFile.AddIncludeFile(file);
 
-			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CompileFileExtensions);
+			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CompileFileSearchPattern);
 			foreach (string file in files)
 				projectFile.AddCompileFile(file);
 

@@ -16,6 +16,11 @@ namespace Engine.Frontend.System.Build
 
 		protected static ReflectionBuildProcess reflectionBuildProcess = null;
 
+		private string HashesFilePath
+		{
+			get { return $"{IntermediateTempPath}Hashes.json"; }
+		}
+
 		public ModuleRules Module
 		{
 			get;
@@ -104,10 +109,12 @@ namespace Engine.Frontend.System.Build
 						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
 
 					State = States.Built;
-				}
 
-				if (Module.GenerateRenderDocSettings)
-					GenerateRenderDocSettings();
+					if (Module.GenerateRenderDocSettings)
+						GenerateRenderDocSettings();
+
+					GenerateHashes();
+				}
 			}
 			catch
 			{
@@ -134,10 +141,10 @@ namespace Engine.Frontend.System.Build
 		private bool MustCompile()
 		{
 			if (Module.UseType == ModuleRules.UseTypes.UseOnly)
-				return false;
+				return true;
 
 			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
-				if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileExtension).Length != 0)
+				if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern).Length != 0)
 					return true;
 
 			foreach (string moduleName in Module.GetAllDependencies())
@@ -146,22 +153,17 @@ namespace Engine.Frontend.System.Build
 					return true;
 			}
 
-			string hashesFilePath = IntermediateTempPath + $"Hashes.cache";
+			if (!File.Exists(HashesFilePath))
+				return true;
 
-			ISerializeObject hashesData = null;
-
-			if (File.Exists(hashesFilePath))
-				hashesData = Creator.Create<ISerializeObject>(File.ReadAllText(hashesFilePath));
-
-			if (hashesData == null)
-				hashesData = Creator.Create<ISerializeObject>();
+			ISerializeObject hashesData = Creator.Create<ISerializeObject>(File.ReadAllText(HashesFilePath));
 
 			bool result = false;
 
 			List<string> extensions = new List<string>();
-			extensions.AddRange(EnvironmentHelper.HeaderFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CompileFileExtensions);
-			extensions.AddRange(EnvironmentHelper.CSharpFileExtensions);
+			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
 			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
 			foreach (string file in files)
 			{
@@ -171,14 +173,26 @@ namespace Engine.Frontend.System.Build
 				if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
 					continue;
 
-				hashesData.Set(filePathHash, contentHash);
-
 				result = true;
 			}
 
-			File.WriteAllText(hashesFilePath, hashesData.Content);
-
 			return result;
+		}
+
+		private void GenerateHashes()
+		{
+			ISerializeObject hashesData = Creator.Create<ISerializeObject>();
+
+			List<string> extensions = new List<string>();
+			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
+			extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
+			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
+
+			foreach (string file in files)
+				hashesData.Set(GetHash(file).ToString(), GetHash(File.ReadAllText(file)));
+
+			File.WriteAllText(HashesFilePath, hashesData.Content);
 		}
 
 		private void GenerateRenderDocSettings()
@@ -279,7 +293,7 @@ namespace Engine.Frontend.System.Build
 			foreach (string lib in Module.DependencyStaticLibraries)
 				profile.AddIncludeLibrary(lib);
 
-			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.HeaderFileExtensions);
+			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.HeaderFileSearchPattern);
 			foreach (string file in files)
 			{
 				cppProj.AddIncludeFile(file);
@@ -295,7 +309,7 @@ namespace Engine.Frontend.System.Build
 				}
 			}
 
-			files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileExtensions);
+			files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern);
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 

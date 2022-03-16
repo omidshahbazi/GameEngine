@@ -31,12 +31,11 @@ namespace Engine.Frontend.System
 
 		public static readonly string HeaderFileExtension = ".h";
 		public static readonly string CompileFileExtension = ".cpp";
-		public static readonly string CSharpFileExtension = ".cs";
 
-		public static readonly string[] HeaderFileExtensions = new string[] { "*.h", "*.hpp" };
-		public static readonly string[] CompileFileExtensions = new string[] { "*.cpp", "*.c", "*.cxx" };
-		public static readonly string[] CSharpFileExtensions = new string[] { "*.cs" };
-		public static readonly string[] DebugVisualizerFileExtensions = new string[] { "*.natvis" };
+		public static readonly string[] HeaderFileSearchPattern = new string[] { "*.h", "*.hpp" };
+		public static readonly string[] CompileFileSearchPattern = new string[] { "*.cpp", "*.c", "*.cxx" };
+		public static readonly string[] CSharpFileSearchPattern = new string[] { "*.cs" };
+		public static readonly string[] DebugVisualizerFileSearchPattern = new string[] { "*.natvis" };
 
 		private static string FrontenddToolDirectory
 		{

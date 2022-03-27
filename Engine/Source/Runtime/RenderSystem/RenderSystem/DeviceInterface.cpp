@@ -110,7 +110,7 @@ namespace Engine
 			m_ThreadedDevice = RenderSystemAllocators::RenderSystemAllocator_Allocate<ThreadedDevice>();
 			Construct(m_ThreadedDevice, m_Device, m_DeviceType);
 
-			m_FrameConstantBuffersPool = RenderSystemAllocators::ContainersAllocator_Allocate<FrameConstantBuffersPool>();
+			m_FrameConstantBuffersPool = RenderSystemAllocators::RenderSystemAllocator_Allocate<FrameConstantBuffersPool>();
 			Construct(m_FrameConstantBuffersPool, m_ThreadedDevice);
 
 			CHECK_CALL_STRONG(m_ThreadedDevice->Initialize());

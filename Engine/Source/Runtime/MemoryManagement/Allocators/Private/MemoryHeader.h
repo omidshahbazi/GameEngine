@@ -23,9 +23,9 @@ namespace Engine
 #ifdef DEBUG_MODE
 				bool IsAllocated;
 				uint64 UserSize;
-				cstr File;
+				char8 File[128];
 				uint32 LineNumber;
-				cstr Function;
+				char8 Function[256];
 #endif
 			};
 		}

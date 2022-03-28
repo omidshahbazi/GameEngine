@@ -2,6 +2,7 @@
 #include <Allocators\CustomAllocator.h>
 #include <Allocators\Private\MemoryHeader.h>
 #include <Platform\PlatformMemory.h>
+#include <Common\CharacterUtility.h>
 
 #ifdef ONLY_USING_C_ALLOCATOR
 #include <Allocators\DefaultAllocator.h>
@@ -10,6 +11,7 @@
 namespace Engine
 {
 	using namespace Platform;
+	using namespace Common;
 
 	namespace Allocators
 	{
@@ -331,11 +333,25 @@ namespace Engine
 #ifdef DEBUG_MODE
 		void CustomAllocator::SetDebugInfo(MemoryHeader* Header, uint64 UserSize, cstr File, uint32 LineNumber, cstr Function)
 		{
+#define SET_STRING(ValueName) \
+			{ \
+				const uint16 otherLen = CharacterUtility::GetLength(ValueName); \
+				const uint8 selfLen = _countof(Header->ValueName) - 1; \
+				bool mustCut = otherLen > selfLen; \
+				uint8 copyLen = mustCut ? selfLen - 3 : otherLen; \
+				uint8 selfIndex = 0; \
+				if (mustCut) \
+					Header->ValueName[selfIndex++] = Header->ValueName[selfIndex++] = Header->ValueName[selfIndex++] = '.'; \
+				PlatformMemory::Copy(ValueName, otherLen - copyLen, Header->ValueName, selfIndex, copyLen); \
+				selfIndex += copyLen; \
+				Header->ValueName[selfIndex] = '\0'; \
+			}
+
 			Header->IsAllocated = true;
 			Header->UserSize = UserSize;
-			Header->File = File;
+			SET_STRING(File);
 			Header->LineNumber = LineNumber;
-			Header->Function = Function;
+			SET_STRING(Function);
 
 #ifdef CORRUPTED_HEAP_DETECTION
 			byte* corruptionSign = GetAddressFromHeader(Header) + Header->UserSize;

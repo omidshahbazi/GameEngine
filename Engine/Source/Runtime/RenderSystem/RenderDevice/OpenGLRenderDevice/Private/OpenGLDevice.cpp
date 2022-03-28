@@ -161,27 +161,38 @@ namespace Engine
 				return 0;
 			}
 
-			bool CreateBufferInternal(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, ResourceHandle& Handle)
+			bool CreateNativeBuffer(GPUBufferTypes Type, uint32 Size, uint32& Handle)
 			{
 				if (Size == 0)
 					return false;
 
-				BufferInfo* info = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
-
 				uint32 target = GetBufferType(Type);
 
-				uint32 handle;
-				glGenBuffers(1, &handle);
+				glGenBuffers(1, &Handle);
 
-				glBindBuffer(target, handle);
+				glBindBuffer(target, Handle);
 
 				glBufferData(target, Size, nullptr, GL_STATIC_COPY);
 
 				glBindBuffer(target, 0);
 
-				INITIALIZE_BUFFER_INFO(info, handle, Size, Type, IsIntermediate);
+				return true;
+			}
 
-				Handle = ReinterpretCast(ResourceHandle, info);
+			bool CreateBufferInfo(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, BufferInfo*& Buffer)
+			{
+				if (Size == 0)
+					return false;
+
+				Buffer = RenderSystemAllocators::ResourceAllocator_Allocate<BufferInfo>();
+
+				uint32 target = GetBufferType(Type);
+
+				uint32 handle;
+				if (!CreateNativeBuffer(Type, Size, handle))
+					return false;
+
+				INITIALIZE_BUFFER_INFO(Buffer, handle, Size, Type, IsIntermediate);
 
 				return true;
 			}
@@ -424,7 +435,13 @@ namespace Engine
 
 			bool OpenGLDevice::CreateBuffer(GPUBufferTypes Type, uint32 Size, ResourceHandle& Handle)
 			{
-				return CreateBufferInternal(Type, Size, true, Handle);
+				BufferInfo* info;
+				if (!CreateBufferInfo(Type, Size, true, info))
+					return false;
+
+				Handle = ReinterpretCast(ResourceHandle, info);
+
+				return true;
 			}
 
 			bool OpenGLDevice::DestroyBuffer(ResourceHandle Handle)
@@ -762,9 +779,9 @@ namespace Engine
 
 			bool OpenGLDevice::CreateMesh(const SubMeshInfo* Info, ResourceHandle& Handle)
 			{
-#define IMPLEMENT_UPLOAD_BUFFER(BufferHandle, Type, Size, Data) \
+#define IMPLEMENT_UPLOAD_BUFFER(BufferInfo, Type, Size, Data) \
 					uint32 target = GetBufferType(Type); \
-					glBindBuffer(target, ReinterpretCast(BufferInfo*, BufferHandle)->Handle); \
+					glBindBuffer(target, BufferInfo->Handle); \
 					glBufferData(target, Size, Data, GL_STATIC_DRAW); \
 					glBindBuffer(target, 0);
 
@@ -773,29 +790,28 @@ namespace Engine
 
 				uint32 size = Helper::GetMeshVertexBufferSize(Info->Vertices.GetSize());
 
-				ResourceHandle vbo;
-				if (!CreateBufferInternal(GPUBufferTypes::Vertex, size, false, vbo))
+				uint32 vbo;
+				if (!CreateNativeBuffer(GPUBufferTypes::Vertex, size, vbo))
 					return false;
 
-				IMPLEMENT_UPLOAD_BUFFER(vbo, GPUBufferTypes::Vertex, size, Info->Vertices.GetData());
+				MeshBufferInfo* meshBufferInfo = RenderSystemAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
+				PlatformMemory::Set(meshBufferInfo, 0, 1);
+				INITIALIZE_BUFFER_INFO(meshBufferInfo, vbo, size, GPUBufferTypes::Vertex, false);
 
-				ResourceHandle ebo = 0;
+				IMPLEMENT_UPLOAD_BUFFER(meshBufferInfo, GPUBufferTypes::Vertex, size, Info->Vertices.GetData());
+
+				BufferInfo* indexBufferInfo = nullptr;
 				if (Info->Indices.GetSize() != 0)
 				{
 					size = Helper::GetMeshIndexBufferSize(Info->Indices.GetSize());
 
-					if (!CreateBufferInternal(GPUBufferTypes::Index, size, false, ebo))
+					if (!CreateBufferInfo(GPUBufferTypes::Index, size, false, indexBufferInfo))
 						return false;
 
-					IMPLEMENT_UPLOAD_BUFFER(ebo, GPUBufferTypes::Index, size, Info->Indices.GetData());
+					IMPLEMENT_UPLOAD_BUFFER(indexBufferInfo, GPUBufferTypes::Index, size, Info->Indices.GetData());
 				}
 
-				MeshBufferInfo* meshBufferInfo = RenderSystemAllocators::ResourceAllocator_Allocate<MeshBufferInfo>();
-				PlatformMemory::Set(meshBufferInfo, 0, 1);
-
-				meshBufferInfo = ReinterpretCast(MeshBufferInfo*, vbo);
-				if (ebo != 0)
-					meshBufferInfo->IndexBufferObject = ReinterpretCast(BufferInfo*, ebo);
+				meshBufferInfo->IndexBufferObject = indexBufferInfo;
 				meshBufferInfo->Layout = Info->Layout;
 
 				Handle = ReinterpretCast(ResourceHandle, meshBufferInfo);

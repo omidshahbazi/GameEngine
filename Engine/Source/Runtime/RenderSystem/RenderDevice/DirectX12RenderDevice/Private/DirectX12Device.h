@@ -109,8 +109,6 @@ namespace Engine
 				}
 
 			private:
-				bool WaitForAsyncCommandBuffers(void);
-
 				bool CreateBufferInternal(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, BufferInfo* Buffer);
 
 				bool UpdateSwapChainBufferSize(RenderContextInfo* Info, const Vector2I& Size);

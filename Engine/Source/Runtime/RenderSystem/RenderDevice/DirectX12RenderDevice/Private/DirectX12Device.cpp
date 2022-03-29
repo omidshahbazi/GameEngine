@@ -92,7 +92,7 @@ namespace Engine
 					} \
 					else if (!CHECK_CALL(m_DepthStencilViewAllocator.DeallocateView((ViewPtr)->TargetView))) \
 						return false; \
-					if (!CHECK_CALL(m_ResourceViewAllocator.DeallocateView((ViewPtr)->View))) \
+					if ((ViewPtr)->View.DescriptorHeap != nullptr && !CHECK_CALL(m_ResourceViewAllocator.DeallocateView((ViewPtr)->View))) \
 						return false; \
 					if (!CHECK_CALL(m_SamplerViewAllocator.DeallocateView((ViewPtr)->SamplerView))) \
 						return false; \
@@ -441,9 +441,6 @@ namespace Engine
 				if (m_CurrentContext == info)
 					SetContext(0);
 
-				if (!WaitForAsyncCommandBuffers())
-					return false;
-
 				if (!DestroySwapChainBuffers(info))
 					return false;
 
@@ -529,9 +526,6 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				if (!WaitForAsyncCommandBuffers())
-					return false;
-
 				BufferInfo* info = ReinterpretCast(BufferInfo*, Handle);
 
 				if (!CHECK_CALL(m_BufferHeapAllocator.Deallocate(info->Resource)))
@@ -609,9 +603,6 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				if (!WaitForAsyncCommandBuffers())
-					return false;
-
 				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
 				IMPLEMENT(VertexShader);
@@ -684,9 +675,6 @@ namespace Engine
 			bool DirectX12Device::DestroyTexture(ResourceHandle Handle)
 			{
 				if (Handle == 0)
-					return false;
-
-				if (!WaitForAsyncCommandBuffers())
 					return false;
 
 				TextureResourceInfo* textureResourceInfo = ReinterpretCast(TextureResourceInfo*, Handle);
@@ -798,9 +786,6 @@ namespace Engine
 				if (Handle == 0)
 					return false;
 
-				if (!WaitForAsyncCommandBuffers())
-					return false;
-
 				RenderTargetInfos* renderTargetInfos = ReinterpretCast(RenderTargetInfos*, Handle);
 
 				for (auto& viewInfo : renderTargetInfos->Views)
@@ -868,9 +853,6 @@ namespace Engine
 			bool DirectX12Device::DestroyMesh(ResourceHandle Handle)
 			{
 				if (Handle == 0)
-					return false;
-
-				if (!WaitForAsyncCommandBuffers())
 					return false;
 
 				MeshBufferInfo* meshBufferInfo = ReinterpretCast(MeshBufferInfo*, Handle);
@@ -982,11 +964,6 @@ namespace Engine
 				return true;
 			}
 
-			bool DirectX12Device::WaitForAsyncCommandBuffers(void)
-			{
-				return true;
-			}
-
 			bool DirectX12Device::CreateBufferInternal(GPUBufferTypes Type, uint32 Size, bool IsIntermediate, BufferInfo* Buffer)
 			{
 				D3D12_RESOURCE_STATES state = D3D12_RESOURCE_STATE_COMMON;
@@ -1009,9 +986,6 @@ namespace Engine
 
 			bool DirectX12Device::UpdateSwapChainBufferSize(RenderContextInfo* Info, const Vector2I& Size)
 			{
-				if (!WaitForAsyncCommandBuffers())
-					return false;
-
 				if (Info->Initialized)
 					if (!DestroySwapChainBuffers(Info))
 						return false;

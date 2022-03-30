@@ -355,6 +355,8 @@ namespace Engine
 
 				RenderSystemAllocators::ResourceAllocator_Deallocate(m_InputLayout);
 
+				m_CommandBufferPool.Back(m_UploadCommandBuffer);
+
 				m_BufferHeapAllocator.Deallocate(m_UploadBuffer.Resource);
 
 				m_SamplerViewAllocator.Deinitialize();

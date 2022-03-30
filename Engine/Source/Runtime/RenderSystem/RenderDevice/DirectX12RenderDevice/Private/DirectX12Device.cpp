@@ -989,8 +989,13 @@ namespace Engine
 			bool DirectX12Device::UpdateSwapChainBufferSize(RenderContextInfo* Info, const Vector2I& Size)
 			{
 				if (Info->Initialized)
+				{
 					if (!DestroySwapChainBuffers(Info))
 						return false;
+				
+					for (uint8 i = 0; i < Info->ViewCount; ++i)
+						DirectX12Wrapper::ReleaseInstance(Info->Views[i].Resource.Resource);
+				}
 
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Resize(Info->SwapChain, Info->ViewCount, Size.X, Size.Y)))
 					return false;

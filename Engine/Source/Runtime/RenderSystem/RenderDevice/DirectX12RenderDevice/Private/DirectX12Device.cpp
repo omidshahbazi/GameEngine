@@ -1035,15 +1035,8 @@ namespace Engine
 				DESTROY_VIEW(&ContextInfo->IntermediateViews[RenderContextInfo::DEPTH_STENCIL_VIEW_INDEX]);
 
 				for (uint8 i = 0; i < ContextInfo->ViewCount; ++i)
-				{
-					ViewInfo& renderTargetView = ContextInfo->Views[i];
-
-					if (!DirectX12Wrapper::ReleaseInstance(renderTargetView.Resource.Resource))
+					if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(ContextInfo->Views[i].TargetView)))
 						return false;
-
-					if (!CHECK_CALL(m_RenderTargetViewAllocator.DeallocateView(renderTargetView.TargetView)))
-						return false;
-				}
 
 				return true;
 			}

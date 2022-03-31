@@ -31,15 +31,6 @@ namespace Engine
 					return false; \
 				return CHECK_CALL(m_SamplerViewAllocator.AllocateSampler(TextureResourcePtr->SamplerDescription, &TextureResourcePtr->SamplerView));
 
-#define EXECUTE_AND_WAIT(CommandBuffer) \
-				if (!(CommandBuffer)->Execute()) \
-					return false; \
-				IFence* fence = m_FencePool.Get(); \
-				(CommandBuffer)->SignalFences(&fence, 1); \
-				if (!fence->Wait()) \
-					return false; \
-				m_FencePool.Back(fence);
-
 #define BEGIN_UPLOAD() \
 				{ \
 					byte* buffer = nullptr; \
@@ -55,7 +46,13 @@ namespace Engine
 					m_UploadBuffer.Type = (MainResourceInfo)->Type; \
 					m_UploadCommandBuffer->CopyBuffer(ReinterpretCast(ResourceHandle, &m_UploadBuffer), ReinterpretCast(ResourceHandle, MainResourceInfo)); \
 					m_UploadCommandBuffer->EndEvent(); \
-					EXECUTE_AND_WAIT(m_UploadCommandBuffer); \
+					if (!m_UploadCommandBuffer->Execute()) \
+						return false; \
+					IFence* fence = m_FencePool.Get(); \
+					m_UploadCommandBuffer->SignalFences(&fence, 1); \
+					if (!fence->Wait()) \
+						return false; \
+					m_FencePool.Back(fence); \
 				}
 
 #define CREATE_VIEW(ViewPtr, BufferWidth, BufferHeight, AttachPoint, BufferFormat, IsColored, CurrentState, ShaderVisible) \
@@ -496,12 +493,19 @@ namespace Engine
 				cb.CopyTexture(ReinterpretCast(ResourceHandle, &rt), Vector2I::Zero, view, Vector2I::Zero, rt.Dimension);
 				cb.MoveTextureToPresentState(view);
 				cb.EndEvent();
-				EXECUTE_AND_WAIT(&cb);
+				if (!cb.Execute())
+					return false;
 
 				IDXGISwapChain4* swapChain = m_CurrentContext->SwapChain;
 
 				if (!CHECK_CALL(DirectX12Wrapper::SwapChain::Present(swapChain, false)))
 					return false;
+
+				IFence* fence = m_FencePool.Get();
+				cb.SignalFences(&fence, 1);
+				if (!fence->Wait())
+					return false;
+				m_FencePool.Back(fence);
 
 				m_CurrentContext->CurrentViewIndex = swapChain->GetCurrentBackBufferIndex();
 
@@ -992,7 +996,7 @@ namespace Engine
 				{
 					if (!DestroySwapChainBuffers(Info))
 						return false;
-				
+
 					for (uint8 i = 0; i < Info->ViewCount; ++i)
 						DirectX12Wrapper::ReleaseInstance(Info->Views[i].Resource.Resource);
 				}
@@ -1006,6 +1010,9 @@ namespace Engine
 
 				for (uint8 i = 0; i < Info->ViewCount; ++i)
 				{
+					if (!DirectX12Wrapper::Debugging::SetObjectName(backBuffers[i], L"BackBuffer"))
+						return false;
+
 					ViewInfo& renderTargetView = Info->Views[i];
 					INITIALIZE_RESOURCE_INFO(&renderTargetView, D3D12_RESOURCE_STATE_PRESENT);
 					renderTargetView.Resource.Resource = backBuffers[i];

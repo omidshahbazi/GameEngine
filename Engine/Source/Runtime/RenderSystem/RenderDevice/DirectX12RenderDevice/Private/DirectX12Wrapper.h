@@ -246,9 +246,11 @@ namespace Engine
 						desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 						desc.BufferCount = BackBufferCount;
 						desc.Scaling = DXGI_SCALING_STRETCH;
-						desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+						desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 						desc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-						desc.Flags = Support::CheckTearing(Factory) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
+
+						desc.Flags |= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+						desc.Flags |= Support::CheckTearing(Factory) ? DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING : 0;
 
 						IDXGISwapChain1* swapChain = nullptr;
 						if (!SUCCEEDED(Factory->CreateSwapChainForHwnd(CommandQueue, (HWND)Handle, &desc, nullptr, nullptr, &swapChain)))

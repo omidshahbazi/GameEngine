@@ -81,8 +81,6 @@ namespace Engine
 
 		void DeviceInterface::Initialize(void)
 		{
-			PlatformWindow::SetDPIAwareness(PlatformWindow::DPIAwareness::PerMonitorAware2);
-
 			CoreDebugAssert(Categories::RenderSystem, !m_Initialized, "DeviceInterface already initialized");
 
 			String moduleName = "";

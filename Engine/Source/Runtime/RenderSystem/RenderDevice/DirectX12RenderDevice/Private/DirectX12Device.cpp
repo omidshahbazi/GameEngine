@@ -1010,9 +1010,6 @@ namespace Engine
 
 				for (uint8 i = 0; i < Info->ViewCount; ++i)
 				{
-					if (!DirectX12Wrapper::Debugging::SetObjectName(backBuffers[i], L"BackBuffer"))
-						return false;
-
 					ViewInfo& renderTargetView = Info->Views[i];
 					INITIALIZE_RESOURCE_INFO(&renderTargetView, D3D12_RESOURCE_STATE_PRESENT);
 					renderTargetView.Resource.Resource = backBuffers[i];

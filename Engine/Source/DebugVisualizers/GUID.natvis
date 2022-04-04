@@ -2,11 +2,11 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Engine::Containers::GUID">
     <DisplayString>
-{m_Data.Part1[0],nvoxb}{m_Data.Part1[1],nvoxb}{m_Data.Part1[2],nvoxb}{m_Data.Part1[3],nvoxb}-
-{m_Data.Part2[0],nvoxb}{m_Data.Part2[1],nvoxb}-
-{m_Data.Part3[0],nvoxb}{m_Data.Part3[1],nvoxb}-
-{m_Data.Part4[0],nvoxb}{m_Data.Part4[1],nvoxb}-
-{m_Data.Part5[0],nvoxb}{m_Data.Part5[1],nvoxb}{m_Data.Part5[2],nvoxb}{m_Data.Part5[3],nvoxb}{m_Data.Part5[5],nvoxb}
+{m_Data.Part1[0],nvoXb}{m_Data.Part1[1],nvoXb}{m_Data.Part1[2],nvoXb}{m_Data.Part1[3],nvoXb}-
+{m_Data.Part2[0],nvoXb}{m_Data.Part2[1],nvoXb}-
+{m_Data.Part3[0],nvoXb}{m_Data.Part3[1],nvoXb}-
+{m_Data.Part4[0],nvoXb}{m_Data.Part4[1],nvoXb}-
+{m_Data.Part5[0],nvoXb}{m_Data.Part5[1],nvoXb}{m_Data.Part5[2],nvoXb}{m_Data.Part5[3],nvoXb}{m_Data.Part5[5],nvoXb}
     </DisplayString>
     <Expand HideRawView="true">
       <Item Name="Part1">m_Data.Part1</Item>

@@ -104,7 +104,7 @@ namespace Engine
 		void Logger::Put(const Exception& Exception)
 		{
 			String content = Exception.GetWhat();
-			if (Exception.GetInfo().GetLength() != 0)
+			if (Exception.GetInfo() != String::Empty)
 				content += StringUtility::Format<char8>(" Info: %S", Exception.GetInfo().GetValue());
 
 			InsertLog(Levels::Exception, Exception.GetCategoryFlags(), Exception.GetFile().GetValue(), Exception.GetLineNumber(), Exception.GetFunction().GetValue(), content.GetValue());
@@ -151,7 +151,7 @@ namespace Engine
 		{
 			PlatformFile::Handle handle = 0;
 
-			if (m_FilePath.GetLength() != 0)
+			if (m_FilePath != WString::Empty)
 			{
 				if (PlatformFile::Exists(m_FilePath.GetValue()))
 					PlatformFile::Move(m_FilePath.GetValue(), Path::ChangeExtension(m_FilePath, L".Previous" + Path::GetExtension(m_FilePath)).GetValue());

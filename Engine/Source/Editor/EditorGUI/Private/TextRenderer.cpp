@@ -28,7 +28,7 @@ namespace Engine
 
 			void TextRenderer::Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const
 			{
-				if (m_Text.GetLength() == 0)
+				if (m_Text == WString::Empty)
 					return;
 
 				static const ProgramConstantHash ConstantHash_FontTexture = Material::GetHash("FontTexture");

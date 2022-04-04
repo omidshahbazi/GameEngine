@@ -56,7 +56,7 @@ namespace Engine
 
 					result += m_DataType->ToString() + " " + GetName();
 
-					if (m_Register.GetLength() != 0)
+					if (m_Register != String::Empty)
 						result += " : " + m_Register;
 
 					result += ";";

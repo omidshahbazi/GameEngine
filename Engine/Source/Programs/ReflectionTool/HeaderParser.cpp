@@ -327,7 +327,7 @@ namespace Engine
 
 			DataType dataType;
 			GetDataType(dataType);
-			if (dataType.GetValueType() == ValueTypes::None && dataType.GetExtraValueType().GetLength() == 0)
+			if (dataType.GetValueType() == ValueTypes::None && dataType.GetExtraValueType() == String::Empty)
 			{
 				ReflectionToolAllocators::TypesAllocator_Deallocate(property);
 				return;

@@ -102,9 +102,9 @@ namespace Engine
 			{
 				auto variables = Struct->GetItems();
 
-				if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
+				if (variables.ContainsIf([](auto item) { return item->GetRegister() != String::Empty; }))
 				{
-					if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() == 0; }))
+					if (variables.ContainsIf([](auto item) { return item->GetRegister() == String::Empty; }))
 					{
 						THROW_PROGRAM_COMPILER_EXCEPTION("Combination of input layout variables and user layout variables is forbidden", Struct->GetName());
 					}
@@ -379,7 +379,7 @@ namespace Engine
 			{
 				bool buildOutVarialbe = false;
 
-				bool doesBoundToRegister = (Register.GetLength() != 0);
+				bool doesBoundToRegister = (Register != String::Empty);
 
 				if (doesBoundToRegister)
 				{
@@ -406,7 +406,7 @@ namespace Engine
 					Shader += (IsOutputMode ? "out " : "in ");
 				}
 
-				if (DataType->GetUserDefined().GetLength() != 0)
+				if (DataType->GetUserDefined() != String::Empty)
 				{
 					int32 index = GetStructs().FindIf([&DataType](auto item) { return item->GetName() == DataType->GetUserDefined(); });
 					if (index != -1)
@@ -452,7 +452,7 @@ namespace Engine
 			{
 				auto variables = Struct->GetItems();
 
-				if (variables.ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
+				if (variables.ContainsIf([](auto item) { return item->GetRegister() != String::Empty; }))
 					THROW_PROGRAM_COMPILER_EXCEPTION("Cannot compile an struct with input layout in GLSL", Struct->GetName());
 
 				Shader += "layout(std140, binding=";

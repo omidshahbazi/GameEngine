@@ -110,7 +110,7 @@ namespace Engine
 
 					result += ")";
 
-					if (m_Register.GetLength() != 0)
+					if (m_Register != String::Empty)
 						result += " : " + m_Register;
 
 					result += "\n{";

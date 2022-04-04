@@ -21,7 +21,7 @@ namespace Engine
 		{
 			static IByteCodeCompiler* compilers[DEVICE_TYPE_COUNT] = {};
 
-			if (Info.Source.GetLength() == 0)
+			if (Info.Source == String::Empty)
 				return false;
 
 			OutputInfo outputInfos[DEVICE_TYPE_COUNT];

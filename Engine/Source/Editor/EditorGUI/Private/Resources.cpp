@@ -27,26 +27,6 @@ namespace Engine
 			cwstr ASSETS_DIRECTORY_PATH(L"../../Contents/Editor");
 			cwstr LIBRARY_DIRECTORY_PATH(L"../../Contents/Editor/Library");
 
-			cstr TEXTURE_TEXT_PROGRAM_SOURCE =
-				"#include <ShaderIncludes.program>"
-				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
-				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
-				"struct Data { float4 FontTextureBound; float4 Color; };"
-				"texture2D FontTexture;"
-				"TransformData _TransformData;"
-				"Data data;"
-				"float4 VertexMain(InputData inputData)"
-				"{"
-				"return _TransformData.MVP * float4(inputData.Position, 1);"
-				"}"
-				"float4 FragmentMain(InputData inputData)"
-				"{"
-				"float2 finalUV;"
-				"finalUV.x = Map(inputData.UV.x, 0, 1, data.FontTextureBound.x, data.FontTextureBound.x + data.FontTextureBound.z, 1);"
-				"finalUV.y = 1 - Map(inputData.UV.y, 0, 1, data.FontTextureBound.y, data.FontTextureBound.y + data.FontTextureBound.w, 1);"
-				"return data.Color * Sample(FontTexture, finalUV).r;"
-				"}";
-
 			Resources::Resources(void)
 			{
 				m_ResourceHolder = EditorGUIAllocators::TypesAllocator_Allocate<ResourceHolder>();
@@ -55,7 +35,7 @@ namespace Engine
 
 				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad)->GetPointer();
 
-				m_Font = m_ResourceHolder->Load<Font>("Roboto-Light.ttf");
+				m_Font = m_ResourceHolder->Load<Font>("Fonts/Roboto-Light.ttf");
 
 				ProgramResource* spriteRendererProgram = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
@@ -65,8 +45,10 @@ namespace Engine
 					m_SpriteRendererMaterial.GetRenderState().DepthTestFunction = TestFunctions::Never;
 				}
 
-				ProgramResource* textRendererProgram = CreateProgram(TEXTURE_TEXT_PROGRAM_SOURCE);
+				ProgramResource* textRendererProgram = m_ResourceHolder->Load<Program>("Programs/TextureText.program");
 				{
+					textRendererProgram->Wait();
+
 					textRendererProgram->GetPointer()->SetName("TextProgram");
 
 					m_TextRendererMaterial.SetProgram(textRendererProgram);
@@ -83,21 +65,7 @@ namespace Engine
 
 			SpriteResource* Resources::GetSprite(const String& Name)
 			{
-				return m_ResourceHolder->Load<Sprite>(Name);
-			}
-
-			ProgramResource* Resources::CreateProgram(const String& Source)
-			{
-				ProgramInfo programInfo;
-				programInfo.Source = Source;
-
-#ifdef DEBUG_MODE
-				programInfo.DebugMode = true;
-#endif
-
-				Program* program = RenderManager::GetInstance()->GetDevice()->CreateProgram(&programInfo);
-
-				return m_ResourceHolder->AddFromMemory(GUID::Create(), program);
+				return m_ResourceHolder->Load<Sprite>("Sprites/" + Name);
 			}
 		}
 	}

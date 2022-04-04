@@ -95,7 +95,7 @@ namespace Engine
 			{
 				BuildStruct(Struct, Stage, false, Shader);
 
-				if (Struct->GetItems().ContainsIf([](auto item) { return item->GetRegister().GetLength() != 0; }))
+				if (Struct->GetItems().ContainsIf([](auto item) { return item->GetRegister() != String::Empty; }))
 				{
 					m_InputAssemblerStruct = Struct;
 
@@ -348,7 +348,7 @@ namespace Engine
 				shader += " ";
 				shader += Name;
 
-				if (Register.GetLength() != 0)
+				if (Register != String::Empty)
 				{
 					shader += ':';
 					shader += Register;
@@ -377,7 +377,7 @@ namespace Engine
 
 						BuildVariable(variable->GetName(), variable->GetRegister(), dataType, Shader);
 
-						if (variable->GetRegister().GetLength() == 0)
+						if (variable->GetRegister() == String::Empty)
 						{
 							uint8 size = 0;
 							uint16 offset = 0;
@@ -486,7 +486,7 @@ namespace Engine
 				Shader += " ";
 				Shader += Name;
 
-				if (Register.GetLength() != 0)
+				if (Register != String::Empty)
 				{
 					Shader += ":";
 					Shader += Register;

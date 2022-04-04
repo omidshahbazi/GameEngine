@@ -42,7 +42,7 @@ namespace Engine
 
 		void ProgramToAPICompiler::Compile(const ProgramInfo* Info, const DeviceTypes* Types, uint8 TypeCount, OutputInfo* Outputs)
 		{
-			if (Info->Source.GetLength() == 0)
+			if (Info->Source == String::Empty)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Program source cannot be empty", String::Empty);
 
 			PreprocessorParser preprocessorParser(Info->Source);
@@ -53,7 +53,7 @@ namespace Engine
 				{
 					(*handler)(Name, Source);
 
-					if (Source.GetLength() != 0)
+					if (Source != String::Empty)
 						return true;
 				}
 
@@ -116,7 +116,7 @@ namespace Engine
 				for (auto& structType : parameters.Structs)
 				{
 					auto variables = structType->GetItems();
-					variables.RemoveIf([](auto item) { return item->GetRegister().GetLength() != 0; });
+					variables.RemoveIf([](auto item) { return item->GetRegister() != String::Empty; });
 
 					if (variables.GetSize() == 0)
 						continue;

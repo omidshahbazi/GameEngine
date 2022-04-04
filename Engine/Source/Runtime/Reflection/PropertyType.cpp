@@ -17,7 +17,7 @@ namespace Engine
 		{
 			byte* target = ConstCast(byte*, ReinterpretCast(const byte*, TargetObject)) + m_Offset;
 
-			if (m_DataType.GetExtraValueType().GetLength() != 0)
+			if (m_DataType.GetExtraValueType() != String::Empty)
 				if (Enum::GetType(m_DataType.GetExtraValueType()) != nullptr)
 					return *ReinterpretCast(int32*, target);
 
@@ -78,7 +78,7 @@ namespace Engine
 
 			bool isNumberValueType = AnyDataType::IsNumericValueType(Value.GetValueType());
 
-			if (m_DataType.GetExtraValueType().GetLength() != 0)
+			if (m_DataType.GetExtraValueType() != String::Empty)
 			{
 				int32 enumValue = 0;
 

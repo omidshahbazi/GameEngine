@@ -150,6 +150,8 @@ namespace Engine
 
 			void CheckDirectories(void);
 
+			void GetResourcePaths(WStringList& Files);
+
 			void IOThreadWorker(void);
 
 			static FileTypes GetFileTypeByExtension(const WString& Extension);

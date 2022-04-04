@@ -99,21 +99,7 @@ namespace Engine
 		Promise<void> ResourceCompiler::CompileResources(bool Force)
 		{
 			WStringList files;
-			FileSystem::GetFiles(GetResourcesPath(), files, FileSystem::SearchOptions::All);
-
-			files.RemoveIf([&](auto& item)
-				{
-					FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(item));
-
-					switch (fileType)
-					{
-					case FileTypes::META:
-					case FileTypes::Unknown:
-						return true;
-					}
-
-					return false;
-				});
+			GetResourcePaths(files);
 
 			PromiseBlock<void>* promiseBlock = nullptr;
 
@@ -134,6 +120,14 @@ namespace Engine
 
 		void ResourceCompiler::RefreshDatabase(void)
 		{
+			// New Resource
+			// Moved Resource
+			// Renamed Resource
+			// Deleted Resource -> Done
+			// Modified Resource
+
+			//*All of them with and without Meta
+
 			WStringList files;
 
 			FileSystem::GetFiles(GetResourcesPath(), files, ImporterExporter::META_EXTENSION, FileSystem::SearchOptions::All);
@@ -150,32 +144,61 @@ namespace Engine
 			}
 
 			files.Clear();
-			FileSystem::GetFiles(GetResourcesPath(), files, FileSystem::SearchOptions::All);
-			files.RemoveIf([&](auto& item)
-				{
-					FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(item));
+			GetResourcePaths(files);
 
-					switch (fileType)
-					{
-					case FileTypes::META:
-					case FileTypes::Unknown:
-						return true;
-					}
+			//Vector<ImporterExporter::Settings> settingList(files.GetSize());
+			//for (const auto& file : files)
+			//{
+			//	FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(file));
 
-					return false;
-				});
+			//	ImporterExporter::Settings settings = {};
+			//	if (!ImporterExporter::Import(file, &settings))
+			//	{
+			//		WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
+
+			//		ResourceDatabase::ResourceInfo info;
+			//		if (m_ResourceDatabase->GetResourceInfo(relativeFilePath, info))
+			//			settings.ID = info.GUID.ToString();
+
+			//		ImporterExporter::Export(file, &settings);
+			//	}
+
+			//	settingList.Add(settings);
+			//}
+
+			//for (const auto& firstSettings : settingList)
+			//{
+			//	uint8 foundCount = 0;
+
+			//	for (const auto& secondSettings : settingList)
+			//	{
+			//		if (firstSettings.ID != secondSettings.ID)
+			//			continue;
+
+			//		if (foundCount++ < 1)
+			//			continue;
+
+			//		//secondSettings
+			//			export is the basic version, should we do it?
+			//	}
+			//}
 
 			for (const auto& file : files)
 			{
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(file));
-
 				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
 
 				ResourceDatabase::ResourceInfo info;
 				bool existsInDatabase = m_ResourceDatabase->GetResourceInfo(relativeFilePath, info);
 
 				ImporterExporter::Settings settings = {};
-				if (!ImporterExporter::Import(file, &settings))
+				if (ImporterExporter::Import(file, &settings))
+				{
+					//if (!existsInDatabase)
+					//{
+					//	m_ResourceDatabase->GetResourceInfo(settings.ID, info);
+					//}
+				}
+				else
 				{
 					if (existsInDatabase)
 						settings.ID = info.GUID.ToString();
@@ -195,10 +218,6 @@ namespace Engine
 					m_ResourceDatabase->UpdateCompiledResource(info);
 				}
 			}
-
-			//what about duplication or corrupted metas?
-			//if (m_ResourceDatabase->CheckDuplicate(info.GUID, relativeFilePath))
-			//	ImporterExporter::Invalidate(FullPath);
 		}
 
 		bool ResourceCompiler::CompileFile(const WString& FullPath, FileTypes FileType, bool Force)
@@ -328,6 +347,25 @@ namespace Engine
 			dir = GetLibraryPath();
 			if (!PlatformDirectory::Exists(dir.GetValue()))
 				PlatformDirectory::Create(dir.GetValue());
+		}
+
+		void ResourceCompiler::GetResourcePaths(WStringList& Files)
+		{
+			FileSystem::GetFiles(GetResourcesPath(), Files, FileSystem::SearchOptions::All);
+
+			Files.RemoveIf([&](auto& item)
+				{
+					FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(item));
+
+					switch (fileType)
+					{
+					case FileTypes::META:
+					case FileTypes::Unknown:
+						return true;
+					}
+
+					return false;
+				});
 		}
 
 		void ResourceCompiler::IOThreadWorker(void)

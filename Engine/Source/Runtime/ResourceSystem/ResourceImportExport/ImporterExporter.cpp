@@ -21,6 +21,11 @@ namespace Engine
 		cwstr ImporterExporter::META_EXTENSION = L".meta";
 		const int8 ImporterExporter::META_FILE_FORMAT_VERSION = 1;
 
+		bool ImporterExporter::Exists(const WString& FilePath)
+		{
+			return PlatformFile::Exists(GetMetaFilePath(FilePath).GetValue());
+		}
+
 		bool ImporterExporter::Invalidate(const WString& FilePath)
 		{
 			WString metaFilePath = GetMetaFilePath(FilePath);

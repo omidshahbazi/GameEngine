@@ -184,6 +184,8 @@ namespace Engine
 			};
 
 		public:
+			static bool Exists(const WString& FilePath);
+
 			static bool Invalidate(const WString& FilePath);
 
 			template<typename T>
@@ -205,7 +207,7 @@ namespace Engine
 			template<typename T>
 			static bool Export(const WString& FilePath, T* Settings)
 			{
-				if (Settings->ID.GetLength() == 0)
+				if (Settings->ID == String::Empty)
 					Settings->ID = GUID::Create().ToString();
 
 				Settings->FileFormatVersion = META_FILE_FORMAT_VERSION;

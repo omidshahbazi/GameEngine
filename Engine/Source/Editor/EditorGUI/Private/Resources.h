@@ -59,8 +59,6 @@ namespace Engine
 
 				SpriteResource* GetSprite(const String& Name);
 
-				ProgramResource* CreateProgram(const String& Source);
-
 			private:
 				ResourceHolder* m_ResourceHolder;
 				Mesh* m_QuadMesh;

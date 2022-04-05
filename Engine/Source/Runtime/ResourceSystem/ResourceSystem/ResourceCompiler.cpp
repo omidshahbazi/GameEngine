@@ -120,10 +120,10 @@ namespace Engine
 
 		void ResourceCompiler::RefreshDatabase(void)
 		{
-			// New Resource
-			// Moved Resource
-			// Renamed Resource
-			// Deleted Resource -> Done
+			// New Resource -> With Without
+			// Moved Resource -> With Without
+			// Renamed Resource -> With Without
+			// Deleted Resource -> With Without
 			// Modified Resource
 
 			//*All of them with and without Meta
@@ -187,21 +187,41 @@ namespace Engine
 			{
 				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
 
+				bool existsInDatabase = false;
+				bool shouldUpdateDatabase = false;
 				ResourceDatabase::ResourceInfo info;
-				bool existsInDatabase = m_ResourceDatabase->GetResourceInfo(relativeFilePath, info);
 
 				ImporterExporter::Settings settings = {};
 				if (ImporterExporter::Import(file, &settings))
 				{
-					//if (!existsInDatabase)
-					//{
-					//	m_ResourceDatabase->GetResourceInfo(settings.ID, info);
-					//}
+					existsInDatabase = m_ResourceDatabase->GetResourceInfo(settings.ID, info);
+
+					if (existsInDatabase)
+					{
+						if (info.RelativePath != relativeFilePath)
+						{
+							if (FileSystem::Exists(GetResourceFullPath(info.RelativePath)))
+							{
+
+								//it's duplicate
+							}
+							else
+							{
+								info.RelativePath = relativeFilePath;
+								shouldUpdateDatabase = true;
+							}
+						}
+					}
 				}
 				else
 				{
+					existsInDatabase = m_ResourceDatabase->GetResourceInfo(relativeFilePath, info);
+
 					if (existsInDatabase)
+					{
 						settings.ID = info.GUID.ToString();
+						shouldUpdateDatabase = true;
+					}
 
 					ImporterExporter::Export(file, &settings);
 				}
@@ -210,11 +230,12 @@ namespace Engine
 				{
 					info.GUID = settings.ID;
 					info.RelativePath = relativeFilePath;
+					shouldUpdateDatabase = true;
 				}
 
-				if (!existsInDatabase || info.LastWriteTime != PlatformFile::GetLastWriteTime(file.GetValue()))
+				//if (!existsInDatabase || info.LastWriteTime != PlatformFile::GetLastWriteTime(file.GetValue()))
+				if (shouldUpdateDatabase)
 				{
-					info.LastWriteTime = 0;
 					m_ResourceDatabase->UpdateCompiledResource(info);
 				}
 			}
@@ -347,6 +368,11 @@ namespace Engine
 			dir = GetLibraryPath();
 			if (!PlatformDirectory::Exists(dir.GetValue()))
 				PlatformDirectory::Create(dir.GetValue());
+		}
+
+		WString ResourceCompiler::GetResourceFullPath(const WString& RelativePath)
+		{
+			return Path::Combine(GetResourcesPath(), RelativePath);
 		}
 
 		void ResourceCompiler::GetResourcePaths(WStringList& Files)

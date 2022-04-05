@@ -220,6 +220,24 @@ namespace Engine
 				return true;
 			}
 
+			//TODO: load then overwrite properties only if version is the same
+
+			template<typename T>
+			static bool Export(const WString& FilePath, T* Settings)
+			{
+				if (Settings->ID == String::Empty)
+					Settings->ID = GUID::Create().ToString();
+
+				Settings->FileFormatVersion = META_FILE_FORMAT_VERSION;
+
+				Reflection::TypeList properties;
+				GetProperties(T::GetType(), properties);
+
+				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings);
+
+				return true;
+			}
+
 			static WString GetResourceFilePath(const WString& FilePath);
 
 		private:

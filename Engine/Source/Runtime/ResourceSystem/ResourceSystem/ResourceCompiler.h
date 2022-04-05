@@ -150,6 +150,7 @@ namespace Engine
 
 			void CheckDirectories(void);
 
+			WString GetResourceFullPath(const WString& RelativePath);
 			void GetResourcePaths(WStringList& Files);
 
 			void IOThreadWorker(void);

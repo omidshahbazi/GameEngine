@@ -202,7 +202,8 @@ namespace Engine
 						{
 							if (FileSystem::Exists(GetResourceFullPath(info.RelativePath)))
 							{
-
+								settings.ID = String::Empty;
+								ImporterExporter::Export(file, &settings, false);
 								//it's duplicate
 							}
 							else

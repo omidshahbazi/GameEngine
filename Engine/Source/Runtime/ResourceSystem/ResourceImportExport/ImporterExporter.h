@@ -8,12 +8,14 @@
 #include <Common\Definitions.h>
 #include <Platform\PlatformFile.h>
 #include <Reflection\PropertyType.h>
+#include <JSON\JSONObject.h>
 #include <ImporterExporter.Reflection.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace Platform;
+	using namespace JSON;
 
 	namespace ResourceImportExport
 	{
@@ -205,7 +207,7 @@ namespace Engine
 			}
 
 			template<typename T>
-			static bool Export(const WString& FilePath, T* Settings)
+			static bool Export(const WString& FilePath, T* Settings, bool Overwrite = true)
 			{
 				if (Settings->ID == String::Empty)
 					Settings->ID = GUID::Create().ToString();
@@ -215,25 +217,7 @@ namespace Engine
 				Reflection::TypeList properties;
 				GetProperties(T::GetType(), properties);
 
-				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings);
-
-				return true;
-			}
-
-			//TODO: load then overwrite properties only if version is the same
-
-			template<typename T>
-			static bool Export(const WString& FilePath, T* Settings)
-			{
-				if (Settings->ID == String::Empty)
-					Settings->ID = GUID::Create().ToString();
-
-				Settings->FileFormatVersion = META_FILE_FORMAT_VERSION;
-
-				Reflection::TypeList properties;
-				GetProperties(T::GetType(), properties);
-
-				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings);
+				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings, Overwrite);
 
 				return true;
 			}
@@ -244,8 +228,9 @@ namespace Engine
 			static WString GetMetaFilePath(const WString& FilePath);
 
 			static void GetProperties(const Reflection::DataStructureType& Type, Reflection::TypeList& Properties);
-			static void ReadMetaFile(const WString& FilePath, Reflection::TypeList& Properties, void* SettingObject);
-			static void WriteMetaFile(const WString& FilePath, Reflection::TypeList& Properties, const void* SettingObject);
+			static bool ParseMetaFile(AllocatorBase* Allocator, const WString& FilePath, JSONObject& Object);
+			static bool ReadMetaFile(const WString& FilePath, Reflection::TypeList& Properties, void* SettingObject);
+			static bool WriteMetaFile(const WString& FilePath, Reflection::TypeList& Properties, const void* SettingObject, bool Overwrite);
 		};
 	}
 }

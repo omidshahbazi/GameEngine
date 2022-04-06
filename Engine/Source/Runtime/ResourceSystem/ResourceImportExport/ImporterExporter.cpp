@@ -2,7 +2,6 @@
 #include <ResourceImportExport\ImporterExporter.h>
 #include <Platform\PlatformFile.h>
 #include <JSON\JSONParser.h>
-#include <JSON\JSONObject.h>
 #include <Reflection\PropertyType.h>
 #include <Platform\PlatformOS.h>
 #include <Allocators\RootAllocator.h>
@@ -13,7 +12,6 @@ namespace Engine
 	using namespace Containers;
 	using namespace Reflection;
 	using namespace Platform;
-	using namespace JSON;
 	using namespace Allocators;
 
 	namespace ResourceImportExport
@@ -61,9 +59,11 @@ namespace Engine
 				GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
 		}
 
-		void ImporterExporter::ReadMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
+		bool ImporterExporter::ParseMetaFile(AllocatorBase* Allocator, const WString& FilePath, JSONObject& Object)
 		{
 			auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Input);
+			if (handle == 0)
+				return false;
 
 			char8 str[1024];
 			uint64 readCount = PlatformFile::Read(handle, str, 1024);
@@ -71,9 +71,17 @@ namespace Engine
 
 			PlatformFile::Close(handle);
 
+			JSONParser::Parse(Allocator, str, &Object);
+
+			return true;
+		}
+
+		bool ImporterExporter::ReadMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
+		{
 			FrameAllocator allocator("MetaFile parser allocator", RootAllocator::GetInstance(), MegaByte);
 			JSONObject obj(&allocator);
-			JSONParser::Parse(&allocator, str, &obj);
+			if (!ParseMetaFile(&allocator, FilePath, obj))
+				return false;
 
 			for (auto& type : Properties)
 			{
@@ -86,12 +94,17 @@ namespace Engine
 
 				prop->SetValue(SettingObject, data.GetAny());
 			}
+
+			return true;
 		}
 
-		void ImporterExporter::WriteMetaFile(const WString& FilePath, TypeList& Properties, const void* SettingObject)
+		bool ImporterExporter::WriteMetaFile(const WString& FilePath, TypeList& Properties, const void* SettingObject, bool Overwrite)
 		{
 			FrameAllocator allocator("MetaFile writer allocator", RootAllocator::GetInstance(), MegaByte);
 			JSONObject obj(&allocator);
+
+			if (!Overwrite && !ParseMetaFile(&allocator, FilePath, obj))
+				return false;
 
 			for (auto type : Properties)
 			{
@@ -101,8 +114,13 @@ namespace Engine
 			}
 
 			auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Output);
+			if (handle == 0)
+				return false;
+
 			PlatformFile::Write(handle, obj.ToString().GetValue());
 			PlatformFile::Close(handle);
+
+			return true;
 		}
 	}
 }

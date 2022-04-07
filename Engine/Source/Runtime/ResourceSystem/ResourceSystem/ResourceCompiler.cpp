@@ -196,22 +196,20 @@ namespace Engine
 				{
 					existsInDatabase = m_ResourceDatabase->GetResourceInfo(settings.ID, info);
 
-					if (existsInDatabase)
+					if (existsInDatabase && info.RelativePath != relativeFilePath)
 					{
-						if (info.RelativePath != relativeFilePath)
+						if (FileSystem::Exists(GetResourceFullPath(info.RelativePath)))
 						{
-							if (FileSystem::Exists(GetResourceFullPath(info.RelativePath)))
-							{
-								settings.ID = String::Empty;
-								ImporterExporter::Export(file, &settings, false);
-								//it's duplicate
-							}
-							else
-							{
-								info.RelativePath = relativeFilePath;
-								shouldUpdateDatabase = true;
-							}
+							settings.ID = String::Empty;
+							ImporterExporter::Export(file, &settings, false);
+
+							existsInDatabase = false;
+							info.LastWriteTime = 0;
 						}
+						else
+							info.RelativePath = relativeFilePath;
+
+						shouldUpdateDatabase = true;
 					}
 				}
 				else
@@ -234,11 +232,8 @@ namespace Engine
 					shouldUpdateDatabase = true;
 				}
 
-				//if (!existsInDatabase || info.LastWriteTime != PlatformFile::GetLastWriteTime(file.GetValue()))
 				if (shouldUpdateDatabase)
-				{
 					m_ResourceDatabase->UpdateCompiledResource(info);
-				}
 			}
 		}
 

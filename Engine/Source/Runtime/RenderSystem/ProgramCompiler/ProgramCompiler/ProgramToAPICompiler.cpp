@@ -64,16 +64,16 @@ namespace Engine
 			if (Info->DebugMode)
 				preprocessParameters.Defines.Add("DEBUG_MODE");
 			else
-				preprocessParameters.Defines.Add("RELASE_MODE");
+				preprocessParameters.Defines.Add("RELEASE_MODE");
 
 			preprocessorParser.Process(preprocessParameters);
 
-			FrameAllocator parserAllocator("Program Parser Allocator", RenderSystemAllocators::ProgramCompilerAllocator, MegaByte);
+			FrameAllocator parserAllocator("Program Parser Allocator", RenderSystemAllocators::ProgramCompilerAllocator, 8 * MegaByte);
 			Parser parser(&parserAllocator, preprocessParameters.Result);
 			Parser::Parameters parameters;
 			parser.Parse(parameters);
 
-			FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderSystemAllocators::ProgramCompilerAllocator, MegaByte);
+			FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderSystemAllocators::ProgramCompilerAllocator, 8 * MegaByte);
 
 			if (!parameters.Functions.ContainsIf([](auto& item) { return item->GetType() != FunctionType::Types::None; }))
 				return;

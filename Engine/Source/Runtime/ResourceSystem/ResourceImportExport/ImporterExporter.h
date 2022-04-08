@@ -143,7 +143,7 @@ namespace Engine
 				}
 
 			public:
-				REFLECTION_PROPERTY()
+				//REFLECTION_PROPERTY()
 					Vector<String> Defines;
 
 				REFLECTION_PROPERTY()

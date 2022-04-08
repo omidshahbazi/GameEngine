@@ -70,10 +70,9 @@ namespace Engine
 
 			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-			if (!Utilities::ReadDataFile(Path::Combine(Holder->GetLibraryPath(), finalPath), inBuffer))
-				return;
+			bool loadResult = Utilities::ReadDataFile(Path::Combine(Holder->GetLibraryPath(), finalPath), inBuffer);
 
-			Holder->LoadInternal(GUID, inBuffer, Type, Resource);
+			Holder->LoadInternal(GUID, loadResult, inBuffer, Type, Resource);
 		}
 
 		ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
@@ -144,18 +143,22 @@ namespace Engine
 			m_ResourceLoaderTasksLock.Release();
 		}
 
-		void ResourceHolder::LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
+		void ResourceHolder::LoadInternal(const GUID& GUID, bool LoadResult, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr)
 		{
 #ifdef DEBUG_MODE
 #define IMPLEMENT(TypeName) \
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
-				auto result = ResourceFactory::Create<TypeName>(Buffer); \
-				if (result != nullptr) \
+				TypeName* result = nullptr; \
+				if (LoadResult) \
 				{ \
-					ResourceDatabase::ResourceInfo info = {}; \
-					if (m_ResourceDatabase->GetResourceInfo(GUID, info)) \
-						result->SetName(Path::GetFileName(info.RelativePath)); \
+					result = ResourceFactory::Create<TypeName>(Buffer); \
+					if (result != nullptr) \
+					{ \
+						ResourceDatabase::ResourceInfo info = {}; \
+						if (m_ResourceDatabase->GetResourceInfo(GUID, info)) \
+							result->SetName(Path::GetFileName(info.RelativePath)); \
+					} \
 				} \
 				handle->SetID(GUID); \
 				handle->Set(result); \
@@ -165,7 +168,9 @@ namespace Engine
 #define IMPLEMENT(TypeName) \
 				Resource<TypeName>* handle = ReinterpretCast(Resource<TypeName>*, ResourcePtr); \
 				TypeName* oldResource = handle->GetPointer(); \
-				auto result = ResourceFactory::Create<TypeName>(Buffer); \
+				TypeName* result = nullptr; \
+				if (LoadResult) \
+					result = ResourceFactory::Create<TypeName>(Buffer); \
 				handle->SetID(GUID); \
 				handle->Set(result); \
 				if (oldResource != nullptr) \

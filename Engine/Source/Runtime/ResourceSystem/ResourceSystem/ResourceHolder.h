@@ -158,7 +158,7 @@ namespace Engine
 
 		private:
 			void AddLoadTask(const GUID& GUID, ResourceTypes Type, ResourceBase* ResourcePtr);
-			void LoadInternal(const GUID& GUID, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
+			void LoadInternal(const GUID& GUID, bool LoadResult, const ByteBuffer& Buffer, ResourceTypes Type, ResourceBase* ResourcePtr);
 
 			bool DoesResourceExists(const GUID& GUID) const;
 			GUID FindGUID(const WString& RelativeFilePath) const;

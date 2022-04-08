@@ -49,8 +49,6 @@ namespace Engine
 				{
 					textRendererProgram->Wait();
 
-					textRendererProgram->GetPointer()->SetName("TextProgram");
-
 					m_TextRendererMaterial.SetProgram(textRendererProgram);
 					m_TextRendererMaterial.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
 					m_TextRendererMaterial.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;

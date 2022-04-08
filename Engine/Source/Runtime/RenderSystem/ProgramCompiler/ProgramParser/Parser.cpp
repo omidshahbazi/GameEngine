@@ -478,6 +478,9 @@ namespace Engine
 		{
 			const String& identifier = DeclarationToken.GetIdentifier();
 
+			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+				THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", DeclarationToken);
+
 			ProgramDataTypes primitiveType = GetPrimitiveDataType(identifier);
 			if (primitiveType == ProgramDataTypes::Void)
 				THROW_PROGRAM_PARSER_EXCEPTION("Expected a valid data type", DeclarationToken);

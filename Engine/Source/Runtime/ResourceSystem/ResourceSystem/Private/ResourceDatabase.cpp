@@ -36,17 +36,13 @@ namespace Engine
 
 			void ResourceDatabase::UpdateCompiledResource(const ResourceInfo& Info)
 			{
-				const String guid = Info.GUID.ToString();
-
-				CoreDebugAssert(Categories::ResourceSystem, !m_Database.Contains(guid) || m_Database[guid].GetObject()[KEY_RELATIVE_PATH].GetAny().GetAsWString() == Info.RelativePath, "Dupplicate resources GUID has found");
-
 				JSONObject* obj = (JSONObject*)(AllocateMemory(&m_Allocator, sizeof(JSONObject)));
 				Construct(obj, &m_Allocator);
 
 				(*obj)[KEY_RELATIVE_PATH] = Info.RelativePath;
 				(*obj)[KEY_LAST_WRITE_TIME] = (int64)Info.LastWriteTime;
 
-				m_Database[guid] = obj;
+				m_Database[Info.GUID.ToString()] = obj;
 
 				Save();
 			}

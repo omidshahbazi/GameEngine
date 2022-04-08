@@ -72,6 +72,9 @@ namespace Engine
 
 			bool loadResult = Utilities::ReadDataFile(Path::Combine(Holder->GetLibraryPath(), finalPath), inBuffer);
 
+			if (!loadResult)
+				return;
+
 			Holder->LoadInternal(GUID, loadResult, inBuffer, Type, Resource);
 		}
 

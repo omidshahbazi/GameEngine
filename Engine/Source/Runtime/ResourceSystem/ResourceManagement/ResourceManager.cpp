@@ -10,6 +10,7 @@
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
 #include <Common\CharacterUtility.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
@@ -81,27 +82,22 @@ namespace Engine
 
 		MeshResource* ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
 		{
-			const GUID* guid;
 			switch (Type)
 			{
 			case ResourceManager::PrimitiveMeshTypes::Quad:
-				guid = &BuiltInAssets::QUAD_MESH_GUID;
-				break;
+				return m_InternalResourceHolder.Load<Mesh>("Meshes/Quad.obj");
 
 			case ResourceManager::PrimitiveMeshTypes::Cube:
 				return m_InternalResourceHolder.Load<Mesh>("Meshes/Cube.obj");
 
 			case ResourceManager::PrimitiveMeshTypes::Sphere:
-				guid = &BuiltInAssets::SPHERE_MESH_GUID;
-				break;
+				return m_InternalResourceHolder.Load<Mesh>("Meshes/Sphere.obj");
 
 			case ResourceManager::PrimitiveMeshTypes::Cone:
-				guid = &BuiltInAssets::CONE_MESH_GUID;
-				break;
-
+				return m_InternalResourceHolder.Load<Mesh>("Meshes/Cone.obj");
 			}
 
-			return GetLoaded<Mesh>(*guid);
+			THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ResourceSystem);
 		}
 
 		void ResourceManager::CreateDefaultResources(void)
@@ -118,65 +114,6 @@ namespace Engine
 				buf->GetColorUI8Pixel() = ColorUI8::White;
 				buf->Unlock();
 				AddFromMemory(BuiltInAssets::WHITE_TEXTURE_GUID, tex);
-			}
-
-			// Quad Mesh
-			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, ResourceSystemAllocators::ResourceAllocator);
-
-				info->Vertices.Add({ Vector3F(-0.5F, 0.5F, 0), Vector2F(0, 1) });
-				info->Vertices.Add({ Vector3F(-0.5F, -0.5F, 0), Vector2F(0, 0) });
-				info->Vertices.Add({ Vector3F(0.5F, 0.5F, 0), Vector2F(1, 1) });
-				info->Vertices.Add({ Vector3F(0.5F, -0.5F, 0), Vector2F(1, 0) });
-				info->Indices.Add(0);
-				info->Indices.Add(1);
-				info->Indices.Add(2);
-				info->Indices.Add(2);
-				info->Indices.Add(1);
-				info->Indices.Add(3);
-				info->Type = PolygonTypes::Triangles;
-				info->Layout = VertexLayouts::Position | VertexLayouts::TexCoord;
-
-				Mesh* mesh = CreateMesh(info);
-				mesh->SetName("QuadMesh");
-				AddFromMemory(BuiltInAssets::QUAD_MESH_GUID, mesh);
-			}
-
-			// Cube Mesh
-			//{
-			//	SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-			//	Construct(info, ResourceSystemAllocators::ResourceAllocator);
-
-			//	OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CUBE_MESH_DATA)), *info);
-
-			//	Mesh* mesh = CreateMesh(info);
-			//	mesh->SetName("CubeMesh");
-			//	AddFromMemory(BuiltInAssets::CUBE_MESH_GUID, mesh);
-			//}
-
-			// Sphere Mesh
-			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, ResourceSystemAllocators::ResourceAllocator);
-
-				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::SPHERE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::SPHERE_MESH_DATA)), *info);
-
-				Mesh* mesh = CreateMesh(info);
-				mesh->SetName("SphereMesh");
-				AddFromMemory(BuiltInAssets::SPHERE_MESH_GUID, mesh);
-			}
-
-			// Cone Mesh
-			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, ResourceSystemAllocators::ResourceAllocator);
-
-				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CONE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CONE_MESH_DATA)), *info);
-
-				Mesh* mesh = CreateMesh(info);
-				mesh->SetName("ConeMesh");
-				AddFromMemory(BuiltInAssets::CONE_MESH_GUID, mesh);
 			}
 		}
 	}

@@ -28,12 +28,14 @@ namespace Engine
 					uint64 LastWriteTime;
 				};
 
+				typedef Vector<ResourceInfo> ResourceInfoList;
+
 			public:
 				ResourceDatabase(const WString& LibraryPath);
 
 				void UpdateCompiledResource(const ResourceInfo& Info);
 
-				void RemoveResourceInfo(const WString& RelativeFilePath);
+				void UpdateKeepingResources(const WStringList& ExistsRelativeFilePaths, ResourceInfoList& RemovedResources);
 
 				bool DoesResourceExists(const GUID& GUID) const;
 

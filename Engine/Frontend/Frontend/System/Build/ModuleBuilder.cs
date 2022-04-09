@@ -112,8 +112,6 @@ namespace Engine.Frontend.System.Build
 
 					if (Module.GenerateRenderDocSettings)
 						GenerateRenderDocSettings();
-
-					GenerateHashes();
 				}
 			}
 			catch
@@ -122,6 +120,9 @@ namespace Engine.Frontend.System.Build
 
 				State = States.Failed;
 			}
+
+			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
+				GenerateHashes();
 		}
 
 		protected override void CreateDirectories()

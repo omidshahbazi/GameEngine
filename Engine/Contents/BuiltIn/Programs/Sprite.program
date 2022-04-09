@@ -1,0 +1,53 @@
+#include <Includes/Utilities.program>
+
+struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };
+struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };
+
+// DrawModes
+// Simple: 0
+// Sliced: 1
+// Tiled: 2
+struct Data { float DrawMode; float2 ElementDimension; float2 TextureDimension; float4 TextureBorders; float4 Color; };
+
+texture2D DiffuseTexture;
+TransformData _TransformData;
+Data data;
+
+float4 VertexMain(InputData inputData)
+{
+	return _TransformData.MVP * float4(inputData.Position, 1);
+}
+
+float ProcessCoord(float Coord, float ElementBorderSizeMin, float ElementBorderSizeMax, float TextureBorderSizeMin, float TextureBorderSizeMax, float TileCount)
+{
+	if (Coord < ElementBorderSizeMin)
+		return Map(Coord, 0, ElementBorderSizeMin, 0, TextureBorderSizeMin, TileCount);
+
+	if (Coord > 1 - ElementBorderSizeMax)
+		return Map(Coord, 1 - ElementBorderSizeMax, 1, 1 - TextureBorderSizeMax, 1, TileCount);
+
+	return Map(Coord, ElementBorderSizeMin, 1 - ElementBorderSizeMax, TextureBorderSizeMin, 1 - TextureBorderSizeMax, TileCount);
+}
+
+float4 FragmentMain(InputData inputData)
+{
+	float2 finalUV = inputData.UV;
+
+	if (data.DrawMode != 0)
+	{
+		float4 texDim4 = float4(data.TextureDimension.x, data.TextureDimension.y, data.TextureDimension.x, data.TextureDimension.y);
+		float4 texBordersUV = data.TextureBorders / texDim4;
+		float4 elemBorderUV = data.TextureBorders / float4(data.ElementDimension.x, data.ElementDimension.y, data.ElementDimension.x, data.ElementDimension.y);
+		
+		if (data.DrawMode == 1)
+			finalUV = float2(ProcessCoord(inputData.UV.x, elemBorderUV.x, elemBorderUV.z, texBordersUV.x, texBordersUV.z, 1), ProcessCoord(inputData.UV.y, elemBorderUV.y, elemBorderUV.w, texBordersUV.y, texBordersUV.w, 1));
+		else if (data.DrawMode == 2)
+		{
+			float2 bordersSum = float2(data.TextureBorders.x + data.TextureBorders.z, data.TextureBorders.y + data.TextureBorders.w);
+			float2 tileCount = (data.ElementDimension - bordersSum) / (data.TextureDimension - bordersSum);
+			finalUV = float2(ProcessCoord(inputData.UV.x, elemBorderUV.x, elemBorderUV.z, texBordersUV.x, texBordersUV.z, tileCount.x), ProcessCoord(inputData.UV.y, elemBorderUV.y, elemBorderUV.w, texBordersUV.y, texBordersUV.w, tileCount.y));
+		}
+	}
+
+	return Sample(DiffuseTexture, finalUV) * data.Color;
+}

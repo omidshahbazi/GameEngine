@@ -363,7 +363,7 @@ namespace Engine
 
 				PlatformMemory::Set(&removedNode->Value, 0, 1);
 
-				if (Index == 0)
+				if (Index == 0 && m_Capacity != 1)
 					m_FirstNode = removedNode->Next;
 
 				if (endingNode != removedNode)

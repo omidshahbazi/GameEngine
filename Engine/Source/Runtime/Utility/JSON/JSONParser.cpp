@@ -163,6 +163,9 @@ namespace Engine
 		{
 			while (true)
 			{
+				if (Tokenizer->MatchASymbol(CLOSE_BRACKET))
+					break;
+
 				String key(Allocator);
 				Tokenizer->RequireALiteral(key);
 
@@ -184,6 +187,9 @@ namespace Engine
 		{
 			while (true)
 			{
+				if (Tokenizer->MatchASymbol(CLOSE_SQUARE_BRACKET))
+					break;
+
 				JSONData data;
 				ParseData(Allocator, Tokenizer, &data, ForceWString);
 

@@ -25,8 +25,8 @@ namespace Engine
 		cwstr ASSETS_DIRECTORY_NAME(L"Assets");
 		cwstr LIBRARY_DIRECTORY_NAME(L"Library");
 
-		cwstr INTERNAL_ASSETS_DIRECTORY_PATH(L"../../Contents/Resources");
-		cwstr INTERNAL_LIBRARY_DIRECTORY_PATH(L"../../Contents/Resources/Library");
+		cwstr BUILT_IN_ASSETS_DIRECTORY_PATH(L"../../Contents/BuiltIn");
+		cwstr BUILT_IN_LIBRARY_DIRECTORY_PATH(L"../../Contents/BuiltIn/Library");
 
 		Program* CreateProgram(ProgramInfo* ProgramInfo)
 		{
@@ -48,7 +48,7 @@ namespace Engine
 
 			ResourceManager::ResourceManager(void) :
 			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_NAME)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_NAME))),
-			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(INTERNAL_LIBRARY_DIRECTORY_PATH)))
+			m_InternalResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(BUILT_IN_ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(BUILT_IN_LIBRARY_DIRECTORY_PATH)))
 		{
 			CreateDefaultResources();
 
@@ -76,7 +76,7 @@ namespace Engine
 
 		ProgramResource* ResourceManager::GetSpriteRendererShader(void)
 		{
-			return GetLoaded<Program>(BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID);
+			return m_InternalResourceHolder.Load<Program>("Programs/Sprite.program");
 		}
 
 		MeshResource* ResourceManager::GetPrimitiveMesh(PrimitiveMeshTypes Type)
@@ -131,13 +131,13 @@ namespace Engine
 			}
 
 			// Sprite Program
-			{
-				ProgramInfo info;
-				info.Source = BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE;
-				Program* program = CreateProgram(&info);
-				program->SetName("SpriteProgram");
-				AddFromMemory(BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID, program);
-			}
+			//{
+			//	ProgramInfo info;
+			//	info.Source = BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE;
+			//	Program* program = CreateProgram(&info);
+			//	program->SetName("SpriteProgram");
+			//	AddFromMemory(BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID, program);
+			//}
 
 			// Quad Mesh
 			{

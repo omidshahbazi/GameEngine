@@ -39,6 +39,8 @@ namespace Engine
 
 				ProgramResource* spriteRendererProgram = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
+					spriteRendererProgram->Wait();
+
 					m_SpriteRendererMaterial.SetProgram(spriteRendererProgram);
 					m_SpriteRendererMaterial.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
 					m_SpriteRendererMaterial.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;

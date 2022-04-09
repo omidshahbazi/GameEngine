@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ResourceSystem\Private\ResourceDatabase.h>
 #include <ResourceSystem\Private\ResourceSystemAllocators.h>
+#include <ResourceSystem\Private\Utilities.h>
 #include <Containers\Exception.h>
 #include <FileUtility\FileSystem.h>
 #include <FileUtility\Path.h>
@@ -47,14 +48,20 @@ namespace Engine
 				Save();
 			}
 
-			void ResourceDatabase::RemoveResourceInfo(const WString& RelativeFilePath)
+			void ResourceDatabase::UpdateKeepingResources(const WStringList& ExistsRelativeFilePaths, ResourceInfoList& RemovedResources)
 			{
-				m_Database.RemoveIf([&RelativeFilePath](const auto& item)
+				m_Database.RemoveIf([&](const auto& item)
 					{
-						const auto& obj = item.GetSecond().GetObject();
+						ResourceInfo info;
+						FillResourceInfo(item.GetSecond().GetObject(), item.GetFirst(), info);
 
-						return (obj[KEY_RELATIVE_PATH].GetAny().GetAsWString() == RelativeFilePath);
+						if (ExistsRelativeFilePaths.Contains(info.RelativePath))
+							return false;
+
+						RemovedResources.Add(info);
 					});
+
+				Save();
 			}
 
 			bool ResourceDatabase::DoesResourceExists(const GUID& GUID) const

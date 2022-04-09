@@ -19,9 +19,6 @@ namespace Engine
 				static GUID DEFAULT_PROGRAM_GUID;
 				static cstr DEFAULT_PROGRAM_SOURCE;
 
-				static GUID SPRITE_RENDERER_PROGRAM_GUID;
-				static cstr SPRITE_RENDERER_PROGRAM_SOURCE;
-
 				static GUID WHITE_TEXTURE_GUID;
 
 				static GUID QUAD_MESH_GUID;

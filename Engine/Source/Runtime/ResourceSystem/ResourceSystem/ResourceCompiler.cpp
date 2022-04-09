@@ -101,12 +101,10 @@ namespace Engine
 			WStringList files;
 			GetResourcePaths(files);
 
-			PromiseBlock<void>* promiseBlock = nullptr;
+			PromiseBlock<void>* promiseBlock = CreatePromiseBlock(files.GetSize());
 
 			if (files.GetSize() != 0)
 			{
-				promiseBlock = CreatePromiseBlock(files.GetSize());
-
 				MultipleCompileTaskInfo* task = ResourceSystemAllocators::ResourceAllocator_Allocate<MultipleCompileTaskInfo>();
 				Construct(task, this, Force, promiseBlock, files);
 
@@ -120,14 +118,6 @@ namespace Engine
 
 		void ResourceCompiler::RefreshDatabase(void)
 		{
-			// New Resource -> With Without
-			// Moved Resource -> With Without
-			// Renamed Resource -> With Without
-			// Deleted Resource -> With Without
-			// Modified Resource
-
-			//*All of them with and without Meta
-
 			WStringList files;
 
 			FileSystem::GetFiles(GetResourcesPath(), files, ImporterExporter::META_EXTENSION, FileSystem::SearchOptions::All);
@@ -139,50 +129,12 @@ namespace Engine
 					continue;
 
 				FileSystem::Delete(file);
-
-				m_ResourceDatabase->RemoveResourceInfo(Path::GetRelativePath(GetResourcesPath(), resourceFilePath));
 			}
 
 			files.Clear();
 			GetResourcePaths(files);
 
-			//Vector<ImporterExporter::Settings> settingList(files.GetSize());
-			//for (const auto& file : files)
-			//{
-			//	FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(file));
-
-			//	ImporterExporter::Settings settings = {};
-			//	if (!ImporterExporter::Import(file, &settings))
-			//	{
-			//		WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
-
-			//		ResourceDatabase::ResourceInfo info;
-			//		if (m_ResourceDatabase->GetResourceInfo(relativeFilePath, info))
-			//			settings.ID = info.GUID.ToString();
-
-			//		ImporterExporter::Export(file, &settings);
-			//	}
-
-			//	settingList.Add(settings);
-			//}
-
-			//for (const auto& firstSettings : settingList)
-			//{
-			//	uint8 foundCount = 0;
-
-			//	for (const auto& secondSettings : settingList)
-			//	{
-			//		if (firstSettings.ID != secondSettings.ID)
-			//			continue;
-
-			//		if (foundCount++ < 1)
-			//			continue;
-
-			//		//secondSettings
-			//			export is the basic version, should we do it?
-			//	}
-			//}
-
+			WStringList toKeepInDatabase;
 			for (const auto& file : files)
 			{
 				WString relativeFilePath = Path::GetRelativePath(GetResourcesPath(), file);
@@ -234,7 +186,21 @@ namespace Engine
 
 				if (shouldUpdateDatabase)
 					m_ResourceDatabase->UpdateCompiledResource(info);
+
+				toKeepInDatabase.Add(relativeFilePath);
 			}
+
+			ResourceDatabase::ResourceInfoList removedResources;
+			m_ResourceDatabase->UpdateKeepingResources(toKeepInDatabase, removedResources);
+
+			//ResourceDatabase::ResourceInfoList allResources;
+			//m_ResourceDatabase->GetAllResources(allResources);
+			//for (const auto& info : allResources)
+			//	if (!FileSystem::Exists(Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID))))
+			//		removedResources.Add(info);
+
+			for (const auto& info : removedResources)
+				FileSystem::Delete(Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID)));
 		}
 
 		bool ResourceCompiler::CompileFile(const WString& FullPath, FileTypes FileType, bool Force)

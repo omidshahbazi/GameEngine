@@ -16,15 +16,12 @@ namespace Engine
 			class BuiltInAssets
 			{
 			public:
-				static GUID DEFAULT_PROGRAM_GUID;
-				static cstr DEFAULT_PROGRAM_SOURCE;
-
 				static GUID WHITE_TEXTURE_GUID;
 
 				static GUID QUAD_MESH_GUID;
 
-				static GUID CUBE_MESH_GUID;
-				static cstr CUBE_MESH_DATA;
+				//static GUID CUBE_MESH_GUID;
+				//static cstr CUBE_MESH_DATA;
 
 				static GUID SPHERE_MESH_GUID;
 				static cstr SPHERE_MESH_DATA;

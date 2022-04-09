@@ -71,7 +71,7 @@ namespace Engine
 
 		ProgramResource* ResourceManager::GetDefaultShader(void)
 		{
-			return GetLoaded<Program>(BuiltInAssets::DEFAULT_PROGRAM_GUID);
+			return m_InternalResourceHolder.Load<Program>("Programs/Default.program");
 		}
 
 		ProgramResource* ResourceManager::GetSpriteRendererShader(void)
@@ -89,8 +89,7 @@ namespace Engine
 				break;
 
 			case ResourceManager::PrimitiveMeshTypes::Cube:
-				guid = &BuiltInAssets::CUBE_MESH_GUID;
-				break;
+				return m_InternalResourceHolder.Load<Mesh>("Meshes/Cube.obj");
 
 			case ResourceManager::PrimitiveMeshTypes::Sphere:
 				guid = &BuiltInAssets::SPHERE_MESH_GUID;
@@ -121,24 +120,6 @@ namespace Engine
 				AddFromMemory(BuiltInAssets::WHITE_TEXTURE_GUID, tex);
 			}
 
-			// Default Program
-			{
-				ProgramInfo info;
-				info.Source = BuiltInAssets::DEFAULT_PROGRAM_SOURCE;
-				Program* program = CreateProgram(&info);
-				program->SetName("DefaultProgram");
-				AddFromMemory(BuiltInAssets::DEFAULT_PROGRAM_GUID, program);
-			}
-
-			// Sprite Program
-			//{
-			//	ProgramInfo info;
-			//	info.Source = BuiltInAssets::SPRITE_RENDERER_PROGRAM_SOURCE;
-			//	Program* program = CreateProgram(&info);
-			//	program->SetName("SpriteProgram");
-			//	AddFromMemory(BuiltInAssets::SPRITE_RENDERER_PROGRAM_GUID, program);
-			//}
-
 			// Quad Mesh
 			{
 				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
@@ -163,16 +144,16 @@ namespace Engine
 			}
 
 			// Cube Mesh
-			{
-				SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
-				Construct(info, ResourceSystemAllocators::ResourceAllocator);
+			//{
+			//	SubMeshInfo* info = ReinterpretCast(SubMeshInfo*, AllocateMemory(ResourceSystemAllocators::ResourceAllocator, sizeof(SubMeshInfo)));
+			//	Construct(info, ResourceSystemAllocators::ResourceAllocator);
 
-				OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CUBE_MESH_DATA)), *info);
+			//	OBJParser::Parse(ByteBuffer(ReinterpretCast(byte*, ConstCast(char8*, BuiltInAssets::CUBE_MESH_DATA)), CharacterUtility::GetLength(BuiltInAssets::CUBE_MESH_DATA)), *info);
 
-				Mesh* mesh = CreateMesh(info);
-				mesh->SetName("CubeMesh");
-				AddFromMemory(BuiltInAssets::CUBE_MESH_GUID, mesh);
-			}
+			//	Mesh* mesh = CreateMesh(info);
+			//	mesh->SetName("CubeMesh");
+			//	AddFromMemory(BuiltInAssets::CUBE_MESH_GUID, mesh);
+			//}
 
 			// Sphere Mesh
 			{

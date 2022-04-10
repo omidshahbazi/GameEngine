@@ -34,7 +34,7 @@ namespace Engine.Frontend.System.Generator
 						profile.BuildConfiguration = configuration;
 						profile.PlatformArchitecture = architecture;
 						profile.OutputType = ProjectBase.ProfileBase.OutputTypes.Makefile;
-						profile.OutputPath = EnvironmentHelper.GetOutputDirectory(configuration, architecture) + targetModule.TargetName + EnvironmentHelper.ExecutableExtentions;
+						profile.OutputPath = EnvironmentHelper.GetOutputDirectory(configuration, architecture) + targetModule.TargetName + EnvironmentHelper.ExecutableExtensions;
 						profile.IntermediateDirectory = EnvironmentHelper.IntermediateDirectory;
 						profile.LanguageStandard = CPPProject.Profile.LanguageStandards.CPPLatest;
 

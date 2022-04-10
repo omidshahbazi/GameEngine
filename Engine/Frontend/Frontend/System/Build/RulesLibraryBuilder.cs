@@ -92,7 +92,7 @@ namespace Engine.Frontend.System.Build
 
 			compiler.Build(profile);
 
-			Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtentions);
+			Assembly rulesLibrary = Assembly.LoadFile(profile.OutputPath + ModuleName + EnvironmentHelper.DynamicLibraryExtensions);
 
 			moduleTypes.AddRange(rulesLibrary.GetTypes<ModuleRules>());
 			targetTypes.AddRange(rulesLibrary.GetTypes<TargetRules>());

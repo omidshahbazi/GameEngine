@@ -238,15 +238,16 @@ namespace Engine.Frontend.System.Compile
 
 				if (!string.IsNullOrEmpty(project.ResourceDefinition.IconPath))
 				{
-					string icoFilePath = projFilePath + "Icon.ico";
+					string icoFilePath = $"{projFilePath}Icon{EnvironmentHelper.IconExtension}";
 					IconMaker.Make(project.ResourceDefinition.IconPath, icoFilePath);
+
 					project.ResourceDefinition.IconPath = icoFilePath.Replace("\\", "\\\\");
 				}
 
 				string resourceContent = generator.GenerateResourceDefinition(project);
 				if (!string.IsNullOrEmpty(resourceContent))
 				{
-					string resourcePath = projFilePath + "Resources.rc";
+					string resourcePath = $"{projFilePath}Resources.rc";
 					File.WriteAllText(resourcePath, resourceContent);
 
 					project.AddResource(resourcePath);

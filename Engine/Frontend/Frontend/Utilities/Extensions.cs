@@ -46,13 +46,13 @@ namespace Engine.Frontend.Utilities
 			switch (Build.UseType)
 			{
 				case ModuleRules.UseTypes.Executable:
-					return EnvironmentHelper.ExecutableExtentions;
+					return EnvironmentHelper.ExecutableExtensions;
 
 				case ModuleRules.UseTypes.DynamicLibrary:
-					return EnvironmentHelper.DynamicLibraryExtentions;
+					return EnvironmentHelper.DynamicLibraryExtensions;
 
 				case ModuleRules.UseTypes.StaticLibrary:
-					return EnvironmentHelper.StaticLibraryExtentions;
+					return EnvironmentHelper.StaticLibraryExtensions;
 
 				default:
 					throw new NotImplementedException($"Handler for {Build.UseType} has not implemented");

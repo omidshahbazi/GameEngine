@@ -104,9 +104,9 @@ namespace Engine.Frontend.System.Build
 					Compile(cppProject.Profiles[0]);
 
 					if (Module.UseType == ModuleRules.UseTypes.Executable)
-						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtentions);
+						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.ExecutableExtensions);
 					else if (Module.UseType == ModuleRules.UseTypes.DynamicLibrary)
-						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtentions);
+						CopyAllFilesToFinalPath(IntermediateOutputPath, EnvironmentHelper.DynamicLibraryExtensions);
 
 					State = States.Built;
 
@@ -207,7 +207,7 @@ namespace Engine.Frontend.System.Build
 
 				ISerializeObject settingsObj = rootObj.AddObject("settings");
 				{
-					settingsObj["executable"] = OutputTargetName + EnvironmentHelper.ExecutableExtentions;
+					settingsObj["executable"] = OutputTargetName + EnvironmentHelper.ExecutableExtensions;
 					settingsObj["workingDir"] = FinalOutputDirectory;
 
 					settingsObj["autoStart"] = false;
@@ -316,11 +316,11 @@ namespace Engine.Frontend.System.Build
 
 			cppProj.ResourceDefinition = new ResourceDefinition();
 			cppProj.ResourceDefinition.ProductName = Module.Name;
-			//cppProj.ResourceDefinition.ProductVersion = new global::System.Version(10, 0, 0, 1);
-			//cppProj.ResourceDefinition.Copyright
+			cppProj.ResourceDefinition.ProductVersion = EnvironmentHelper.Version;
+			cppProj.ResourceDefinition.Copyright = EnvironmentHelper.Copyright;
 
 			if (Module.UseType == ModuleRules.UseTypes.Executable)
-				cppProj.ResourceDefinition.IconPath = EnvironmentHelper.RooDirectory + Module.IconPath;
+				cppProj.ResourceDefinition.IconPath = EnvironmentHelper.WorkingDirectory + Module.IconPath;
 
 			return cppProj;
 		}
@@ -364,7 +364,7 @@ namespace Engine.Frontend.System.Build
 				Profile.AddPreprocessorDefinition(dependencyModule.GetAPIPreprocessor(type));
 				Profile.AddPreprocessorDefinition(dependencyModule.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Empty));
 
-				string[] libFiles = FileSystemUtilites.GetAllFiles(dependencyBuilder.IntermediateOutputPath, $"*{EnvironmentHelper.StaticLibraryExtentions}");
+				string[] libFiles = FileSystemUtilites.GetAllFiles(dependencyBuilder.IntermediateOutputPath, $"*{EnvironmentHelper.StaticLibraryExtensions}");
 
 				foreach (string libFile in libFiles)
 					Profile.AddIncludeLibrary(libFile);

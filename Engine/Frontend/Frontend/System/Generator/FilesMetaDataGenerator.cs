@@ -7,7 +7,6 @@ namespace Engine.Frontend.System.Generator
 {
 	static class FilesMetaDataGenerator
 	{
-		public const string Copyright_Text = "// Copyright 2016-2020 ?????????????. All Rights Reserved.";
 		private const string PragmaOnce_Text = "#pragma once";
 
 		public static void Generate(string SearchPath)
@@ -85,13 +84,13 @@ namespace Engine.Frontend.System.Generator
 
 				int i = Find("// Copyright", lines);
 				if (i == 0)
-					lines[0] = Copyright_Text;
+					lines[0] = "// " + EnvironmentHelper.Copyright;
 				else
 				{
 					if (i != -1)
 						lines.RemoveAt(i);
 
-					lines.Insert(0, Copyright_Text);
+					lines.Insert(0, "// " + EnvironmentHelper.Copyright);
 				}
 
 				i = Find(PragmaOnce_Text, lines);

@@ -1,0 +1,2 @@
+
+struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };

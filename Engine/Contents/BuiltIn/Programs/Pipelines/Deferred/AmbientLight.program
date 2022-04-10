@@ -1,0 +1,24 @@
+#include <Programs/Pipelines/Deferred/Common.program>
+
+struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };
+struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };
+
+texture2D AlbedoSpecTexture;
+TransformData _TransformData;
+Data data;
+
+float4 VertexMain(InputData inputData)
+{
+	matrix4 mat = matrix4(
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1);
+	return mat * float4(inputData.Position, 1);
+}
+
+float4 FragmentMain(InputData inputData)
+{
+	float3 diffuse = Sample(AlbedoSpecTexture, inputData.UV).rgb;
+	return float4(diffuse * data.Color.rgb * data.Strength, 1);
+}

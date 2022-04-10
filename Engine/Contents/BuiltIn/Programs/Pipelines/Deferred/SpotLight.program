@@ -1,0 +1,61 @@
+#include <Programs/Pipelines/Deferred/Common.program>
+
+struct InputData { float3 Position : POSITION; };
+struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };
+struct ViewportData { float2 FrameSize; };
+struct AutoData { matrix4 MVP; float2 FrameSize; };
+
+texture2D PositionTexture;
+texture2D NormalTexture;
+texture2D AlbedoSpecTexture;
+TransformData _TransformData;
+ViewportData _ViewportData;
+Data data;
+
+float4 VertexMain(InputData inputData)
+{
+	matrix4 mvp = _TransformData.MVP;
+	float coneRadius = Sin(data.OuterCutOff / 2) * (data.Radius / Cos(data.OuterCutOff / 2));
+	matrix4 scaleMat = matrix4(
+		coneRadius * 2, 0, 0, 0,
+		0, coneRadius * 2, 0, 0,
+		0, 0, data.Radius, 0,
+		0, 0, 0, 1);
+	mvp *= scaleMat;
+	return mvp * float4(inputData.Position, 1);
+}
+
+float4 FragmentMain(InputData inputData)
+{
+	float2 uv = _FragPosition / _ViewportData.FrameSize;
+	float3 gPos = Sample(PositionTexture, uv).rgb;
+	float3 toFragDir = Normalize(gPos - data.WorldPosition);
+	float theta = ACos(Dot(toFragDir, data.Direction) / Length(toFragDir) * Length(data.Direction));
+	float halfOuterCutOff = data.OuterCutOff / 2;
+
+	float3 result = float3(0,0,0);
+	if (theta <= halfOuterCutOff)
+	{
+		float halfInnerCutOff = data.InnerCutOff / 2;
+		float4 gAlbedoSpec = Sample(AlbedoSpecTexture, uv);
+		float3 gDiffuse = gAlbedoSpec.rgb;
+		float gSpecular = gAlbedoSpec.a;
+		float3 gNormal = Sample(NormalTexture, uv).rgb;
+
+		float3 toLightDir = Normalize(data.WorldPosition - gPos);
+
+		float3 diffuse = Max(Dot(gNormal, toLightDir), 0) * data.Color.rgb * gDiffuse * data.Strength;
+
+		float3 toViewDir = Normalize(data.ViewPosition - gPos);
+		float3 reflectDir = Reflect(-toLightDir, gNormal);
+		float specular = Pow(Max(Dot(toViewDir, reflectDir), 0), 16) * gSpecular;
+
+		float epsilon = (halfOuterCutOff - halfInnerCutOff);
+		float intensity = Clamp((halfOuterCutOff - theta) / epsilon, 0, 1);
+
+		diffuse *= intensity;
+		specular *= intensity;
+		result = diffuse + specular;
+	}
+	return float4(result, 1);
+}

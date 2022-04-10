@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef RESOURCE_MANAGER_H
-#define RESOURCE_MANAGER_H
+#ifndef BUILT_IN_RESOURCE_MANAGER_H
+#define BUILT_IN_RESOURCE_MANAGER_H
 
 #include <MemoryManagement\Singleton.h>
 #include <ResourceSystem\ResourceHolder.h>
@@ -12,23 +12,14 @@ namespace Engine
 	using namespace Containers;
 	using namespace ResourceSystem;
 
-	namespace ResourceManagement
+	namespace BuiltInResources
 	{
-		class RESOURCEMANAGEMENT_API ResourceManager : public ResourceHolder
+		class BUILTINRESOURCES_API BuiltInResourceManager : public ResourceHolder
 		{
-		public:
-			enum class PrimitiveMeshTypes
-			{
-				Quad,
-				Cube,
-				Sphere,
-				Cone
-			};
-
-			SINGLETON_DECLARATION(ResourceManager)
+			SINGLETON_DECLARATION(BuiltInResourceManager)
 
 		private:
-			ResourceManager(void);
+			BuiltInResourceManager(void);
 
 		public:
 			TextureResource* GetWhiteTexture(void);
@@ -37,7 +28,13 @@ namespace Engine
 			ProgramResource* GetDefaultShader(void);
 			ProgramResource* GetSpriteRendererShader(void);
 
-			MeshResource* GetPrimitiveMesh(PrimitiveMeshTypes Type);
+			MeshResource* GetQuad(void);
+			MeshResource* GetCube(void);
+			MeshResource* GetSphere(void);
+			MeshResource* GetCone(void);
+
+		private:
+			void CreateDefaultResources(void);
 		};
 	}
 }

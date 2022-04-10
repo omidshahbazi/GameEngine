@@ -1,11 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Runtime.ResourceSystem
 {
-	class ResourceManagementModuleRules : ModuleRules
+	class BuiltInResourcesModuleRules : ModuleRules
 	{
 		public override string Name
 		{
-			get { return "ResourceManagement"; }
+			get { return "BuiltInResources"; }
 		}
 
 		public override UseTypes UseType
@@ -13,13 +13,11 @@ namespace Engine.Runtime.ResourceSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ResourceManagementModuleRules(Configurations Configuration, Platforms Platform) :
+		public BuiltInResourcesModuleRules(Configurations Configuration, Platforms Platform) :
 			base(Configuration, Platform)
 		{
-			PrivateDependencyModuleNames.Add("BuiltInResources");
 			PrivateDependencyModuleNames.Add("RenderSystem");
 			PrivateDependencyModuleNames.Add("FileUtility");
-			PrivateDependencyModuleNames.Add("Debugging");
 
 			PublicDependencyModuleNames.Add("MemoryManagement");
 			PublicDependencyModuleNames.Add("ResourceSystem");

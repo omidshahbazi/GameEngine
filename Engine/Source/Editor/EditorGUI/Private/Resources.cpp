@@ -33,7 +33,9 @@ namespace Engine
 				Construct(m_ResourceHolder, Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_PATH)));
 				m_ResourceHolder->GetCompiler()->CompileResources();
 
-				m_QuadMesh = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad)->GetPointer();
+				MeshResource* quadMeshRes = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad);
+				quadMeshRes->Wait();
+				m_QuadMesh = **quadMeshRes;
 
 				m_Font = m_ResourceHolder->Load<Font>("Fonts/Roboto-Light.ttf");
 

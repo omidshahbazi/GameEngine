@@ -6,178 +6,23 @@
 #include <RenderSystem\RenderContext.h>
 #include <RenderSystem\Material.h>
 #include <RenderSystem\RenderTarget.h>
+#include <BuiltInResources\BuiltInResourceManager.h>
 
 namespace Engine
 {
 	using namespace RenderDevice;
+	using namespace BuiltInResources;
 
 	namespace DeferredPipeline
 	{
 		namespace Private
 		{
-			cstr AmbientLightShader =
-				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
-				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
-				"struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };"
-				"texture2D AlbedoSpecTexture;"
-				"TransformData _TransformData;"
-				"Data data;"
-				"float4 VertexMain(InputData inputData)"
-				"{"
-				"	matrix4 mat = matrix4("
-				"		1, 0, 0, 0,"
-				"		0, 1, 0, 0,"
-				"		0, 0, 1, 0,"
-				"		0, 0, 0, 1);"
-				"	return mat * float4(inputData.Position, 1);"
-				"}"
-				"float4 FragmentMain(InputData inputData)"
-				"{"
-				"	float3 diffuse = Sample(AlbedoSpecTexture, inputData.UV).rgb;"
-				"	return float4(diffuse * data.Color.rgb * data.Strength, 1);"
-				"}";
-
-			cstr DirectionalLightShader =
-				"struct InputData { float3 Position : POSITION; float2 UV : TEXCOORD; };"
-				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
-				"struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };"
-				"texture2D NormalTexture;"
-				"texture2D AlbedoSpecTexture;"
-				"TransformData _TransformData;"
-				"Data data;"
-				"float4 VertexMain(InputData inputData)"
-				"{"
-				"	matrix4 mat = matrix4("
-				"		1, 0, 0, 0,"
-				"		0, 1, 0, 0,"
-				"		0, 0, 1, 0,"
-				"		0, 0, 0, 1);"
-				"	return mat * float4(inputData.Position, 1);"
-				"}"
-				"float4 FragmentMain(InputData inputData)"
-				"{"
-				"	float3 dir = Normalize(-data.Direction);"
-				"	float3 normal = Sample(NormalTexture, inputData.UV).rgb;"
-				"	float angle = Max(Dot(normal, dir), 0.0);"
-				"	float3 diffuse = Sample(AlbedoSpecTexture, inputData.UV).rgb;"
-				"	return float4(diffuse * data.Color.rgb * data.Strength * angle, 1);"
-				"}";
-
-			cstr PointLightShader =
-				"struct InputData { float3 Position : POSITION; };"
-				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
-				"struct ViewportData { float2 FrameSize; };"
-				"struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };"
-				"texture2D PositionTexture;"
-				"texture2D NormalTexture;"
-				"texture2D AlbedoSpecTexture;"
-				"TransformData _TransformData;"
-				"ViewportData _ViewportData;"
-				"Data data;"
-				"float4 VertexMain(InputData inputData)"
-				"{"
-				"	matrix4 mvp = _TransformData.MVP;"
-				"	matrix4 scaleMat = matrix4("
-				"		data.Radius * 2, 0, 0, 0,"
-				"		0, data.Radius * 2, 0, 0,"
-				"		0, 0, data.Radius * 2, 0,"
-				"		0, 0, 0, 1);"
-				"	mvp *= scaleMat;"
-				"	return mvp * float4(inputData.Position, 1);"
-				"}"
-				"float4 FragmentMain(InputData inputData)"
-				"{"
-				"	float2 uv = _FragPosition / _ViewportData.FrameSize;"
-				"	float3 gPos = Sample(PositionTexture, uv).rgb;"
-				"	float distance = Length(data.WorldPosition - gPos);"
-				""
-				"	float3 result = float3(0,0,0);"
-				"	if (distance < data.Radius)"
-				"	{"
-				"		float4 gAlbedoSpec = Sample(AlbedoSpecTexture, uv);"
-				"		float3 gDiffuse = gAlbedoSpec.rgb;"
-				"		float gSpecular = gAlbedoSpec.a;"
-				""
-				"		float3 toLightDir = Normalize(data.WorldPosition - gPos);"
-				"		float3 normal = Sample(NormalTexture, uv).rgb;"
-				""
-				"		float3 diffuse = Max(Dot(normal, toLightDir), 0) * data.Color.rgb * gDiffuse * data.Strength;"
-				""
-				"		float3 viewDir = Normalize(data.ViewPosition - gPos);"
-				"		float3 halfwayDir = Normalize(toLightDir + viewDir);"
-				"		float3 specular = Pow(Max(Dot(normal, halfwayDir), 0), 16) * data.Color.rgb * gSpecular;"
-				""
-				"		float attenuation = 1 / (data.ConstantAttenuation + (data.LinearAttenuation * distance) + (data.QuadraticAttenuation * distance * distance));"
-				""
-				"		diffuse *= attenuation;"
-				"		specular *= attenuation;"
-				"		result = diffuse + specular;"
-				"	}"
-				"	return float4(result, 1);"
-				"}";
-
-			cstr SpotLightShader =
-				"struct InputData { float3 Position : POSITION; };"
-				"struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };"
-				"struct ViewportData { float2 FrameSize; };"
-				"struct AutoData { matrix4 MVP; float2 FrameSize; };"
-				"struct Data { float3 WorldPosition; float3 ViewPosition; float4 Color; float Strength; float Radius; float ConstantAttenuation; float LinearAttenuation; float QuadraticAttenuation; float InnerCutOff; float OuterCutOff; float3 Direction; };"
-				"texture2D PositionTexture;"
-				"texture2D NormalTexture;"
-				"texture2D AlbedoSpecTexture;"
-				"TransformData _TransformData;"
-				"ViewportData _ViewportData;"
-				"Data data;"
-				"float4 VertexMain(InputData inputData)"
-				"{"
-				"	matrix4 mvp = _TransformData.MVP;"
-				"	float coneRadius = Sin(data.OuterCutOff / 2) * (data.Radius / Cos(data.OuterCutOff / 2));"
-				"	matrix4 scaleMat = matrix4("
-				"		coneRadius * 2, 0, 0, 0,"
-				"		0, coneRadius * 2, 0, 0,"
-				"		0, 0, data.Radius, 0,"
-				"		0, 0, 0, 1);"
-				"	mvp *= scaleMat;"
-				"	return mvp * float4(inputData.Position, 1);"
-				"}"
-				""
-				"float4 FragmentMain(InputData inputData)"
-				"{"
-				"	float2 uv = _FragPosition / _ViewportData.FrameSize;"
-				"	float3 gPos = Sample(PositionTexture, uv).rgb;"
-				"	float3 toFragDir = Normalize(gPos - data.WorldPosition);"
-				"	float theta = ACos(Dot(toFragDir, data.Direction) / Length(toFragDir) * Length(data.Direction));"
-				"	float halfOuterCutOff = data.OuterCutOff / 2;"
-				""
-				"	float3 result = float3(0,0,0);"
-				"	if (theta <= halfOuterCutOff)"
-				"	{"
-				"		float halfInnerCutOff = data.InnerCutOff / 2;"
-				"		float4 gAlbedoSpec = Sample(AlbedoSpecTexture, uv);"
-				"		float3 gDiffuse = gAlbedoSpec.rgb;"
-				"		float gSpecular = gAlbedoSpec.a;"
-				"		float3 gNormal = Sample(NormalTexture, uv).rgb;"
-				""
-				"		float3 toLightDir = Normalize(data.WorldPosition - gPos);"
-				""
-				"		float3 diffuse = Max(Dot(gNormal, toLightDir), 0) * data.Color.rgb * gDiffuse * data.Strength;"
-				""
-				"		float3 toViewDir = Normalize(data.ViewPosition - gPos);"
-				"		float3 reflectDir = Reflect(-toLightDir, gNormal);"
-				"		float specular = Pow(Max(Dot(toViewDir, reflectDir), 0), 16) * gSpecular;"
-				""
-				"		float epsilon = (halfOuterCutOff - halfInnerCutOff);"
-				"		float intensity = Clamp((halfOuterCutOff - theta) / epsilon, 0, 1);"
-				""
-				"		diffuse *= intensity;"
-				"		specular *= intensity;"
-				"		result = diffuse + specular;"
-				"	}"
-				"	return float4(result, 1);"
-				"}";
-
 			DeferredRendering::DeferredRendering(void) :
 				m_DeviceInterface(nullptr),
+				m_AmbientLightProgram(nullptr),
+				m_DirectionalLightProgram(nullptr),
+				m_PointLightProgram(nullptr),
+				m_SpotLightProgram(nullptr),
 				m_ActiveInfo(nullptr),
 				m_CommandBufferGBuffer("GBuffer Pass"),
 				m_CommandBufferLighting("Lighting Pass"),
@@ -193,23 +38,11 @@ namespace Engine
 			{
 				m_DeviceInterface = DeviceInterface;
 
-				ProgramInfo info;
-
-#ifdef DEBUG_MODE
-				info.DebugMode = true;
-#endif
-
-				info.Source = AmbientLightShader;
-				m_AmbientLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
-
-				info.Source = DirectionalLightShader;
-				m_DirectionalLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
-
-				info.Source = PointLightShader;
-				m_PointLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
-
-				info.Source = SpotLightShader;
-				m_SpotLightProgram = ProgramResource(m_DeviceInterface->CreateProgram(&info));
+				auto builtInResourceManager = BuiltInResourceManager::GetInstance();
+				m_AmbientLightProgram = builtInResourceManager->Load<Program>("Programs/Pipelines/Deferred/AmbientLight.program");
+				m_DirectionalLightProgram = builtInResourceManager->Load<Program>("Programs/Pipelines/Deferred/DirectionalLight.program");
+				m_PointLightProgram = builtInResourceManager->Load<Program>("Programs/Pipelines/Deferred/PointLight.program");
+				m_SpotLightProgram = builtInResourceManager->Load<Program>("Programs/Pipelines/Deferred/SpotLight.program");
 
 				m_DeviceInterface->OnContextChangedEvent += EventListener_OnContextChanged;
 				m_DeviceInterface->OnContextResizedEvent += EventListener_OnContextResized;
@@ -219,11 +52,6 @@ namespace Engine
 			{
 				m_DeviceInterface->OnContextChangedEvent -= EventListener_OnContextChanged;
 				m_DeviceInterface->OnContextResizedEvent -= EventListener_OnContextResized;
-
-				m_DeviceInterface->DestroyProgram(*m_AmbientLightProgram);
-				m_DeviceInterface->DestroyProgram(*m_DirectionalLightProgram);
-				m_DeviceInterface->DestroyProgram(*m_PointLightProgram);
-				m_DeviceInterface->DestroyProgram(*m_SpotLightProgram);
 
 				for (auto& info : m_RenderTargets)
 					m_DeviceInterface->DestroyRenderTarget(info.GetSecond().RenderTarget);

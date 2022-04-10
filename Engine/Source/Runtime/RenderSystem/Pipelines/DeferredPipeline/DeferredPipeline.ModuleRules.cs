@@ -21,6 +21,7 @@ namespace Engine.Runtime.RenderSystem.Pipelines
 
 			PublicDependencyModuleNames.Add("Containers");
 			PublicDependencyModuleNames.Add("RenderSystem");
+			PublicDependencyModuleNames.Add("BuiltInResources");
 		}
 	}
 }

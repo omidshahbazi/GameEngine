@@ -53,22 +53,22 @@ namespace Engine
 
 				ProgramResource* GetAmbinetLightProgram(void) override
 				{
-					return &m_AmbientLightProgram;
+					return m_AmbientLightProgram;
 				}
 
 				ProgramResource* GetDirectionalLightProgram(void) override
 				{
-					return &m_DirectionalLightProgram;
+					return m_DirectionalLightProgram;
 				}
 
 				ProgramResource* GetPointLightProgram(void) override
 				{
-					return &m_PointLightProgram;
+					return m_PointLightProgram;
 				}
 
 				ProgramResource* GetSpotLightProgram(void) override
 				{
-					return &m_SpotLightProgram;
+					return m_SpotLightProgram;
 				}
 
 				void OnContextChanged(const RenderContext* Context);
@@ -82,10 +82,10 @@ namespace Engine
 			private:
 				DeviceInterface* m_DeviceInterface;
 
-				ProgramResource m_AmbientLightProgram;
-				ProgramResource m_DirectionalLightProgram;
-				ProgramResource m_PointLightProgram;
-				ProgramResource m_SpotLightProgram;
+				ProgramResource *m_AmbientLightProgram;
+				ProgramResource *m_DirectionalLightProgram;
+				ProgramResource *m_PointLightProgram;
+				ProgramResource *m_SpotLightProgram;
 
 				RenderTargetContextMap m_RenderTargets;
 

@@ -28,6 +28,8 @@ namespace Engine.Test
 			PrivateDependencyModuleNames.Add("Mathematics");
 
 			GenerateRenderDocSettings = true;
+
+			IconPath = "Engine/Contents/Icon.png";
 		}
     }
 }

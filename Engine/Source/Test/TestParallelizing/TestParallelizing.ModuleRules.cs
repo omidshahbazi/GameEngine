@@ -22,6 +22,8 @@ namespace Engine.Test
 			PrivateDependencyModuleNames.Add("MemoryManagement");
 			PrivateDependencyModuleNames.Add("Parallelizing");
 			PrivateDependencyModuleNames.Add("Threading");
+
+			IconPath = "Engine/Contents/Icon.png";
 		}
     }
 }

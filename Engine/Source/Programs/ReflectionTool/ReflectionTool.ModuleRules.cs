@@ -24,6 +24,8 @@ namespace Engine.Programs
 			PrivateDependencyModuleNames.Add("Lexer");
 			PrivateDependencyModuleNames.Add("EntryPointUtility");
 			PrivateDependencyModuleNames.Add("MemoryManagement");
+
+			IconPath = "Engine/Contents/Icon.png";
 		}
 	}
 }

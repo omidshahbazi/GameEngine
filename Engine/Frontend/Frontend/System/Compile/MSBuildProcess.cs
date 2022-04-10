@@ -236,21 +236,24 @@ namespace Engine.Frontend.System.Compile
 
 				CPPProject project = (CPPProject)ProjectProfile.Project;
 
-				if (!string.IsNullOrEmpty(project.ResourceDefinition.IconPath))
+				if (project.CompileFiles.Length != 0)
 				{
-					string icoFilePath = $"{projFilePath}Icon{EnvironmentHelper.IconExtension}";
-					IconMaker.Make(project.ResourceDefinition.IconPath, icoFilePath);
+					if (!string.IsNullOrEmpty(project.ResourceDefinition.IconPath))
+					{
+						string icoFilePath = $"{projFilePath}Icon{EnvironmentHelper.IconExtension}";
+						IconMaker.Make(project.ResourceDefinition.IconPath, icoFilePath);
 
-					project.ResourceDefinition.IconPath = icoFilePath.Replace("\\", "\\\\");
-				}
+						project.ResourceDefinition.IconPath = icoFilePath.Replace("\\", "\\\\");
+					}
 
-				string resourceContent = generator.GenerateResourceDefinition(project);
-				if (!string.IsNullOrEmpty(resourceContent))
-				{
-					string resourcePath = $"{projFilePath}Resources.rc";
-					File.WriteAllText(resourcePath, resourceContent);
+					string resourceContent = generator.GenerateResourceDefinition(project);
+					if (!string.IsNullOrEmpty(resourceContent))
+					{
+						string resourcePath = $"{projFilePath}Resources.rc";
+						File.WriteAllText(resourcePath, resourceContent);
 
-					project.AddResource(resourcePath);
+						project.AddResource(resourcePath);
+					}
 				}
 
 				projFilePath += ".vcxproj";

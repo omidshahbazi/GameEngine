@@ -66,6 +66,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Frontend\EntryPoint.cs" />
+    <Compile Include="Frontend\Project\ResourceDefinition.cs" />
     <Compile Include="Frontend\System\Compile\ReflectionBuildProcess.cs" />
     <Compile Include="Frontend\System\RulesLibrary.cs" />
     <Compile Include="BaseRules.cs" />
@@ -123,6 +124,7 @@
       <HintPath>Libraries\CommonManaged.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

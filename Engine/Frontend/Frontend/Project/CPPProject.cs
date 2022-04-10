@@ -31,7 +31,7 @@ namespace Engine.Frontend.Project
             private StringList includeDirectories = new StringList();
             private StringList includeLibraries = new StringList();
 
-            public string[] IncludeDirectories
+			public string[] IncludeDirectories
             {
                 get { return includeDirectories.ToArray(); }
             }
@@ -112,18 +112,38 @@ namespace Engine.Frontend.Project
         }
 
         private StringList includeFiles = new StringList();
+		private StringList resources = new StringList();
 
-        public string[] IncludeFiles
+		public ResourceDefinition ResourceDefinition
+		{
+			get;
+			set;
+		}
+
+		public string[] IncludeFiles
         {
             get { return includeFiles.ToArray(); }
-        }
+		}
 
-        public void AddIncludeFile(string FilePath)
+		public string[] Resources
+		{
+			get { return resources.ToArray(); }
+		}
+
+		public void AddIncludeFile(string FilePath)
         {
             includeFiles.Add(FilePath);
-        }
+		}
 
-        public override ProfileBase CreateProfile()
+		public void AddResource(string FilePath)
+		{
+			if (resources.Contains(FilePath))
+				return;
+
+			resources.Add(FilePath);
+		}
+
+		public override ProfileBase CreateProfile()
         {
             Profile profile = new Profile(this);
             AddProfile(profile);

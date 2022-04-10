@@ -6,6 +6,7 @@ using System;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using Engine.Frontend.Utilities;
+using GameFramework.Common.Utilities;
 
 namespace Engine.Frontend.System.Compile
 {
@@ -223,7 +224,7 @@ namespace Engine.Frontend.System.Compile
 
 		public override void Build(ProjectBase.ProfileBase ProjectProfile)
 		{
-			string projPath = ProjectProfile.IntermediateDirectory + ProjectProfile.AssemblyName;
+			string projFilePath = ProjectProfile.IntermediateDirectory + ProjectProfile.AssemblyName;
 
 			MSBuildProjectGenerator projectGenerator = null;
 
@@ -233,18 +234,36 @@ namespace Engine.Frontend.System.Compile
 				projectGenerator = generator;
 				generator.ToolsVersion = Info.ToolsVersion;
 
-				projPath += ".vcxproj";
+				CPPProject project = (CPPProject)ProjectProfile.Project;
+
+				if (!string.IsNullOrEmpty(project.ResourceDefinition.IconPath))
+				{
+					string icoFilePath = projFilePath + "Icon.ico";
+					IconMaker.Make(project.ResourceDefinition.IconPath, icoFilePath);
+					project.ResourceDefinition.IconPath = icoFilePath.Replace("\\", "\\\\");
+				}
+
+				string resourceContent = generator.GenerateResourceDefinition(project);
+				if (!string.IsNullOrEmpty(resourceContent))
+				{
+					string resourcePath = projFilePath + "Resources.rc";
+					File.WriteAllText(resourcePath, resourceContent);
+
+					project.AddResource(resourcePath);
+				}
+
+				projFilePath += ".vcxproj";
 			}
 			else if (ProjectProfile is CSProject.Profile)
 			{
 				projectGenerator = new MicrosoftCSProjectGenerator();
 
-				projPath += ".csproj";
+				projFilePath += ".csproj";
 			}
 
-			File.WriteAllText(projPath, projectGenerator.Generate(ProjectProfile.Project, false));
+			File.WriteAllText(projFilePath, projectGenerator.Generate(ProjectProfile.Project, false));
 
-			Build(projPath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformArchitecture);
+			Build(projFilePath, ProjectProfile.BuildConfiguration, ProjectProfile.PlatformArchitecture);
 		}
 
 		public override void Rebuild(string ProjectPath, ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

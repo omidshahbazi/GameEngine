@@ -27,6 +27,8 @@ namespace Engine.Test
 			PrivateDependencyModuleNames.Add("EntryPointUtility");
 
 			GenerateRenderDocSettings = true;
+
+			IconPath = "Engine/Contents/Icon.png";
 		}
 	}
 }

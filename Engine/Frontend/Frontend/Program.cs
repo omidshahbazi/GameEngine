@@ -13,7 +13,7 @@ namespace Engine.Frontend
 			try
 			{
 #endif
-				EntryPoint.Start(ArgumentParser.Parse(Args));
+			EntryPoint.Start(ArgumentParser.Parse(Args));
 
 				return 0;
 #if !DEBUG

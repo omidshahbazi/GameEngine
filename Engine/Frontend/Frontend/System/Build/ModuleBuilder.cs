@@ -314,6 +314,14 @@ namespace Engine.Frontend.System.Build
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 
+			cppProj.ResourceDefinition = new ResourceDefinition();
+			cppProj.ResourceDefinition.ProductName = Module.Name;
+			//cppProj.ResourceDefinition.ProductVersion = new global::System.Version(10, 0, 0, 1);
+			//cppProj.ResourceDefinition.Copyright
+
+			if (Module.UseType == ModuleRules.UseTypes.Executable)
+				cppProj.ResourceDefinition.IconPath = EnvironmentHelper.RooDirectory + Module.IconPath;
+
 			return cppProj;
 		}
 

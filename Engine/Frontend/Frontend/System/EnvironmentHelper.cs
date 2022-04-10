@@ -83,19 +83,30 @@ namespace Engine.Frontend.System
 			set;
 		}
 
+		//In the future, we need to override this based on where it should working on
 		public static string RooDirectory
+		{
+			get { return Path.GetFullPath($"{BinariesDirectory}..{PathSeparator}..{PathSeparator}"); }
+		}
+
+		public static string EngineRooDirectory
 		{
 			get { return Path.GetFullPath($"{BinariesDirectory}..{PathSeparator}..{PathSeparator}"); }
 		}
 
 		public static string EngineDirectory
 		{
-			get { return $"{RooDirectory}Engine{PathSeparator}"; }
+			get { return $"{EngineRooDirectory}Engine{PathSeparator}"; }
 		}
 
 		public static string SourceDirectory
 		{
 			get { return $"{EngineDirectory}Source{PathSeparator}"; }
+		}
+
+		public static string ContentsDirectory
+		{
+			get { return $"{EngineDirectory}Contents{PathSeparator}"; }
 		}
 
 		public static string IntermediateDirectory

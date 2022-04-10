@@ -31,6 +31,12 @@ namespace Engine
 			set;
 		}
 
+		public string IconPath
+		{
+			get;
+			set;
+		}
+
 		public List<string> PreprocessorDefinitions
 		{
 			get;

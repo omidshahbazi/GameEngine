@@ -4,6 +4,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Xml;
 
 namespace Engine.Frontend.Project.Generator
@@ -78,6 +79,9 @@ namespace Engine.Frontend.Project.Generator
 
 				XmlElement compileFiles = CreateElement("ItemGroup", projectElement);
 				AddStringListToEllementAsAttribute(includeFiles, "ClCompile", "Include", project.CompileFiles);
+
+				XmlElement resourceFiles = CreateElement("ItemGroup", projectElement);
+				AddStringListToEllementAsAttribute(resourceFiles, "ResourceCompile", "Include", project.Resources);
 
 				XmlElement noneFiles = CreateElement("ItemGroup", projectElement);
 				AddStringListToEllementAsAttribute(noneFiles, "None", "Include", project.ExtraFiles);
@@ -203,10 +207,8 @@ namespace Engine.Frontend.Project.Generator
 			return projectElement.OwnerDocument.OuterXml;
 		}
 
-		public virtual string GenerateFilter(ProjectBase Project, string RootPath)
+		public virtual string GenerateFilter(CPPProject Project, string RootPath)
 		{
-			CPPProject project = (CPPProject)Project;
-
 			XmlDocument document = new XmlDocument();
 
 			XmlElement projectElement = document.CreateElement("Project");
@@ -219,9 +221,9 @@ namespace Engine.Frontend.Project.Generator
 				XmlElement itemGroup = CreateElement("ItemGroup", projectElement);
 				{
 					List<string> files = new List<string>();
-					files.AddRange(project.IncludeFiles);
-					files.AddRange(project.CompileFiles);
-					files.AddRange(project.ExtraFiles);
+					files.AddRange(Project.IncludeFiles);
+					files.AddRange(Project.CompileFiles);
+					files.AddRange(Project.ExtraFiles);
 
 					List<string> filtersName = new List<string>();
 
@@ -261,16 +263,79 @@ namespace Engine.Frontend.Project.Generator
 				}
 
 				XmlElement includeFiles = CreateElement("ItemGroup", projectElement);
-				AddStringListToEllementAsAttributeAndFilter(includeFiles, "ClInclude", "Include", project.IncludeFiles, RootPath);
+				AddStringListToEllementAsAttributeAndFilter(includeFiles, "ClInclude", "Include", Project.IncludeFiles, RootPath);
 
 				XmlElement compileFiles = CreateElement("ItemGroup", projectElement);
-				AddStringListToEllementAsAttributeAndFilter(includeFiles, "ClCompile", "Include", project.CompileFiles, RootPath);
+				AddStringListToEllementAsAttributeAndFilter(includeFiles, "ClCompile", "Include", Project.CompileFiles, RootPath);
 
 				XmlElement noneFiles = CreateElement("ItemGroup", projectElement);
-				AddStringListToEllementAsAttributeAndFilter(noneFiles, "None", "Include", project.ExtraFiles, RootPath);
+				AddStringListToEllementAsAttributeAndFilter(noneFiles, "None", "Include", Project.ExtraFiles, RootPath);
 			}
 
 			return projectElement.OwnerDocument.OuterXml;
+		}
+
+		public virtual string GenerateResourceDefinition(CPPProject Project)
+		{
+			ResourceDefinition resourceDefinition = Project.ResourceDefinition;
+
+			if (resourceDefinition == null)
+				return null;
+
+			string commaSeparatedVersion = resourceDefinition.ProductVersion.ToString().Replace('.', ',');
+
+			StringBuilder builder = new StringBuilder();
+
+			builder.AppendLine("#include \"winres.h\"");
+			builder.AppendLine("VS_VERSION_INFO VERSIONINFO");
+			{
+				builder.AppendFormat(" FILEVERSION {0}\n", commaSeparatedVersion);
+				builder.AppendFormat(" PRODUCTVERSION {0}\n", commaSeparatedVersion);
+				builder.AppendLine(" FILEFLAGSMASK 0x3fL");
+
+				builder.AppendLine("#ifdef _DEBUG");
+				builder.AppendLine(" FILEFLAGS 0x1L");
+				builder.AppendLine("#else");
+				builder.AppendLine(" FILEFLAGS 0x0L");
+				builder.AppendLine("#endif");
+
+				builder.AppendLine(" FILEOS 0x40004L");
+				builder.AppendLine(" FILETYPE 0x1L");
+				builder.AppendLine(" FILESUBTYPE 0x0L");
+
+				builder.AppendLine("BEGIN");
+				{
+					builder.AppendLine("	BLOCK \"StringFileInfo\"");
+					builder.AppendLine("	BEGIN");
+					{
+						builder.AppendLine("		BLOCK \"040904b0\"");
+						builder.AppendLine("		BEGIN");
+						{
+							builder.AppendFormat("			VALUE \"CompanyName\", \"{0}\"\n", resourceDefinition.CompanyName);
+							builder.AppendFormat("			VALUE \"ProductName\", \"{0}\"\n", resourceDefinition.ProductName);
+							builder.AppendFormat("			VALUE \"ProductVersion\", \"{0}\"\n", resourceDefinition.ProductVersion);
+							builder.AppendFormat("			VALUE \"FileDescription\", \"{0}\"\n", resourceDefinition.ProductDescription);
+							builder.AppendFormat("			VALUE \"LegalCopyright\", \"{0}\"\n", resourceDefinition.Copyright);
+						}
+						builder.AppendLine("		END");
+
+					}
+					builder.AppendLine("	END");
+
+					builder.AppendLine("	BLOCK \"VarFileInfo\"");
+					builder.AppendLine("	BEGIN");
+					{
+						builder.AppendLine("		VALUE \"Translation\", 0x409, 1200");
+					}
+					builder.AppendLine("	END");
+				}
+				builder.AppendLine("END");
+			}
+
+			if (!string.IsNullOrEmpty(resourceDefinition.IconPath))
+				builder.AppendFormat("IDI_ICON1               ICON                    \"{0}\"\n", resourceDefinition.IconPath);
+
+			return builder.ToString();
 		}
 
 		public static string GetPlatformType(ProjectBase.ProfileBase.PlatformArchitectures Architecture)

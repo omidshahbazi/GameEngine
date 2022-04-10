@@ -137,7 +137,7 @@ namespace Engine.Frontend.System
 		{
 			WorkingDirectory = EngineRooDirectory;
 
-			ISerializeObject obj = Creator.Create<ISerializeObject>(File.ReadAllText(EngineRooDirectory + InfoFileName));
+			ISerializeObject obj = Creator.Create<ISerializeObject>(File.ReadAllText(EngineDirectory + InfoFileName));
 
 			Version = new Version(obj.Get<string>("Version", "0.0.0.0"));
 			Copyright = obj.Get<string>("Copyright");

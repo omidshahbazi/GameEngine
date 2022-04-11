@@ -333,7 +333,7 @@ namespace Engine.Frontend.Project.Generator
 			}
 
 			if (!string.IsNullOrEmpty(resourceDefinition.IconPath))
-				builder.AppendFormat("IDI_ICON1               ICON                    \"{0}\"\n", resourceDefinition.IconPath);
+				builder.AppendFormat("{0}               ICON                    \"{1}\"\n", BuildSystemHelper.IconIDName, resourceDefinition.IconPath);
 
 			return builder.ToString();
 		}

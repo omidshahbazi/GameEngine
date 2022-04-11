@@ -38,6 +38,9 @@ namespace Engine
 
 			static void GetExecutablePath(wstr Path);
 
+			static Handle GetModuleIcon(cwstr ModuleName);
+			static Handle GetExecutableIcon(void);
+
 			static void GetExecutableExtension(str Extension);
 			static void GetDynamicLinkLibraryExtension(str Extension);
 

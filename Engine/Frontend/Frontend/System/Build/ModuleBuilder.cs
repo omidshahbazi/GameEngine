@@ -122,7 +122,7 @@ namespace Engine.Frontend.System.Build
 			}
 
 			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
-				GenerateHashes();
+				GenerateHashes(State != States.Failed);
 		}
 
 		protected override void CreateDirectories()
@@ -180,18 +180,21 @@ namespace Engine.Frontend.System.Build
 			return result;
 		}
 
-		private void GenerateHashes()
+		private void GenerateHashes(bool Failed)
 		{
 			ISerializeObject hashesData = Creator.Create<ISerializeObject>();
 
-			List<string> extensions = new List<string>();
-			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
-			extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
-			extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
-			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
+			if (!Failed)
+			{
+				List<string> extensions = new List<string>();
+				extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
+				extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
+				extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
+				string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
 
-			foreach (string file in files)
-				hashesData.Set(GetHash(file).ToString(), GetHash(File.ReadAllText(file)));
+				foreach (string file in files)
+					hashesData.Set(GetHash(file).ToString(), GetHash(File.ReadAllText(file)));
+			}
 
 			File.WriteAllText(HashesFilePath, hashesData.Content);
 		}
@@ -314,6 +317,7 @@ namespace Engine.Frontend.System.Build
 			foreach (string file in files)
 				cppProj.AddCompileFile(file);
 
+			profile.AddPreprocessorDefinition(BuildSystemHelper.IconIDDefinition);
 			cppProj.ResourceDefinition = new ResourceDefinition();
 			cppProj.ResourceDefinition.ProductName = Module.Name;
 			cppProj.ResourceDefinition.ProductVersion = EnvironmentHelper.Version;

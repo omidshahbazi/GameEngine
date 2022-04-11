@@ -42,6 +42,16 @@ namespace Engine
 			GetModuleFileNameW(nullptr, Path, _MAX_PATH);
 		}
 
+		PlatformOS::Handle PlatformOS::GetModuleIcon(cwstr ModuleName)
+		{
+			return (Handle)LoadIcon((HMODULE)GetModuleInstance(ModuleName), MAKEINTRESOURCE(ICON_ID));
+		}
+
+		PlatformOS::Handle PlatformOS::GetExecutableIcon(void)
+		{
+			return GetModuleIcon(nullptr);
+		}
+
 		void PlatformOS::GetExecutableExtension(str Extension)
 		{
 			PlatformMemory::Copy(".exe", Extension, 4);

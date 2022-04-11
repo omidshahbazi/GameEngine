@@ -1328,7 +1328,7 @@ namespace Engine
 			wcex.cbClsExtra = 0;
 			wcex.cbWndExtra = 0;
 			wcex.hInstance = (HINSTANCE)Handle;
-			wcex.hIcon = nullptr;
+			wcex.hIcon = (HICON)PlatformOS::GetExecutableIcon();
 			wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
 			wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 			wcex.lpszMenuName = nullptr;

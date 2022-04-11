@@ -24,5 +24,9 @@ namespace Engine.Frontend.System
 
 		public static readonly string ExportAPIPreprocessor = "EXPORT_API".GetAPIPreprocessorRaw(APIPreprocessorTypes.Export);
 		public static readonly string EmptyModuleNamePreprocessor = ((ModuleRules)null).GetNamePreprocessor();
+
+		public static readonly int IconID = 100;
+		public static readonly string IconIDName = "ICON_ID";
+		public static readonly string IconIDDefinition = $"{IconIDName}={IconID}";
 	}
 }

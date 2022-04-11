@@ -68,6 +68,7 @@ namespace Engine.Frontend.System.Generator
 						profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
 						profile.AddPreprocessorDefinition(architecture.GetPreprocessor());
 						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
+						profile.AddPreprocessorDefinition(BuildSystemHelper.IconIDDefinition);
 					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileSearchPattern);

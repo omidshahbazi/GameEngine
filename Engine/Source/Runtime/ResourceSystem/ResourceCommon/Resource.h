@@ -6,7 +6,7 @@
 #include <Common\PrimitiveTypes.h>
 #include <Platform\PlatformThread.h>
 #include <Containers\GUID.h>
-#include <functional>
+#include <Containers\Delegate.h>
 
 namespace Engine
 {
@@ -76,19 +76,18 @@ namespace Engine
 		class Resource : public ResourceBase
 		{
 		public:
-			typedef std::function<void(void)> CallbackType;
+		public:
+			typedef Delegate<Resource<T>*> OnUpdatedEventHandler;
 
 		public:
-			Resource(T* Resource = nullptr) :
-				m_Resource(Resource),
-				m_Set(m_Resource != nullptr)
+			Resource(T* Resource = nullptr)
 			{
+				*this = Resource;
 			}
 
-			Resource(const Resource<T>& Other) :
-				m_Resource(Other.m_Resource),
-				m_Set(Other.m_Set.load())
+			Resource(const Resource<T>& Other)
 			{
+				*this = Other;
 			}
 
 			T* GetPointer(void)
@@ -111,19 +110,13 @@ namespace Engine
 				m_Resource = Resource;
 				m_Set = true;
 
-				if (m_Callback != nullptr)
-					(*m_Callback)();
+				OnUpdated(this);
 			}
 
 			void Wait(void) const
 			{
 				while (!m_Set)
 					PlatformThread::Sleep(1);
-			}
-
-			void Then(const CallbackType& Callback)
-			{
-				m_Callback = std::make_shared<CallbackType>(Callback);
 			}
 
 			T* operator *(void)
@@ -146,10 +139,18 @@ namespace Engine
 				return m_Resource;
 			}
 
+			Resource& operator=(T* Other)
+			{
+				m_Resource = Other;
+				m_Set = (m_Resource != nullptr);
+
+				return *this;
+			}
+
 			Resource& operator=(const Resource<T>& Other)
 			{
 				m_Resource = Other.m_Resource;
-				m_Set = Other.m_Set.load();
+				m_Set = (m_Resource != nullptr);
 
 				return *this;
 			}
@@ -157,7 +158,9 @@ namespace Engine
 		private:
 			T* m_Resource;
 			std::atomic_bool m_Set;
-			std::shared_ptr<CallbackType> m_Callback;
+
+		public:
+			OnUpdatedEventHandler OnUpdated;
 		};
 
 		typedef Resource<RenderSystem::Texture> TextureResource;

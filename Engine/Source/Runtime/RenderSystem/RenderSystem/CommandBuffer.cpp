@@ -243,9 +243,6 @@ namespace Engine
 			if (Material == nullptr)
 				return false;
 
-			if (Material->GetProgram() == nullptr)
-				return false;
-
 			m_Buffer.Append(CommandTypes::Draw);
 
 			DrawCommandData data = {};
@@ -533,10 +530,14 @@ namespace Engine
 			BuiltiInProgramConstants::GetInstance()->SetTransfomData(data);
 
 			auto& material = *Material;
+			auto programRes = material.GetProgram();
+
+			if (programRes == nullptr || programRes->IsNull())
+				return;
 
 			CommandBuffer->SetState(material.GetRenderState());
 
-			CommandBuffer->SetProgram(material.GetProgram()->GetPointer()->GetHandle());
+			CommandBuffer->SetProgram((*programRes)->GetHandle());
 
 			ProgramConstantSupplier::GPUBufferDataMap buffers;
 			for (auto& info : material.GetBuffers())

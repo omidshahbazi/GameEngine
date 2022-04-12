@@ -100,6 +100,9 @@ namespace Engine
 
 		Material::~Material(void)
 		{
+			if (m_Program != nullptr)
+				m_Program->OnUpdated -= EventListener_OnProgramUpdated;
+
 			m_Program = nullptr;
 
 			for (auto& constant : m_Buffers)
@@ -114,49 +117,57 @@ namespace Engine
 			if (m_Program == Program)
 				return true;
 
+			if (m_Program != nullptr)
+				m_Program->OnUpdated -= EventListener_OnProgramUpdated;
+
 			m_Program = Program;
 
 			if (m_Program == nullptr)
 				return true;
 
-			CoreDebugAssert(Categories::RenderSystem, !m_Program->IsNull(), "Program cannot be null to initialize a Pass");
+			m_Program->OnUpdated += EventListener_OnProgramUpdated;
 
-			auto& metaInfo = (*m_Program)->GetMetaInfo();
+			if (m_Program != nullptr)
+				OnProgramUpdated(Program);
 
-			for (auto& constant : metaInfo.Variables)
-			{
-				ProgramConstantHash hash = GetHash(constant.Name);
+			//CoreDebugAssert(Categories::RenderSystem, !m_Program->IsNull(), "Program cannot be null to initialize a Pass");
 
-				if (constant.DataType == ProgramDataTypes::Unknown)
-				{
-					const StructMetaInfo* structInfo = FindStructInfoOf(metaInfo, hash);
-					if (structInfo == nullptr)
-						return false;
+			//auto& metaInfo = (*m_Program)->GetMetaInfo();
 
-					if (m_Buffers.Contains(hash))
-					{
-						const BufferMetaConstantData& data = m_Buffers[hash];
-						if (data.Value->GetSize() == structInfo->Size)
-							continue;
+			//for (auto& constant : metaInfo.Variables)
+			//{
+			//	ProgramConstantHash hash = GetHash(constant.Name);
 
-						RenderSystemAllocators::ContainersAllocator_Deallocate(data.Value);
-					}
+			//	if (constant.DataType == ProgramDataTypes::Unknown)
+			//	{
+			//		const StructMetaInfo* structInfo = FindStructInfoOf(metaInfo, hash);
+			//		if (structInfo == nullptr)
+			//			return false;
 
-					CreateBufferData(m_Buffers, constant.Handle, constant.Name, constant.UserDefinedType, structInfo->Size);
+			//		if (m_Buffers.Contains(hash))
+			//		{
+			//			const BufferMetaConstantData& data = m_Buffers[hash];
+			//			if (data.Value->GetSize() == structInfo->Size)
+			//				continue;
 
-					continue;
-				}
-				else
-				{
-					if (m_Textures.Contains(hash))
-						continue;
+			//			RenderSystemAllocators::ContainersAllocator_Deallocate(data.Value);
+			//		}
 
-					CreateTextureData(m_Textures, constant.Handle, constant.Name);
-				}
-			}
+			//		CreateBufferData(m_Buffers, constant.Handle, constant.Name, constant.UserDefinedType, structInfo->Size);
 
-			Remove(m_Buffers, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, true);
-			Remove(m_Textures, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, false);
+			//		continue;
+			//	}
+			//	else
+			//	{
+			//		if (m_Textures.Contains(hash))
+			//			continue;
+
+			//		CreateTextureData(m_Textures, constant.Handle, constant.Name);
+			//	}
+			//}
+
+			//Remove(m_Buffers, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, true);
+			//Remove(m_Textures, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, false);
 		}
 
 		ConstantBuffer* Material::GetConstantBuffer(ProgramConstantHash Hash)
@@ -257,6 +268,48 @@ namespace Engine
 			Remove(m_Textures, [&Other](ProgramConstantHash Hash) { return !Other.m_Textures.Contains(Hash); }, false);
 
 			return *this;
+		}
+
+		void Material::OnProgramUpdated(ProgramResource* Resource)
+		{
+			if (Resource->IsNull())
+				return;
+
+			auto& metaInfo = (*m_Program)->GetMetaInfo();
+
+			for (auto& constant : metaInfo.Variables)
+			{
+				ProgramConstantHash hash = GetHash(constant.Name);
+
+				if (constant.DataType == ProgramDataTypes::Unknown)
+				{
+					const StructMetaInfo* structInfo = FindStructInfoOf(metaInfo, hash);
+					CoreDebugAssert(Categories::RenderSystem, structInfo != nullptr, "Couldn't find StructMetaInfo of %S", constant.UserDefinedType);
+
+					if (m_Buffers.Contains(hash))
+					{
+						const BufferMetaConstantData& data = m_Buffers[hash];
+						if (data.Value->GetSize() == structInfo->Size)
+							continue;
+
+						RenderSystemAllocators::ContainersAllocator_Deallocate(data.Value);
+					}
+
+					CreateBufferData(m_Buffers, constant.Handle, constant.Name, constant.UserDefinedType, structInfo->Size);
+
+					continue;
+				}
+				else
+				{
+					if (m_Textures.Contains(hash))
+						continue;
+
+					CreateTextureData(m_Textures, constant.Handle, constant.Name);
+				}
+			}
+
+			Remove(m_Buffers, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, true);
+			Remove(m_Textures, [&metaInfo](ProgramConstantHash Hash) { return !metaInfo.Variables.ContainsIf([Hash](auto& item) { return Material::GetHash(item.Name) == Hash; }); }, false);
 		}
 
 		ProgramConstantHash Material::GetHash(const String& Name)

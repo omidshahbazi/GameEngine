@@ -98,6 +98,9 @@ namespace Engine
 			INLINE Material& operator=(const Material& Other);
 
 		private:
+			void OnProgramUpdated(ProgramResource* Resource);
+			DECLARE_MEMBER_EVENT_LISTENER(Material, OnProgramUpdated);
+
 			INLINE const BufferMetaDataMap& GetBuffers(void) const
 			{
 				return m_Buffers;

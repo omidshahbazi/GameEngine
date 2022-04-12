@@ -65,7 +65,7 @@ namespace Engine
 
 				INLINE void SetTexture(Texture* Texture)
 				{
-					m_Texture = TextureResource(Texture);
+					m_Texture = Texture;
 				}
 
 			public:

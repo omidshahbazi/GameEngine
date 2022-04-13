@@ -400,6 +400,9 @@ namespace Engine
 						buildOutVarialbe = true;
 					}
 
+					if (location < 0)
+						THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't fine layout", Register);
+
 					Shader += "layout(location=";
 					Shader += StringUtility::ToString<char8>(location);
 					Shader += ")";

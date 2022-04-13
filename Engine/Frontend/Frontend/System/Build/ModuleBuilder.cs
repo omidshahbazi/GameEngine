@@ -122,7 +122,7 @@ namespace Engine.Frontend.System.Build
 			}
 
 			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
-				GenerateHashes(State != States.Failed);
+				GenerateHashes(State == States.Failed);
 		}
 
 		protected override void CreateDirectories()

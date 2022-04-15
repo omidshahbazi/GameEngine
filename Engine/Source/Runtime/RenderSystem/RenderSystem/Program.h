@@ -13,12 +13,18 @@ namespace Engine
 	namespace RenderSystem
 	{
 		class DeviceInterface;
-		class Material;
+
+		namespace Private
+		{
+			class ProgramInstance;
+		}
+
+		using namespace Private;
 
 		class RENDERSYSTEM_API Program : public NativeType
 		{
 			friend class DeviceInterface;
-			friend class Material;
+			friend class ProgramInstance;
 
 		private:
 			Program(ThreadedDevice* Device, ResourceHandle Handle, const MetaInfo& Meta);

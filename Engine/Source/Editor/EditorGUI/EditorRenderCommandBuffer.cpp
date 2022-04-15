@@ -14,26 +14,9 @@ namespace Engine
 		EditorRenderCommandBuffer::EditorRenderCommandBuffer(void) :
 			CommandBuffer("EditorRenderCommandBuffer"),
 			m_ProjMat(Matrix4F::Identity),
-			m_PivotMat(Matrix4F::Identity),
-			m_CopiedMaterials(EditorGUIAllocators::TypesAllocator, 4096)
+			m_PivotMat(Matrix4F::Identity)
 		{
 			m_QuadMesh = Resources::GetInstance()->GetQuadMesh();
-		}
-
-		void EditorRenderCommandBuffer::Clear(void)
-		{
-			CommandBuffer::Clear();
-
-			m_CopiedMaterials.Clear();
-		}
-
-		void EditorRenderCommandBuffer::DrawText(Mesh* Mesh, const Matrix4F& Model, const Material& Material)
-		{
-			m_CopiedMaterials.Add({});
-			auto& material = m_CopiedMaterials[m_CopiedMaterials.GetSize() - 1];
-			material = Material;
-
-			DrawMesh(Mesh, Model, &material);
 		}
 
 		void EditorRenderCommandBuffer::DrawQuad(const Vector2I& Position, float32 DegreesRotation, const Vector2I& Scale, const Material* Material)

@@ -251,7 +251,7 @@ namespace Engine
 			data.View = View;
 			data.Projection = Projection;
 			data.MVP = MVP;
-			data.Material = Material;
+			data.Material = ConstCast(RenderSystem::Material*, Material);
 
 			m_Buffer.Append(data);
 
@@ -272,7 +272,7 @@ namespace Engine
 			m_Buffer.Append(CommandTypes::Draw);
 
 			DispatchCommandData data = {};
-			data.ComputeProgram = ComputeProgram;
+			data.ComputeProgram = ConstCast(RenderSystem::ComputeProgram*, ComputeProgram);
 			data.ThreadGroupCount = ThreadGroupCount;
 
 			m_Buffer.Append(data);
@@ -520,7 +520,7 @@ namespace Engine
 #undef SET_VIEWPORT
 		}
 
-		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, const Material* Material)
+		void CommandBuffer::InsertDrawCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const Mesh* Mesh, const Matrix4F& Model, const Matrix4F& View, const Matrix4F& Projection, const Matrix4F& MVP, Material* Material)
 		{
 			static BuiltiInProgramConstants::TransformData data;
 			data.Model = Model;
@@ -539,41 +539,50 @@ namespace Engine
 
 			CommandBuffer->SetProgram((*programRes)->GetHandle());
 
-			ProgramConstantSupplier::GPUBufferDataMap buffers;
+			ProgramConstantSupplier::GetInstance()->SupplyConstants(material);
+
+			ProgramConstantSupplier::ProgramGPUConstantBufferMap buffers;
 			for (auto& info : material.GetBuffers())
 			{
-				auto& constantInfo = info.GetSecond();
-				auto& localConstantInfo = buffers[info.GetFirst()];
+				auto& hash = info.GetFirst();
+				auto& bufferInfo = info.GetSecond();
 
-				localConstantInfo.Handle = constantInfo.Handle;
-				localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
-				localConstantInfo.Value->Copy(constantInfo.Value);
+				auto gpuBuffer = ConstantBuffers->Get(bufferInfo->GetSize());
+				gpuBuffer->Copy(bufferInfo);
+
+				buffers[hash] = gpuBuffer;
 			}
 
-			ProgramConstantSupplier::TextureDataMap textures;
+			ProgramTextureMap textures;
 			for (auto& info : material.GetTextures())
 				textures[info.GetFirst()] = info.GetSecond();
 
-			ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
+			const auto& handles = material.GetHandles();
 
 			for (auto& info : buffers)
 			{
-				auto& constant = info.GetSecond();
+				auto& hash = info.GetFirst();
+				if (!handles.Contains(hash))
+					continue;
 
-				CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+				CommandBuffer->SetProgramConstantBuffer(handles[hash], info.GetSecond()->GetHandle());
 			}
 
 			for (auto& info : textures)
 			{
-				auto& constant = info.GetSecond();
+				auto& hash = info.GetFirst();
+				if (!handles.Contains(hash))
+					continue;
+
+				auto& texture = info.GetSecond();
 
 				ResourceHandle texHandle = 0;
-				if (constant.Value != nullptr && !constant.Value->IsNull())
-					texHandle = constant.Value->GetPointer()->GetHandle();
+				if (texture != nullptr && !texture->IsNull())
+					texHandle = texture->GetPointer()->GetHandle();
 				else
 					texHandle = DefaultTexture->GetHandle();
 
-				CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
+				CommandBuffer->SetProgramTexture(handles[hash], texHandle);
 			}
 
 			for (uint16 i = 0; i < Mesh->GetSubMeshCount(); ++i)
@@ -590,48 +599,48 @@ namespace Engine
 			}
 		}
 
-		void CommandBuffer::InsertDispatchCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, const ComputeProgram* ComputeProgram, const Vector3I& ThreadGroupCount)
+		void CommandBuffer::InsertDispatchCommand(ICommandBuffer* CommandBuffer, FrameConstantBuffers* ConstantBuffers, Texture* DefaultTexture, ComputeProgram* ComputeProgram, const Vector3I& ThreadGroupCount)
 		{
 			auto& computeProgram = *ComputeProgram;
 
 			CommandBuffer->SetProgram(computeProgram.GetProgram()->GetPointer()->GetHandle());
 
-			ProgramConstantSupplier::GPUBufferDataMap buffers;
-			for (auto& info : computeProgram.GetBuffers())
-			{
-				auto& constantInfo = info.GetSecond();
-				auto& localConstantInfo = buffers[info.GetFirst()];
+			//ProgramConstantSupplier::GPUBufferDataMap buffers;
+			//for (auto& info : computeProgram.GetBuffers())
+			//{
+			//	auto& constantInfo = info.GetSecond();
+			//	auto& localConstantInfo = buffers[info.GetFirst()];
 
-				localConstantInfo.Handle = constantInfo.Handle;
-				localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
-				localConstantInfo.Value->Copy(constantInfo.Value);
-			}
+			//	localConstantInfo.Handle = constantInfo.Handle;
+			//	localConstantInfo.Value = ConstantBuffers->Get(constantInfo.Value->GetSize());
+			//	localConstantInfo.Value->Copy(constantInfo.Value);
+			//}
 
-			ProgramConstantSupplier::TextureDataMap textures;
-			for (auto& info : computeProgram.GetTextures())
-				textures[info.GetFirst()] = info.GetSecond();
+			//ProgramConstantSupplier::TextureDataMap textures;
+			//for (auto& info : computeProgram.GetTextures())
+			//	textures[info.GetFirst()] = info.GetSecond();
 
-			ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
+			//ProgramConstantSupplier::GetInstance()->SupplyConstants(buffers, textures);
 
-			for (auto& info : buffers)
-			{
-				auto& constant = info.GetSecond();
+			//for (auto& info : buffers)
+			//{
+			//	auto& constant = info.GetSecond();
 
-				CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
-			}
+			//	CommandBuffer->SetProgramConstantBuffer(constant.Handle, constant.Value->GetHandle());
+			//}
 
-			for (auto& info : textures)
-			{
-				auto& constant = info.GetSecond();
+			//for (auto& info : textures)
+			//{
+			//	auto& constant = info.GetSecond();
 
-				ResourceHandle texHandle = 0;
-				if (constant.Value != nullptr && !constant.Value->IsNull())
-					texHandle = constant.Value->GetPointer()->GetHandle();
-				else
-					texHandle = DefaultTexture->GetHandle();
+			//	ResourceHandle texHandle = 0;
+			//	if (constant.Value != nullptr && !constant.Value->IsNull())
+			//		texHandle = constant.Value->GetPointer()->GetHandle();
+			//	else
+			//		texHandle = DefaultTexture->GetHandle();
 
-				CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
-			}
+			//	CommandBuffer->SetProgramTexture(constant.Handle, texHandle);
+			//}
 
 			CommandBuffer->Dispatch(ThreadGroupCount.X, ThreadGroupCount.Y, ThreadGroupCount.Z);
 		}

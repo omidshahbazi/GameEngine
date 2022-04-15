@@ -28,32 +28,33 @@ namespace Engine
 			m_FetchTextureConstants[Material::GetHash(Name)] = std::make_shared<FetchTexturetFunction>(Function);
 		}
 
-		void ProgramConstantSupplier::SupplyConstants(GPUBufferDataMap& Buffers, TextureDataMap& Textures) const
+		void ProgramConstantSupplier::SupplyConstants(ProgramInstance& ProgramInstance) const
 		{
-#define IMPLEMENT_ITERATION(Map, SupplierMap) \
-			for (auto& item : Map) \
-			{ \
-				auto hash = item.GetFirst(); \
-				auto& constant = item.GetSecond(); \
-				if (!SupplierMap.Contains(hash)) \
-					continue; \
-				auto value = (*SupplierMap[hash])(); \
-				if (value == nullptr) \
-					continue; \
+			const auto& handles = ProgramInstance.GetHandles();
+			auto& buffer = ProgramInstance.GetBuffers();
+			auto& textures = ProgramInstance.GetTextures();
 
-#define END_OF_IMPLEMENT() \
+			for (auto& item : handles)
+			{
+				auto hash = item.GetFirst();
+
+				if (m_FetchBufferConstants.Contains(hash))
+				{
+					auto value = (*m_FetchBufferConstants[hash])();
+					if (value == nullptr)
+						continue;
+					
+					ProgramInstance.SetBuffer(hash, value);
+				}
+				else if (m_FetchTextureConstants.Contains(hash))
+				{
+					auto value = (*m_FetchTextureConstants[hash])();
+					if (value == nullptr)
+						continue;
+
+					ProgramInstance.SetTexture(hash, value);
+				}
 			}
-
-			IMPLEMENT_ITERATION(Buffers, m_FetchBufferConstants)
-				constant.Value->Copy(value);
-			END_OF_IMPLEMENT();
-
-			IMPLEMENT_ITERATION(Textures, m_FetchTextureConstants)
-				constant.Value = ConstCast(TextureResource*, value);
-			END_OF_IMPLEMENT();
-
-#undef END_OF_IMPLEMENT
-#undef IMPLEMENT_ITERATION
 		}
 	}
 }

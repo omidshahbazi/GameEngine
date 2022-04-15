@@ -86,13 +86,13 @@ namespace Engine
 				Matrix4F View;
 				Matrix4F Projection;
 				Matrix4F MVP;
-				const Material* Material;
+				Material* Material;
 			};
 
 			struct DispatchCommandData
 			{
 			public:
-				const ComputeProgram* ComputeProgram;
+				ComputeProgram* ComputeProgram;
 				Vector3I ThreadGroupCount;
 			};
 

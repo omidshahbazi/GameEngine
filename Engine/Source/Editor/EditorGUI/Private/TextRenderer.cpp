@@ -26,6 +26,22 @@ namespace Engine
 				m_Font = Resources::GetInstance()->GetFont();
 			}
 
+			void TextRenderer::Update(void)
+			{
+				uint32 textLen = m_Text.GetLength();
+				if (textLen > m_Materials.GetSize())
+				{
+					m_Materials.Clear();
+					m_Materials.Extend(textLen);
+
+					const auto& refMat = GetMaterial();
+
+					Material* materials = m_Materials.GetData();
+					for (uint32 i = 0; i < textLen; ++i)
+						materials[i] = refMat;
+				}
+			}
+
 			void TextRenderer::Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const
 			{
 				if (m_Text == WString::Empty)
@@ -34,17 +50,18 @@ namespace Engine
 				static const ProgramConstantHash ConstantHash_FontTexture = Material::GetHash("FontTexture");
 				static const ProgramConstantHash ConstantHash_data = Material::GetHash("data");
 
+				uint32 index = 0;
 				auto drawCallback = [&](const Font::Character* Character, const Matrix4F& Model)
 				{
 					TextRenderer* renderer = ConstCast(TextRenderer*, this);
 
-					renderer->GetMaterial().SetTexture(ConstantHash_FontTexture, Character->GetTexture());
-
 					renderer->m_Data.FontTextureBound = Character->GetBounds();
 
-					renderer->GetMaterial().SetBuffer(ConstantHash_data, &m_Data);
+					Material& material = renderer->m_Materials[index++];
+					material.SetTexture(ConstantHash_FontTexture, Character->GetTexture());
+					material.SetBuffer(ConstantHash_data, &m_Data);
 
-					CommandBuffer->DrawText(Character->GetMesh(), Model, GetMaterial());
+					CommandBuffer->DrawMesh(Character->GetMesh(), Model, &material);
 				};
 
 				static StringRenderer::Info info;
@@ -61,6 +78,7 @@ namespace Engine
 				Matrix4F modelMat(Matrix4F::Identity);
 				modelMat.SetTranslate(Vector3F(Position.X, Position.Y + m_Size, 0));
 
+				index = 0;
 				StringRenderer::Render(drawCallback, modelMat, m_Text, &info);
 			}
 

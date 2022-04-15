@@ -11,17 +11,10 @@ namespace Engine
 
 	namespace RenderSystem
 	{
-		namespace Private
-		{
-			class GPUConstantBuffer;
-		}
-
 		using namespace Private;
 
 		class RENDERSYSTEM_API ConstantBuffer
 		{
-			friend class GPUConstantBuffer;
-
 		public:
 			typedef ResourceHandle Handle;
 
@@ -68,6 +61,7 @@ namespace Engine
 			{
 				return m_Size;
 			}
+			void Resize(uint32 Size);
 
 		private:
 			uint32 m_Size;

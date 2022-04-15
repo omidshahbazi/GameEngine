@@ -35,8 +35,11 @@ namespace Engine
 				{
 				}
 
-				virtual void Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const override;
+				void Update(void);
 
+				void Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const override;
+
+			public:
 				void SetColor(const ColorUI8& Value) override;
 
 				float32 GetSize(void) const
@@ -72,7 +75,7 @@ namespace Engine
 				}
 				void SetText(const String& Value)
 				{
-					m_Text = Value.ChangeType<char16>();
+					SetText(Value.ChangeType<char16>());
 				}
 				void SetText(const WString& Value)
 				{
@@ -85,6 +88,7 @@ namespace Engine
 				bool m_IsMultiLine;
 				float32 m_LineSpacing;
 				Data m_Data;
+				Vector<Material> m_Materials;
 
 				WString m_Text;
 			};

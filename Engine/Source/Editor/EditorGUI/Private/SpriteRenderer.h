@@ -44,9 +44,9 @@ namespace Engine
 				{
 				}
 
-				virtual void Update(void) override;
+				void Update(void) override;
 
-				virtual void Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const override;
+				void Render(EditorRenderCommandBuffer* CommandBuffer, const Vector2I& Position) const override;
 
 				void SetColor(const ColorUI8& Value) override;
 

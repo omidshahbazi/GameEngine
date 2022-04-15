@@ -20,6 +20,7 @@ namespace Engine
 	{
 		namespace Private
 		{
+			class ProgramInstance;
 			class GPUConstantBuffer;
 		}
 
@@ -42,10 +43,7 @@ namespace Engine
 		private:
 			typedef Map<ProgramConstantHash, std::shared_ptr<FetchBufferFunction>> FetchBufferConstantMap;
 			typedef Map<ProgramConstantHash, std::shared_ptr<FetchTexturetFunction>> FetchTextureConstantMap;
-			typedef ConstantData<GPUConstantBuffer*> GPUBufferConstantData;
-			typedef ConstantData<TextureResource*> TextureConstantData;
-			typedef Map<ProgramConstantHash, GPUBufferConstantData> GPUBufferDataMap;
-			typedef Map<ProgramConstantHash, TextureConstantData> TextureDataMap;
+			typedef ProgramBufferMap<GPUConstantBuffer> ProgramGPUConstantBufferMap;
 
 		private:
 			ProgramConstantSupplier(void)
@@ -59,7 +57,7 @@ namespace Engine
 			void RegisterTexture(const String& Name, FetchTexturetFunction Function);
 
 		private:
-			void SupplyConstants(GPUBufferDataMap& Buffers, TextureDataMap& Textures) const;
+			void SupplyConstants(ProgramInstance& ProgramInstance) const;
 
 		private:
 			FetchBufferConstantMap m_FetchBufferConstants;

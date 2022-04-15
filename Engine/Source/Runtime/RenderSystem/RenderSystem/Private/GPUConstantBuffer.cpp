@@ -15,17 +15,8 @@ namespace Engine
 
 			void GPUConstantBuffer::Copy(const ConstantBuffer* const Other)
 			{
-				PlatformMemory::Copy(Other->m_CachedData, m_CachedData, Math::Min<uint16>(GPUBuffer::GetSize(), Other->GetSize()));
+				PlatformMemory::Copy(Other->Get<byte>(), ConstantBuffer::Get<byte>(), Math::Min<uint16>(GPUBuffer::GetSize(), Other->GetSize()));
 			}
-
-			//void GPUConstantBuffer::UploadToGPU(void)
-			//{
-			//	GPUBuffer::Lock(GPUBufferAccess::WriteOnly, true);
-
-			//	PlatformMemory::Copy(m_CachedData, GetCurrentBuffer(), GPUBuffer::GetSize());
-
-			//	GPUBuffer::Unlock(true);
-			//}
 		}
 	}
 }

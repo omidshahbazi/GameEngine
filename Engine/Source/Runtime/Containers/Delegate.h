@@ -22,10 +22,14 @@ namespace Engine
 		public:
 			void operator += (SharedFunctionType Handler)
 			{
+				ScopeGuard scope(m_Lock);
+
 				m_Handlers.Add(Handler);
 			}
 			void operator -= (SharedFunctionType Handler)
 			{
+				ScopeGuard scope(m_Lock);
+
 				m_Handlers.Remove(Handler);
 			}
 
@@ -33,6 +37,8 @@ namespace Engine
 
 			void operator =(SharedFunctionType Handler)
 			{
+				ScopeGuard scope(m_Lock);
+
 				m_Handlers.Clear();
 
 				m_Handlers.Add(Handler);
@@ -40,11 +46,15 @@ namespace Engine
 
 			void operator =(void*)
 			{
+				ScopeGuard scope(m_Lock);
+
 				m_Handlers.Clear();
 			}
 
 			void operator()(Params... Arguments) const
 			{
+				ScopeGuard scope(ConstCast(SpinLock&, m_Lock));
+
 				for (auto handler : m_Handlers)
 					(*handler)(Arguments...);
 			}
@@ -56,6 +66,7 @@ namespace Engine
 
 		private:
 			Vector<SharedFunctionType> m_Handlers;
+			SpinLock m_Lock;
 		};
 
 #define DECLARE_MEMBER_EVENT_LISTENER(DeclaringType, Listener) std::shared_ptr<ExtractFunctionType<decltype(&DeclaringType::Listener)>::Type> EventListener_##Listener = std::make_shared<ExtractFunctionType<decltype(&DeclaringType::Listener)>::Type>(Attach(&DeclaringType::Listener, this))

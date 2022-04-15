@@ -27,7 +27,7 @@ namespace Engine
 
 				const byte* GetCachedData(void) const
 				{
-					return m_CachedData;
+					return ConstantBuffer::Get<byte>();
 				}
 			};
 		}

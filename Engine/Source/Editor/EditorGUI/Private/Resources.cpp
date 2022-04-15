@@ -41,8 +41,6 @@ namespace Engine
 
 				ProgramResource* spriteRendererProgram = ResourceManager::GetInstance()->GetSpriteRendererShader();
 				{
-					//spriteRendererProgram->Wait();
-
 					m_SpriteRendererMaterial.SetProgram(spriteRendererProgram);
 					m_SpriteRendererMaterial.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
 					m_SpriteRendererMaterial.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;
@@ -51,8 +49,6 @@ namespace Engine
 
 				ProgramResource* textRendererProgram = m_ResourceHolder->Load<Program>("Programs/TextureText.program");
 				{
-					//textRendererProgram->Wait();
-
 					m_TextRendererMaterial.SetProgram(textRendererProgram);
 					m_TextRendererMaterial.GetRenderState().BlendFunctionDestinationFactor = BlendFunctions::OneMinusSourceAlpha;
 					m_TextRendererMaterial.GetRenderState().BlendFunctionSourceFactor = BlendFunctions::SourceAlpha;

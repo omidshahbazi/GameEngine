@@ -67,7 +67,6 @@ BEGIN_ENTRY_POINT
 		ProgramResource* textShader = resources->Load<Program>("TextShader.program");
 		ProgramResource* shader = resources->Load<Program>("Shader.program");
 
-		shader->Wait();
 		Material mat(shader);
 		mat.SetQueue(RenderQueues::Geometry);
 		mat.SetTexture("DiffuseTexture", brickTex);

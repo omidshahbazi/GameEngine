@@ -23,10 +23,10 @@ namespace Engine
 			friend class CommandBuffer;
 
 		public:
-			typedef MetaConstantData<ConstantBuffer*> BufferMetaConstantData;
-			typedef MetaConstantData<TextureResource*> TextureMetaConstantData;
-			typedef Map<ProgramConstantHash, BufferMetaConstantData> BufferMetaDataMap;
-			typedef Map<ProgramConstantHash, TextureMetaConstantData> TextureMetaDataMap;
+			//typedef MetaConstantData<ConstantBuffer*> BufferMetaConstantData;
+			//typedef MetaConstantData<TextureResource*> TextureMetaConstantData;
+			//typedef Map<ProgramConstantHash, BufferMetaConstantData> BufferMetaDataMap;
+			//typedef Map<ProgramConstantHash, TextureMetaConstantData> TextureMetaDataMap;
 
 		public:
 			ComputeProgram(void);
@@ -37,20 +37,20 @@ namespace Engine
 			}
 
 		private:
-			INLINE const BufferMetaDataMap& GetBuffers(void) const
-			{
-				return m_Buffers;
-			}
+			//INLINE const BufferMetaDataMap& GetBuffers(void) const
+			//{
+			//	return m_Buffers;
+			//}
 
-			INLINE const TextureMetaDataMap& GetTextures(void) const
-			{
-				return m_Textures;
-			}
+			//INLINE const TextureMetaDataMap& GetTextures(void) const
+			//{
+			//	return m_Textures;
+			//}
 
 		private:
 			ProgramResource* m_Program;
-			BufferMetaDataMap m_Buffers;
-			TextureMetaDataMap m_Textures;
+			//BufferMetaDataMap m_Buffers;
+			//TextureMetaDataMap m_Textures;
 		};
 	}
 }

@@ -281,58 +281,75 @@ namespace Engine
 			return '\0';
 		}
 
-		bool Tokenizer::RequireToken(Token& Token)
+		void Tokenizer::RequireToken(Token& Token)
 		{
 			if (GetToken(Token))
-				return true;
+				return;
 
 			THROW_LEXER_EXCEPTION("Token required");
-
-			return false;
 		}
 
-		bool Tokenizer::RequireSymbol(const String& Match, const String& Tag)
+		void Tokenizer::RequireIdentifierToken(Token& Token)
+		{
+			if (MatchIdentifierToken(Token))
+				return;
+
+			THROW_LEXER_EXCEPTION("Missing an identifier");
+		}
+
+		bool Tokenizer::MatchIdentifierToken(Token& Token)
+		{
+			RequireToken(Token);
+
+			if (Token.GetTokenType() != Token::Types::Identifier)
+			{
+				UngetToken(Token);
+				return false;
+			}
+
+			return true; 
+		}
+
+		void Tokenizer::RequireSymbol(const String& Match, const String& Tag)
 		{
 			if (MatchSymbol(Match))
-				return true;
+				return;
 
 			THROW_LEXER_EXCEPTION("Missing symbol '" + Match + "' in " + Tag);
-
-			return false;
 		}
 
 		bool Tokenizer::MatchSymbol(const String& Match)
 		{
 			Token token;
+			if (!GetToken(token))
+				return false;
 
-			if (GetToken(token))
-				if (token.GetTokenType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
-					return true;
-				else
-					UngetToken(token);
+			if (token.GetTokenType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
+				return true;
+
+			UngetToken(token);
 
 			return false;
 		}
 
-		bool Tokenizer::RequireIdentifier(const String& Match, const String& Tag)
+		void Tokenizer::RequireIdentifier(const String& Match, const String& Tag)
 		{
 			if (MatchIdentifier(Match))
-				return true;
+				return;
 
 			THROW_LEXER_EXCEPTION("Missing identifier '" + Match + "' in " + Tag);
-
-			return false;
 		}
 
 		bool Tokenizer::MatchIdentifier(const String& Match)
 		{
 			Token token;
+			if (!GetToken(token))
+				return false;
 
-			if (GetToken(token))
-				if (token.GetTokenType() == Token::Types::Identifier && token.Matches(Match, Token::SearchCases::IgnoreCase))
-					return true;
-				else
-					UngetToken(token);
+			if (token.GetTokenType() == Token::Types::Identifier && token.Matches(Match, Token::SearchCases::IgnoreCase))
+				return true;
+
+			UngetToken(token);
 
 			return false;
 		}

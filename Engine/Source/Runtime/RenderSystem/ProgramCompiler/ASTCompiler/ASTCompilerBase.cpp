@@ -215,12 +215,6 @@ namespace Engine
 
 				BuildMemberAccessStatement(stm, Type, Stage, Shader);
 			}
-			else if (IsAssignableFrom(Statement, SemicolonStatement))
-			{
-				SemicolonStatement* stm = ReinterpretCast(SemicolonStatement*, Statement);
-
-				BuildSemicolonStatement(stm, Type, Stage, Shader);
-			}
 			else if (IsAssignableFrom(Statement, IfStatement))
 			{
 				IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
@@ -254,11 +248,12 @@ namespace Engine
 			else
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 
-			//ContinueStatement
-			//DoStatement
-			//ForStatement
-			//SwitchStatement
-			//WhileStatement
+			//Break
+			//Continue
+			//For
+			//Switch/Case/Default
+			//While
+			//Do/While
 		}
 
 		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -310,7 +305,13 @@ namespace Engine
 
 			BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
-			if (!isAssignment)
+			if (isAssignment)
+			{
+				Shader += ";";
+
+				ADD_NEW_LINE();
+			}
+			else
 				Shader += ")";
 		}
 
@@ -372,13 +373,15 @@ namespace Engine
 			Shader += " ";
 			Shader += Statement->GetName();
 
-			if (Statement->GetInitialStatement() == nullptr)
-				Shader += ';';
-			else
+			if (Statement->GetInitialStatement() != nullptr)
 			{
 				Shader += "=";
 				BuildStatement(Statement->GetInitialStatement(), Type, Stage, Shader);
 			}
+
+			Shader += ";";
+
+			ADD_NEW_LINE();
 		}
 
 		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -399,13 +402,6 @@ namespace Engine
 			Shader += ".";
 
 			BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-		}
-
-		void ASTCompilerBase::BuildSemicolonStatement(SemicolonStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-		{
-			Shader += ";";
-
-			ADD_NEW_LINE();
 		}
 
 		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -451,7 +447,7 @@ namespace Engine
 
 		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			Shader += "discard";
+			Shader += "discard;";
 		}
 
 		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

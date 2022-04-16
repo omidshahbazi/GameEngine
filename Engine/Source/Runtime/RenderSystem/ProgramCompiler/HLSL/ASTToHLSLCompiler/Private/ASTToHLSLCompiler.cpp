@@ -261,6 +261,10 @@ namespace Engine
 					Shader += "return ";
 					Shader += GetStageResultVariableName();
 				}
+
+				Shader += ";";
+
+				ADD_NEW_LINE();
 			}
 
 			void ASTToHLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

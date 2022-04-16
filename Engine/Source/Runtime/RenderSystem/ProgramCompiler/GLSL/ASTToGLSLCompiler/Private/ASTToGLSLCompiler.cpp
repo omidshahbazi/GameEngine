@@ -306,6 +306,10 @@ namespace Engine
 					Shader += "return ";
 
 				BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+
+				Shader += ";";
+
+				ADD_NEW_LINE();
 			}
 
 			void ASTToGLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

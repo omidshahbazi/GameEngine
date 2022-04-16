@@ -47,8 +47,9 @@ namespace Engine
 
 		void PreprocessorParser::Process(Parameters& Parameters, EndConditions ConditionMask)
 		{
-#define ADD_TO_RESULT(Value) Parameters.Result += ' ' + Value
+#define ADD_TO_RESULT(Value) Parameters.Result += String(" ") + String(Value)
 
+			uint32 lastLineIndex = 0;
 			while (true)
 			{
 				Token token;
@@ -57,7 +58,6 @@ namespace Engine
 
 				if (IsEndCondition(token, ConditionMask))
 				{
-					UngetToken(token);
 					return;
 				}
 				else if (token.Matches(SHARP, Token::SearchCases::CaseSensitive))
@@ -68,11 +68,18 @@ namespace Engine
 
 					if (IsEndCondition(preprocessorCommandToken, ConditionMask))
 					{
-						UngetToken(token);
 						return;
 					}
 					else
 						UngetToken(preprocessorCommandToken);
+				}
+
+				if (lastLineIndex != token.GetLineIndex())
+				{
+					uint32 diff = token.GetLineIndex() - lastLineIndex;
+					for (uint32 i = 0; i < diff; ++i)
+						ADD_TO_RESULT("\n");
+					lastLineIndex = token.GetLineIndex();
 				}
 
 				if (ParsePreprocessor(token, Parameters))
@@ -108,10 +115,7 @@ namespace Engine
 			if (!DeclarationToken.Matches(SHARP, Token::SearchCases::CaseSensitive))
 				return false;
 
-			Token preprocessorToken;
-			RequireToken(preprocessorToken);
-
-			if (preprocessorToken.Matches(PREPROCESSOR_INCLUDE, Token::SearchCases::CaseSensitive))
+			if (MatchIdentifier(PREPROCESSOR_INCLUDE))
 			{
 				Token openBracketToken;
 				RequireSymbol(OPEN_ANGLE_BRACKET, "Preprocess include directive");
@@ -130,14 +134,15 @@ namespace Engine
 
 				String source;
 				if (!Parameters.IncludeFunction(fileName, source))
-					THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find the include file {" + fileName + "}", preprocessorToken);
+					THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find the include file {" + fileName + "}", openBracketToken);
 
 				PreprocessorParser parser(source);
 				parser.Process(Parameters);
 
 				return true;
 			}
-			else if (preprocessorToken.Matches(PREPROCESSOR_DEFINE, Token::SearchCases::CaseSensitive))
+
+			if (MatchIdentifier(PREPROCESSOR_DEFINE))
 			{
 				Token nameToken;
 				RequireToken(nameToken);
@@ -155,7 +160,8 @@ namespace Engine
 
 				return true;
 			}
-			else if (preprocessorToken.Matches(PREPROCESSOR_UNDEF, Token::SearchCases::CaseSensitive))
+
+			if (MatchIdentifier(PREPROCESSOR_UNDEF))
 			{
 				Token nameToken;
 				RequireToken(nameToken);
@@ -166,12 +172,14 @@ namespace Engine
 
 				return true;
 			}
-			else if (preprocessorToken.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || preprocessorToken.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
+
+			bool isNotDef = false;
+			if (MatchIdentifier(PREPROCESSOR_IFDEF) || (isNotDef = MatchIdentifier(PREPROCESSOR_IFNDEF)))
 			{
 				Token nameToken;
 				RequireToken(nameToken);
 
-				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetIdentifier()) == preprocessorToken.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive));
+				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetIdentifier()) == isNotDef);
 
 				ParsePreprocessorBlock(Parameters, shouldRemoveBlock);
 
@@ -187,7 +195,7 @@ namespace Engine
 				return true;
 			}
 
-			THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", preprocessorToken);
+			THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", DeclarationToken);
 		}
 
 		void PreprocessorParser::ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove)
@@ -223,8 +231,6 @@ namespace Engine
 
 					prevToken = token;
 				}
-
-				return;
 			}
 
 			Process(Parameters, EndConditions::PreprocessorElse | EndConditions::PreprocessorEndIf);
@@ -249,9 +255,16 @@ namespace Engine
 
 		bool PreprocessorParser::IsEndCondition(Token Token, EndConditions ConditionMask)
 		{
-			return
+			bool isTheEnd =
 				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorElse) && Token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive)) ||
 				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorEndIf) && Token.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive));
+
+			if (!isTheEnd)
+				return false;
+
+			UngetToken(Token);
+
+			return true;
 		}
 	}
 }

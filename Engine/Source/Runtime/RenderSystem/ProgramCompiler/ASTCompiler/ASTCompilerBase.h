@@ -27,7 +27,6 @@
 #include <ProgramParser\AbstractSyntaxTree\VariableAccessStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ArrayElementAccessStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\MemberAccessStatement.h>
-#include <ProgramParser\AbstractSyntaxTree\SemicolonStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ArrayStatement.h>
 #include <Allocators\AllocatorBase.h>
 
@@ -106,8 +105,6 @@ namespace Engine
 			virtual void BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
-
-			virtual void BuildSemicolonStatement(SemicolonStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 

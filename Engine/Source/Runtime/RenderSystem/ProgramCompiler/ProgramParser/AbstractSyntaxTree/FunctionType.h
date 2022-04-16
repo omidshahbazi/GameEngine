@@ -32,7 +32,6 @@ namespace Engine
 					StatementItemHolder(Allocator),
 					m_ReturnType(nullptr),
 					m_Parameters(Allocator),
-					m_Register(Allocator),
 					m_Type(Types::None)
 				{
 				}
@@ -64,16 +63,6 @@ namespace Engine
 				const ParameterList& GetParameters(void) const
 				{
 					return m_Parameters;
-				}
-
-				void SetRegister(const String& Register)
-				{
-					m_Register = Register;
-				}
-
-				const String& GetRegister(void) const
-				{
-					return m_Register;
 				}
 
 				void SetType(Types Type)
@@ -110,9 +99,6 @@ namespace Engine
 
 					result += ")";
 
-					if (m_Register != String::Empty)
-						result += " : " + m_Register;
-
 					result += "\n{";
 
 					for (auto stm : GetItems())
@@ -129,7 +115,6 @@ namespace Engine
 			private:
 				DataTypeStatement* m_ReturnType;
 				ParameterList m_Parameters;
-				String m_Register;
 				Types m_Type;
 			};
 

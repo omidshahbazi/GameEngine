@@ -70,8 +70,6 @@ namespace Engine
 			void Parse(Parameters& Parameters);
 
 		private:
-			void Parse(Parameters& Parameters, EndConditions ConditionMask);
-
 			bool ParseStruct(Token& DeclarationToken);
 			bool ParseVariable(Token& DeclarationToken);
 			bool ParseFunction(Token& DeclarationToken);
@@ -90,7 +88,6 @@ namespace Engine
 			Statement* ParseBreakStatement(Token& DeclarationToken);
 			Statement* ParseReturnStatement(Token& DeclarationToken);
 			Statement* ParseDiscardStatement(Token& DeclarationToken);
-			Statement* ParseSemicolonStatement(Token& DeclarationToken);
 
 			bool ParseScopedStatements(StatementItemHolder* StatementItemHolder);
 
@@ -100,8 +97,8 @@ namespace Engine
 			Statement* ParseUnaryExpression(Token& DeclarationToken, EndConditions ConditionMask);
 			Statement* ParseUnaryExpressionPrefix(Token& DeclarationToken, EndConditions ConditionMask);
 			Statement* ParseUnaryOperatorExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseBinaryExpression(int8 LeftHandPrecedence, Statement* LeftHandStatement, EndConditions ConditionMask);
 			Statement* ParseArrayExpression(Token& DeclarationToken, EndConditions ConditionMask);
-			Statement* ParseBinary(int8 LeftHandPrecedence, Statement* LeftHandStatement, EndConditions ConditionMask);
 
 			Statement* ParseConstantStatement(Token& DeclarationToken);
 			Statement* ParseVariableAccessStatement(Token& DeclarationToken);

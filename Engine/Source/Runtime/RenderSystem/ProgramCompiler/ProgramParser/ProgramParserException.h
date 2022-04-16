@@ -27,7 +27,7 @@ namespace Engine
 			}
 		};
 
-#define THROW_PROGRAM_PARSER_EXCEPTION(What, Token) throw ProgramParserException(What, Token.GetIdentifier(), Token.GetLineIndex(), Token.GetColumnIndex())
+#define THROW_PROGRAM_PARSER_EXCEPTION(What, Token) throw ProgramParserException(What, Token.GetIdentifier(), Token.GetLineIndex() + 1, Token.GetColumnIndex() + 1)
 	}
 }
 #endif

@@ -42,12 +42,14 @@ namespace Engine
 				return (m_CurrentIndex < m_Text.GetLength() ? m_Text[m_CurrentIndex] : '\0');
 			}
 
-			virtual bool RequireToken(Token& Token);
+			virtual void RequireToken(Token& Token);
+			virtual void RequireIdentifierToken(Token& Token);
+			virtual bool MatchIdentifierToken(Token& Token);
 
-			virtual bool RequireSymbol(const String& Match, const String& Tag);
+			virtual void RequireSymbol(const String& Match, const String& Tag);
 			virtual bool MatchSymbol(const String& Match);
 
-			virtual bool RequireIdentifier(const String& Match, const String& Tag);
+			virtual void RequireIdentifier(const String& Match, const String& Tag);
 			virtual bool MatchIdentifier(const String& Match);
 
 			INLINE bool IsDigit(char8 c) const

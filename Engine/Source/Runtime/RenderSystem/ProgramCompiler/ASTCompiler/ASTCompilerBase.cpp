@@ -262,6 +262,18 @@ namespace Engine
 
 				BuildForStatement(stm, Type, Stage, Shader);
 			}
+			else if (IsAssignableFrom(Statement, DoStatement))
+			{
+				DoStatement* stm = ReinterpretCast(DoStatement*, Statement);
+
+				BuildDoStatement(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Statement, WhileStatement))
+			{
+				WhileStatement* stm = ReinterpretCast(WhileStatement*, Statement);
+
+				BuildWhileStatement(stm, Type, Stage, Shader);
+			}
 			else if (IsAssignableFrom(Statement, BreakStatement))
 			{
 				BreakStatement* stm = ReinterpretCast(BreakStatement*, Statement);
@@ -544,6 +556,56 @@ namespace Engine
 				BuildStatement(Statement->GetStep(), Type, Stage, Shader);
 
 			Shader += ")";
+
+			if (Statement->GetItems().GetSize() == 0)
+			{
+				Shader += ";";
+				ADD_NEW_LINE();
+
+				return;
+			}
+
+			ADD_NEW_LINE();
+
+			Shader += "{";
+			ADD_NEW_LINE();
+
+			BuildStatementHolder(Statement, Type, Stage, Shader);
+
+			Shader += "}";
+			ADD_NEW_LINE();
+		}
+
+		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "do";
+
+			Shader += "{";
+			ADD_NEW_LINE();
+
+			BuildStatementHolder(Statement, Type, Stage, Shader);
+
+			Shader += "}";
+
+			BuildStatement(Statement->GetWhile(), Type, Stage, Shader);
+		}
+
+		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "while (";
+
+			BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+
+			Shader += ")";
+
+			if (Statement->GetItems().GetSize() == 0)
+			{
+				Shader += ";";
+				ADD_NEW_LINE();
+
+				return;
+			}
+
 			ADD_NEW_LINE();
 
 			Shader += "{";

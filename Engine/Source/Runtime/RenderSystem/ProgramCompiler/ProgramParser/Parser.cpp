@@ -584,19 +584,46 @@ namespace Engine
 				RequireSymbol(CLOSE_BRACE, "for statement");
 			}
 
-			ParseScopedStatements(stm, false, EndConditions::None);
+			if (!MatchSymbol(SEMICOLON))
+				ParseScopedStatements(stm, false, EndConditions::None);
 
 			return stm;
 		}
 
 		Statement* Parser::ParseDoStatement(const Token& DeclarationToken)
 		{
-			return nullptr;
+			DoStatement* stm = Allocate<DoStatement>(m_Allocator);
+
+			ParseScopedStatements(stm, false, EndConditions::None);
+
+			Token token;
+			RequireToken(token);
+
+			if (!token.Matches(WHILE, Token::SearchCases::CaseSensitive))
+				THROW_PROGRAM_PARSER_EXCEPTION("expected while after do", token);
+
+			stm->SetWhile(ParseWhileStatement(token));
+
+			return stm;
 		}
 
 		Statement* Parser::ParseWhileStatement(const Token& DeclarationToken)
 		{
-			return nullptr;
+			WhileStatement* stm = Allocate<WhileStatement>(m_Allocator);
+
+			RequireSymbol(OPEN_BRACE, "while statement");
+
+			Token token;
+			RequireToken(token);
+
+			stm->SetCondition(ParseExpression(token, EndConditions::Brace));
+
+			RequireSymbol(CLOSE_BRACE, "while statement");
+
+			if (!MatchSymbol(SEMICOLON))
+				ParseScopedStatements(stm, false, EndConditions::None);
+
+			return stm;
 		}
 
 		Statement* Parser::ParseContinueStatement(const Token& DeclarationToken)

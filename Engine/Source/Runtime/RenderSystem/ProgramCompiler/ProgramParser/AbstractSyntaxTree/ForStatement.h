@@ -81,15 +81,20 @@ namespace Engine
 					if (m_Step != nullptr)
 						result += m_Step->ToString();
 
-					result += ")\n{";
+					result += ")\n";
 
-					for (auto stm : GetItems())
+					if (GetItems().GetSize() != 0)
 					{
-						result += stm->ToString();
-						result += "\n";
-					}
+						result += "{";
 
-					result += "}";
+						for (auto stm : GetItems())
+						{
+							result += stm->ToString();
+							result += "\n";
+						}
+
+						result += "}";
+					}
 
 					return result;
 				}

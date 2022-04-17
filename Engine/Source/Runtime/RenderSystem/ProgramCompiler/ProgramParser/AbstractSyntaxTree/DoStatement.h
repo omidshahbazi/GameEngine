@@ -11,12 +11,50 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class PROGRAMPARSER_API DoStatement : public Statement
+			class PROGRAMPARSER_API DoStatement : public Statement, public StatementItemHolder
 			{
 			public:
-				DoStatement(void)
+				DoStatement(AllocatorBase* Allocator) :
+					StatementItemHolder(Allocator),
+					m_While(nullptr)
 				{
 				}
+
+				~DoStatement(void)
+				{
+					if (m_While != nullptr)
+						Destruct(m_While);
+				}
+
+				Statement* GetWhile(void) const
+				{
+					return m_While;
+				}
+
+				void SetWhile(Statement* Value)
+				{
+					m_While = Value;
+				}
+
+				virtual String ToString(void) const override
+				{
+					String result = "do\n{";
+
+					for (auto stm : GetItems())
+					{
+						result += stm->ToString();
+						result += "\n";
+					}
+
+					result += "}";
+
+					result += m_While->ToString();
+
+					return result;
+				}
+
+			private:
+				Statement* m_While;
 			};
 		}
 	}

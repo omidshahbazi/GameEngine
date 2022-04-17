@@ -92,7 +92,7 @@ namespace Engine
 			return OperatorStatement::Operators::Unknown;
 		}
 
-		UnaryOperatorStatement::Operators GetUnaryOperator(const String& Symbol)
+		UnaryOperatorStatement::Operators GetUnaryOperator(const String& Symbol, bool IsPostfix)
 		{
 			static bool initialized = false;
 			static Map<String, UnaryOperatorStatement::Operators> operators;
@@ -101,13 +101,29 @@ namespace Engine
 			{
 				initialized = true;
 
+				operators["!"] = UnaryOperatorStatement::Operators::Exlamation;
 				operators["-"] = UnaryOperatorStatement::Operators::Minus;
+				operators["++"] = UnaryOperatorStatement::Operators::PrefixIncrement;
+				operators["--"] = UnaryOperatorStatement::Operators::PrefixDecrement;
 			}
 
-			if (operators.Contains(Symbol))
-				return operators[Symbol];
+			UnaryOperatorStatement::Operators op = UnaryOperatorStatement::Operators::Unknown;
 
-			return UnaryOperatorStatement::Operators::Unknown;
+			if (operators.Contains(Symbol))
+				op = operators[Symbol];
+
+			if (IsPostfix)
+				switch (op)
+				{
+				case UnaryOperatorStatement::Operators::PrefixIncrement:
+					op = UnaryOperatorStatement::Operators::PostfixIncrement;
+					break;
+				case UnaryOperatorStatement::Operators::PrefixDecrement:
+					op = UnaryOperatorStatement::Operators::PostfixDecrement;
+					break;
+				}
+
+			return op;
 		}
 
 		int8 GetOperatorPrecedence(OperatorStatement::Operators Operator)
@@ -576,6 +592,9 @@ namespace Engine
 
 		Statement* Parser::ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask)
 		{
+			if (DeclarationToken.GetTokenType() == Token::Types::Symbol)
+				return nullptr;
+
 			Token nameToken;
 			if (!MatchIdentifierToken(nameToken))
 				return nullptr;
@@ -609,14 +628,24 @@ namespace Engine
 		{
 			Statement* stm = ParseUnaryExpressionPrefix(DeclarationToken, ConditionMask);
 
-			if (MatchSymbol(INCREMENT))
+			Token token;
+			RequireToken(token);
+			if (token.Matches(INCREMENT, Token::SearchCases::CaseSensitive) ||
+				token.Matches(DECREMENT, Token::SearchCases::CaseSensitive))
 			{
+				UnaryOperatorStatement::Operators op = GetUnaryOperator(token.GetIdentifier(), true);
+				if (op == UnaryOperatorStatement::Operators::Unknown)
+					THROW_PROGRAM_PARSER_EXCEPTION("Unrecognized operator", token);
 
-			}
-			else if (MatchSymbol(DECREMENT))
-			{
+				UnaryOperatorStatement* unaryStm = Allocate<UnaryOperatorStatement>();
+				unaryStm->SetOperator(op);
 
+				unaryStm->SetStatement(stm);
+
+				stm = unaryStm;
 			}
+			else
+				UngetToken(token);
 
 			return stm;
 		}
@@ -636,17 +665,11 @@ namespace Engine
 				return stm;
 			}
 
-			if (DeclarationToken.Matches(EXLAMATION, Token::SearchCases::CaseSensitive))
-			{
-				return ParseUnaryOperatorExpression(DeclarationToken, ConditionMask);
-			}
-
-			if (DeclarationToken.Matches(TILDE, Token::SearchCases::CaseSensitive))
-			{
-				return ParseUnaryOperatorExpression(DeclarationToken, ConditionMask);
-			}
-
-			if (DeclarationToken.Matches(MINES, Token::SearchCases::CaseSensitive))
+			if (DeclarationToken.Matches(EXLAMATION, Token::SearchCases::CaseSensitive) ||
+				DeclarationToken.Matches(TILDE, Token::SearchCases::CaseSensitive) ||
+				DeclarationToken.Matches(MINES, Token::SearchCases::CaseSensitive) ||
+				DeclarationToken.Matches(INCREMENT, Token::SearchCases::CaseSensitive) ||
+				DeclarationToken.Matches(DECREMENT, Token::SearchCases::CaseSensitive))
 			{
 				return ParseUnaryOperatorExpression(DeclarationToken, ConditionMask);
 			}
@@ -699,7 +722,9 @@ namespace Engine
 			if (IsEndCondition(token, ConditionMask))
 				return nullptr;
 
-			UnaryOperatorStatement::Operators op = GetUnaryOperator(DeclarationToken.GetIdentifier());
+			UnaryOperatorStatement::Operators op = GetUnaryOperator(DeclarationToken.GetIdentifier(), false);
+			if (op == UnaryOperatorStatement::Operators::Unknown)
+				THROW_PROGRAM_PARSER_EXCEPTION("Unrecognized operator", DeclarationToken);
 
 			UnaryOperatorStatement* stm = Allocate<UnaryOperatorStatement>();
 			stm->SetOperator(op);

@@ -323,9 +323,11 @@ namespace Engine
 		{
 			Shader += "(";
 
-			Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+			Shader += UnaryOperatorStatement::GetPrefixOperatorSymbol(Statement->GetOperator());
 
 			BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+
+			Shader += UnaryOperatorStatement::GetPostfixOperatorSymbol(Statement->GetOperator());
 
 			Shader += ")";
 		}

@@ -16,7 +16,12 @@ namespace Engine
 			public:
 				enum class Operators
 				{
-					Minus = 0,
+					Exlamation = 0,
+					Minus,
+					PrefixIncrement,
+					PrefixDecrement,
+					PostfixIncrement,
+					PostfixDecrement,
 					Unknown
 				};
 
@@ -56,20 +61,41 @@ namespace Engine
 				{
 					String result;
 
-					result += GetOperatorSymbol(m_Operator);
+					result += GetPrefixOperatorSymbol(m_Operator);
 
 					result += m_Statement->ToString();
+
+					result += GetPostfixOperatorSymbol(m_Operator);
 
 					return result;
 				}
 
 			public:
-				static String GetOperatorSymbol(Operators Operator)
+				static String GetPrefixOperatorSymbol(Operators Operator)
 				{
 					switch (Operator)
 					{
+					case Operators::Exlamation:
+						return "!";
 					case Operators::Minus:
 						return "-";
+					case Operators::PrefixIncrement:
+						return "++";
+					case Operators::PrefixDecrement:
+						return "--";
+					}
+
+					return "";
+				}
+
+				static String GetPostfixOperatorSymbol(Operators Operator)
+				{
+					switch (Operator)
+					{
+					case Operators::PostfixIncrement:
+						return "++";
+					case Operators::PostfixDecrement:
+						return "--";
 					}
 
 					return "";

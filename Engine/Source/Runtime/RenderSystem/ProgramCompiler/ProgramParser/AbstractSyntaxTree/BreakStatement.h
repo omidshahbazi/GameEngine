@@ -17,6 +17,11 @@ namespace Engine
 				BreakStatement(void)
 				{
 				}
+
+				virtual String ToString(void) const override
+				{
+					return "break";
+				}
 			};
 		}
 	}

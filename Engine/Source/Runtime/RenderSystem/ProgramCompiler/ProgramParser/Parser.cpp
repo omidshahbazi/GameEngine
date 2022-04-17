@@ -7,6 +7,7 @@
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\SwitchStatement.h>
+#include <ProgramParser\AbstractSyntaxTree\DefaultStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\CaseStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ForStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\DoStatement.h>
@@ -172,18 +173,18 @@ namespace Engine
 			m_Parameters(nullptr),
 			m_Structs(m_Allocator)
 		{
-			m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseIfStatement(Token); });
-			m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseElseStatement(Token); });
-			m_KeywordParsers[SWITCH] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseSwitchStatement(Token); });
-			m_KeywordParsers[CASE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseCaseStatement(Token); });
-			m_KeywordParsers[DEFAULT] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseCaseStatement(Token); });
-			m_KeywordParsers[FOR] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseForStatement(Token); });
-			m_KeywordParsers[DO] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseDoStatement(Token); });
-			m_KeywordParsers[WHILE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseWhileStatement(Token); });
-			m_KeywordParsers[CONTINUE] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseContinueStatement(Token); });
-			m_KeywordParsers[BREAK] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseBreakStatement(Token); });
-			m_KeywordParsers[RETURN] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseReturnStatement(Token); });
-			m_KeywordParsers[DISCARD] = std::make_shared<KeywordParseFunction>([&](Token& Token) { return ParseDiscardStatement(Token); });
+			m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseIfStatement(DeclarationToken); });
+			m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseElseStatement(DeclarationToken); });
+			m_KeywordParsers[SWITCH] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseSwitchStatement(DeclarationToken); });
+			m_KeywordParsers[DEFAULT] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseDefaultStatement(DeclarationToken); });
+			m_KeywordParsers[CASE] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseCaseStatement(DeclarationToken); });
+			m_KeywordParsers[FOR] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseForStatement(DeclarationToken); });
+			m_KeywordParsers[DO] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseDoStatement(DeclarationToken); });
+			m_KeywordParsers[WHILE] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseWhileStatement(DeclarationToken); });
+			m_KeywordParsers[CONTINUE] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseContinueStatement(DeclarationToken); });
+			m_KeywordParsers[BREAK] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseBreakStatement(DeclarationToken); });
+			m_KeywordParsers[RETURN] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseReturnStatement(DeclarationToken); });
+			m_KeywordParsers[DISCARD] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseDiscardStatement(DeclarationToken); });
 		}
 
 		void Parser::Parse(Parameters& Parameters)
@@ -213,7 +214,7 @@ namespace Engine
 			m_Parameters = nullptr;
 		}
 
-		bool Parser::ParseStruct(Token& DeclarationToken)
+		bool Parser::ParseStruct(const Token& DeclarationToken)
 		{
 			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 			{
@@ -254,7 +255,7 @@ namespace Engine
 			return true;
 		}
 
-		bool Parser::ParseVariable(Token& DeclarationToken)
+		bool Parser::ParseVariable(const Token& DeclarationToken)
 		{
 			bool result = true;
 
@@ -333,7 +334,7 @@ namespace Engine
 			return result;
 		}
 
-		bool Parser::ParseFunction(Token& DeclarationToken)
+		bool Parser::ParseFunction(const Token& DeclarationToken)
 		{
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
 
@@ -381,10 +382,10 @@ namespace Engine
 				ParseFunctionParameter(parameterToken, parameterType);
 			}
 
-			return ParseScopedStatements(functionType);
+			return ParseScopedStatements(functionType, true, EndConditions::None);
 		}
 
-		bool Parser::ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter)
+		bool Parser::ParseFunctionParameter(const Token& DeclarationToken, ParameterType* Parameter)
 		{
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
 
@@ -405,7 +406,7 @@ namespace Engine
 			return true;
 		}
 
-		DataTypeStatement* Parser::ParseDataType(Token& DeclarationToken)
+		DataTypeStatement* Parser::ParseDataType(const Token& DeclarationToken)
 		{
 			const String& identifier = DeclarationToken.GetIdentifier();
 
@@ -448,7 +449,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseIfStatement(Token& DeclarationToken)
+		Statement* Parser::ParseIfStatement(const Token& DeclarationToken)
 		{
 			IfStatement* stm = Allocate<IfStatement>(m_Allocator);
 
@@ -460,7 +461,7 @@ namespace Engine
 
 			RequireSymbol(CLOSE_BRACE, "if statement");
 
-			ParseScopedStatements(stm);
+			ParseScopedStatements(stm, false, EndConditions::None);
 
 			if (MatchIdentifier(ELSE))
 				stm->SetElse(ParseElseStatement(DeclarationToken));
@@ -468,11 +469,11 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseElseStatement(Token& DeclarationToken)
+		Statement* Parser::ParseElseStatement(const Token& DeclarationToken)
 		{
 			ElseStatement* stm = Allocate<ElseStatement>(m_Allocator);
 
-			if (!ParseScopedStatements(stm))
+			if (!ParseScopedStatements(stm, false, EndConditions::None))
 			{
 				Deallocate(stm);
 
@@ -482,7 +483,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseSwitchStatement(Token& DeclarationToken)
+		Statement* Parser::ParseSwitchStatement(const Token& DeclarationToken)
 		{
 			SwitchStatement* stm = Allocate<SwitchStatement>(m_Allocator);
 
@@ -495,42 +496,88 @@ namespace Engine
 
 			RequireSymbol(CLOSE_BRACE, "switch statement");
 
-			ParseScopedStatements(stm);
+			ParseScopedStatements(stm, true, EndConditions::None);
 
 			return stm;
 		}
 
-		Statement* Parser::ParseCaseStatement(Token& DeclarationToken)
+		Statement* Parser::ParseDefaultStatement(const Token& DeclarationToken)
+		{
+			DefaultStatement* stm = Allocate<DefaultStatement>(m_Allocator);
+
+			RequireSymbol(COLON, "default statement");
+
+			Token nextToken;
+			RequireToken(nextToken);
+
+			bool isSingle =
+				nextToken.Matches(CASE, Token::SearchCases::CaseSensitive) ||
+				nextToken.Matches(DEFAULT, Token::SearchCases::CaseSensitive);
+
+			UngetToken(nextToken);
+
+			if (!isSingle)
+				ParseScopedStatements(stm, false, EndConditions::Break);
+
+			return stm;
+		}
+
+		Statement* Parser::ParseCaseStatement(const Token& DeclarationToken)
+		{
+			CaseStatement* stm = Allocate<CaseStatement>(m_Allocator);
+
+			Token token;
+			RequireToken(token);
+
+			stm->SetCondition(ParseExpression(token, EndConditions::Colon));
+
+			RequireSymbol(COLON, "case statement");
+
+			Token nextToken;
+			RequireToken(nextToken);
+
+			bool isSingle =
+				nextToken.Matches(CASE, Token::SearchCases::CaseSensitive) ||
+				nextToken.Matches(DEFAULT, Token::SearchCases::CaseSensitive);
+
+			UngetToken(nextToken);
+
+			if (!isSingle)
+				ParseScopedStatements(stm, false, EndConditions::Break);
+
+			return stm;
+		}
+
+		Statement* Parser::ParseForStatement(const Token& DeclarationToken)
 		{
 			return nullptr;
 		}
 
-		Statement* Parser::ParseForStatement(Token& DeclarationToken)
+		Statement* Parser::ParseDoStatement(const Token& DeclarationToken)
 		{
 			return nullptr;
 		}
 
-		Statement* Parser::ParseDoStatement(Token& DeclarationToken)
+		Statement* Parser::ParseWhileStatement(const Token& DeclarationToken)
 		{
 			return nullptr;
 		}
 
-		Statement* Parser::ParseWhileStatement(Token& DeclarationToken)
+		Statement* Parser::ParseContinueStatement(const Token& DeclarationToken)
 		{
 			return nullptr;
 		}
 
-		Statement* Parser::ParseContinueStatement(Token& DeclarationToken)
+		Statement* Parser::ParseBreakStatement(const Token& DeclarationToken)
 		{
-			return nullptr;
+			BreakStatement* stm = Allocate<BreakStatement>();
+
+			RequireSymbol(SEMICOLON, "break statement");
+
+			return stm;
 		}
 
-		Statement* Parser::ParseBreakStatement(Token& DeclarationToken)
-		{
-			return nullptr;
-		}
-
-		Statement* Parser::ParseReturnStatement(Token& DeclarationToken)
+		Statement* Parser::ParseReturnStatement(const Token& DeclarationToken)
 		{
 			ReturnStatement* stm = Allocate<ReturnStatement>();
 
@@ -544,26 +591,38 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseDiscardStatement(Token& DeclarationToken)
+		Statement* Parser::ParseDiscardStatement(const Token& DeclarationToken)
 		{
 			return Allocate<DiscardStatement>();
 		}
 
-		bool Parser::ParseScopedStatements(StatementItemHolder* StatementItemHolder)
+		bool Parser::ParseScopedStatements(StatementItemHolder* StatementItemHolder, bool MustHaveBrackets, EndConditions ConditionMask)
 		{
-			bool hasOpenBracket = MatchSymbol(OPEN_BRACKET);
+			bool hasOpenBracket = false;
 
-			bool firstStatementParsed = false;
+			if (MustHaveBrackets)
+			{
+				RequireSymbol(OPEN_BRACKET, "scope");
+				hasOpenBracket = true;
+			}
+			else
+				hasOpenBracket = MatchSymbol(OPEN_BRACKET);
+
+			if (hasOpenBracket)
+				ConditionMask = EndConditions::Bracket;
+
 			while (true)
 			{
-				if (!hasOpenBracket && firstStatementParsed)
-					break;
-
-				if (MatchSymbol(CLOSE_BRACKET))
-					break;
-
 				Token token;
 				RequireToken(token);
+
+				if (IsEndCondition(token, ConditionMask))
+				{
+					if (hasOpenBracket)
+						RequireSymbol(CLOSE_BRACKET, "scope");
+
+					break;
+				}
 
 				Statement* bodyStm = nullptr;
 
@@ -584,13 +643,14 @@ namespace Engine
 
 				StatementItemHolder->AddItem(bodyStm);
 
-				firstStatementParsed = true;
+				if (ConditionMask == EndConditions::None && !hasOpenBracket)
+					break;
 			}
 
 			return true;
 		}
 
-		Statement* Parser::ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask)
+		Statement* Parser::ParseVariableStatement(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			if (DeclarationToken.GetTokenType() == Token::Types::Symbol)
 				return nullptr;
@@ -614,7 +674,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseExpression(Token& DeclarationToken, EndConditions ConditionMask)
+		Statement* Parser::ParseExpression(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			Statement* leftHand = ParseUnaryExpression(DeclarationToken, ConditionMask);
 
@@ -624,7 +684,7 @@ namespace Engine
 			return ParseBinaryExpression(0, leftHand, ConditionMask);
 		}
 
-		Statement* Parser::ParseUnaryExpression(Token& DeclarationToken, EndConditions ConditionMask)
+		Statement* Parser::ParseUnaryExpression(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			Statement* stm = ParseUnaryExpressionPrefix(DeclarationToken, ConditionMask);
 
@@ -650,7 +710,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseUnaryExpressionPrefix(Token& DeclarationToken, EndConditions ConditionMask)
+		Statement* Parser::ParseUnaryExpressionPrefix(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			if (DeclarationToken.Matches(OPEN_BRACE, Token::SearchCases::CaseSensitive) ||
 				DeclarationToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
@@ -714,7 +774,7 @@ namespace Engine
 			return nullptr;
 		}
 
-		Statement* Parser::ParseUnaryOperatorExpression(Token& DeclarationToken, EndConditions ConditionMask)
+		Statement* Parser::ParseUnaryOperatorExpression(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			Token token;
 			RequireToken(token);
@@ -786,7 +846,7 @@ namespace Engine
 			return LeftHandStatement;
 		}
 
-		Statement* Parser::ParseArrayExpression(Token& DeclarationToken, EndConditions ConditionMask)
+		Statement* Parser::ParseArrayExpression(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			ArrayStatement* stm = Allocate<ArrayStatement>(m_Allocator);
 
@@ -810,7 +870,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseConstantStatement(Token& DeclarationToken)
+		Statement* Parser::ParseConstantStatement(const Token& DeclarationToken)
 		{
 			ConstantStatement* stm = Allocate<ConstantStatement>();
 
@@ -826,7 +886,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseVariableAccessStatement(Token& DeclarationToken)
+		Statement* Parser::ParseVariableAccessStatement(const Token& DeclarationToken)
 		{
 			VariableAccessStatement* stm = Allocate<VariableAccessStatement>(m_Allocator);
 
@@ -838,7 +898,7 @@ namespace Engine
 			return ParseMemberAccessStatement(token, stm);
 		}
 
-		Statement* Parser::ParseArrayElementAccessStatement(Token& DeclarationToken, Statement* ArrayStatement)
+		Statement* Parser::ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement)
 		{
 			ArrayElementAccessStatement* stm = Allocate<ArrayElementAccessStatement>();
 
@@ -850,7 +910,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseMemberAccessStatement(Token& DeclarationToken, Statement* LeftStatement)
+		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement)
 		{
 			if (DeclarationToken.Matches(DOT, Token::SearchCases::CaseSensitive))
 			{
@@ -871,7 +931,7 @@ namespace Engine
 			return LeftStatement;
 		}
 
-		Statement* Parser::ParseFunctionCallStatement(Token& DeclarationToken)
+		Statement* Parser::ParseFunctionCallStatement(const Token& DeclarationToken)
 		{
 			if (!MatchSymbol(OPEN_BRACE))
 				return nullptr;
@@ -900,14 +960,16 @@ namespace Engine
 			return ParseMemberAccessStatement(token, stm);
 		}
 
-		bool Parser::IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask)
+		bool Parser::IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			bool isTheEnd =
+				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Colon) && DeclarationToken.Matches(COLON, Token::SearchCases::CaseSensitive)) ||
 				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Semicolon) && DeclarationToken.Matches(SEMICOLON, Token::SearchCases::CaseSensitive)) ||
 				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Brace) && DeclarationToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive)) ||
 				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Comma) && DeclarationToken.Matches(COMMA, Token::SearchCases::CaseSensitive)) ||
 				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Bracket) && (DeclarationToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))) ||
-				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (DeclarationToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)));
+				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::SquareBracket) && (DeclarationToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive) || DeclarationToken.Matches(CLOSE_SQUARE_BRACKET, Token::SearchCases::CaseSensitive)) ||
+					(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::Break) && DeclarationToken.Matches(BREAK, Token::SearchCases::CaseSensitive)));
 
 			if (!isTheEnd)
 				return false;

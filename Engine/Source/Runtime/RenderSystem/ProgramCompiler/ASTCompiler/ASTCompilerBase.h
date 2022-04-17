@@ -12,6 +12,7 @@
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\SwitchStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\CaseStatement.h>
+#include <ProgramParser\AbstractSyntaxTree\DefaultStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ForStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\DoStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\WhileStatement.h>
@@ -109,6 +110,14 @@ namespace Engine
 			virtual void BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildElseStatement(ElseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildCaseStatement(CaseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildDefaultStatement(DefaultStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildBreakStatement(BreakStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 

@@ -258,6 +258,97 @@ namespace Engine
 				ASTCompilerBase::BuildIfStatement(Statement, Type, Stage, Shader);
 			}
 
+			void ASTToGLSLCompiler::BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+				bool isFirstOne = true;
+				bool isCoupling = false;
+
+				for (auto statement : Statement->GetItems())
+				{
+					if (IsAssignableFrom(statement, BreakStatement))
+						continue;
+
+					if (IsAssignableFrom(statement, CaseStatement))
+					{
+						if (!isCoupling)
+						{
+							if (isFirstOne)
+							{
+								Shader += "if";
+								isFirstOne = false;
+							}
+							else
+								Shader += "else if";
+
+							Shader += "(";
+						}
+
+						isCoupling = false;
+
+						BuildStatement(Statement->GetSelector(), Type, Stage, Shader);
+
+						Shader += " == ";
+
+						CaseStatement* caseStatement = ReinterpretCast(CaseStatement*, statement);
+
+						BuildStatement(caseStatement->GetCondition(), Type, Stage, Shader);
+
+						if (caseStatement->GetItems().GetSize() == 0)
+						{
+							Shader += " || ";
+
+							isCoupling = true;
+							continue;
+						}
+
+						Shader += ")";
+						ADD_NEW_LINE();
+						Shader += "{";
+
+						BuildStatementHolder(caseStatement, Type, Stage, Shader);
+
+						Shader += "}";
+					}
+					else if (IsAssignableFrom(statement, DefaultStatement))
+					{
+						if (!isCoupling)
+						{
+							if (isFirstOne)
+							{
+								Shader += "if";
+								isFirstOne = false;
+							}
+							else
+								Shader += "else if";
+
+							Shader += "(";
+						}
+
+						isCoupling = false;
+
+						Shader += "true";
+
+						DefaultStatement* defaultStatement = ReinterpretCast(DefaultStatement*, statement);
+
+						if (defaultStatement->GetItems().GetSize() == 0)
+						{
+							Shader += " || ";
+
+							isCoupling = true;
+							continue;
+						}
+
+						Shader += ")";
+						ADD_NEW_LINE();
+						Shader += "{";
+
+						BuildStatementHolder(defaultStatement, Type, Stage, Shader);
+
+						Shader += "}";
+					}
+				}
+			}
+
 			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 				Shader += String(GetReturnBoolName()) + "=true;";

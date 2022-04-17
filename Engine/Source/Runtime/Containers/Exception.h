@@ -115,7 +115,7 @@ namespace Engine
 		{
 		public:
 			NotImplementedException(Categories CategoryFlags, const String& File, uint32 LineNumber, const String& Function) :
-				Exception(CategoryFlags, String::Empty, File, LineNumber, Function)
+				Exception(CategoryFlags, "Not Implemented", File, LineNumber, Function)
 			{
 			}
 		};

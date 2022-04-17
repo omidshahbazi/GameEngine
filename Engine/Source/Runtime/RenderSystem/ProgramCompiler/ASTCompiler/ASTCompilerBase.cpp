@@ -162,7 +162,16 @@ namespace Engine
 		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
 			for (auto statement : Holder->GetItems())
+			{
 				BuildStatement(statement, Type, Stage, Shader);
+
+				if (IsAssignableFrom(statement, OperatorStatement) || IsAssignableFrom(statement, UnaryOperatorStatement))
+				{
+					Shader += ";";
+
+					ADD_NEW_LINE();
+				}
+			}
 		}
 
 		void ASTCompilerBase::BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -227,6 +236,30 @@ namespace Engine
 
 				BuildElseStatement(stm, Type, Stage, Shader);
 			}
+			else if (IsAssignableFrom(Statement, SwitchStatement))
+			{
+				SwitchStatement* stm = ReinterpretCast(SwitchStatement*, Statement);
+
+				BuildSwitchStatement(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Statement, CaseStatement))
+			{
+				CaseStatement* stm = ReinterpretCast(CaseStatement*, Statement);
+
+				BuildCaseStatement(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Statement, DefaultStatement))
+			{
+				DefaultStatement* stm = ReinterpretCast(DefaultStatement*, Statement);
+
+				BuildDefaultStatement(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Statement, BreakStatement))
+			{
+				BreakStatement* stm = ReinterpretCast(BreakStatement*, Statement);
+
+				BuildBreakStatement(stm, Type, Stage, Shader);
+			}
 			else if (IsAssignableFrom(Statement, ReturnStatement))
 			{
 				ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
@@ -248,10 +281,9 @@ namespace Engine
 			else
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 
-			//Break
+
 			//Continue
 			//For
-			//Switch/Case/Default
 			//While
 			//Do/While
 		}
@@ -279,10 +311,6 @@ namespace Engine
 
 					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
 
-					Shader += ";";
-
-					ADD_NEW_LINE();
-
 					return;
 				}
 			}
@@ -309,13 +337,7 @@ namespace Engine
 
 			BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
-			if (isAssignment)
-			{
-				Shader += ";";
-
-				ADD_NEW_LINE();
-			}
-			else
+			if (!isAssignment)
 				Shader += ")";
 		}
 
@@ -451,9 +473,71 @@ namespace Engine
 			ADD_NEW_LINE();
 		}
 
+		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "switch(";
+
+			BuildStatement(Statement->GetSelector(), Type, Stage, Shader);
+
+			Shader += ")";
+			ADD_NEW_LINE();
+			Shader += "{";
+			ADD_NEW_LINE();
+
+			BuildStatementHolder(Statement, Type, Stage, Shader);
+
+			Shader += "}";
+			ADD_NEW_LINE();
+		}
+
+		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "case ";
+
+			BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+
+			Shader += ":";
+			ADD_NEW_LINE();
+
+			if (Statement->GetItems().GetSize() != 0)
+			{
+				Shader += "{";
+				ADD_NEW_LINE();
+
+				BuildStatementHolder(Statement, Type, Stage, Shader);
+
+				Shader += "}";
+				ADD_NEW_LINE();
+			}
+		}
+
+		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "default:";
+			ADD_NEW_LINE();
+
+			if (Statement->GetItems().GetSize() != 0)
+			{
+				Shader += "{";
+				ADD_NEW_LINE();
+
+				BuildStatementHolder(Statement, Type, Stage, Shader);
+
+				Shader += "}";
+				ADD_NEW_LINE();
+			}
+		}
+
+		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "break;";
+			ADD_NEW_LINE();
+		}
+
 		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
 			Shader += "discard;";
+			ADD_NEW_LINE();
 		}
 
 		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

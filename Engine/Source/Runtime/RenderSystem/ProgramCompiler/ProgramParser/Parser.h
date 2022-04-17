@@ -44,14 +44,16 @@ namespace Engine
 			enum class EndConditions
 			{
 				None = 1 << 0,
-				Semicolon = 1 << 1,
-				Brace = 1 << 2,
-				Comma = 1 << 3,
-				Bracket = 1 << 4,
-				SquareBracket = 1 << 5,
+				Colon = 1 << 1,
+				Semicolon = 1 << 2,
+				Brace = 1 << 3,
+				Comma = 1 << 4,
+				Bracket = 1 << 5,
+				SquareBracket = 1 << 6,
+				Break = 1 << 7,
 			};
 
-			typedef std::function<Statement* (Token& DeclarationToken)> KeywordParseFunction;
+			typedef std::function<Statement* (const Token& DeclarationToken)> KeywordParseFunction;
 			typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 			typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
 
@@ -70,43 +72,44 @@ namespace Engine
 			void Parse(Parameters& Parameters);
 
 		private:
-			bool ParseStruct(Token& DeclarationToken);
-			bool ParseVariable(Token& DeclarationToken);
-			bool ParseFunction(Token& DeclarationToken);
-			bool ParseFunctionParameter(Token& DeclarationToken, ParameterType* Parameter);
+			bool ParseStruct(const Token& DeclarationToken);
+			bool ParseVariable(const Token& DeclarationToken);
+			bool ParseFunction(const Token& DeclarationToken);
+			bool ParseFunctionParameter(const Token& DeclarationToken, ParameterType* Parameter);
 
-			DataTypeStatement* ParseDataType(Token& DeclarationToken);
+			DataTypeStatement* ParseDataType(const Token& DeclarationToken);
 
-			Statement* ParseIfStatement(Token& DeclarationToken);
-			Statement* ParseElseStatement(Token& DeclarationToken);
-			Statement* ParseSwitchStatement(Token& DeclarationToken);
-			Statement* ParseCaseStatement(Token& DeclarationToken);
-			Statement* ParseForStatement(Token& DeclarationToken);
-			Statement* ParseDoStatement(Token& DeclarationToken);
-			Statement* ParseWhileStatement(Token& DeclarationToken);
-			Statement* ParseContinueStatement(Token& DeclarationToken);
-			Statement* ParseBreakStatement(Token& DeclarationToken);
-			Statement* ParseReturnStatement(Token& DeclarationToken);
-			Statement* ParseDiscardStatement(Token& DeclarationToken);
+			Statement* ParseIfStatement(const Token& DeclarationToken);
+			Statement* ParseElseStatement(const Token& DeclarationToken);
+			Statement* ParseSwitchStatement(const Token& DeclarationToken);
+			Statement* ParseDefaultStatement(const Token& DeclarationToken);
+			Statement* ParseCaseStatement(const Token& DeclarationToken);
+			Statement* ParseForStatement(const Token& DeclarationToken);
+			Statement* ParseDoStatement(const Token& DeclarationToken);
+			Statement* ParseWhileStatement(const Token& DeclarationToken);
+			Statement* ParseContinueStatement(const Token& DeclarationToken);
+			Statement* ParseBreakStatement(const Token& DeclarationToken);
+			Statement* ParseReturnStatement(const Token& DeclarationToken);
+			Statement* ParseDiscardStatement(const Token& DeclarationToken);
 
-			bool ParseScopedStatements(StatementItemHolder* StatementItemHolder);
+			bool ParseScopedStatements(StatementItemHolder* StatementItemHolder, bool MustHaveBrackets, EndConditions ConditionMask);
 
-			Statement* ParseVariableStatement(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseVariableStatement(const Token& DeclarationToken, EndConditions ConditionMask);
 
-			Statement* ParseExpression(Token& DeclarationToken, EndConditions ConditionMask);
-			Statement* ParseUnaryExpression(Token& DeclarationToken, EndConditions ConditionMask);
-			Statement* ParseUnaryExpressionPrefix(Token& DeclarationToken, EndConditions ConditionMask);
-			Statement* ParseUnaryOperatorExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseExpression(const Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseUnaryExpression(const Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseUnaryExpressionPrefix(const Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseUnaryOperatorExpression(const Token& DeclarationToken, EndConditions ConditionMask);
 			Statement* ParseBinaryExpression(int8 LeftHandPrecedence, Statement* LeftHandStatement, EndConditions ConditionMask);
-			Statement* ParseArrayExpression(Token& DeclarationToken, EndConditions ConditionMask);
+			Statement* ParseArrayExpression(const Token& DeclarationToken, EndConditions ConditionMask);
 
-			Statement* ParseConstantStatement(Token& DeclarationToken);
-			Statement* ParseVariableAccessStatement(Token& DeclarationToken);
-			Statement* ParseArrayElementAccessStatement(Token& DeclarationToken, Statement* ArrayStatement);
-			Statement* ParseMemberAccessStatement(Token& DeclarationToken, Statement* LeftStatement);
-			Statement* ParseFunctionCallStatement(Token& DeclarationToken);
+			Statement* ParseConstantStatement(const Token& DeclarationToken);
+			Statement* ParseVariableAccessStatement(const Token& DeclarationToken);
+			Statement* ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement);
+			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement);
+			Statement* ParseFunctionCallStatement(const Token& DeclarationToken);
 
-			bool IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask);
+			bool IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask);
 
 			template<typename T>
 			INLINE T* Allocate(void)

@@ -92,7 +92,7 @@ namespace Engine
 			Statement* ParseReturnStatement(const Token& DeclarationToken);
 			Statement* ParseDiscardStatement(const Token& DeclarationToken);
 
-			bool ParseScopedStatements(StatementItemHolder* StatementItemHolder, bool MustHaveBrackets, EndConditions ConditionMask);
+			void ParseScopedStatements(StatementItemHolder* StatementItemHolder, bool MustHaveBrackets, EndConditions ConditionMask);
 
 			Statement* ParseVariableStatement(const Token& DeclarationToken, EndConditions ConditionMask);
 

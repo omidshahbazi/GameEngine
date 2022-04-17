@@ -382,7 +382,9 @@ namespace Engine
 				ParseFunctionParameter(parameterToken, parameterType);
 			}
 
-			return ParseScopedStatements(functionType, true, EndConditions::None);
+			ParseScopedStatements(functionType, true, EndConditions::None);
+
+			return true;
 		}
 
 		bool Parser::ParseFunctionParameter(const Token& DeclarationToken, ParameterType* Parameter)
@@ -473,12 +475,7 @@ namespace Engine
 		{
 			ElseStatement* stm = Allocate<ElseStatement>(m_Allocator);
 
-			if (!ParseScopedStatements(stm, false, EndConditions::None))
-			{
-				Deallocate(stm);
-
-				return nullptr;
-			}
+			ParseScopedStatements(stm, false, EndConditions::None);
 
 			return stm;
 		}
@@ -663,7 +660,7 @@ namespace Engine
 			return Allocate<DiscardStatement>();
 		}
 
-		bool Parser::ParseScopedStatements(StatementItemHolder* StatementItemHolder, bool MustHaveBrackets, EndConditions ConditionMask)
+		void Parser::ParseScopedStatements(StatementItemHolder* StatementItemHolder, bool MustHaveBrackets, EndConditions ConditionMask)
 		{
 			bool hasOpenBracket = false;
 
@@ -710,8 +707,6 @@ namespace Engine
 				if (ConditionMask == EndConditions::None && !hasOpenBracket)
 					break;
 			}
-
-			return true;
 		}
 
 		Statement* Parser::ParseVariableStatement(const Token& DeclarationToken, EndConditions ConditionMask)

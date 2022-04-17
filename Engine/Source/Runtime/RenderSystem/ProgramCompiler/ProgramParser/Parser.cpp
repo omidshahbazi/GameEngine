@@ -133,16 +133,18 @@ namespace Engine
 			case OperatorStatement::Operators::GreaterEqualCheck:
 				return 2;
 
-			case OperatorStatement::Operators::Multiplication:
 			case OperatorStatement::Operators::Division:
 				return 3;
 
-			case OperatorStatement::Operators::Remainder:
+			case OperatorStatement::Operators::Multiplication:
 				return 4;
+
+			case OperatorStatement::Operators::Remainder:
+				return 5;
 
 			case OperatorStatement::Operators::Addition:
 			case OperatorStatement::Operators::Subtraction:
-				return 5;
+				return 6;
 			}
 
 			return -1;

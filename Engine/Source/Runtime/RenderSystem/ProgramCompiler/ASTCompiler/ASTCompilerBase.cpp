@@ -279,6 +279,10 @@ namespace Engine
 
 					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
 
+					Shader += ";";
+
+					ADD_NEW_LINE();
+
 					return;
 				}
 			}

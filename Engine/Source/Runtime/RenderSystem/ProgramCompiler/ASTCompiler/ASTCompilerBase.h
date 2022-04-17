@@ -117,6 +117,10 @@ namespace Engine
 
 			virtual void BuildDefaultStatement(DefaultStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
+			virtual void BuildForStatement(ForStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildContinueStatement(ContinueStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+			
 			virtual void BuildBreakStatement(BreakStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;

@@ -550,7 +550,43 @@ namespace Engine
 
 		Statement* Parser::ParseForStatement(const Token& DeclarationToken)
 		{
-			return nullptr;
+			ForStatement* stm = Allocate<ForStatement>(m_Allocator);
+
+			RequireSymbol(OPEN_BRACE, "for statement");
+
+			if (!MatchSymbol(SEMICOLON))
+			{
+				Token token;
+				RequireToken(token);
+
+				stm->SetInitializer(ParseExpression(token, EndConditions::Semicolon));
+
+				RequireSymbol(SEMICOLON, "for statement");
+			}
+
+			if (!MatchSymbol(SEMICOLON))
+			{
+				Token token;
+				RequireToken(token);
+
+				stm->SetCondition(ParseExpression(token, EndConditions::Semicolon));
+
+				RequireSymbol(SEMICOLON, "for statement");
+			}
+
+			if (!MatchSymbol(CLOSE_BRACE))
+			{
+				Token token;
+				RequireToken(token);
+
+				stm->SetStep(ParseExpression(token, EndConditions::Brace));
+
+				RequireSymbol(CLOSE_BRACE, "for statement");
+			}
+
+			ParseScopedStatements(stm, false, EndConditions::None);
+
+			return stm;
 		}
 
 		Statement* Parser::ParseDoStatement(const Token& DeclarationToken)
@@ -565,7 +601,11 @@ namespace Engine
 
 		Statement* Parser::ParseContinueStatement(const Token& DeclarationToken)
 		{
-			return nullptr;
+			ContinueStatement* stm = Allocate<ContinueStatement>();
+
+			RequireSymbol(SEMICOLON, "continue statement");
+
+			return stm;
 		}
 
 		Statement* Parser::ParseBreakStatement(const Token& DeclarationToken)
@@ -630,10 +670,7 @@ namespace Engine
 					bodyStm = (*m_KeywordParsers[token.GetIdentifier()])(token);
 				else
 				{
-					bodyStm = ParseVariableStatement(token, EndConditions::Semicolon);
-
-					if (bodyStm == nullptr)
-						bodyStm = ParseExpression(token, EndConditions::Semicolon);
+					bodyStm = ParseExpression(token, EndConditions::Semicolon);
 
 					RequireSymbol(SEMICOLON, "expression");
 				}
@@ -676,6 +713,10 @@ namespace Engine
 
 		Statement* Parser::ParseExpression(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
+			Statement* stm = ParseVariableStatement(DeclarationToken, ConditionMask);
+			if (stm != nullptr)
+				return stm;
+
 			Statement* leftHand = ParseUnaryExpression(DeclarationToken, ConditionMask);
 
 			if (leftHand == nullptr)

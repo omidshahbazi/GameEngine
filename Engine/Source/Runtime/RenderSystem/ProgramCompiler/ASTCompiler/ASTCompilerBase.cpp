@@ -165,7 +165,9 @@ namespace Engine
 			{
 				BuildStatement(statement, Type, Stage, Shader);
 
-				if (IsAssignableFrom(statement, OperatorStatement) || IsAssignableFrom(statement, UnaryOperatorStatement))
+				if (IsAssignableFrom(statement, VariableStatement) ||
+					IsAssignableFrom(statement, OperatorStatement) ||
+					IsAssignableFrom(statement, UnaryOperatorStatement))
 				{
 					Shader += ";";
 
@@ -254,6 +256,12 @@ namespace Engine
 
 				BuildDefaultStatement(stm, Type, Stage, Shader);
 			}
+			else if (IsAssignableFrom(Statement, ForStatement))
+			{
+				ForStatement* stm = ReinterpretCast(ForStatement*, Statement);
+
+				BuildForStatement(stm, Type, Stage, Shader);
+			}
 			else if (IsAssignableFrom(Statement, BreakStatement))
 			{
 				BreakStatement* stm = ReinterpretCast(BreakStatement*, Statement);
@@ -280,12 +288,6 @@ namespace Engine
 			}
 			else
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-
-
-			//Continue
-			//For
-			//While
-			//Do/While
 		}
 
 		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -406,10 +408,6 @@ namespace Engine
 				Shader += "=";
 				BuildStatement(Statement->GetInitialStatement(), Type, Stage, Shader);
 			}
-
-			Shader += ";";
-
-			ADD_NEW_LINE();
 		}
 
 		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -526,6 +524,41 @@ namespace Engine
 				Shader += "}";
 				ADD_NEW_LINE();
 			}
+		}
+
+		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "for (";
+
+			if (Statement->GetInitializer() != nullptr)
+				BuildStatement(Statement->GetInitializer(), Type, Stage, Shader);
+
+			Shader += ";";
+
+			if (Statement->GetCondition() != nullptr)
+				BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+
+			Shader += ";";
+
+			if (Statement->GetStep() != nullptr)
+				BuildStatement(Statement->GetStep(), Type, Stage, Shader);
+
+			Shader += ")";
+			ADD_NEW_LINE();
+
+			Shader += "{";
+			ADD_NEW_LINE();
+
+			BuildStatementHolder(Statement, Type, Stage, Shader);
+
+			Shader += "}";
+			ADD_NEW_LINE();
+		}
+
+		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			Shader += "continue;";
+			ADD_NEW_LINE();
 		}
 
 		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

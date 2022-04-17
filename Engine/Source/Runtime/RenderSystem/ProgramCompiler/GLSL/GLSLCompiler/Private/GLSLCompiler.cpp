@@ -117,9 +117,9 @@ namespace Engine
 
 				/* limits */
 				{
-					/* nonInductiveForLoops */ 0,
-					/* whileLoops */ 0,
-					/* doWhileLoops */ 0,
+					/* nonInductiveForLoops */ 1,
+					/* whileLoops */ 1,
+					/* doWhileLoops */ 1,
 					/* generalUniformIndexing */ 0,
 					/* generalAttributeMatrixVectorIndexing */ 0,
 					/* generalVaryingIndexing */ 0,

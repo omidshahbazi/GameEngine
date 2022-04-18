@@ -141,7 +141,7 @@ namespace Engine
 
 			virtual ResourceCompiler* GetCompiler(void)
 			{
-				return &m_Compiler;
+				return m_Compiler;
 			}
 
 			virtual const WString& GetLibraryPath(void) const
@@ -186,14 +186,13 @@ namespace Engine
 			DECLARE_MEMBER_EVENT_LISTENER(ResourceHolder, FetchShaderSource);
 
 		private:
-			ResourceCompiler m_Compiler;
+			ResourceCompiler* m_Compiler;
 			Thread m_IOThread;
 			ResourceLoaderTaskQueue m_ResourceLoaderTasks;
 			SpinLock m_ResourceLoaderTasksLock;
 			WString m_LibraryPath;
 			ResourceDatabase* m_ResourceDatabase;
 			ResourceMap m_LoadedResources;
-			//ResourceByNameMap m_WaitingToCompile;
 		};
 	}
 }

@@ -50,28 +50,22 @@ namespace Engine
 			Promise->Drop();
 		}
 
-		ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
+		ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase) :
 			m_ResourcesPath(ResourcesFullPath),
 			m_LibraryPath(LibraryFullPath),
-			m_ResourceDatabase(nullptr)
+			m_ResourceDatabase(ResourceDatabase)
 		{
-		}
-
-		ResourceCompiler::~ResourceCompiler(void)
-		{
-			m_IOThread.Shutdown().Wait();
-		}
-
-		void ResourceCompiler::Initialize(ResourceDatabase* ResourceDatabase)
-		{
-			m_ResourceDatabase = ResourceDatabase;
-
 			CheckDirectories();
 
 			m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 			m_IOThread.SetName("ResourceCompiler IO");
 
 			RefreshDatabase();
+		}
+
+		ResourceCompiler::~ResourceCompiler(void)
+		{
+			m_IOThread.Shutdown().Wait();
 		}
 
 		Promise<void> ResourceCompiler::CompileResource(const WString& RelativeFilePath, bool Force)

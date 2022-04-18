@@ -119,13 +119,10 @@ namespace Engine
 		public:
 			typedef Delegate<const GUID&, const WString&> ResourceCompiledEventHandler;
 
-		private:
-			ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath);
+		public:
+			ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase);
 			~ResourceCompiler(void);
 
-			void Initialize(ResourceDatabase* ResourceDatabase);
-
-		public:
 			Promise<void> CompileResource(const String& RelativeFilePath, bool Force = false)
 			{
 				return CompileResource(RelativeFilePath.ChangeType<char16>(), Force);

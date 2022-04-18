@@ -79,7 +79,7 @@ namespace Engine
 		}
 
 		ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
-			m_Compiler(ResourcesFullPath, LibraryFullPath),
+			m_Compiler(nullptr),
 			m_LibraryPath(LibraryFullPath)
 		{
 			TTFParserAllocators::Create();
@@ -89,8 +89,9 @@ namespace Engine
 			m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
 			Construct(m_ResourceDatabase, m_LibraryPath);
 
-			m_Compiler.Initialize(m_ResourceDatabase);
-			m_Compiler.OnResourceCompiledEvent += EventListener_OnResourceCompiled;
+			m_Compiler = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceCompiler>();
+			Construct(m_Compiler, ResourcesFullPath, LibraryFullPath, m_ResourceDatabase);
+			m_Compiler->OnResourceCompiledEvent += EventListener_OnResourceCompiled;
 
 			ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
 
@@ -104,7 +105,8 @@ namespace Engine
 
 			m_IOThread.Shutdown().Wait();
 
-			m_Compiler.OnResourceCompiledEvent -= EventListener_OnResourceCompiled;
+			m_Compiler->OnResourceCompiledEvent -= EventListener_OnResourceCompiled;
+			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_Compiler);
 
 			for (auto& resourcePair : m_LoadedResources)
 			{
@@ -115,6 +117,7 @@ namespace Engine
 
 			m_LoadedResources.Clear();
 
+			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
 			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
 		}
 

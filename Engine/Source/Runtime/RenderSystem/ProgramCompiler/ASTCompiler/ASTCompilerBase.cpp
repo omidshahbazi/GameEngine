@@ -631,6 +631,9 @@ namespace Engine
 
 		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
+			if (Stage != Stages::Fragment)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
+			
 			Shader += "discard;";
 			ADD_NEW_LINE();
 		}

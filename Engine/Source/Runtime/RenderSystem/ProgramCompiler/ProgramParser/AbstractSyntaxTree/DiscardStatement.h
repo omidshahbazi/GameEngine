@@ -13,6 +13,7 @@ namespace Engine
 		{
 			class PROGRAMPARSER_API DiscardStatement : public Statement
 			{
+			public:
 				virtual String ToString(void) const override
 				{
 					return "discard";

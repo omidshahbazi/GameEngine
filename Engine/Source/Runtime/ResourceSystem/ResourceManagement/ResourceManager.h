@@ -31,6 +31,8 @@ namespace Engine
 			ResourceManager(void);
 
 		public:
+			~ResourceManager(void);
+
 			TextureResource* GetWhiteTexture(void);
 			SpriteResource* GetWhiteSprite(void);
 

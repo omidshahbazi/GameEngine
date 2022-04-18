@@ -21,7 +21,6 @@ namespace Engine
 			Material(void);
 			Material(ProgramResource* Program);
 			Material(const Material& Other);
-			Material(Material&& Other);
 
 			INLINE RenderQueues GetQueue(void) const
 			{

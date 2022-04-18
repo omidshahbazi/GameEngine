@@ -30,6 +30,11 @@ namespace Engine
 			BuiltInResourceManager::Create(ResourceSystemAllocators::ResourceAllocator);
 		}
 
+		ResourceManager::~ResourceManager(void)
+		{
+			BuiltInResourceManager::Destroy();
+		}
+
 		TextureResource* ResourceManager::GetWhiteTexture(void)
 		{
 			return BuiltInResourceManager::GetInstance()->GetWhiteTexture();

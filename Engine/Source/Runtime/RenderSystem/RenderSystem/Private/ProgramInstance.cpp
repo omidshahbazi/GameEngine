@@ -135,7 +135,7 @@ namespace Engine
 					}
 					else
 					{
-						value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
+						m_Buffers[hash] = value = RenderSystemAllocators::ContainersAllocator_Allocate<ConstantBuffer>();
 						Construct(value, otherValue->GetSize());
 					}
 

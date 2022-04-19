@@ -118,7 +118,6 @@ namespace Engine
 			m_LoadedResources.Clear();
 
 			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
-			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_ResourceDatabase);
 		}
 
 		void ResourceHolder::Unload(ResourceBase* Resource)

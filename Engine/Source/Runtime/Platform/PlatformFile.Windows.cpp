@@ -39,6 +39,8 @@ namespace Engine
 
 		FILE* GetFile(PlatformFile::Handle Handle)
 		{
+			ScopeGuard gaurd(fileLock);
+
 			if (files.find(Handle) != files.end())
 				return files[(uint32)Handle];
 
@@ -47,9 +49,9 @@ namespace Engine
 
 		FILE* PullFile(PlatformFile::Handle Handle)
 		{
-			ScopeGuard gaurd(fileLock);
-
 			FILE* file = GetFile(Handle);
+
+			ScopeGuard gaurd(fileLock);
 
 			files.erase(Handle);
 

@@ -24,6 +24,7 @@ namespace Engine
 
 			for (auto& library : m_Libraries)
 				UnloadInternal(library.GetFirst(), &library.GetSecond());
+			m_Libraries.Clear();
 		}
 
 		Promise<void*> ModuleManager::Load(const String& Name)
@@ -138,6 +139,8 @@ namespace Engine
 				{
 					promise->SetValue(UnloadInternal(Name, Info));
 
+					m_Libraries.Remove(Name);
+
 					promise->IncreaseDoneCount();
 				};
 
@@ -167,8 +170,6 @@ namespace Engine
 
 				result = true;
 			}
-
-			m_Libraries.Remove(Name);
 
 			return result;
 		}

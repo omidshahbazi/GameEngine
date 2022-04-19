@@ -237,7 +237,7 @@ namespace Engine
 
 			Mesh* ResourceFactory::CreateMesh(const ByteBuffer& Buffer)
 			{
-				MeshInfo info;
+				MeshInfo info(ResourceSystemAllocators::ResourceAllocator);
 
 				MeshParser::Parse(Buffer, info);
 

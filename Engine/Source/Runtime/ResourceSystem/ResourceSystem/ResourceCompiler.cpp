@@ -40,18 +40,13 @@ namespace Engine
 
 		void ResourceCompiler::MultipleCompileTaskInfo::operator()(void)
 		{
-			WStringList retryFilePaths;
-
 			for (auto& assetFilePath : AssetsFullPaths)
 			{
 				Promise->IncreaseDoneCount();
 
 				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(assetFilePath));
 
-				bool result = Compiler->CompileFile(assetFilePath, fileType, Force);
-
-				if (!result && fileType == FileTypes::PROGRAM)
-					retryFilePaths.Add(assetFilePath);
+				Compiler->CompileFile(assetFilePath, fileType, Force);
 			}
 
 			Promise->Drop();

@@ -182,7 +182,7 @@ namespace Engine
 			void OnResourceCompiled(const GUID& GUID, const WString& FullPath);
 			DECLARE_MEMBER_EVENT_LISTENER(ResourceHolder, OnResourceCompiled);
 
-			void FetchShaderSource(const String& Name, String& Source);
+			void FetchShaderSource(const String& Name, bool& Found, String& Source);
 			DECLARE_MEMBER_EVENT_LISTENER(ResourceHolder, FetchShaderSource);
 
 		private:

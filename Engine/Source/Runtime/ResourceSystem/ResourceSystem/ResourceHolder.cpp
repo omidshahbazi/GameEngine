@@ -283,7 +283,7 @@ namespace Engine
 			}
 		}
 
-		void ResourceHolder::FetchShaderSource(const String& RelativeFilePath, String& Source)
+		void ResourceHolder::FetchShaderSource(const String& RelativeFilePath, bool& Found, String& Source)
 		{
 			ResourceDatabase::ResourceInfo info = {};
 			if (!m_ResourceDatabase->GetResourceInfo(RelativeFilePath.ChangeType<char16>(), info))
@@ -295,6 +295,7 @@ namespace Engine
 			if (!Utilities::ReadDataFile(Path::Combine(m_LibraryPath, finalPath), inBuffer))
 				return;
 
+			Found = true;
 			Source = ResourceFactory::GetProgramSource(inBuffer);
 		}
 	}

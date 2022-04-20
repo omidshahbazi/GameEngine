@@ -51,9 +51,10 @@ namespace Engine
 			{
 				for (auto handler : OnFetchShaderSourceEvent.GetHandlers())
 				{
-					(*handler)(Name, Source);
+					bool found = false;
+					(*handler)(Name, found, Source);
 
-					if (Source != String::Empty)
+					if (found)
 						return true;
 				}
 

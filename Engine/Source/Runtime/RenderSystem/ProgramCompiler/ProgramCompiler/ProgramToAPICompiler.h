@@ -23,7 +23,7 @@ namespace Engine
 		class PROGRAMCOMPILER_API ProgramToAPICompiler
 		{
 		public:
-			typedef Delegate<const String&, String&> FetchShaderSourceEventHandler;
+			typedef Delegate<const String&, bool&, String&> FetchShaderSourceEventHandler;
 
 			SINGLETON_DECLARATION(ProgramToAPICompiler);
 

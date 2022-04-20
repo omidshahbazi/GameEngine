@@ -40,11 +40,18 @@ namespace Engine
 
 		void ResourceCompiler::MultipleCompileTaskInfo::operator()(void)
 		{
+			WStringList retryFilePaths;
+
 			for (auto& assetFilePath : AssetsFullPaths)
 			{
 				Promise->IncreaseDoneCount();
 
-				Compiler->CompileFile(assetFilePath, Compiler->GetFileTypeByExtension(Path::GetExtension(assetFilePath)), Force);
+				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(assetFilePath));
+
+				bool result = Compiler->CompileFile(assetFilePath, fileType, Force);
+
+				if (!result && fileType == FileTypes::PROGRAM)
+					retryFilePaths.Add(assetFilePath);
 			}
 
 			Promise->Drop();
@@ -187,12 +194,6 @@ namespace Engine
 			ResourceDatabase::ResourceInfoList removedResources;
 			m_ResourceDatabase->UpdateKeepingResources(toKeepInDatabase, removedResources);
 
-			//ResourceDatabase::ResourceInfoList allResources;
-			//m_ResourceDatabase->GetAllResources(allResources);
-			//for (const auto& info : allResources)
-			//	if (!FileSystem::Exists(Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID))))
-			//		removedResources.Add(info);
-
 			for (const auto& info : removedResources)
 				FileSystem::Delete(Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID)));
 		}
@@ -201,8 +202,7 @@ namespace Engine
 		{
 			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
 
-			bool result = Utilities::ReadDataFile(FullPath, inBuffer);
-			if (!result)
+			if (!Utilities::ReadDataFile(FullPath, inBuffer))
 				return false;
 
 			FrameAllocator outBufferAllocator("Resource Holder Out Buffer Allocator", ResourceSystemAllocators::ResourceAllocator, 128 * MegaByte);
@@ -229,27 +229,26 @@ namespace Engine
 				forceToCompile = true;
 			}
 
+			bool result = false;
+
 #define BEGIN_IMPLEMENT(Type) \
 			ImporterExporter::##Type##Settings settings; \
-			if (result = (!ImporterExporter::Import(FullPath, &settings) || forceToCompile)) \
-			{ \
-				result = ImporterExporter::Export(FullPath, &settings); \
-				if (result) \
-				{ \
-					try \
-					{
+			if (ImporterExporter::Import(FullPath, &settings) && !forceToCompile) \
+				return true; \
+			if (!ImporterExporter::Export(FullPath, &settings)) \
+				return false; \
+			try \
+			{
 
 #define END_IMPLEMENT() \
-						if (result) \
-							id = settings.ID; \
-					} \
-					catch (const Exception& ex) \
-					{ \
-						CoreDebugLogError(Categories::ResourceSystem, "[%S] compilation has failed: [%S]", relativeFilePath.ChangeType<char8>(), ex.GetInfo()); \
-						result = false; \
-					} \
-				} \
-			}
+				if (result) \
+					id = settings.ID; \
+			} \
+			catch (const Exception& ex) \
+			{ \
+				CoreDebugLogError(Categories::ResourceSystem, "[%S] compilation has failed: [%S]", relativeFilePath.ChangeType<char8>(), ex.GetInfo()); \
+				return false; \
+			} \
 
 			String id;
 			switch (FileType)
@@ -294,22 +293,23 @@ namespace Engine
 			} break;
 			}
 
-			if (result)
-				info.GUID = id;
-			else
+			if (!result)
 				return false;
+
+			info.GUID = id;
 
 			if (dataFullPath == WString::Empty)
 				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID));
 
-			result = Utilities::WriteDataFile(dataFullPath, outBuffer);
+			if (!Utilities::WriteDataFile(dataFullPath, outBuffer))
+				return false;
 
 			info.LastWriteTime = PlatformFile::GetLastWriteTime(FullPath.GetValue());
 			m_ResourceDatabase->UpdateCompiledResource(info);
 
 			OnResourceCompiledEvent(info.GUID, relativeFilePath);
 
-			return result;
+			return true;
 
 #undef END_IMPLEMENT
 #undef BEGIN_IMPLEMENT

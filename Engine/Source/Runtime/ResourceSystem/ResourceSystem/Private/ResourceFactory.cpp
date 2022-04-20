@@ -133,8 +133,6 @@ namespace Engine
 
 				if (!Compiler::Compile(info, DEVICE_TYPES, DEVICE_TYPE_COUNT, compiledInfos))
 				{
-					bool foundAnything = false;
-
 					for (uint8 i = 0; i < DEVICE_TYPE_COUNT; ++i)
 					{
 						auto& compiledInfo = compiledInfos[i];
@@ -143,13 +141,9 @@ namespace Engine
 							continue;
 
 						THROW_FULL_EXCEPTION(Categories::ProgramCompiler, "Compiling program has failed", compiledInfo.ErrorMessage);
-
-						foundAnything = true;
-						break;
 					}
 
-					if (!foundAnything)
-						THROW_EXCEPTION(Categories::ProgramCompiler, "Compiling a program has failed for unknown reason");
+					THROW_EXCEPTION(Categories::ProgramCompiler, "Compiling a program has failed for unknown reason");
 
 					return false;
 				}

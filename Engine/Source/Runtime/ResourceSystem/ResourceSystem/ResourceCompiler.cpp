@@ -44,9 +44,7 @@ namespace Engine
 			{
 				Promise->IncreaseDoneCount();
 
-				FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(assetFilePath));
-
-				Compiler->CompileFile(assetFilePath, fileType, Force);
+				Compiler->CompileFile(assetFilePath, GetFileTypeByExtension(Path::GetExtension(assetFilePath)), Force);
 			}
 
 			Promise->Drop();

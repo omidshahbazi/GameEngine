@@ -71,12 +71,9 @@ namespace Engine
 		Promise<void> ResourceCompiler::CompileResource(const WString& RelativeFilePath, bool Force)
 		{
 			FileTypes fileType = GetFileTypeByExtension(Path::GetExtension(RelativeFilePath));
-			switch (fileType)
-			{
-			case FileTypes::META:
-			case FileTypes::Unknown:
+
+			if (!BitwiseUtils::IsEnabled(FileTypes::AllResources, fileType))
 				return nullptr;
-			}
 
 			PromiseBlock<void>* promiseBlock = CreatePromiseBlock(1);
 
@@ -90,10 +87,10 @@ namespace Engine
 			return promiseBlock;
 		}
 
-		Promise<void> ResourceCompiler::CompileResources(FileTypes FileTypesMask, bool Force)
+		Promise<void> ResourceCompiler::CompileResources(const WString& RelativePath, FileTypes FileTypesMask, bool Force)
 		{
 			WStringList files;
-			GetResourcePaths(FileTypesMask, files);
+			GetResourcePaths(RelativePath, FileTypesMask, files);
 
 			PromiseBlock<void>* promiseBlock = CreatePromiseBlock(files.GetSize());
 
@@ -126,7 +123,7 @@ namespace Engine
 			}
 
 			files.Clear();
-			GetResourcePaths(FileTypes::AllResources, files);
+			GetResourcePaths(WString::Empty, FileTypes::AllResources, files);
 
 			WStringList toKeepInDatabase;
 			for (const auto& file : files)
@@ -324,9 +321,9 @@ namespace Engine
 			return Path::Combine(GetResourcesPath(), RelativePath);
 		}
 
-		void ResourceCompiler::GetResourcePaths(FileTypes FileTypesMask, WStringList& Files)
+		void ResourceCompiler::GetResourcePaths(const WString& RelativePath, FileTypes FileTypesMask, WStringList& Files)
 		{
-			FileSystem::GetFiles(GetResourcesPath(), Files, FileSystem::SearchOptions::All);
+			FileSystem::GetFiles(Path::Combine(GetResourcesPath(), RelativePath), Files, FileSystem::SearchOptions::All);
 
 			Files.RemoveIf([&](auto& item)
 				{

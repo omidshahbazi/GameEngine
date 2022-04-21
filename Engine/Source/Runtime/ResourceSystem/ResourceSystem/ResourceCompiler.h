@@ -125,12 +125,22 @@ namespace Engine
 			ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase);
 			~ResourceCompiler(void);
 
+			Promise<void> CompileResource(const WString& RelativeFilePath, bool Force = false);
 			Promise<void> CompileResource(const String& RelativeFilePath, bool Force = false)
 			{
 				return CompileResource(RelativeFilePath.ChangeType<char16>(), Force);
 			}
-			Promise<void> CompileResource(const WString& RelativeFilePath, bool Force = false);
-			Promise<void> CompileResources(FileTypes FileTypesMask, bool Force = false);
+
+			Promise<void> CompileResources(const WString& RelativePath, FileTypes FileTypesMask, bool Force = false);
+			Promise<void> CompileResources(const String& RelativePath, bool Force = false)
+			{
+				return CompileResources(RelativePath.ChangeType<char16>(), FileTypes::AllResources, Force);
+			}
+
+			Promise<void> CompileResources(FileTypes FileTypesMask, bool Force = false)
+			{
+				return CompileResources(WString::Empty, FileTypes::AllResources, Force);
+			}
 			Promise<void> CompileResources(bool Force = false)
 			{
 				return CompileResources(FileTypes::AllResources, Force);
@@ -154,7 +164,7 @@ namespace Engine
 			void CheckDirectories(void);
 
 			WString GetResourceFullPath(const WString& RelativePath);
-			void GetResourcePaths(FileTypes FileTypesMask, WStringList& Files);
+			void GetResourcePaths(const WString& RelativePath, FileTypes FileTypesMask, WStringList& Files);
 
 			void IOThreadWorker(void);
 

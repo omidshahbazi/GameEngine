@@ -38,17 +38,19 @@ namespace Engine
 		{
 			friend class ResourceHolder;
 
-		private:
+		public:
 			enum class FileTypes
 			{
-				META = 0,
-				TXT = 1,
-				PNG = 2,
-				JPG = 3,
-				PROGRAM = 4,
-				OBJ = 5,
-				TTF = 6,
-				Unknown
+				Unknown = 1 << 0,
+				META = 1 << 1,
+				TXT = 1 << 2,
+				PNG = 1 << 3,
+				JPG = 1 << 4,
+				PROGRAM = 1 << 5,
+				OBJ = 1 << 6,
+				TTF = 1 << 7,
+				All = 0xFFFFFFF,
+				AllResources = All & ~(Unknown | META)
 			};
 
 			struct CompileTaskInfo
@@ -128,7 +130,11 @@ namespace Engine
 				return CompileResource(RelativeFilePath.ChangeType<char16>(), Force);
 			}
 			Promise<void> CompileResource(const WString& RelativeFilePath, bool Force = false);
-			Promise<void> CompileResources(bool Force = false);
+			Promise<void> CompileResources(FileTypes FileTypesMask, bool Force = false);
+			Promise<void> CompileResources(bool Force = false)
+			{
+				return CompileResources(FileTypes::AllResources, Force);
+			}
 
 			virtual const WString& GetResourcesPath(void) const
 			{
@@ -148,7 +154,7 @@ namespace Engine
 			void CheckDirectories(void);
 
 			WString GetResourceFullPath(const WString& RelativePath);
-			void GetResourcePaths(WStringList& Files);
+			void GetResourcePaths(FileTypes FileTypesMask, WStringList& Files);
 
 			void IOThreadWorker(void);
 

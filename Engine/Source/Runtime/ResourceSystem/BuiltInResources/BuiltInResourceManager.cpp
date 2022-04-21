@@ -21,10 +21,10 @@ namespace Engine
 
 		const GUID WHITE_TEXTURE_GUID = GUID::Create();
 
-		SINGLETON_DEFINITION(BuiltInResourceManager)
+		SINGLETON_DEFINITION(BuiltInResourceManager);
 
-			BuiltInResourceManager::BuiltInResourceManager(void) :
-			ResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(ASSETS_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(LIBRARY_DIRECTORY_PATH)))
+		BuiltInResourceManager::BuiltInResourceManager(void) :
+			ResourceHolder(Path::Combine(FileSystem::GetExecutableDirectory(), WString(LIBRARY_DIRECTORY_PATH)), Path::Combine(FileSystem::GetExecutableDirectory(), WString(ASSETS_DIRECTORY_PATH)), true)
 		{
 			CreateDefaultResources();
 

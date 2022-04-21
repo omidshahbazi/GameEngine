@@ -62,7 +62,7 @@ namespace Engine
 			typedef Map<WString, ResourceInfo> ResourceByNameMap;
 
 		public:
-			ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath);
+			ResourceHolder(const WString& LibraryFullPath, const WString& ResourcesFullPath, bool ServeIncludes);
 			virtual ~ResourceHolder(void);
 
 			template<typename T>
@@ -186,13 +186,14 @@ namespace Engine
 			DECLARE_MEMBER_EVENT_LISTENER(ResourceHolder, FetchShaderSource);
 
 		private:
-			ResourceCompiler* m_Compiler;
+			WString m_LibraryPath;
+			ResourceDatabase* m_ResourceDatabase;
+			bool m_ServeIncludes;
 			Thread m_IOThread;
 			ResourceLoaderTaskQueue m_ResourceLoaderTasks;
 			SpinLock m_ResourceLoaderTasksLock;
-			WString m_LibraryPath;
-			ResourceDatabase* m_ResourceDatabase;
 			ResourceMap m_LoadedResources;
+			ResourceCompiler* m_Compiler;
 		};
 	}
 }

@@ -22,10 +22,10 @@ namespace Engine
 		cwstr ASSETS_DIRECTORY_NAME(L"Assets");
 		cwstr LIBRARY_DIRECTORY_NAME(L"Library");
 
-		SINGLETON_DEFINITION(ResourceManager)
+		SINGLETON_DEFINITION(ResourceManager);
 
-			ResourceManager::ResourceManager(void) :
-			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_NAME)), Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_NAME)))
+		ResourceManager::ResourceManager(void) :
+			ResourceHolder(Path::Combine(FileSystem::GetWorkingPath(), WString(LIBRARY_DIRECTORY_NAME)), Path::Combine(FileSystem::GetWorkingPath(), WString(ASSETS_DIRECTORY_NAME)), true)
 		{
 			BuiltInResourceManager::Create(ResourceSystemAllocators::ResourceAllocator);
 		}

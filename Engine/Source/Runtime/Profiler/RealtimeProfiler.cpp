@@ -21,9 +21,9 @@ namespace Engine
 
 		cwstr PROFILER_DIRECTORY_NAME(L"Profiler");
 
-		SINGLETON_DEFINITION(RealtimeProfiler)
+		SINGLETON_DEFINITION(RealtimeProfiler);
 
-			uint64 GetTime(void)
+		uint64 GetTime(void)
 		{
 			return HighResolutionTime::GetTime().GetMicroseconds();
 		}

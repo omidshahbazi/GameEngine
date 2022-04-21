@@ -9,7 +9,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DEFINITION(SceneManager)
+		SINGLETON_DEFINITION(SceneManager);
 
 		SceneManager::SceneManager(void) :
 			m_ActiveScene(0)
@@ -33,7 +33,7 @@ namespace Engine
 			return Scene(m_ActiveScene);
 		}
 
-		SceneData *SceneManager::GetSceneData(IDType ID)
+		SceneData* SceneManager::GetSceneData(IDType ID)
 		{
 			return m_DataManager.GetScene(ID);
 		}

@@ -78,9 +78,10 @@ namespace Engine
 			Holder->LoadInternal(GUID, loadResult, inBuffer, Type, Resource);
 		}
 
-		ResourceHolder::ResourceHolder(const WString& ResourcesFullPath, const WString& LibraryFullPath) :
+		ResourceHolder::ResourceHolder(const WString& LibraryFullPath, const WString& ResourcesFullPath, bool ServeIncludes) :
+			m_LibraryPath(LibraryFullPath),
 			m_Compiler(nullptr),
-			m_LibraryPath(LibraryFullPath)
+			m_ServeIncludes(ServeIncludes)
 		{
 			TTFParserAllocators::Create();
 			FontParserAllocators::Create();
@@ -89,19 +90,21 @@ namespace Engine
 			m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
 			Construct(m_ResourceDatabase, m_LibraryPath);
 
+			m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
+			m_IOThread.SetName("ResourceHolder IO");
+
 			m_Compiler = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceCompiler>();
 			Construct(m_Compiler, ResourcesFullPath, LibraryFullPath, m_ResourceDatabase);
 			m_Compiler->OnResourceCompiledEvent += EventListener_OnResourceCompiled;
 
-			ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
-
-			m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
-			m_IOThread.SetName("ResourceHolder IO");
+			if (m_ServeIncludes)
+				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
 		}
 
 		ResourceHolder::~ResourceHolder(void)
 		{
-			ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
+			if (m_ServeIncludes)
+				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
 
 			m_IOThread.Shutdown().Wait();
 

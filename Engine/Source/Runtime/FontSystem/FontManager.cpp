@@ -16,9 +16,9 @@ namespace Engine
 	{
 		using namespace Private;
 
-		SINGLETON_DEFINITION(FontManager)
+		SINGLETON_DEFINITION(FontManager);
 
-			FontManager::FontManager(void) :
+		FontManager::FontManager(void) :
 			m_QuadMesh(nullptr)
 		{
 			FontSystemAllocators::Create();

@@ -589,7 +589,8 @@ namespace Engine
 				programInfos->RootSignature = rootSignature;
 
 				IMPLEMENT(VertexShader);
-				IMPLEMENT(TessellationShader);
+				IMPLEMENT(HullShader);
+				IMPLEMENT(DomainShader);
 				IMPLEMENT(GeometryShader);
 				IMPLEMENT(FragmentShader);
 				IMPLEMENT(ComputeShader);
@@ -612,7 +613,8 @@ namespace Engine
 				ProgramInfos* programInfos = ReinterpretCast(ProgramInfos*, Handle);
 
 				IMPLEMENT(VertexShader);
-				IMPLEMENT(TessellationShader);
+				IMPLEMENT(HullShader);
+				IMPLEMENT(DomainShader);
 				IMPLEMENT(GeometryShader);
 				IMPLEMENT(FragmentShader);
 				IMPLEMENT(ComputeShader);

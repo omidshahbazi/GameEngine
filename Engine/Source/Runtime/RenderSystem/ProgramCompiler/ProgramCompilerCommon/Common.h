@@ -14,8 +14,8 @@ namespace Engine
 		enum class Stages
 		{
 			Vertex = 0,
-			//Hull -> Domain -> Geometry
-			Tessellation,
+			Hull,
+			Domain,
 			Geometry,
 			Fragment,
 			Compute
@@ -46,7 +46,8 @@ namespace Engine
 			static cstr ENTRY_POINT_NAME;
 
 			static cstr VERTEX_ENTRY_POINT_NAME;
-			static cstr TESSELLATION_ENTRY_POINT_NAME;
+			static cstr HULL_ENTRY_POINT_NAME;
+			static cstr DOMAIN_ENTRY_POINT_NAME;
 			static cstr GEOMETRY_ENTRY_POINT_NAME;
 			static cstr FRAGMENT_ENTRY_POINT_NAME;
 			static cstr COMPUTE_ENTRY_POINT_NAME;

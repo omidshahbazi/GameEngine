@@ -61,7 +61,9 @@ namespace Engine
 
 			virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildTessellationShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildHullShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+
+			virtual void BuildDomainShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
 
 			virtual void BuildGeometryShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
 

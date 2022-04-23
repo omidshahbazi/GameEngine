@@ -36,7 +36,8 @@ namespace Engine
 					CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
 
 					compiledProgrm.VertexShader.Size = 0;
-					compiledProgrm.TessellationShader.Size = 0;
+					compiledProgrm.HullShader.Size = 0;
+					compiledProgrm.DomainShader.Size = 0;
 					compiledProgrm.GeometryShader.Size = 0;
 					compiledProgrm.FragmentShader.Size = 0;
 					compiledProgrm.ComputeShader.Size = 0;
@@ -50,7 +51,8 @@ namespace Engine
 			for (uint8 i = 0; i < TypesCount; ++i)
 			{
 				if (outputInfos->VertexShader == String::Empty &&
-					outputInfos->TessellationShader == String::Empty &&
+					outputInfos->HullShader == String::Empty &&
+					outputInfos->DomainShader == String::Empty &&
 					outputInfos->GeometryShader == String::Empty &&
 					outputInfos->FragmentShader == String::Empty &&
 					outputInfos->ComputeShader == String::Empty)
@@ -97,7 +99,8 @@ namespace Engine
 						compiler->Compile(deviceType, StageType, outputInfo.StageName.GetValue(), Constants::ENTRY_POINT_NAME, Info.DebugMode, compiledProgrm.StageName.Buffer, compiledProgrm.StageName.Size);
 
 					IMPLEMENT_COMPILE(Stages::Vertex, VertexShader);
-					IMPLEMENT_COMPILE(Stages::Tessellation, TessellationShader);
+					IMPLEMENT_COMPILE(Stages::Hull, HullShader);
+					IMPLEMENT_COMPILE(Stages::Domain, DomainShader);
 					IMPLEMENT_COMPILE(Stages::Geometry, GeometryShader);
 					IMPLEMENT_COMPILE(Stages::Fragment, FragmentShader);
 					IMPLEMENT_COMPILE(Stages::Compute, ComputeShader);

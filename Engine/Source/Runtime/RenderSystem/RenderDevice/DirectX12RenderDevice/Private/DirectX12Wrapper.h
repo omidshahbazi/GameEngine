@@ -355,7 +355,8 @@ namespace Engine
 
 					typedef PipelineStateSubobject<ID3D12RootSignature*, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_ROOT_SIGNATURE> PipelineStateSubobjectRootSignature;
 					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_VS> PipelineStateSubobjectVertexShader;
-					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DS> PipelineStateSubobjectTessellationShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_HS> PipelineStateSubobjectHullShader;
+					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_DS> PipelineStateSubobjectDomainShader;
 					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_GS> PipelineStateSubobjectGeometryShader;
 					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_PS> PipelineStateSubobjectFragmentShader;
 					typedef PipelineStateSubobject<D3D12_SHADER_BYTECODE, D3D12_PIPELINE_STATE_SUBOBJECT_TYPE_CS> PipelineStateSubobjectComputeShader;
@@ -378,7 +379,8 @@ namespace Engine
 					struct GraphicsPipelineStateDesc
 					{
 						PipelineStateSubobjectVertexShader VertexShader;
-						PipelineStateSubobjectTessellationShader TessellationShader;
+						PipelineStateSubobjectHullShader HullShader;
+						PipelineStateSubobjectDomainShader DomainShader;
 						PipelineStateSubobjectGeometryShader GeometryShader;
 						PipelineStateSubobjectFragmentShader FragmentShader;
 

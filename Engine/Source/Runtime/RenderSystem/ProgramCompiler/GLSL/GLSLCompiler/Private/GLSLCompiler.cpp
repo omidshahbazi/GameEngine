@@ -169,8 +169,12 @@ namespace Engine
 					type = EShLangVertex;
 					break;
 
-				case Stages::Tessellation:
+				case Stages::Hull:
 					type = EShLangTessControl;
+					break;
+
+				case Stages::Domain:
+					type = EShLangTessEvaluation;
 					break;
 
 				case Stages::Geometry:

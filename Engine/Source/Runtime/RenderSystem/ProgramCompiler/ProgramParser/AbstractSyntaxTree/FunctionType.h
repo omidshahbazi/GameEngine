@@ -20,7 +20,8 @@ namespace Engine
 				{
 					None = 0,
 					VertexMain,
-					TessellationMain,
+					HullMain,
+					DomainMain,
 					GeometryMain,
 					FragmentMain,
 					ComputeMain

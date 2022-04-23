@@ -32,7 +32,8 @@ namespace Engine
 			}
 
 			IMPLEMENT_PARSE(VertexShader);
-			IMPLEMENT_PARSE(TessellationShader);
+			IMPLEMENT_PARSE(HullShader);
+			IMPLEMENT_PARSE(DomainShader);
 			IMPLEMENT_PARSE(GeometryShader);
 			IMPLEMENT_PARSE(FragmentShader);
 			IMPLEMENT_PARSE(ComputeShader);
@@ -106,7 +107,8 @@ namespace Engine
 			size += CompiledProgramInfo.StageVariable.Size;
 
 			IMPLEMENT_DUMP_SIZE(VertexShader);
-			IMPLEMENT_DUMP_SIZE(TessellationShader);
+			IMPLEMENT_DUMP_SIZE(HullShader);
+			IMPLEMENT_DUMP_SIZE(DomainShader);
 			IMPLEMENT_DUMP_SIZE(GeometryShader);
 			IMPLEMENT_DUMP_SIZE(FragmentShader);
 			IMPLEMENT_DUMP_SIZE(ComputeShader);
@@ -164,7 +166,8 @@ namespace Engine
 				Buffer.AppendBuffer(CompiledProgramInfo.StageVariable.Buffer, 0, CompiledProgramInfo.StageVariable.Size);
 
 			IMPLEMENT_DUMP(VertexShader);
-			IMPLEMENT_DUMP(TessellationShader);
+			IMPLEMENT_DUMP(HullShader);
+			IMPLEMENT_DUMP(DomainShader);
 			IMPLEMENT_DUMP(GeometryShader);
 			IMPLEMENT_DUMP(FragmentShader);
 			IMPLEMENT_DUMP(ComputeShader);

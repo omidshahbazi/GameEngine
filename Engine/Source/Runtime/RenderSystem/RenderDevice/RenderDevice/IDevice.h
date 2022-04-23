@@ -80,7 +80,8 @@ namespace Engine
 
 			public:
 				CompiledShader VertexShader;
-				CompiledShader TessellationShader;
+				CompiledShader HullShader;
+				CompiledShader DomainShader;
 				CompiledShader GeometryShader;
 				CompiledShader FragmentShader;
 				CompiledShader ComputeShader;

@@ -354,8 +354,10 @@ namespace Engine
 
 			if (name.ToLower() == Constants::VERTEX_ENTRY_POINT_NAME)
 				functionType->SetType(FunctionType::Types::VertexMain);
-			else if (name.ToLower() == Constants::TESSELLATION_ENTRY_POINT_NAME)
-				functionType->SetType(FunctionType::Types::TessellationMain);
+			else if (name.ToLower() == Constants::HULL_ENTRY_POINT_NAME)
+				functionType->SetType(FunctionType::Types::HullMain);
+			else if (name.ToLower() == Constants::DOMAIN_ENTRY_POINT_NAME)
+				functionType->SetType(FunctionType::Types::DomainMain);
 			else if (name.ToLower() == Constants::GEOMETRY_ENTRY_POINT_NAME)
 				functionType->SetType(FunctionType::Types::GeometryMain);
 			else if (name.ToLower() == Constants::FRAGMENT_ENTRY_POINT_NAME)

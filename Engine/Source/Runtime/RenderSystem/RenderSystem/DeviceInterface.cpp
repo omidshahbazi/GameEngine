@@ -325,20 +325,29 @@ namespace Engine
 			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
 
 			static byte compiledVeretexShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-			static byte compiledTessellationShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledHullShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			static byte compiledDomainShaderShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledGeometryShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledFragmentShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			static byte compiledComputeShader[DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 
 			CompiledProgramInfo compiledInfo = {};
+			
 			compiledInfo.VertexShader.Buffer = compiledVeretexShader;
 			compiledInfo.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-			compiledInfo.TessellationShader.Buffer = compiledTessellationShaderShader;
-			compiledInfo.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+			compiledInfo.HullShader.Buffer = compiledHullShaderShader;
+			compiledInfo.HullShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+			compiledInfo.DomainShader.Buffer = compiledDomainShaderShader;
+			compiledInfo.DomainShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			
 			compiledInfo.GeometryShader.Buffer = compiledGeometryShader;
 			compiledInfo.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			
 			compiledInfo.FragmentShader.Buffer = compiledFragmentShader;
 			compiledInfo.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+			
 			compiledInfo.ComputeShader.Buffer = compiledComputeShader;
 			compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 
@@ -353,14 +362,22 @@ namespace Engine
 			CoreDebugAssert(Categories::RenderSystem, Info != nullptr, "Info cannot be null");
 
 			IDevice::CompiledShaders compiledShaders = {};
+			
 			compiledShaders.VertexShader.Buffer = Info->VertexShader.Buffer;
 			compiledShaders.VertexShader.Size = Info->VertexShader.Size;
-			compiledShaders.TessellationShader.Buffer = Info->TessellationShader.Buffer;
-			compiledShaders.TessellationShader.Size = Info->TessellationShader.Size;
+
+			compiledShaders.HullShader.Buffer = Info->HullShader.Buffer;
+			compiledShaders.HullShader.Size = Info->HullShader.Size;
+
+			compiledShaders.DomainShader.Buffer = Info->DomainShader.Buffer;
+			compiledShaders.DomainShader.Size = Info->DomainShader.Size;
+			
 			compiledShaders.GeometryShader.Buffer = Info->GeometryShader.Buffer;
 			compiledShaders.GeometryShader.Size = Info->GeometryShader.Size;
+			
 			compiledShaders.FragmentShader.Buffer = Info->FragmentShader.Buffer;
 			compiledShaders.FragmentShader.Size = Info->FragmentShader.Size;
+			
 			compiledShaders.ComputeShader.Buffer = Info->ComputeShader.Buffer;
 			compiledShaders.ComputeShader.Size = Info->ComputeShader.Size;
 

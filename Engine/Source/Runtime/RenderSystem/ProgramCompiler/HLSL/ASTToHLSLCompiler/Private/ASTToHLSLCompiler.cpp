@@ -417,7 +417,12 @@ namespace Engine
 						registerName = "SV_POSITION";
 					} break;
 
-					case Stages::Tessellation:
+					case Stages::Hull:
+					{
+						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+					} break;
+
+					case Stages::Domain:
 					{
 						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 					} break;

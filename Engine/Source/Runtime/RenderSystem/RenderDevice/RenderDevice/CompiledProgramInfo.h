@@ -30,7 +30,8 @@ namespace Engine
 		public:
 			CompiledProgramInfo(void) :
 				VertexShader({}),
-				TessellationShader({}),
+				HullShader({}),
+				DomainShader({}),
 				GeometryShader({}),
 				FragmentShader({}),
 				ComputeShader({})
@@ -39,7 +40,8 @@ namespace Engine
 
 		public:
 			CompiledProgram VertexShader;
-			CompiledProgram TessellationShader;
+			CompiledProgram HullShader;
+			CompiledProgram DomainShader;
 			CompiledProgram GeometryShader;
 			CompiledProgram FragmentShader;
 			CompiledProgram ComputeShader;

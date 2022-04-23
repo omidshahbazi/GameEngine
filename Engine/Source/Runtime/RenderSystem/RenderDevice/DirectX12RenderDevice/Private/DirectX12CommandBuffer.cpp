@@ -450,7 +450,8 @@ namespace Engine
 					{
 						DirectX12Wrapper::PipelineStateObject::GraphicsPipelineStateDesc desc = {};
 						IMPLEMENT_SET_SHADER_DATA(VertexShader);
-						IMPLEMENT_SET_SHADER_DATA(TessellationShader);
+						IMPLEMENT_SET_SHADER_DATA(HullShader);
+						IMPLEMENT_SET_SHADER_DATA(DomainShader);
 						IMPLEMENT_SET_SHADER_DATA(GeometryShader);
 						IMPLEMENT_SET_SHADER_DATA(FragmentShader);
 

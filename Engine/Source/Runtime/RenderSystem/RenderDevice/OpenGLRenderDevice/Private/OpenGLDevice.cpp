@@ -509,7 +509,8 @@ namespace Engine
 				uint32 handle = glCreateProgram();
 
 				IMPLEMENT_CREATE_SHADER(GL_VERTEX_SHADER, VertexShader);
-				IMPLEMENT_CREATE_SHADER(GL_TESS_CONTROL_SHADER, TessellationShader);
+				IMPLEMENT_CREATE_SHADER(GL_TESS_CONTROL_SHADER, HullShader);
+				IMPLEMENT_CREATE_SHADER(GL_TESS_EVALUATION_SHADER, DomainShader);
 				IMPLEMENT_CREATE_SHADER(GL_GEOMETRY_SHADER, GeometryShader);
 				IMPLEMENT_CREATE_SHADER(GL_FRAGMENT_SHADER, FragmentShader);
 				IMPLEMENT_CREATE_SHADER(GL_COMPUTE_SHADER, ComputeShader);
@@ -529,8 +530,11 @@ namespace Engine
 					if (VertexShaderID != 0)
 						glDeleteShader(VertexShaderID);
 
-					if (TessellationShaderID != 0)
-						glDeleteShader(TessellationShaderID);
+					if (HullShaderID != 0)
+						glDeleteShader(HullShaderID);
+
+					if (DomainShaderID != 0)
+						glDeleteShader(DomainShaderID);
 
 					if (GeometryShaderID != 0)
 						glDeleteShader(GeometryShaderID);
@@ -552,8 +556,11 @@ namespace Engine
 				if (VertexShaderID != 0)
 					glDetachShader(handle, VertexShaderID);
 
-				if (TessellationShaderID != 0)
-					glDetachShader(handle, TessellationShaderID);
+				if (HullShaderID != 0)
+					glDetachShader(handle, HullShaderID);
+
+				if (DomainShaderID != 0)
+					glDetachShader(handle, DomainShaderID);
 
 				if (GeometryShaderID != 0)
 					glDetachShader(handle, GeometryShaderID);

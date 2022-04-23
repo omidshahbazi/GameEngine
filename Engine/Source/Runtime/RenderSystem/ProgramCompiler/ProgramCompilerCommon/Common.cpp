@@ -10,7 +10,8 @@ namespace Engine
 		cstr Constants::ENTRY_POINT_NAME = "main";
 
 		cstr Constants::VERTEX_ENTRY_POINT_NAME = "vertexmain";
-		cstr Constants::TESSELLATION_ENTRY_POINT_NAME = "tessellationmain";
+		cstr Constants::HULL_ENTRY_POINT_NAME = "hullmain";
+		cstr Constants::DOMAIN_ENTRY_POINT_NAME = "domainmain";
 		cstr Constants::GEOMETRY_ENTRY_POINT_NAME = "geometrymain";
 		cstr Constants::FRAGMENT_ENTRY_POINT_NAME = "fragmentmain";
 		cstr Constants::COMPUTE_ENTRY_POINT_NAME = "computemain";

@@ -43,8 +43,11 @@ namespace Engine
 			if (ContainsType(FunctionType::Types::VertexMain))
 				BuildVertexShader(Structs, Variables, Functions, Output.VertexShader);
 
-			if (ContainsType(FunctionType::Types::TessellationMain))
-				BuildTessellationShader(Structs, Variables, Functions, Output.TessellationShader);
+			if (ContainsType(FunctionType::Types::HullMain))
+				BuildHullShader(Structs, Variables, Functions, Output.HullShader);
+
+			if (ContainsType(FunctionType::Types::DomainMain))
+				BuildDomainShader(Structs, Variables, Functions, Output.DomainShader);
 
 			if (ContainsType(FunctionType::Types::GeometryMain))
 				BuildGeometryShader(Structs, Variables, Functions, Output.GeometryShader);
@@ -79,9 +82,14 @@ namespace Engine
 			BuildStageShader(Stages::Vertex, Structs, Variables, Functions, Shader);
 		}
 
-		void ASTCompilerBase::BuildTessellationShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildHullShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
-			BuildStageShader(Stages::Tessellation, Structs, Variables, Functions, Shader);
+			BuildStageShader(Stages::Hull, Structs, Variables, Functions, Shader);
+		}
+
+		void ASTCompilerBase::BuildDomainShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		{
+			BuildStageShader(Stages::Domain, Structs, Variables, Functions, Shader);
 		}
 
 		void ASTCompilerBase::BuildGeometryShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)

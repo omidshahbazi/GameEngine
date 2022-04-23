@@ -30,7 +30,8 @@ namespace Engine
 		namespace Private
 		{
 			byte COMPILED_VERETEX_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
-			byte COMPILED_TESSELLATION_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_HULL_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
+			byte COMPILED_DOMAIN_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			byte COMPILED_GEOMETRY_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			byte COMPILED_FRAGMENT_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
 			byte COMPILED_COMPUTE_SHADER[DEVICE_TYPE_COUNT][DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE];
@@ -121,12 +122,19 @@ namespace Engine
 
 					compiledInfo.VertexShader.Buffer = COMPILED_VERETEX_SHADER[i];
 					compiledInfo.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-					compiledInfo.TessellationShader.Buffer = COMPILED_TESSELLATION_SHADER[i];
-					compiledInfo.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+					compiledInfo.HullShader.Buffer = COMPILED_HULL_SHADER[i];
+					compiledInfo.HullShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+					compiledInfo.DomainShader.Buffer = COMPILED_DOMAIN_SHADER[i];
+					compiledInfo.DomainShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					
 					compiledInfo.GeometryShader.Buffer = COMPILED_GEOMETRY_SHADER[i];
 					compiledInfo.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					
 					compiledInfo.FragmentShader.Buffer = COMPILED_FRAGMENT_SHADER[i];
 					compiledInfo.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					
 					compiledInfo.ComputeShader.Buffer = COMPILED_COMPUTE_SHADER[i];
 					compiledInfo.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 				}
@@ -190,12 +198,19 @@ namespace Engine
 
 					compiledInfos.VertexShader.Buffer = COMPILED_VERETEX_SHADER[0];
 					compiledInfos.VertexShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
-					compiledInfos.TessellationShader.Buffer = COMPILED_TESSELLATION_SHADER[0];
-					compiledInfos.TessellationShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+					compiledInfos.HullShader.Buffer = COMPILED_HULL_SHADER[0];
+					compiledInfos.HullShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+
+					compiledInfos.DomainShader.Buffer = COMPILED_DOMAIN_SHADER[0];
+					compiledInfos.DomainShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					
 					compiledInfos.GeometryShader.Buffer = COMPILED_GEOMETRY_SHADER[0];
 					compiledInfos.GeometryShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					
 					compiledInfos.FragmentShader.Buffer = COMPILED_FRAGMENT_SHADER[0];
 					compiledInfos.FragmentShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
+					
 					compiledInfos.ComputeShader.Buffer = COMPILED_COMPUTE_SHADER[0];
 					compiledInfos.ComputeShader.Size = DeviceInterface::DEFAULT_COMPILED_SHADER_BUFFER_SIZE;
 

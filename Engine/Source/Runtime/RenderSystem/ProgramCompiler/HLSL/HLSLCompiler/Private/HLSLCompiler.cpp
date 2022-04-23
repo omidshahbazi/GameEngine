@@ -40,7 +40,12 @@ namespace Engine
 					target[1] = 's';
 					break;
 
-				case Stages::Tessellation:
+				case Stages::Hull:
+					target[0] = 'h';
+					target[1] = 's';
+					break;
+
+				case Stages::Domain:
 					target[0] = 'd';
 					target[1] = 's';
 					break;

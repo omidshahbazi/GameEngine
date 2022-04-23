@@ -30,7 +30,7 @@ namespace Engine
 			};
 
 		public:
-			typedef std::function<bool(const String&, String& Source)> IncludeFunction;
+			typedef std::function<bool(const String& FileName, String& Source)> IncludeFunction;
 			typedef Vector<String> DefineList;
 
 			struct Parameters

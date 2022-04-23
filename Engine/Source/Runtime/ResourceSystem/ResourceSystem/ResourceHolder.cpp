@@ -16,8 +16,8 @@
 #include <RenderSystem\Mesh.h>
 #include <RenderSystem\Sprite.h>
 #include <FontSystem\Font.h>
-#include <Allocators\FrameAllocator.h>
 #include <ProgramCompiler\ProgramToAPICompiler.h>
+#include <Allocators\FrameAllocator.h>
 
 namespace Engine
 {
@@ -90,26 +90,26 @@ namespace Engine
 			m_ResourceDatabase = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceDatabase>();
 			Construct(m_ResourceDatabase, m_LibraryPath);
 
+			if (m_ServeIncludes)
+				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_OnFetchShaderSource;
+
 			m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 			m_IOThread.SetName("ResourceHolder IO");
 
 			m_Compiler = ResourceSystemAllocators::ResourceAllocator_Allocate<ResourceCompiler>();
-			Construct(m_Compiler, ResourcesFullPath, LibraryFullPath, m_ResourceDatabase);
+			Construct(m_Compiler, ResourcesFullPath, LibraryFullPath, m_ResourceDatabase, m_ServeIncludes);
 			m_Compiler->OnResourceCompiledEvent += EventListener_OnResourceCompiled;
-
-			if (m_ServeIncludes)
-				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_FetchShaderSource;
 		}
 
 		ResourceHolder::~ResourceHolder(void)
 		{
-			if (m_ServeIncludes)
-				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_FetchShaderSource;
-
 			m_IOThread.Shutdown().Wait();
 
 			m_Compiler->OnResourceCompiledEvent -= EventListener_OnResourceCompiled;
 			ResourceSystemAllocators::ResourceAllocator_Deallocate(m_Compiler);
+
+			if (m_ServeIncludes)
+				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_OnFetchShaderSource;
 
 			for (auto& resourcePair : m_LoadedResources)
 			{
@@ -286,16 +286,14 @@ namespace Engine
 			}
 		}
 
-		void ResourceHolder::FetchShaderSource(const String& RelativeFilePath, bool& Found, String& Source)
+		void ResourceHolder::OnFetchShaderSource(const String& RelativeFilePath, bool& Found, String& Source)
 		{
 			ResourceDatabase::ResourceInfo info = {};
 			if (!m_ResourceDatabase->GetResourceInfo(RelativeFilePath.ChangeType<char16>(), info))
 				return;
 
-			WString finalPath = Utilities::GetDataFileName(info.GUID);
-
 			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
-			if (!Utilities::ReadDataFile(Path::Combine(m_LibraryPath, finalPath), inBuffer))
+			if (!Utilities::ReadDataFile(Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID)), inBuffer))
 				return;
 
 			Found = true;

@@ -14,6 +14,7 @@ namespace Engine
 		enum class Stages
 		{
 			Vertex = 0,
+			//Hull -> Domain -> Geometry
 			Tessellation,
 			Geometry,
 			Fragment,

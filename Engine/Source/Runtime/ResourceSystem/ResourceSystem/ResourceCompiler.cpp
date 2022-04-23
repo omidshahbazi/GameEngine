@@ -3,6 +3,7 @@
 #include <ResourceSystem\Private\Utilities.h>
 #include <ResourceSystem\Private\ResourceFactory.h>
 #include <ResourceSystem\Private\ResourceDatabase.h>
+#include <ProgramCompiler\ProgramToAPICompiler.h>
 #include <Containers\Buffer.h>
 #include <Containers\StringStream.h>
 #include <Platform\PlatformFile.h>
@@ -19,6 +20,7 @@ namespace Engine
 	using namespace Containers;
 	using namespace Platform;
 	using namespace MemoryManagement;
+	using namespace ProgramCompiler;
 
 	namespace ResourceSystem
 	{
@@ -50,21 +52,28 @@ namespace Engine
 			Promise->Drop();
 		}
 
-		ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase) :
+		ResourceCompiler::ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase, bool ServeIncludes) :
 			m_ResourcesPath(ResourcesFullPath),
 			m_LibraryPath(LibraryFullPath),
-			m_ResourceDatabase(ResourceDatabase)
+			m_ResourceDatabase(ResourceDatabase),
+			m_ServeIncludes(ServeIncludes)
 		{
 			CheckDirectories();
 
 			m_IOThread.Initialize([this](void*) { IOThreadWorker(); });
 			m_IOThread.SetName("ResourceCompiler IO");
 
+			if (m_ServeIncludes)
+				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent += EventListener_OnFetchShaderSource;
+
 			RefreshDatabase();
 		}
 
 		ResourceCompiler::~ResourceCompiler(void)
 		{
+			if (m_ServeIncludes)
+				ProgramToAPICompiler::GetInstance()->OnFetchShaderSourceEvent -= EventListener_OnFetchShaderSource;
+
 			m_IOThread.Shutdown().Wait();
 		}
 
@@ -185,7 +194,7 @@ namespace Engine
 			m_ResourceDatabase->UpdateKeepingResources(toKeepInDatabase, removedResources);
 
 			for (const auto& info : removedResources)
-				FileSystem::Delete(Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID)));
+				FileSystem::Delete(GetDataFileFullPath(info.GUID));
 		}
 
 		bool ResourceCompiler::CompileFile(const WString& FullPath, FileTypes FileType, bool Force)
@@ -206,7 +215,7 @@ namespace Engine
 			ResourceDatabase::ResourceInfo info = {};
 			if (m_ResourceDatabase->GetResourceInfo(relativeFilePath, info))
 			{
-				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID));
+				dataFullPath = GetDataFileFullPath(info.GUID);
 
 				forceToCompile |= !PlatformFile::Exists(FullPath.GetValue());
 				forceToCompile |= (PlatformFile::GetLastWriteTime(FullPath.GetValue()) != info.LastWriteTime);
@@ -289,7 +298,7 @@ namespace Engine
 			info.GUID = id;
 
 			if (dataFullPath == WString::Empty)
-				dataFullPath = Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(info.GUID));
+				dataFullPath = GetDataFileFullPath(info.GUID);
 
 			if (!Utilities::WriteDataFile(dataFullPath, outBuffer))
 				return false;
@@ -321,9 +330,14 @@ namespace Engine
 			return Path::Combine(GetResourcesPath(), RelativePath);
 		}
 
+		WString ResourceCompiler::GetDataFileFullPath(const GUID& GUID)
+		{
+			return Path::Combine(GetLibraryPath(), Utilities::GetDataFileName(GUID));
+		}
+
 		void ResourceCompiler::GetResourcePaths(const WString& RelativePath, FileTypes FileTypesMask, WStringList& Files)
 		{
-			FileSystem::GetFiles(Path::Combine(GetResourcesPath(), RelativePath), Files, FileSystem::SearchOptions::All);
+			FileSystem::GetFiles(GetResourceFullPath(RelativePath), Files, FileSystem::SearchOptions::All);
 
 			Files.RemoveIf([&](auto& item)
 				{
@@ -392,6 +406,28 @@ namespace Engine
 				return FileTypes::TTF;
 
 			return FileTypes::Unknown;
+		}
+
+		void ResourceCompiler::OnFetchShaderSource(const String& RelativeFilePath, bool& Found, String& Source)
+		{
+			ResourceDatabase::ResourceInfo info = {};
+			if (!m_ResourceDatabase->GetResourceInfo(RelativeFilePath.ChangeType<char16>(), info))
+				return;
+
+			WString dataFilePath = GetDataFileFullPath(info.GUID);
+
+			if (FileSystem::Exists(dataFilePath))
+				THROW_EXCEPTION(Categories::ResourceSystem, "The program has supposed to be compiled and must got catched in the prior handler of this event in ResourceHolder");
+
+			if (!CompileFile(GetResourceFullPath(RelativeFilePath.ChangeType<char16>()), FileTypes::PROGRAM, true))
+				return;
+
+			ByteBuffer inBuffer(ResourceSystemAllocators::ResourceAllocator);
+			if (!Utilities::ReadDataFile(dataFilePath, inBuffer))
+				return;
+
+			Found = true;
+			Source = ResourceFactory::GetProgramSource(inBuffer);
 		}
 	}
 }

@@ -122,7 +122,7 @@ namespace Engine
 			typedef Delegate<const GUID&, const WString&> ResourceCompiledEventHandler;
 
 		public:
-			ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase);
+			ResourceCompiler(const WString& ResourcesFullPath, const WString& LibraryFullPath, ResourceDatabase* ResourceDatabase, bool ServeIncludes);
 			~ResourceCompiler(void);
 
 			Promise<void> CompileResource(const WString& RelativeFilePath, bool Force = false);
@@ -146,12 +146,12 @@ namespace Engine
 				return CompileResources(FileTypes::AllResources, Force);
 			}
 
-			virtual const WString& GetResourcesPath(void) const
+			const WString& GetResourcesPath(void) const
 			{
 				return m_ResourcesPath;
 			}
 
-			virtual const WString& GetLibraryPath(void) const
+			const WString& GetLibraryPath(void) const
 			{
 				return m_LibraryPath;
 			}
@@ -164,22 +164,27 @@ namespace Engine
 			void CheckDirectories(void);
 
 			WString GetResourceFullPath(const WString& RelativePath);
+			WString GetDataFileFullPath(const GUID& GUID);
 			void GetResourcePaths(const WString& RelativePath, FileTypes FileTypesMask, WStringList& Files);
 
 			void IOThreadWorker(void);
 
 			static FileTypes GetFileTypeByExtension(const WString& Extension);
 
+			void OnFetchShaderSource(const String& Name, bool& Found, String& Source);
+			DECLARE_MEMBER_EVENT_LISTENER(ResourceCompiler, OnFetchShaderSource);
+
 		public:
 			ResourceCompiledEventHandler OnResourceCompiledEvent;
 
 		private:
-			Thread m_IOThread;
-			CompileTaskInfoQueue m_CompileTasks;
-			SpinLock m_CompileTasksLock;
 			WString m_ResourcesPath;
 			WString m_LibraryPath;
 			ResourceDatabase* m_ResourceDatabase;
+			bool m_ServeIncludes;
+			Thread m_IOThread;
+			CompileTaskInfoQueue m_CompileTasks;
+			SpinLock m_CompileTasksLock;
 		};
 	}
 }

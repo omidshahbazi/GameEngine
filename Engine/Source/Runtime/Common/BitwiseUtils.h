@@ -22,7 +22,7 @@ namespace Engine
 			template<typename T>
 			static void Disable(T &Mask, T Value)
 			{
-				Mask |= (T)(~(1 << (long)Value));
+				Mask &= (T)(~(1 << (long)Value));
 			}
 
 			template<typename T>

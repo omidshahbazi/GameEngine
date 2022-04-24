@@ -4,6 +4,7 @@
 #define FUNCTION_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
+#include <ProgramParser\AbstractSyntaxTree\BaseAttributeType.h>
 
 namespace Engine
 {
@@ -44,6 +45,16 @@ namespace Engine
 
 					for (auto parameter : m_Parameters)
 						Destruct(parameter);
+				}
+
+				void AddAttributes(const AttributeList& Attributes)
+				{
+					m_Attributes.AddRange(Attributes);
+				}
+
+				const AttributeList& GetAttributes(void) const
+				{
+					return m_Attributes;
 				}
 
 				void SetReturnDataType(DataTypeStatement* Type)
@@ -114,6 +125,7 @@ namespace Engine
 				}
 
 			private:
+				AttributeList m_Attributes;
 				DataTypeStatement* m_ReturnType;
 				ParameterList m_Parameters;
 				Types m_Type;

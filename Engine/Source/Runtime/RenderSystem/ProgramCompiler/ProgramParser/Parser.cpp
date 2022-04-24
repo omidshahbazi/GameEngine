@@ -2,6 +2,7 @@
 #include <ProgramParser\Parser.h>
 #include <ProgramParser\AbstractSyntaxTree\StructType.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
+#include <ProgramParser\AbstractSyntaxTree\DomainAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
@@ -185,6 +186,12 @@ namespace Engine
 			m_KeywordParsers[BREAK] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseBreakStatement(DeclarationToken); });
 			m_KeywordParsers[RETURN] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseReturnStatement(DeclarationToken); });
 			m_KeywordParsers[DISCARD] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseDiscardStatement(DeclarationToken); });
+
+			m_AttributeParsers["Domain"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseDomainAttributeType(DeclarationToken); });
+			m_AttributeParsers["Partitioning"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParsePartitioningAttributeType(DeclarationToken); });
+			m_AttributeParsers["Topology"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseTopologyAttributeType(DeclarationToken); });
+			m_AttributeParsers["ControlPoints"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseControlPointsAttributeType(DeclarationToken); });
+			m_AttributeParsers["ConstantEntrypoint"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseConstantEntrypointAttributeType(DeclarationToken); });
 		}
 
 		void Parser::Parse(Parameters& Parameters)
@@ -205,6 +212,9 @@ namespace Engine
 				if (ParseVariable(token))
 					continue;
 
+				if (ParseAttribute(token))
+					continue;
+
 				if (ParseFunction(token))
 					continue;
 			}
@@ -217,10 +227,7 @@ namespace Engine
 		bool Parser::ParseStruct(const Token& DeclarationToken)
 		{
 			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
-			{
-				UngetToken(DeclarationToken);
 				return false;
-			}
 
 			if (!DeclarationToken.Matches(STRUCT, Token::SearchCases::CaseSensitive))
 				return false;
@@ -258,6 +265,9 @@ namespace Engine
 		bool Parser::ParseVariable(const Token& DeclarationToken)
 		{
 			bool result = true;
+
+			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+				return false;
 
 			VariableType* variableType = Allocate<VariableType>(m_Allocator);
 
@@ -334,6 +344,21 @@ namespace Engine
 			return result;
 		}
 
+		bool Parser::ParseAttribute(const Token& DeclarationToken)
+		{
+			if (!DeclarationToken.Matches(OPEN_SQUARE_BRACKET, Token::SearchCases::CaseSensitive))
+				return false;
+
+			Token token;
+			RequireToken(token);
+
+			m_Attributes.Add((*m_AttributeParsers[token.GetIdentifier()])(token));
+
+			RequireSymbol(CLOSE_SQUARE_BRACKET, "parse attribute");
+
+			return true;
+		}
+
 		bool Parser::ParseFunction(const Token& DeclarationToken)
 		{
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
@@ -347,6 +372,9 @@ namespace Engine
 
 			FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
 			m_Parameters->Functions.Add(functionType);
+
+			functionType->AddAttributes(m_Attributes);
+			m_Attributes.Clear();
 
 			functionType->SetReturnDataType(dataType);
 
@@ -408,6 +436,56 @@ namespace Engine
 			}
 
 			return true;
+		}
+
+		BaseAttributeType* Parser::ParseDomainAttributeType(const Token& DeclarationToken)
+		{
+			RequireSymbol(OPEN_BRACE, "domain attribute");
+
+			Token typeToken;
+			RequireToken(typeToken);
+
+			const String& typeValue = typeToken.GetConstantString();
+
+			if (typeToken.GetTokenType() != Token::Types::Constant || typeValue == String::Empty)
+				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Domain type", typeToken);
+
+			DomainAttributeType::Types type;
+			if (typeValue == "Triangle")
+				type = DomainAttributeType::Types::Triangle;
+			else if (typeValue == "Quad")
+				type = DomainAttributeType::Types::Quad;
+			else if (typeValue == "Isoline")
+				type = DomainAttributeType::Types::Isoline;
+			else
+				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Domain type", typeToken);
+
+			DomainAttributeType* attr = Allocate<DomainAttributeType>();
+			attr->SetType(type);
+
+			RequireSymbol(CLOSE_BRACE, "domain attribute");
+
+			return attr;
+		}
+
+		BaseAttributeType* Parser::ParsePartitioningAttributeType(const Token& DeclarationToken)
+		{
+			return nullptr;
+		}
+
+		BaseAttributeType* Parser::ParseTopologyAttributeType(const Token& DeclarationToken)
+		{
+			return nullptr;
+		}
+
+		BaseAttributeType* Parser::ParseControlPointsAttributeType(const Token& DeclarationToken)
+		{
+			return nullptr;
+		}
+
+		BaseAttributeType* Parser::ParseConstantEntrypointAttributeType(const Token& DeclarationToken)
+		{
+			return nullptr;
 		}
 
 		DataTypeStatement* Parser::ParseDataType(const Token& DeclarationToken)

@@ -94,7 +94,9 @@ namespace Engine
 
 				case Token::Types::Constant:
 				{
-					if (token.GetIdentifier() == "true")
+					if (token.GetConstantString() != String::Empty)
+						ADD_TO_RESULT("\"" + token.GetConstantString() + "\"");
+					else if (token.GetIdentifier() == "true")
 						ADD_TO_RESULT(token.GetIdentifier());
 					else if (token.GetIdentifier() == "false")
 						ADD_TO_RESULT(token.GetIdentifier());

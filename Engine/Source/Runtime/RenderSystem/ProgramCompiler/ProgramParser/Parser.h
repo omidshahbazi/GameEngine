@@ -27,12 +27,15 @@ namespace Engine
 		{
 			class StructType;
 			class VariableType;
+			class BaseAttributeType;
 			class FunctionType;
 			class ParameterType;
 			class DataTypeStatement;
 
 			typedef Vector<StructType*> StructList;
+			typedef Stack<StructType*> StructStack;
 			typedef Vector<VariableType*> VariableList;
+			typedef Vector<BaseAttributeType*> AttributeList;
 			typedef Vector<FunctionType*> FunctionList;
 		}
 
@@ -56,6 +59,9 @@ namespace Engine
 			typedef std::function<Statement* (const Token& DeclarationToken)> KeywordParseFunction;
 			typedef std::shared_ptr<KeywordParseFunction> KeywordParseFunctionPtr;
 			typedef Map<String, KeywordParseFunctionPtr> KeywordParseMap;
+			typedef std::function<BaseAttributeType* (const Token& DeclarationToken)> AttributeParseFunction;
+			typedef std::shared_ptr<AttributeParseFunction> AttributeParseFunctionPtr;
+			typedef Map<String, AttributeParseFunctionPtr> AttributeParseMap;
 
 		public:
 			struct Parameters
@@ -74,8 +80,15 @@ namespace Engine
 		private:
 			bool ParseStruct(const Token& DeclarationToken);
 			bool ParseVariable(const Token& DeclarationToken);
+			bool ParseAttribute(const Token& DeclarationToken);
 			bool ParseFunction(const Token& DeclarationToken);
 			bool ParseFunctionParameter(const Token& DeclarationToken, ParameterType* Parameter);
+
+			BaseAttributeType* ParseDomainAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParsePartitioningAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParseTopologyAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParseControlPointsAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParseConstantEntrypointAttributeType(const Token& DeclarationToken);
 
 			DataTypeStatement* ParseDataType(const Token& DeclarationToken);
 
@@ -141,7 +154,9 @@ namespace Engine
 			AllocatorBase* m_Allocator;
 			KeywordParseMap m_KeywordParsers;
 			Parameters* m_Parameters;
-			Stack<StructType*> m_Structs;
+			StructStack m_Structs;
+			AttributeList m_Attributes;
+			AttributeParseMap m_AttributeParsers;
 		};
 	}
 }

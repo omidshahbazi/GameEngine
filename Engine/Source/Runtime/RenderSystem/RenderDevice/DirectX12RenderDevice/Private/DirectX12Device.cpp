@@ -568,12 +568,12 @@ namespace Engine
 			bool DirectX12Device::CreateProgram(const CompiledShaders* Shaders, ResourceHandle& Handle, cstr* ErrorMessage)
 			{
 #define IMPLEMENT(StageName) \
-					if (Shaders->StageName.Size != 0) \
-					{ \
-						programInfos->StageName.Buffer = RenderSystemAllocators::ResourceAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
-						PlatformMemory::Copy(Shaders->StageName.Buffer, programInfos->StageName.Buffer, Shaders->StageName.Size); \
-						programInfos->StageName.Size = Shaders->StageName.Size; \
-					}
+				if (Shaders->StageName.Size != 0) \
+				{ \
+					programInfos->StageName.Buffer = RenderSystemAllocators::ResourceAllocator_AllocateArray<byte>(Shaders->StageName.Size); \
+					PlatformMemory::Copy(Shaders->StageName.Buffer, programInfos->StageName.Buffer, Shaders->StageName.Size); \
+					programInfos->StageName.Size = Shaders->StageName.Size; \
+				}
 
 				ID3DBlob* serializedRootSignature = nullptr;
 				if (!CHECK_CALL(DirectX12Wrapper::Shader::GetInlineRootSignature(Shaders->VertexShader.Buffer, Shaders->VertexShader.Size, &serializedRootSignature)))

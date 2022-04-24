@@ -20,6 +20,18 @@ namespace Engine
 					VariableType(Allocator)
 				{
 				}
+
+				String ToString(void) const override
+				{
+					String result;
+
+					result += GetDataType()->ToString() + " " + GetName();
+
+					if (GetRegister() != String::Empty)
+						result += " : " + GetRegister();
+
+					return result;
+				}
 			};
 
 			typedef Vector<ParameterType*> ParameterList;

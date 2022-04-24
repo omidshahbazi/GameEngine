@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef DOMAIN_ATTRIBUTE_TYPE_H
-#define DOMAIN_ATTRIBUTE_TYPE_H
+#ifndef PARTITIONING_ATTRIBUTE_TYPE_H
+#define PARTITIONING_ATTRIBUTE_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\BaseAttributeType.h>
 
@@ -13,14 +13,15 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class PROGRAMPARSER_API DomainAttributeType : public BaseAttributeType
+			class PROGRAMPARSER_API PartitioningAttributeType : public BaseAttributeType
 			{
 			public:
 				enum class Types
 				{
-					Triangle = 0,
-					Quad,
-					Isoline
+					Integer = 0,
+					FractionalEven,
+					FractionalOdd,
+					PowerOfTwo
 				};
 
 			public:
@@ -36,22 +37,26 @@ namespace Engine
 
 				String ToString(void) const override
 				{
-					String result = "[Domain";
+					String result = "[Partitioning";
 
 					result += "(";
 
 					switch (m_Type)
 					{
-					case Types::Triangle:
-						result += "Triangle";
+					case Types::Integer:
+						result += "Integer";
 						break;
 
-					case Types::Quad:
-						result += "Triangle";
+					case Types::FractionalEven:
+						result += "FractionalEven";
 						break;
 
-					case Types::Isoline:
-						result += "Isoline";
+					case Types::FractionalOdd:
+						result += "FractionalOdd";
+						break;
+
+					case Types::PowerOfTwo:
+						result += "PowerOfTwo";
 						break;
 					}
 

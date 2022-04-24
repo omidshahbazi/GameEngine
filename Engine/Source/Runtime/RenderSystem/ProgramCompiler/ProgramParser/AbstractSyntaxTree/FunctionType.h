@@ -96,6 +96,12 @@ namespace Engine
 				{
 					String result;
 
+					for (auto attr : m_Attributes)
+					{
+						result += attr->ToString();
+						result += "\n";
+					}
+
 					result += (m_ReturnType == nullptr ? "void" : m_ReturnType->ToString()) + " " + GetName() + "(";
 
 					bool isFirst = true;

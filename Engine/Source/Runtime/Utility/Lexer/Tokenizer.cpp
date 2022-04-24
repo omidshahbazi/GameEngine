@@ -297,6 +297,14 @@ namespace Engine
 			THROW_LEXER_EXCEPTION("Missing an identifier");
 		}
 
+		void Tokenizer::RequireConstantToken(Token& Token)
+		{
+			if (MatchConstantToken(Token))
+				return;
+
+			THROW_LEXER_EXCEPTION("Missing an constant");
+		}
+
 		bool Tokenizer::MatchIdentifierToken(Token& Token)
 		{
 			RequireToken(Token);
@@ -307,7 +315,20 @@ namespace Engine
 				return false;
 			}
 
-			return true; 
+			return true;
+		}
+
+		bool Tokenizer::MatchConstantToken(Token& Token)
+		{
+			RequireToken(Token);
+
+			if (Token.GetTokenType() != Token::Types::Constant)
+			{
+				UngetToken(Token);
+				return false;
+			}
+
+			return true;
 		}
 
 		void Tokenizer::RequireSymbol(const String& Match, const String& Tag)

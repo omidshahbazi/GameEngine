@@ -44,7 +44,9 @@ namespace Engine
 
 			virtual void RequireToken(Token& Token);
 			virtual void RequireIdentifierToken(Token& Token);
+			virtual void RequireConstantToken(Token& Token);
 			virtual bool MatchIdentifierToken(Token& Token);
+			virtual bool MatchConstantToken(Token& Token);
 
 			virtual void RequireSymbol(const String& Match, const String& Tag);
 			virtual bool MatchSymbol(const String& Match);

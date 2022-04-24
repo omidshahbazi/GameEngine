@@ -3,6 +3,10 @@
 #include <ProgramParser\AbstractSyntaxTree\StructType.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
 #include <ProgramParser\AbstractSyntaxTree\DomainAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\PartitioningAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\TopologyAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
@@ -443,19 +447,14 @@ namespace Engine
 			RequireSymbol(OPEN_BRACE, "domain attribute");
 
 			Token typeToken;
-			RequireToken(typeToken);
-
-			const String& typeValue = typeToken.GetConstantString();
-
-			if (typeToken.GetTokenType() != Token::Types::Constant || typeValue == String::Empty)
-				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Domain type", typeToken);
+			RequireIdentifierToken(typeToken);
 
 			DomainAttributeType::Types type;
-			if (typeValue == "Triangle")
+			if (typeToken.Matches("Triangle", Token::SearchCases::CaseSensitive))
 				type = DomainAttributeType::Types::Triangle;
-			else if (typeValue == "Quad")
+			else if (typeToken.Matches("Quad", Token::SearchCases::CaseSensitive))
 				type = DomainAttributeType::Types::Quad;
-			else if (typeValue == "Isoline")
+			else if (typeToken.Matches("Isoline", Token::SearchCases::CaseSensitive))
 				type = DomainAttributeType::Types::Isoline;
 			else
 				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Domain type", typeToken);
@@ -470,22 +469,86 @@ namespace Engine
 
 		BaseAttributeType* Parser::ParsePartitioningAttributeType(const Token& DeclarationToken)
 		{
-			return nullptr;
+			RequireSymbol(OPEN_BRACE, "partitioning attribute");
+
+			Token typeToken;
+			RequireIdentifierToken(typeToken);
+
+			PartitioningAttributeType::Types type;
+			if (typeToken.Matches("Integer", Token::SearchCases::CaseSensitive))
+				type = PartitioningAttributeType::Types::Integer;
+			else if (typeToken.Matches("FractionalEven", Token::SearchCases::CaseSensitive))
+				type = PartitioningAttributeType::Types::FractionalEven;
+			else if (typeToken.Matches("FractionalOdd", Token::SearchCases::CaseSensitive))
+				type = PartitioningAttributeType::Types::FractionalOdd;
+			else if (typeToken.Matches("PowerOfTwo", Token::SearchCases::CaseSensitive))
+				type = PartitioningAttributeType::Types::PowerOfTwo;
+			else
+				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Partitioning type", typeToken);
+
+			PartitioningAttributeType* attr = Allocate<PartitioningAttributeType>();
+			attr->SetType(type);
+
+			RequireSymbol(CLOSE_BRACE, "partitioning attribute");
+
+			return attr;
 		}
 
 		BaseAttributeType* Parser::ParseTopologyAttributeType(const Token& DeclarationToken)
 		{
-			return nullptr;
+			RequireSymbol(OPEN_BRACE, "topology attribute");
+
+			Token typeToken;
+			RequireIdentifierToken(typeToken);
+
+			TopologyAttributeType::Types type;
+			if (typeToken.Matches("Point", Token::SearchCases::CaseSensitive))
+				type = TopologyAttributeType::Types::Point;
+			else if (typeToken.Matches("Line", Token::SearchCases::CaseSensitive))
+				type = TopologyAttributeType::Types::Line;
+			else if (typeToken.Matches("TriangleClockwise", Token::SearchCases::CaseSensitive))
+				type = TopologyAttributeType::Types::TriangleClockwise;
+			else if (typeToken.Matches("TriangleCounterClockwise", Token::SearchCases::CaseSensitive))
+				type = TopologyAttributeType::Types::TriangleCounterClockwise;
+			else
+				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Topology type", typeToken);
+
+			TopologyAttributeType* attr = Allocate<TopologyAttributeType>();
+			attr->SetType(type);
+
+			RequireSymbol(CLOSE_BRACE, "topology attribute");
+
+			return attr;
 		}
 
 		BaseAttributeType* Parser::ParseControlPointsAttributeType(const Token& DeclarationToken)
 		{
-			return nullptr;
+			RequireSymbol(OPEN_BRACE, "control points attribute");
+
+			Token numberToken;
+			RequireConstantToken(numberToken);
+
+			ControlPointsAttributeType* attr = Allocate<ControlPointsAttributeType>();
+			attr->SetNumber(numberToken.GetConstantInt32());
+
+			RequireSymbol(CLOSE_BRACE, "control points attribute");
+
+			return attr;
 		}
 
 		BaseAttributeType* Parser::ParseConstantEntrypointAttributeType(const Token& DeclarationToken)
 		{
-			return nullptr;
+			RequireSymbol(OPEN_BRACE, "constant entrypoint attribute");
+
+			Token entrypointToken;
+			RequireIdentifierToken(entrypointToken);
+
+			ConstantEntrypointAttributeType* attr = Allocate<ConstantEntrypointAttributeType>();
+			attr->SetEntrypoint(entrypointToken.GetIdentifier());
+
+			RequireSymbol(CLOSE_BRACE, "constant entrypoint attribute");
+
+			return attr;
 		}
 
 		DataTypeStatement* Parser::ParseDataType(const Token& DeclarationToken)

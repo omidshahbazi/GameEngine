@@ -7,6 +7,7 @@
 #include <ProgramParser\AbstractSyntaxTree\TopologyAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
@@ -196,6 +197,7 @@ namespace Engine
 			m_AttributeParsers["Topology"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseTopologyAttributeType(DeclarationToken); });
 			m_AttributeParsers["ControlPoints"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseControlPointsAttributeType(DeclarationToken); });
 			m_AttributeParsers["ConstantEntrypoint"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseConstantEntrypointAttributeType(DeclarationToken); });
+			m_AttributeParsers["ThreadCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseThreadCountAttributeType(DeclarationToken); });
 		}
 
 		void Parser::Parse(Parameters& Parameters)
@@ -459,10 +461,10 @@ namespace Engine
 			else
 				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Domain type", typeToken);
 
+			RequireSymbol(CLOSE_BRACE, "domain attribute");
+
 			DomainAttributeType* attr = Allocate<DomainAttributeType>();
 			attr->SetType(type);
-
-			RequireSymbol(CLOSE_BRACE, "domain attribute");
 
 			return attr;
 		}
@@ -486,10 +488,10 @@ namespace Engine
 			else
 				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Partitioning type", typeToken);
 
+			RequireSymbol(CLOSE_BRACE, "partitioning attribute");
+
 			PartitioningAttributeType* attr = Allocate<PartitioningAttributeType>();
 			attr->SetType(type);
-
-			RequireSymbol(CLOSE_BRACE, "partitioning attribute");
 
 			return attr;
 		}
@@ -513,10 +515,10 @@ namespace Engine
 			else
 				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Topology type", typeToken);
 
+			RequireSymbol(CLOSE_BRACE, "topology attribute");
+
 			TopologyAttributeType* attr = Allocate<TopologyAttributeType>();
 			attr->SetType(type);
-
-			RequireSymbol(CLOSE_BRACE, "topology attribute");
 
 			return attr;
 		}
@@ -528,10 +530,10 @@ namespace Engine
 			Token numberToken;
 			RequireConstantToken(numberToken);
 
+			RequireSymbol(CLOSE_BRACE, "control points attribute");
+
 			ControlPointsAttributeType* attr = Allocate<ControlPointsAttributeType>();
 			attr->SetNumber(numberToken.GetConstantInt32());
-
-			RequireSymbol(CLOSE_BRACE, "control points attribute");
 
 			return attr;
 		}
@@ -543,10 +545,36 @@ namespace Engine
 			Token entrypointToken;
 			RequireIdentifierToken(entrypointToken);
 
+			RequireSymbol(CLOSE_BRACE, "constant entrypoint attribute");
+
 			ConstantEntrypointAttributeType* attr = Allocate<ConstantEntrypointAttributeType>();
 			attr->SetEntrypoint(entrypointToken.GetIdentifier());
 
-			RequireSymbol(CLOSE_BRACE, "constant entrypoint attribute");
+			return attr;
+		}
+
+		BaseAttributeType* Parser::ParseThreadCountAttributeType(const Token& DeclarationToken)
+		{
+			RequireSymbol(OPEN_BRACE, "thread count attribute");
+
+			Token xCountToken;
+			RequireConstantToken(xCountToken);
+			RequireSymbol(COMMA, "thread count attribute");
+
+			Token yCountToken;
+			RequireConstantToken(yCountToken);
+			RequireSymbol(COMMA, "thread count attribute");
+
+			Token zCountToken;
+			RequireConstantToken(zCountToken);
+
+			RequireSymbol(CLOSE_BRACE, "thread count attribute");
+
+			ThreadCountAttributeType* attr = Allocate<ThreadCountAttributeType>();
+
+			attr->SetXCount(xCountToken.GetConstantInt32());
+			attr->SetYCount(yCountToken.GetConstantInt32());
+			attr->SetZCount(zCountToken.GetConstantInt32());
 
 			return attr;
 		}

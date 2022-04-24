@@ -117,7 +117,7 @@ namespace Engine
 
 					result += ")";
 
-					result += "\n{";
+					result += "\n{\n";
 
 					for (auto stm : GetItems())
 					{

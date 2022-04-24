@@ -89,6 +89,7 @@ namespace Engine
 			BaseAttributeType* ParseTopologyAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseControlPointsAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseConstantEntrypointAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParseThreadCountAttributeType(const Token& DeclarationToken);
 
 			DataTypeStatement* ParseDataType(const Token& DeclarationToken);
 

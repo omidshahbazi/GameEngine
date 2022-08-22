@@ -42,22 +42,10 @@ namespace Engine
 			class ICompiler
 			{
 			public:
-				virtual void InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register) = 0;
 				virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 				virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
-			};
-
-			struct ConstantInfo
-			{
-			public:
-				typedef std::function<void(ICompiler*, FunctionType::Types, Stages, String&)> BuildStatement;
-
-			public:
-				ProgramDataTypes Type;
-
-				std::shared_ptr<BuildStatement> Build;
 			};
 
 			struct FunctionInfo
@@ -73,7 +61,6 @@ namespace Engine
 				std::shared_ptr<CustomBuildStatement> BuildCustom;
 			};
 
-			typedef Map<String, ConstantInfo> ConstantMap;
 			typedef Vector<FunctionInfo> FunctionOverrideInfoList;
 			typedef Map<String, FunctionOverrideInfoList> FunctionMap;
 
@@ -84,20 +71,10 @@ namespace Engine
 
 			virtual void Initialize(IInitializeHelper* Helper) = 0;
 
-			virtual const ConstantMap& GetConstants(void) const = 0;
 			virtual const FunctionMap& GetFunctions(void) const = 0;
 		};
 
 		const uint8 MAX_PARAMETER_COUNT = 16;
-
-#define ADD_CONSTANT(Name, DataType, BuildCallback) \
-		{ \
-			const String name = Name; \
-			CoreDebugAssert(Categories::ProgramCompiler, !m_Constants.Contains(name), "Constant already added"); \
-			ConstantInfo& info = m_Constants[name]; \
-			info.Type = DataType; \
-			info.Build = std::make_shared<ConstantInfo::BuildStatement>(BuildCallback); \
-		}
 
 #define BEGIN_FUNCTION(Name, OverrideCount) \
 		{ \

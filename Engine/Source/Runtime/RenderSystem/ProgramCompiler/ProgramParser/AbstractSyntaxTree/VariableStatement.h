@@ -3,8 +3,7 @@
 #ifndef VARIABLE_STATEMENT_H
 #define VARIABLE_STATEMENT_H
 
-#include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
-#include <Containers\Strings.h>
+#include <ProgramParser\AbstractSyntaxTree\VariableType.h>
 
 namespace Engine
 {
@@ -14,42 +13,19 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class PROGRAMPARSER_API VariableStatement : public Statement
+			class PROGRAMPARSER_API VariableStatement : public Statement, public VariableType
 			{
 			public:
 				VariableStatement(AllocatorBase* Allocator) :
-					m_DataType(nullptr),
-					m_Name(Allocator),
+					VariableType(Allocator),
 					m_InitialStatement(nullptr)
 				{
 				}
 
 				virtual ~VariableStatement(void)
 				{
-					Destruct(m_DataType);
-
 					if (m_InitialStatement != nullptr)
 						Destruct(m_InitialStatement);
-				}
-
-				DataTypeStatement* GetDataType(void) const
-				{
-					return m_DataType;
-				}
-
-				void SetDataType(DataTypeStatement* DataType)
-				{
-					m_DataType = DataType;
-				}
-
-				const String& GetName(void) const
-				{
-					return m_Name;
-				}
-
-				void SetName(const String& Name)
-				{
-					m_Name = Name;
 				}
 
 				Statement* GetInitialStatement(void) const
@@ -66,11 +42,11 @@ namespace Engine
 				{
 					String result;
 
-					result += m_DataType->ToString();
+					result += GetDataType()->ToString();
 
 					result += " ";
 
-					result += m_Name;
+					result += GetName();
 
 					if (m_InitialStatement != nullptr)
 					{
@@ -82,8 +58,6 @@ namespace Engine
 				}
 
 			private:
-				DataTypeStatement* m_DataType;
-				String m_Name;
 				Statement* m_InitialStatement;
 			};
 		}

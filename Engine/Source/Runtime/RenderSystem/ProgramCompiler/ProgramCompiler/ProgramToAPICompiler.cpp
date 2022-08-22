@@ -4,10 +4,14 @@
 #include <ProgramParser\PreprocessorParser.h>
 #include <ProgramParser\Parser.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
+#include <ProgramParser\AbstractSyntaxTree\GlobalVariableType.h>
 #include <RenderCommon\Private\RenderSystemAllocators.h>
 #include <Allocators\FrameAllocator.h>
 #include <DynamicModuleSystem\ModuleManager.h>
 #include <Debugging\CoreDebug.h>
+
+#include <FileUtility\FileSystem.h>
+using namespace Engine::FileUtility;
 
 namespace Engine
 {
@@ -114,10 +118,24 @@ namespace Engine
 
 				compiler->Compile(&compilerAllocator, parameters.Structs, parameters.Variables, parameters.Functions, output);
 
+				String vs = output.VertexShader;
+				String hs = output.HullShader;
+				String ds = output.DomainShader;
+				String gs = output.GeometryShader;
+				String fs = output.FragmentShader;
+				String cs = output.ComputeShader;
+
+				FileSystem::WriteAllText("D:/vs.hlsl", vs);
+				FileSystem::WriteAllText("D:/hs.hlsl", hs);
+				FileSystem::WriteAllText("D:/ds.hlsl", ds);
+				FileSystem::WriteAllText("D:/gs.hlsl", gs);
+				FileSystem::WriteAllText("D:/fs.hlsl", fs);
+				FileSystem::WriteAllText("D:/cs.hlsl", cs);
+
 				for (auto& structType : parameters.Structs)
 				{
 					auto variables = structType->GetItems();
-					variables.RemoveIf([](auto item) { return item->GetRegister() != String::Empty; });
+					variables.RemoveIf([](auto item) { return item->GetRegisterName() != String::Empty; });
 
 					if (variables.GetSize() == 0)
 						continue;

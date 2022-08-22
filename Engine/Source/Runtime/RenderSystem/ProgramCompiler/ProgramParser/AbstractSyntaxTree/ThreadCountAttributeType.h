@@ -48,7 +48,7 @@ namespace Engine
 					return m_ZCount;
 				}
 
-				String ToString(void) const override
+				virtual String ToString(void) const override
 				{
 					String result = "[ThreadCount";
 

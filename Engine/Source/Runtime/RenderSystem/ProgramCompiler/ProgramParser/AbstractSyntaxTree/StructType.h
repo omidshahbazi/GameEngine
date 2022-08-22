@@ -3,7 +3,7 @@
 #ifndef STRUCT_TYPE_H
 #define STRUCT_TYPE_H
 
-#include <ProgramParser\AbstractSyntaxTree\VariableType.h>
+#include <ProgramParser\AbstractSyntaxTree\StructVariableType.h>
 #include <ProgramParser\AbstractSyntaxTree\SyntaxItemHolder.h>
 #include <RenderCommon\GPUAlignedType.h>
 #include <RenderCommon\Enums.h>
@@ -17,16 +17,16 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class PROGRAMPARSER_API StructType : public Type, public SyntaxItemHolder<VariableType>
+			class PROGRAMPARSER_API StructType : public Type, public SyntaxItemHolder<StructVariableType>
 			{
 			public:
 				StructType(AllocatorBase* Allocator) :
 					Type(Allocator),
-					SyntaxItemHolder<VariableType>(Allocator)
+					SyntaxItemHolder<StructVariableType>(Allocator)
 				{
 				}
 
-				String ToString(void) const override
+				virtual String ToString(void) const override
 				{
 					String result;
 

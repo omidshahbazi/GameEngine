@@ -10,16 +10,6 @@ namespace Engine
 		{
 			void HLSLIntrinsicProvider::Initialize(IInitializeHelper* Helper)
 			{
-				ADD_CONSTANT("_FragPosition", ProgramDataTypes::Float2, [this](auto Compiler, auto Type, auto Stage, auto& Shader)
-					{
-						if (Type != FunctionType::Types::FragmentMain)
-							return;
-
-						Compiler->InjectParameterIntoTopFunction(ProgramDataTypes::Float4, "dx_FragCoord", "SV_Position");
-
-						Shader += "dx_FragCoord.xy";
-					});
-
 				BEGIN_FUNCTION("float2", 2);
 				{
 					BEGIN_OVERRIDE(ProgramDataTypes::Float2);

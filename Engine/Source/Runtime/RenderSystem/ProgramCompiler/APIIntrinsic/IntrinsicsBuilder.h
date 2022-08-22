@@ -24,8 +24,6 @@ namespace Engine
 
 			void Initialize(DeviceTypes Device);
 
-			bool BuildConstantStatement(const String& Name, FunctionType::Types Type, Stages Stage, String& Shader);
-
 			bool BuildFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			bool BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

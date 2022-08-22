@@ -113,7 +113,10 @@ namespace Engine
 		void Logger::InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content, va_list Args)
 		{
 			char8 content[2048];
-			StringUtility::Format(content, Content, Args);
+			if (Content == nullptr)
+				content[0] = '\0';
+			else
+				StringUtility::Format(content, Content, Args);
 
 			InsertLog(Level, CategoryFlags, File, LineNumber, Function, content);
 		}
@@ -121,9 +124,13 @@ namespace Engine
 		void Logger::InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content)
 		{
 #define SET_STRING(ValueRef, Parameter) \
-			(ValueRef).Length = CharacterUtility::GetLength(Parameter); \
+			(ValueRef).Length = 0; \
 			if (Parameter != nullptr) \
-				PlatformMemory::Copy(Parameter, (ValueRef).Value, (ValueRef).Length); \
+			{ \
+				(ValueRef).Length = CharacterUtility::GetLength(Parameter); \
+				if ((ValueRef).Length != 0) \
+					PlatformMemory::Copy(Parameter, (ValueRef).Value, (ValueRef).Length); \
+			} \
 			(ValueRef).Value[(ValueRef).Length] = '\0';
 
 			if (Level < m_MinimumLevel)

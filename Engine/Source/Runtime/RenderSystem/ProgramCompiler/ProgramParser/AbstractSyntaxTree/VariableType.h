@@ -20,8 +20,7 @@ namespace Engine
 			public:
 				VariableType(AllocatorBase* Allocator) :
 					Type(Allocator),
-					m_DataType(nullptr),
-					m_Register(Allocator)
+					m_DataType(nullptr)
 				{
 				}
 
@@ -40,33 +39,8 @@ namespace Engine
 					m_DataType = DataType;
 				}
 
-				const String& GetRegister(void) const
-				{
-					return m_Register;
-				}
-
-				void SetRegister(const String& Register)
-				{
-					m_Register = Register;
-				}
-
-				String ToString(void) const override
-				{
-					String result;
-
-					result += m_DataType->ToString() + " " + GetName();
-
-					if (m_Register != String::Empty)
-						result += " : " + m_Register;
-
-					result += ";";
-
-					return result;
-				}
-
 			private:
 				DataTypeStatement* m_DataType;
-				String m_Register;
 			};
 
 			typedef Vector<VariableType*> VariableList;

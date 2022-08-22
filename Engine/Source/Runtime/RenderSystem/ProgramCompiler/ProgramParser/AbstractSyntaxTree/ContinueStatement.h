@@ -17,6 +17,11 @@ namespace Engine
 				ContinueStatement(void)
 				{
 				}
+
+				virtual String ToString(void) const override
+				{
+					return "continue;";
+				}
 			};
 		}
 	}

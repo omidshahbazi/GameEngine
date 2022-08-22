@@ -22,7 +22,7 @@ namespace Engine
 
 				virtual void Initialize(DeviceTypes DeviceType) override;
 
-				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
+				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
 
 			private:
 				virtual void ResetPerStageValues(Stages Stage) override;
@@ -51,7 +51,7 @@ namespace Engine
 
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
 
-				void BuildVariable(String Name, const String& Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader);
+				void BuildVariable(String Name, StructVariableType::Registers Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader);
 
 				void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader);
 
@@ -60,7 +60,6 @@ namespace Engine
 				uint8 m_BindingCount;
 				OutputMap m_Outputs;
 				ParameterList m_Parameters;
-				uint8 m_MemberAccessLevel;
 			};
 		}
 	}

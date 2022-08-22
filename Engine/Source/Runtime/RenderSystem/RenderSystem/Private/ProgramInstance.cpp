@@ -24,12 +24,14 @@ namespace Engine
 			{
 			}
 
-			ProgramInstance::ProgramInstance(ProgramResource* Program)
+			ProgramInstance::ProgramInstance(ProgramResource* Program) :
+				m_Program(nullptr)
 			{
 				SetProgram(Program);
 			}
 
-			ProgramInstance::ProgramInstance(const ProgramInstance& Other)
+			ProgramInstance::ProgramInstance(const ProgramInstance& Other) :
+				m_Program(nullptr)
 			{
 				*this = Other;
 			}

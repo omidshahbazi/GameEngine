@@ -61,7 +61,7 @@ namespace Engine
 				ASTCompilerBase::Initialize(DeviceType);
 			}
 
-			void ASTToGLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+			void ASTToGLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 			{
 				m_Outputs = OutputMap(Allocator);
 				m_AdditionalLayoutCount = 0;
@@ -102,17 +102,8 @@ namespace Engine
 			{
 				auto variables = Struct->GetItems();
 
-				if (variables.ContainsIf([](auto item) { return item->GetRegister() != String::Empty; }))
-				{
-					if (variables.ContainsIf([](auto item) { return item->GetRegister() == String::Empty; }))
-					{
-						THROW_PROGRAM_COMPILER_EXCEPTION("Combination of input layout variables and user layout variables is forbidden", Struct->GetName());
-					}
-				}
-				else
-				{
+				if (!variables.ContainsIf([](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }))
 					return;
-				}
 
 				for (auto variable : variables)
 				{
@@ -122,7 +113,7 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildVariable(VariableType* Variable, Stages Stage, String& Shader)
 			{
-				BuildVariable(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), false, Shader);
+				BuildVariable(Variable->GetName(), StructVariableType::Registers::None, Variable->GetDataType(), false, Shader);
 			}
 
 			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, Stages Stage, String& Shader)
@@ -218,29 +209,17 @@ namespace Engine
 			{
 				String name = Statement->GetName();
 
-				if (m_MemberAccessLevel != 0 || ContainsVariable(name))
+				if (Stage == Stages::Fragment)
 				{
-					if (Stage == Stages::Fragment)
-					{
-						if (m_Outputs.Contains(name))
-							name = m_Outputs[name];
-					}
-
-					Shader += name;
-
-					return;
+					if (m_Outputs.Contains(name))
+						name = m_Outputs[name];
 				}
 
-				if (IntrinsicsBuilder::BuildConstantStatement(name, Type, Stage, Shader))
-					return;
-
-				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", name);
+				Shader += name;
 			}
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
-				++m_MemberAccessLevel;
-
 				String leftStm;
 				BuildStatement(Statement->GetLeft(), Type, Stage, leftStm);
 
@@ -249,8 +228,6 @@ namespace Engine
 					ASTCompilerBase::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
 				else
 					BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-
-				--m_MemberAccessLevel;
 			}
 
 			void ASTToGLSLCompiler::BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -470,11 +447,11 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildVariable(String Name, const String& Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader)
+			void ASTToGLSLCompiler::BuildVariable(String Name, StructVariableType::Registers Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader)
 			{
 				bool buildOutVarialbe = false;
 
-				bool doesBoundToRegister = (Register != String::Empty);
+				bool doesBoundToRegister = (Register != StructVariableType::Registers::None);
 
 				if (doesBoundToRegister)
 				{
@@ -486,17 +463,17 @@ namespace Engine
 
 						location = m_AdditionalLayoutCount++;
 					}
-					else
-					{
-						m_Outputs[Name] = Name + "Out";
+					//else
+					//{
+					//	m_Outputs[Name] = Name + "Out";
 
-						location = SubMeshInfo::GetLayoutIndex(GetLayout(Register));
+					//	location = SubMeshInfo::GetLayoutIndex(GetLayout(Register));
 
-						buildOutVarialbe = true;
-					}
+					//	buildOutVarialbe = true;
+					//}
 
-					if (location < 0)
-						THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't fine layout", Register);
+					//if (location < 0)
+					//	THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't fine layout", Register);
 
 					Shader += "layout(location=";
 					Shader += StringUtility::ToString<char8>(location);
@@ -550,7 +527,7 @@ namespace Engine
 			{
 				auto variables = Struct->GetItems();
 
-				if (variables.ContainsIf([](auto item) { return item->GetRegister() != String::Empty; }))
+				if (variables.ContainsIf([](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }))
 					THROW_PROGRAM_COMPILER_EXCEPTION("Cannot compile an struct with input layout in GLSL", Struct->GetName());
 
 				Shader += "layout(std140, binding=";

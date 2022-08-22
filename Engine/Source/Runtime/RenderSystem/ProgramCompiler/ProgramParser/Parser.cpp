@@ -1,14 +1,16 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ProgramParser\Parser.h>
 #include <ProgramParser\AbstractSyntaxTree\StructType.h>
+#include <ProgramParser\AbstractSyntaxTree\StructVariableType.h>
+#include <ProgramParser\AbstractSyntaxTree\GlobalVariableType.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
+#include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
 #include <ProgramParser\AbstractSyntaxTree\DomainAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\PartitioningAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\TopologyAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
-#include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
@@ -177,7 +179,9 @@ namespace Engine
 			Tokenizer(Text),
 			m_Allocator(Allocator),
 			m_Parameters(nullptr),
-			m_Structs(m_Allocator)
+			m_StructsStack(m_Allocator),
+			m_AttributesList(m_Allocator),
+			m_VariablesStack(m_Allocator)
 		{
 			m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseIfStatement(DeclarationToken); });
 			m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseElseStatement(DeclarationToken); });
@@ -206,6 +210,8 @@ namespace Engine
 
 			m_Parameters = &Parameters;
 
+			PushAVariableList();
+
 			while (true)
 			{
 				Token token;
@@ -215,7 +221,7 @@ namespace Engine
 				if (ParseStruct(token))
 					continue;
 
-				if (ParseVariable(token))
+				if (ParseGlobalVariable(token))
 					continue;
 
 				if (ParseAttribute(token))
@@ -225,7 +231,10 @@ namespace Engine
 					continue;
 			}
 
-			CoreDebugAssert(Categories::RenderSystem, m_Structs.GetSize() == 0, "Structs didn't get evacuated from stack");
+			PopAVariableList();
+
+			CoreDebugAssert(Categories::RenderSystem, m_StructsStack.GetSize() == 0, "m_StructsStack didn't get evacuated from stack");
+			CoreDebugAssert(Categories::RenderSystem, m_VariablesStack.GetSize() == 0, "m_VariablesStack didn't get evacuated from stack");
 
 			m_Parameters = nullptr;
 		}
@@ -246,20 +255,33 @@ namespace Engine
 
 			RequireSymbol(OPEN_BRACKET, "struct");
 
-			m_Structs.Push(structType);
+			m_StructsStack.Push(structType);
 
 			while (true)
 			{
 				if (MatchSymbol(CLOSE_BRACKET))
 					break;
 
+				StructVariableType* variableType = Allocate<StructVariableType>(m_Allocator);
+				structType->AddItem(variableType);
+
 				Token variableToken;
 				RequireToken(variableToken);
 
-				ParseVariable(variableToken);
+				ParseStructVariable(variableToken, variableType);
+
+				auto variables = structType->GetItems();
+
+				if (variables.ContainsIf([](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }))
+				{
+					if (variables.ContainsIf([](auto item) { return item->GetRegister() == StructVariableType::Registers::None; }))
+					{
+						THROW_PROGRAM_PARSER_EXCEPTION("Combination of input layout variables and user layout variables in a same struct is forbidden", variableToken);
+					}
+				}
 			}
 
-			m_Structs.Pop();
+			m_StructsStack.Pop();
 
 			RequireSymbol(SEMICOLON, "struct");
 
@@ -268,14 +290,95 @@ namespace Engine
 			return true;
 		}
 
-		bool Parser::ParseVariable(const Token& DeclarationToken)
+		bool Parser::ParseStructVariable(const Token& DeclarationToken, StructVariableType* VariableType)
+		{
+			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+				return false;
+
+			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+			VariableType->SetDataType(dataType);
+
+			Token nameToken;
+			if (!MatchIdentifierToken(nameToken))
+			{
+				UngetToken(nameToken);
+
+				return false;
+			}
+
+			if (MatchSymbol(OPEN_BRACE))
+			{
+				UngetToken(nameToken);
+
+				return false;
+			}
+
+			VariableType->SetName(nameToken.GetIdentifier());
+
+			if (MatchSymbol(COLON))
+			{
+				Token registerToken;
+				RequireIdentifierToken(registerToken);
+
+				String identifier = registerToken.GetIdentifier();
+
+				uint8 indexStartIndex = identifier.GetLength() - 1;
+				for (; indexStartIndex >= 0; --indexStartIndex)
+					if (!CharacterUtility::IsDigit(identifier[indexStartIndex]))
+					{
+						++indexStartIndex;
+						break;
+					}
+
+				String registerName = identifier.SubString(0, indexStartIndex);
+				StructVariableType::Registers reg = StructVariableType::Registers::None;
+
+				if (registerName == "POSITION")
+					reg = StructVariableType::Registers::Position;
+				else if (registerName == "NORMAL")
+					reg = StructVariableType::Registers::Normal;
+				else if (registerName == "COLOR")
+					reg = StructVariableType::Registers::Color;
+				else if (registerName == "UV")
+					reg = StructVariableType::Registers::UV;
+				else if (registerName == "DOMAIN_LOCATION")
+					reg = StructVariableType::Registers::DomainLocation;
+				else if (registerName == "INSTANCE_ID")
+					reg = StructVariableType::Registers::InstanceID;
+				else if (registerName == "FRAGMENT_POSITION")
+					reg = StructVariableType::Registers::FragmentPosition;
+				else if (registerName == "TARGET")
+					reg = StructVariableType::Registers::Target;
+				else if (registerName == "DISPATCH_THREAD_ID")
+					reg = StructVariableType::Registers::DispatchThreadID;
+				else if (registerName == "GROUP_ID")
+					reg = StructVariableType::Registers::GroupID;
+				else if (registerName == "GROUP_INDEX")
+					reg = StructVariableType::Registers::GroupIndex;
+				else if (registerName == "GROUP_THREAD_ID")
+					reg = StructVariableType::Registers::GroupThreadID;
+				else
+					THROW_PROGRAM_PARSER_EXCEPTION("Couldn't recognize a register", registerToken);
+
+				VariableType->SetRegister(reg);
+
+				if (indexStartIndex != identifier.GetLength())
+					VariableType->SetRegisterIndex(StringUtility::ToUInt8(identifier.SubString(indexStartIndex)));
+			}
+
+			RequireSymbol(SEMICOLON, "variable");
+
+			return true;
+		}
+
+		bool Parser::ParseGlobalVariable(const Token& DeclarationToken)
 		{
 			bool result = true;
 
 			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
 				return false;
 
-			VariableType* variableType = Allocate<VariableType>(m_Allocator);
+			GlobalVariableType* variableType = Allocate<GlobalVariableType>(m_Allocator);
 
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
 			variableType->SetDataType(dataType);
@@ -297,52 +400,30 @@ namespace Engine
 
 			variableType->SetName(nameToken.GetIdentifier());
 
-			if (MatchSymbol(COLON))
-			{
-				Token registerToken;
-				RequireIdentifierToken(registerToken);
-				if (variableType->GetName() == registerToken.GetIdentifier())
-					THROW_PROGRAM_PARSER_EXCEPTION("Variable name cannot be same as register", nameToken);
-
-				variableType->SetRegister(registerToken.GetIdentifier());
-			}
-
 			RequireSymbol(SEMICOLON, "variable");
 
 		FinishUp:
 			if (result)
 			{
-				if (m_Structs.GetSize() == 0)
+				if (dataType->IsBuiltIn())
 				{
-					bool allowed = true;
+					bool allowed = false;
 
-					if (dataType->IsBuiltIn())
+					for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
 					{
-						allowed = false;
+						if (allowedType != dataType->GetType())
+							continue;
 
-						for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
-						{
-							if (allowedType != dataType->GetType())
-								continue;
-
-							allowed = true;
-							break;
-						}
-
-						if (!allowed)
-							THROW_PROGRAM_PARSER_EXCEPTION("Cannot declared in global context", DeclarationToken);
+						allowed = true;
+						break;
 					}
 
-					if (allowed)
-						m_Parameters->Variables.Add(variableType);
+					if (!allowed)
+						THROW_PROGRAM_PARSER_EXCEPTION("Cannot declared in global context", DeclarationToken);
 				}
-				else
-				{
-					StructType* structType = nullptr;
-					m_Structs.Peek(&structType);
 
-					structType->AddItem(variableType);
-				}
+				m_Parameters->Variables.Add(variableType);
+				AddVariableToStack(variableType);
 			}
 			else
 				Deallocate(variableType);
@@ -358,7 +439,7 @@ namespace Engine
 			Token token;
 			RequireToken(token);
 
-			m_Attributes.Add((*m_AttributeParsers[token.GetIdentifier()])(token));
+			m_AttributesList.Add((*m_AttributeParsers[token.GetIdentifier()])(token));
 
 			RequireSymbol(CLOSE_SQUARE_BRACKET, "parse attribute");
 
@@ -379,8 +460,8 @@ namespace Engine
 			FunctionType* functionType = Allocate<FunctionType>(m_Allocator);
 			m_Parameters->Functions.Add(functionType);
 
-			functionType->AddAttributes(m_Attributes);
-			m_Attributes.Clear();
+			functionType->AddAttributes(m_AttributesList);
+			m_AttributesList.Clear();
 
 			functionType->SetReturnDataType(dataType);
 
@@ -401,6 +482,8 @@ namespace Engine
 
 			functionType->SetName(name);
 
+			PushAVariableList();
+
 			while (true)
 			{
 				if (MatchSymbol(CLOSE_BRACE))
@@ -415,30 +498,33 @@ namespace Engine
 				Token parameterToken;
 				RequireToken(parameterToken);
 
-				ParseFunctionParameter(parameterToken, parameterType);
+				ParseParameter(parameterToken, parameterType);
+
+				AddVariableToStack(parameterType);
 			}
 
 			ParseScopedStatements(functionType, true, EndConditions::None);
 
+			PopAVariableList();
+
 			return true;
 		}
 
-		bool Parser::ParseFunctionParameter(const Token& DeclarationToken, ParameterType* Parameter)
+		bool Parser::ParseParameter(const Token& DeclarationToken, ParameterType* ParameterType)
 		{
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
 
-			Parameter->SetDataType(dataType);
+			ParameterType->SetDataType(dataType);
 
 			Token nameToken;
 			RequireIdentifierToken(nameToken);
 
-			Parameter->SetName(nameToken.GetIdentifier());
+			ParameterType->SetName(nameToken.GetIdentifier());
 
 			if (MatchSymbol(COLON))
 			{
 				Token registerToken;
 				RequireIdentifierToken(registerToken);
-				Parameter->SetRegister(registerToken.GetIdentifier());
 			}
 
 			return true;
@@ -901,6 +987,8 @@ namespace Engine
 				stm->SetInitialStatement(ParseExpression(initialToken, ConditionMask));
 			}
 
+			AddVariableToStack(stm);
+
 			return stm;
 		}
 
@@ -1122,6 +1210,13 @@ namespace Engine
 
 		Statement* Parser::ParseVariableAccessStatement(const Token& DeclarationToken)
 		{
+			RequiredVarialbe(DeclarationToken);
+
+			return ParseVariableAccessStatementBase(DeclarationToken);
+		}
+
+		Statement* Parser::ParseVariableAccessStatementBase(const Token& DeclarationToken)
+		{
 			VariableAccessStatement* stm = Allocate<VariableAccessStatement>(m_Allocator);
 
 			stm->SetName(DeclarationToken.GetIdentifier());
@@ -1129,7 +1224,12 @@ namespace Engine
 			Token token;
 			RequireToken(token);
 
-			return ParseMemberAccessStatement(token, stm);
+			StructType* parentStructType = nullptr;
+			VariableType* varType = FindVariableType(stm->GetName());
+			if (varType != nullptr && !varType->GetDataType()->IsBuiltIn())
+				parentStructType = FindStructType(varType->GetDataType()->GetUserDefined());
+
+			return ParseMemberAccessStatement(token, stm, parentStructType);
 		}
 
 		Statement* Parser::ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement)
@@ -1144,7 +1244,7 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement)
+		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, StructType* ParentType)
 		{
 			if (DeclarationToken.Matches(DOT, Token::SearchCases::CaseSensitive))
 			{
@@ -1155,7 +1255,10 @@ namespace Engine
 				Token memberToken;
 				RequireIdentifierToken(memberToken);
 
-				stm->SetRight(ParseVariableAccessStatement(memberToken));
+				if (ParentType != nullptr)
+					RequiredVarialbe(ReinterpretCast(const VariableList&, ParentType->GetItems()), memberToken);
+
+				stm->SetRight(ParseVariableAccessStatementBase(memberToken));
 
 				return stm;
 			}
@@ -1191,7 +1294,12 @@ namespace Engine
 			Token token;
 			RequireToken(token);
 
-			return ParseMemberAccessStatement(token, stm);
+			StructType* parentStructType = nullptr;
+			FunctionType* funcType = FindFunctionType(stm->GetFunctionName());
+			if (funcType != nullptr && !funcType->GetReturnDataType()->IsBuiltIn())
+				parentStructType = FindStructType(funcType->GetReturnDataType()->GetUserDefined());
+
+			return ParseMemberAccessStatement(token, stm, parentStructType);
 		}
 
 		bool Parser::IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask)
@@ -1211,6 +1319,85 @@ namespace Engine
 			UngetToken(DeclarationToken);
 
 			return true;
+		}
+
+		void Parser::PushAVariableList(void)
+		{
+			VariableList variables(m_Allocator);
+
+			m_VariablesStack.Push(variables);
+		}
+
+		void Parser::PopAVariableList(void)
+		{
+			m_VariablesStack.Pop();
+		}
+
+		void Parser::AddVariableToStack(VariableType* Variable)
+		{
+			CoreDebugAssert(Categories::ProgramCompiler, m_VariablesStack.GetSize() != 0, "There's nothing in the m_VariablesStack");
+
+			VariableList list(m_Allocator);
+			m_VariablesStack.Pop(&list);
+
+			list.Add(Variable);
+
+			m_VariablesStack.Push(list);
+		}
+
+		void Parser::RequiredVarialbe(const Token& Token)
+		{
+			const String& name = Token.GetIdentifier();
+
+			for (const auto& list : m_VariablesStack)
+			{
+				if (list.ContainsIf([&name](auto& variable) { return variable->GetName() == name; }))
+					return;
+			}
+
+			THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find variable", Token);
+		}
+
+		void Parser::RequiredVarialbe(const VariableList& List, const Token& Token)
+		{
+			const String& name = Token.GetIdentifier();
+
+			if (List.ContainsIf([&name](auto& variable) { return variable->GetName() == name; }))
+				return;
+
+			THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find variable", Token);
+		}
+
+		StructType* Parser::FindStructType(const String& Name)
+		{
+			int32 index = m_Parameters->Structs.FindIf([&Name](const auto structType) { return structType->GetName() == Name; });
+			if (index == -1)
+				return nullptr;
+
+			return m_Parameters->Structs[index];
+		}
+
+		VariableType* Parser::FindVariableType(const String& Name)
+		{
+			for (const auto& list : m_VariablesStack)
+			{
+				int32 index = list.FindIf([&Name](auto& variable) { return variable->GetName() == Name; });
+				if (index == -1)
+					continue;
+
+				return list[index];
+			}
+
+			return nullptr;
+		}
+
+		FunctionType* Parser::FindFunctionType(const String& Name)
+		{
+			int32 index = m_Parameters->Functions.FindIf([&Name](const auto structType) { return structType->GetName() == Name; });
+			if (index == -1)
+				return nullptr;
+
+			return m_Parameters->Functions[index];
 		}
 
 		ProgramDataTypes Parser::GetPrimitiveDataType(const String& Name)

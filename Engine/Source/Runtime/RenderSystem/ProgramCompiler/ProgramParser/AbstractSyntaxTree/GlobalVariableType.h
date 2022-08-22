@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef PARAMETER_TYPE_H
-#define PARAMETER_TYPE_H
+#ifndef GLOBAL_VARIABLE_TYPE_H
+#define GLOBAL_VARIABLE_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\VariableType.h>
 
@@ -13,10 +13,10 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class PROGRAMPARSER_API ParameterType : public VariableType
+			class PROGRAMPARSER_API GlobalVariableType : public VariableType
 			{
 			public:
-				ParameterType(AllocatorBase* Allocator) :
+				GlobalVariableType(AllocatorBase* Allocator) :
 					VariableType(Allocator)
 				{
 				}
@@ -31,7 +31,7 @@ namespace Engine
 				}
 			};
 
-			typedef Vector<ParameterType*> ParameterList;
+			typedef Vector<GlobalVariableType*> GlobalVariableList;
 		}
 	}
 }

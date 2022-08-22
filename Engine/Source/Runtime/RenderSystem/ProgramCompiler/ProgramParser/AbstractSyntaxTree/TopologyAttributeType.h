@@ -35,7 +35,7 @@ namespace Engine
 					return m_Type;
 				}
 
-				String ToString(void) const override
+				virtual String ToString(void) const override
 				{
 					String result = "[Topology";
 

@@ -133,8 +133,7 @@ namespace Engine
 				ResourceCommon::Resource<TypeName>* handle = ReinterpretCast(ResourceCommon::Resource<TypeName>*, Resource); \
 				if (!handle->IsNull()) \
 					ResourceFactory::Destroy##TypeName(handle->GetPointer()); \
-				ResourceSystemAllocators::ResourceAllocator_Deallocate(handle); \
-				//m_LoadedResources.Remove("")
+				ResourceSystemAllocators::ResourceAllocator_Deallocate(handle);
 
 			IMPLEMENT_TYPES_IMPLEMENT(type);
 

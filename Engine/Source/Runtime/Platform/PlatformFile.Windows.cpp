@@ -297,7 +297,7 @@ namespace Engine
 		{
 			std::ofstream stream(GetFile(Handle));
 
-			stream.write(Data, Length * sizeof(char8));
+			stream.write(Data, Length);
 
 			stream.close();
 		}
@@ -315,7 +315,7 @@ namespace Engine
 		{
 			std::wofstream stream(GetFile(Handle));
 
-			stream.write(Data, Length * sizeof(char16));
+			stream.write(Data, Length);
 
 			stream.close();
 		}

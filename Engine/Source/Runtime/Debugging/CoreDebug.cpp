@@ -107,13 +107,13 @@ namespace Engine
 
 			LogManager::GetInstance()->GetCoreLogger()->Put(Logger::Levels::Fatal, CategoryFlags, str);
 
+			PlatformWindow::ShowMessageBox(str, "Assertion Failed", PlatformWindow::MessageBoxButtons::OK, PlatformWindow::MessageBoxIcons::Stop, PlatformWindow::MessageBoxDefaultButtons::Button1, PlatformWindow::MessageBoxModlities::Task);
+
 			if (PlatformOS::IsDebuggerAttached())
 			{
 				__debugbreak();
 				return;
 			}
-
-			PlatformWindow::ShowMessageBox(str, "Assertion Failed", PlatformWindow::MessageBoxButtons::OK, PlatformWindow::MessageBoxIcons::Stop, PlatformWindow::MessageBoxDefaultButtons::Button1, PlatformWindow::MessageBoxModlities::Task);
 		}
 	}
 }

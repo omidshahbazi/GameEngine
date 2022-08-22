@@ -25,6 +25,27 @@ namespace Engine
 				virtual ~ArrayStatement(void)
 				{
 				}
+
+				virtual String ToString(void) const override
+				{
+					String result;
+
+					result += "[";
+
+					bool isFirst = true;
+					for (auto& item : GetItems())
+					{
+						if (!isFirst)
+							result += ", ";
+						isFirst = false;
+
+						result += item->ToString();
+					}
+
+					result += "]";
+
+					return result;
+				}
 			};
 		}
 	}

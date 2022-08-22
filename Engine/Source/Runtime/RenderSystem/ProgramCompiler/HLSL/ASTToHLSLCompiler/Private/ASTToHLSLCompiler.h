@@ -25,7 +25,7 @@ namespace Engine
 
 				virtual void Initialize(DeviceTypes DeviceType) override;
 
-				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
+				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
 
 			private:
 				virtual void ResetPerStageValues(Stages Stage) override;
@@ -38,25 +38,13 @@ namespace Engine
 
 				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
-				virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
 				virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 				virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
 
-				virtual void InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register) override;
-
-				void BuildStruct(StructType* Struct, Stages Stage, bool IsOutputStruct, String& Shader);
-
-				void BuildVariable(const String& Name, const String& Register, DataTypeStatement* DataType, String& Shader);
-
-				String GetOutputStructName(void) const;
-
-				static String GetStageResultFieldName(uint8 Index);
-
-				static cstr GetStageResultVariableName(void);
+				void BuildVariable(const String& Name, StructVariableType::Registers Register, uint8 RegisterIndex, DataTypeStatement* DataType, String& Shader);
 
 				static cstr GetRootSignatureDefineName(void);
 
@@ -64,13 +52,9 @@ namespace Engine
 				static String GetSamplerVariableName(const String& TextureVariableName);
 
 			private:
-				StructType* m_InputAssemblerStruct;
 				FunctionList m_Functions;
 				uint8 m_ConstantBufferBindingCount;
 				uint8 m_TextureBindingCount;
-
-				String* m_EndOfFunctionParametersCode;
-				uint8 m_MemberAccessLevel;
 			};
 		}
 	}

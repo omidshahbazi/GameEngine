@@ -92,7 +92,7 @@ namespace Engine
 					return (m_Type != Types::None);
 				}
 
-				String ToString(void) const override
+				virtual String ToString(void) const override
 				{
 					String result;
 

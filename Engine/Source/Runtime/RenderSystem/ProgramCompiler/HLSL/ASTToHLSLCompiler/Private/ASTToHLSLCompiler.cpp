@@ -21,11 +21,53 @@ namespace Engine
 #define ADD_NEW_LINE_EX(StringVariable)
 #endif
 
+			String GetRegisterName(StructVariableType::Registers Register)
+			{
+				switch (Register)
+				{
+				case StructVariableType::Registers::Position:
+					return "POSITION";
+
+				case StructVariableType::Registers::Normal:
+					return "NORMAL";
+
+				case StructVariableType::Registers::Color:
+					return "COLOR";
+
+				case StructVariableType::Registers::UV:
+					return "TEXCOORD";
+
+				case StructVariableType::Registers::DomainLocation:
+					return "SV_DomainLocation";
+
+				case StructVariableType::Registers::InstanceID:
+					return "SV_GSInstanceID";
+
+				case StructVariableType::Registers::FragmentPosition:
+					return "SV_Position";
+
+				case StructVariableType::Registers::Target:
+					return "SV_Target";
+
+				case StructVariableType::Registers::DispatchThreadID:
+					return "SV_DispatchThreadID";
+
+				case StructVariableType::Registers::GroupID:
+					return "SV_GroupID";
+
+				case StructVariableType::Registers::GroupIndex:
+					return "SV_GroupIndex";
+
+				case StructVariableType::Registers::GroupThreadID:
+					return "SV_GroupThreadID";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
 			ASTToHLSLCompiler::ASTToHLSLCompiler(void) :
-				m_InputAssemblerStruct(nullptr),
 				m_ConstantBufferBindingCount(0),
-				m_TextureBindingCount(0),
-				m_EndOfFunctionParametersCode(nullptr)
+				m_TextureBindingCount(0)
 			{
 			}
 
@@ -34,13 +76,11 @@ namespace Engine
 				ASTCompilerBase::Initialize(DeviceType);
 			}
 
-			void ASTToHLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+			void ASTToHLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 			{
 				m_Functions = Functions;
-				m_InputAssemblerStruct = nullptr;
 				m_ConstantBufferBindingCount = 0;
 				m_TextureBindingCount = 0;
-				m_EndOfFunctionParametersCode = nullptr;
 
 				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
 
@@ -93,19 +133,49 @@ namespace Engine
 
 			void ASTToHLSLCompiler::BuildStruct(StructType* Struct, Stages Stage, String& Shader)
 			{
-				BuildStruct(Struct, Stage, false, Shader);
+				Shader += "struct ";
 
-				if (Struct->GetItems().ContainsIf([](auto item) { return item->GetRegister() != String::Empty; }))
+				Shader += Struct->GetName();
+
+				ADD_NEW_LINE();
+				Shader += "{";
+				ADD_NEW_LINE();
+
+				auto variables = Struct->GetItems();
+				for (auto variable : variables)
 				{
-					m_InputAssemblerStruct = Struct;
+					DataTypeStatement* dataType = variable->GetDataType();
 
-					BuildStruct(Struct, Stage, true, Shader);
+					BuildVariable(variable->GetName(), variable->GetRegister(), variable->GetRegisterIndex(), dataType, Shader);
+
+					if (variable->GetRegister() == StructVariableType::Registers::None)
+					{
+						uint8 size = 0;
+						uint16 offset = 0;
+						StructType::GetAlignedOffset(dataType->GetType(), offset, size);
+
+						uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
+						if (overflowByteCount != 0)
+						{
+							Shader += "float";
+							Shader += StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size);
+							Shader += " ";
+							Shader += variable->GetName();
+							Shader += "Padding";
+							Shader += ";";
+
+							ADD_NEW_LINE();
+						}
+					}
 				}
+
+				Shader += "};";
+				ADD_NEW_LINE();
 			}
 
 			void ASTToHLSLCompiler::BuildVariable(VariableType* Variable, Stages Stage, String& Shader)
 			{
-				BuildVariable(Variable->GetName(), Variable->GetRegister(), Variable->GetDataType(), Shader);
+				BuildVariable(Variable->GetName(), StructVariableType::Registers::None, 0, Variable->GetDataType(), Shader);
 			}
 
 			void ASTToHLSLCompiler::BuildFunction(FunctionType* Function, Stages Stage, String& Shader)
@@ -121,13 +191,7 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 
-				if (Function->IsEntrypoint())
-				{
-					Shader += GetOutputStructName();
-					Shader += " ";
-				}
-				else
-					BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
+				BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
 
 				Shader += " ";
 
@@ -153,114 +217,31 @@ namespace Engine
 					parameter = par;
 				}
 
-				m_EndOfFunctionParametersCode = &Shader;
+				Shader += ")";
 
-				String restOfFunctionCode;
+				ADD_NEW_LINE();
 
-				restOfFunctionCode += ")";
+				Shader += "{";
 
-				ADD_NEW_LINE_EX(restOfFunctionCode);
+				ADD_NEW_LINE();
 
-				restOfFunctionCode += "{";
+				BuildStatementHolder(Function, funcType, Stage, Shader);
 
-				ADD_NEW_LINE_EX(restOfFunctionCode);
+				Shader += "}";
 
-				if (Function->IsEntrypoint())
-				{
-					restOfFunctionCode += GetOutputStructName();
-					restOfFunctionCode += " ";
-					restOfFunctionCode += GetStageResultVariableName();
-					restOfFunctionCode += ";";
-					ADD_NEW_LINE_EX(restOfFunctionCode);
-
-					if (Stage != Stages::Fragment)
-						for (auto variableType : m_InputAssemblerStruct->GetItems())
-						{
-							restOfFunctionCode += GetStageResultVariableName();
-							restOfFunctionCode += ".";
-							restOfFunctionCode += variableType->GetName();
-							restOfFunctionCode += "=";
-							restOfFunctionCode += parameter->GetName();
-							restOfFunctionCode += ".";
-							restOfFunctionCode += variableType->GetName();
-							restOfFunctionCode += ";";
-
-							ADD_NEW_LINE_EX(restOfFunctionCode);
-						}
-				}
-
-				BuildStatementHolder(Function, funcType, Stage, restOfFunctionCode);
-
-				restOfFunctionCode += "}";
-
-				ADD_NEW_LINE_EX(restOfFunctionCode);
-
-				Shader += restOfFunctionCode;
-
-				m_EndOfFunctionParametersCode = nullptr;
+				ADD_NEW_LINE();
 			}
 
 			void ASTToHLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
-				String name = Statement->GetName();
-
-				if (m_MemberAccessLevel != 0 || ContainsVariable(name))
-				{
-					Shader += name;
-
-					return;
-				}
-
-				if (IntrinsicsBuilder::BuildConstantStatement(name, Type, Stage, Shader))
-					return;
-
-				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", name);
-			}
-
-			void ASTToHLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-			{
-				++m_MemberAccessLevel;
-
-				ASTCompilerBase::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
-
-				--m_MemberAccessLevel;
+				Shader += Statement->GetName();
 			}
 
 			void ASTToHLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
-				if (Type == FunctionType::Types::None)
-				{
-					Shader += "return ";
-					BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
-				}
-				else
-				{
-					uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Type, Stage, Shader);
+				Shader += "return ";
 
-					for (uint8 i = 0; i < elementCount; ++i)
-					{
-						Shader += GetStageResultVariableName();
-						Shader += ".";
-						Shader += GetStageResultFieldName(i);
-						Shader += "=";
-
-						Shader += GetStageResultArrayVariableName();
-
-						if (elementCount > 1)
-						{
-							Shader += '[';
-							Shader += StringUtility::ToString<char8>(i);
-							Shader += "]";
-						}
-
-						Shader += ";";
-
-						ADD_NEW_LINE();
-					}
-
-					Shader += "return ";
-					Shader += GetStageResultVariableName();
-				}
+				BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
 
 				Shader += ";";
 
@@ -330,147 +311,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToHLSLCompiler::InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register)
-			{
-				if (m_EndOfFunctionParametersCode == nullptr)
-					THROW_PROGRAM_COMPILER_EXCEPTION("Invalid call of InjectParameterIntoTopFunction", String::Empty);
-
-				String& shader = *m_EndOfFunctionParametersCode;
-
-				int32 index = shader.LastIndexOf('(');
-				if (index == -1)
-					THROW_PROGRAM_COMPILER_EXCEPTION("Invalid call of InjectParameterIntoTopFunction", String::Empty);
-
-				index = shader.LastIndexOf(Name, index);
-				if (index != -1)
-					return;
-
-				if (!shader.EndsWith('('))
-					shader += ',';
-
-				BuildType(Type, shader);
-				shader += " ";
-				shader += Name;
-
-				if (Register != String::Empty)
-				{
-					shader += ':';
-					shader += Register;
-				}
-			}
-
-			void ASTToHLSLCompiler::BuildStruct(StructType* Struct, Stages Stage, bool IsOutputStruct, String& Shader)
-			{
-				Shader += "struct ";
-
-				if (IsOutputStruct)
-					Shader += GetOutputStructName();
-				else
-					Shader += Struct->GetName();
-
-				ADD_NEW_LINE();
-				Shader += "{";
-				ADD_NEW_LINE();
-
-				if (!IsOutputStruct || Stage != Stages::Fragment)
-				{
-					auto variables = Struct->GetItems();
-					for (auto variable : variables)
-					{
-						DataTypeStatement* dataType = variable->GetDataType();
-
-						BuildVariable(variable->GetName(), variable->GetRegister(), dataType, Shader);
-
-						if (variable->GetRegister() == String::Empty)
-						{
-							uint8 size = 0;
-							uint16 offset = 0;
-							StructType::GetAlignedOffset(dataType->GetType(), offset, size);
-
-							uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
-							if (overflowByteCount != 0)
-							{
-								Shader += "float";
-								Shader += StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size);
-								Shader += " ";
-								Shader += variable->GetName();
-								Shader += "Padding";
-								Shader += ";";
-
-								ADD_NEW_LINE();
-							}
-						}
-					}
-				}
-
-				if (IsOutputStruct)
-				{
-					ProgramDataTypes dataType = ProgramDataTypes::Unknown;
-					String registerName;
-					uint8 count = 1;
-
-					switch (Stage)
-					{
-					case Stages::Vertex:
-					{
-						dataType = ProgramDataTypes::Float4;
-						registerName = "SV_POSITION";
-					} break;
-
-					case Stages::Hull:
-					{
-						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-					} break;
-
-					case Stages::Domain:
-					{
-						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-					} break;
-
-					case Stages::Geometry:
-					{
-						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-					} break;
-
-					case Stages::Fragment:
-					{
-						dataType = ProgramDataTypes::Float4;
-						registerName = "SV_TARGET";
-
-						int32 index = m_Functions.FindIf([](auto function) { return function->GetType() == FunctionType::Types::FragmentMain; });
-						if (index == -1)
-						{
-							//error
-						}
-
-						count = EvaluateDataTypeElementCount(m_Functions[index]->GetReturnDataType());
-					} break;
-
-					case Stages::Compute:
-					{
-						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-					} break;
-					}
-
-					for (uint8 i = 0; i < count; ++i)
-					{
-						BuildType(dataType, Shader);
-						Shader += " ";
-						Shader += GetStageResultFieldName(i);
-						Shader += ":";
-						Shader += registerName;
-						Shader += StringUtility::ToString<char8>(i);
-						Shader += ";";
-
-						ADD_NEW_LINE();
-					}
-				}
-
-				Shader += "};";
-				ADD_NEW_LINE();
-			}
-
-			void ASTToHLSLCompiler::BuildVariable(const String& Name, const String& Register, DataTypeStatement* DataType, String& Shader)
+			void ASTToHLSLCompiler::BuildVariable(const String& Name, StructVariableType::Registers Register, uint8 RegisterIndex, DataTypeStatement* DataType, String& Shader)
 			{
 				if (DataType->IsBuiltIn())
 				{
@@ -495,12 +336,7 @@ namespace Engine
 				Shader += " ";
 				Shader += Name;
 
-				if (Register != String::Empty)
-				{
-					Shader += ":";
-					Shader += Register;
-				}
-				else
+				if (Register == StructVariableType::Registers::None)
 				{
 					if (DataType->IsBuiltIn())
 					{
@@ -517,6 +353,12 @@ namespace Engine
 						Shader += StringUtility::ToString<char8>(m_ConstantBufferBindingCount++);
 						Shader += ")";
 					}
+				}
+				else
+				{
+					Shader += ":";
+					Shader += GetRegisterName(Register);
+					Shader += StringUtility::ToString<char8>(RegisterIndex);
 				}
 
 				Shader += ";";
@@ -535,23 +377,6 @@ namespace Engine
 
 					++m_TextureBindingCount;
 				}
-			}
-
-			String ASTToHLSLCompiler::GetOutputStructName(void) const
-			{
-				return m_InputAssemblerStruct->GetName() + "__Result__";
-			}
-
-			String ASTToHLSLCompiler::GetStageResultFieldName(uint8 Index)
-			{
-				return String("__Result__") + StringUtility::ToString<char8>(Index);
-			}
-
-			cstr ASTToHLSLCompiler::GetStageResultVariableName(void)
-			{
-				static cstr name = "__result__";
-
-				return name;
 			}
 
 			cstr ASTToHLSLCompiler::GetRootSignatureDefineName(void)

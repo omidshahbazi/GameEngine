@@ -25,10 +25,7 @@ namespace Engine
 				{
 				}
 
-				virtual String ToString(void) const
-				{
-					return "";
-				}
+				virtual String ToString(void) const = 0;
 			};
 
 			typedef SyntaxItemHolder<Statement> StatementItemHolder;

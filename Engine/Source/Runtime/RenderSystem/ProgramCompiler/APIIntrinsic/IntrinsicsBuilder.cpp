@@ -49,20 +49,6 @@ namespace Engine
 			m_Provider->Initialize(this);
 		}
 
-		bool IntrinsicsBuilder::BuildConstantStatement(const String& Name, FunctionType::Types Type, Stages Stage, String& Shader)
-		{
-			const auto& constants = m_Provider->GetConstants();
-
-			if (!constants.Contains(Name))
-				return false;
-
-			auto& constant = constants[Name];
-
-			(*constant.Build)(this, Type, Stage, Shader);
-
-			return true;
-		}
-
 		bool IntrinsicsBuilder::BuildFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
 			auto function = FindOverride(Name, Arguments);

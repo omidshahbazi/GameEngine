@@ -18,18 +18,12 @@ namespace Engine
 			public:
 				void Initialize(IInitializeHelper* Helper) override;
 
-				virtual const ConstantMap& GetConstants(void) const override
-				{
-					return m_Constants;
-				}
-
 				virtual const FunctionMap& GetFunctions(void) const override
 				{
 					return m_Functions;
 				}
 
 			private:
-				ConstantMap m_Constants;
 				FunctionMap m_Functions;
 			};
 		}

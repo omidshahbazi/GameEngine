@@ -25,8 +25,10 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class StructType;
 			class VariableType;
+			class GlobalVariableType;
+			class StructType;
+			class StructVariableType;
 			class BaseAttributeType;
 			class FunctionType;
 			class ParameterType;
@@ -35,6 +37,7 @@ namespace Engine
 			typedef Vector<StructType*> StructList;
 			typedef Stack<StructType*> StructStack;
 			typedef Vector<VariableType*> VariableList;
+			typedef Vector<GlobalVariableType*> GlobalVariableList;
 			typedef Vector<BaseAttributeType*> AttributeList;
 			typedef Vector<FunctionType*> FunctionList;
 		}
@@ -62,13 +65,14 @@ namespace Engine
 			typedef std::function<BaseAttributeType* (const Token& DeclarationToken)> AttributeParseFunction;
 			typedef std::shared_ptr<AttributeParseFunction> AttributeParseFunctionPtr;
 			typedef Map<String, AttributeParseFunctionPtr> AttributeParseMap;
+			typedef Stack<VariableList> VariablesStack;
 
 		public:
 			struct Parameters
 			{
 			public:
 				StructList Structs;
-				VariableList Variables;
+				GlobalVariableList Variables;
 				FunctionList Functions;
 			};
 
@@ -79,10 +83,11 @@ namespace Engine
 
 		private:
 			bool ParseStruct(const Token& DeclarationToken);
-			bool ParseVariable(const Token& DeclarationToken);
+			bool ParseStructVariable(const Token& DeclarationToken, StructVariableType* VariableType);
+			bool ParseGlobalVariable(const Token& DeclarationToken);
 			bool ParseAttribute(const Token& DeclarationToken);
 			bool ParseFunction(const Token& DeclarationToken);
-			bool ParseFunctionParameter(const Token& DeclarationToken, ParameterType* Parameter);
+			bool ParseParameter(const Token& DeclarationToken, ParameterType* ParameterType);
 
 			BaseAttributeType* ParseDomainAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParsePartitioningAttributeType(const Token& DeclarationToken);
@@ -119,11 +124,22 @@ namespace Engine
 
 			Statement* ParseConstantStatement(const Token& DeclarationToken);
 			Statement* ParseVariableAccessStatement(const Token& DeclarationToken);
+			Statement* ParseVariableAccessStatementBase(const Token& DeclarationToken);
 			Statement* ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement);
-			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement);
+			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, StructType* ParentType);
 			Statement* ParseFunctionCallStatement(const Token& DeclarationToken);
 
 			bool IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask);
+
+			void PushAVariableList(void);
+			void PopAVariableList(void);
+			void AddVariableToStack(VariableType* Variable);
+			void RequiredVarialbe(const Token& Name);
+			void RequiredVarialbe(const VariableList& List, const Token& Token);
+
+			StructType* FindStructType(const String& Name);
+			VariableType* FindVariableType(const String& Name);
+			FunctionType* FindFunctionType(const String& Name);
 
 			template<typename T>
 			INLINE T* Allocate(void)
@@ -154,10 +170,11 @@ namespace Engine
 		private:
 			AllocatorBase* m_Allocator;
 			KeywordParseMap m_KeywordParsers;
-			Parameters* m_Parameters;
-			StructStack m_Structs;
-			AttributeList m_Attributes;
 			AttributeParseMap m_AttributeParsers;
+			Parameters* m_Parameters;
+			StructStack m_StructsStack;
+			AttributeList m_AttributesList;
+			VariablesStack m_VariablesStack;
 		};
 	}
 }

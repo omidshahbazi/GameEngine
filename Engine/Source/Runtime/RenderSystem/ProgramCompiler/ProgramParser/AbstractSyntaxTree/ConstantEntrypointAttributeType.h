@@ -27,7 +27,7 @@ namespace Engine
 					return m_Entrypoint;
 				}
 
-				String ToString(void) const override
+				virtual String ToString(void) const override
 				{
 					String result = "[ConstantEntrypoint";
 

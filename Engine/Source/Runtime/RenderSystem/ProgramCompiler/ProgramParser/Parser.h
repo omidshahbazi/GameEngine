@@ -97,6 +97,8 @@ namespace Engine
 			BaseAttributeType* ParseThreadCountAttributeType(const Token& DeclarationToken);
 
 			DataTypeStatement* ParseDataType(const Token& DeclarationToken);
+			void ParsePostArrayDataType(DataTypeStatement* DataType);
+			Statement* ParseArrayElementCountStatement(void);
 
 			Statement* ParseIfStatement(const Token& DeclarationToken);
 			Statement* ParseElseStatement(const Token& DeclarationToken);

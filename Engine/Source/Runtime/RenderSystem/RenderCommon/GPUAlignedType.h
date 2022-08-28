@@ -58,6 +58,8 @@ namespace Engine
 		};
 
 		typedef GPUAlignedType<bool, 16> GPUAlignedBool;
+		typedef GPUAlignedType<int32, 16> GPUAlignedInt32;
+		typedef GPUAlignedType<uint32, 16> GPUAlignedUInt32;
 		typedef GPUAlignedType<float32, 16> GPUAlignedFloat32;
 		typedef GPUAlignedType<float64, 16> GPUAlignedFloat64;
 		typedef GPUAlignedType<Vector2F, 16> GPUAlignedVector2F;

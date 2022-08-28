@@ -22,35 +22,18 @@ namespace Engine
 			class PROGRAMPARSER_API DataTypeStatement : public Statement
 			{
 			public:
-				DataTypeStatement(void) :
-					m_Type(ProgramDataTypes::Unknown),
-					m_ElementCount(nullptr)
-				{
-				}
-
 				DataTypeStatement(ProgramDataTypes Type) :
 					m_Type(Type),
-					m_ElementCount(nullptr)
+					m_ElementCount(nullptr),
+					m_PostElementCount(nullptr)
 				{
 				}
 
 				DataTypeStatement(AllocatorBase* Allocator, const String& UserDefined) :
 					m_Type(ProgramDataTypes::Unknown),
 					m_UserDefined(Allocator, UserDefined),
-					m_ElementCount(nullptr)
-				{
-				}
-
-				DataTypeStatement(ProgramDataTypes Type, Statement* ElementCountStatement) :
-					m_Type(Type),
-					m_ElementCount(ElementCountStatement)
-				{
-				}
-
-				DataTypeStatement(AllocatorBase* Allocator, const String& UserDefined, Statement* ElementCountStatement) :
-					m_Type(ProgramDataTypes::Unknown),
-					m_UserDefined(Allocator, UserDefined),
-					m_ElementCount(ElementCountStatement)
+					m_ElementCount(nullptr),
+					m_PostElementCount(nullptr)
 				{
 				}
 
@@ -69,9 +52,29 @@ namespace Engine
 					return m_ElementCount;
 				}
 
+				void SetElementCount(Statement* Value)
+				{
+					m_ElementCount = Value;
+				}
+
+				Statement* GetPostElementCount(void) const
+				{
+					return m_PostElementCount;
+				}
+
+				void SetPostElementCount(Statement* Value)
+				{
+					m_PostElementCount = Value;
+				}
+
 				bool IsBuiltIn(void) const
 				{
 					return (m_Type != ProgramDataTypes::Unknown);
+				}
+
+				bool IsArray(void) const
+				{
+					return !(m_ElementCount == nullptr && m_PostElementCount == nullptr);
 				}
 
 				String ToString(void) const
@@ -86,6 +89,14 @@ namespace Engine
 
 					case ProgramDataTypes::Bool:
 						result = "bool";
+						break;
+
+					case ProgramDataTypes::Integer:
+						result = "int";
+						break;
+
+					case ProgramDataTypes::UnsignedInteger:
+						result = "uint";
 						break;
 
 					case ProgramDataTypes::Float:
@@ -139,10 +150,25 @@ namespace Engine
 					return result;
 				}
 
+				String PostElementCountToString(void) const
+				{
+					String result = "";
+
+					if (m_PostElementCount != nullptr)
+					{
+						result += "[";
+						result += m_PostElementCount->ToString();
+						result += "]";
+					}
+
+					return result;
+				}
+
 			private:
 				ProgramDataTypes m_Type;
 				String m_UserDefined;
 				Statement* m_ElementCount;
+				Statement* m_PostElementCount;
 			};
 		}
 	}

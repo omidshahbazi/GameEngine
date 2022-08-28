@@ -7,11 +7,13 @@
 #include <ProgramParser\AbstractSyntaxTree\SyntaxItemHolder.h>
 #include <RenderCommon\GPUAlignedType.h>
 #include <RenderCommon\Enums.h>
+#include <Debugging\CoreDebug.h>
 
 namespace Engine
 {
 	using namespace Containers;
 	using namespace RenderCommon;
+	using namespace Debugging;
 
 	namespace ProgramParser
 	{
@@ -59,6 +61,16 @@ namespace Engine
 						alignment = GPUAlignedBool::Alignment;
 						break;
 
+					case ProgramDataTypes::Integer:
+						Size = GPUAlignedInt32::Size;
+						alignment = GPUAlignedInt32::Alignment;
+						break;
+
+					case ProgramDataTypes::UnsignedInteger:
+						Size = GPUAlignedUInt32::Size;
+						alignment = GPUAlignedUInt32::Alignment;
+						break;
+
 					case ProgramDataTypes::Float:
 						Size = GPUAlignedFloat32::Size;
 						alignment = GPUAlignedFloat32::Alignment;
@@ -103,6 +115,9 @@ namespace Engine
 						Size = GPUAlignedMatrix4F::Size;
 						alignment = GPUAlignedMatrix4F::Alignment;
 						break;
+
+					default:
+						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 					}
 
 					Offset = GetAlignedSize(Offset, alignment);

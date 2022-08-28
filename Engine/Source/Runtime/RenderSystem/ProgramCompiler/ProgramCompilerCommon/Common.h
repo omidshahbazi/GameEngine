@@ -25,6 +25,8 @@ namespace Engine
 		{
 			Void = 0,
 			Bool,
+			Integer,
+			UnsignedInteger,
 			Float,
 			Double,
 			Float2,

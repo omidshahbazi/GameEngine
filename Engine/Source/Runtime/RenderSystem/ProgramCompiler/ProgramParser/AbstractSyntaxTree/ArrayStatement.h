@@ -30,7 +30,7 @@ namespace Engine
 				{
 					String result;
 
-					result += "[";
+					result += "{";
 
 					bool isFirst = true;
 					for (auto& item : GetItems())
@@ -42,7 +42,7 @@ namespace Engine
 						result += item->ToString();
 					}
 
-					result += "]";
+					result += "}";
 
 					return result;
 				}

@@ -21,6 +21,9 @@ namespace Engine
 					Normal,
 					Color,
 					UV,
+					TessellationFactor,
+					InsideTessellationFactor,
+					PrimitiveID,
 					DomainLocation,
 					InstanceID,
 					FragmentPosition,
@@ -97,6 +100,15 @@ namespace Engine
 
 					case Registers::UV:
 						return "UV";
+
+					case Registers::PrimitiveID:
+						return "PRIMITIVE_ID";
+
+					case Registers::TessellationFactor:
+						return "TESSELLATION_FACTOR";
+
+					case Registers::InsideTessellationFactor:
+						return "INSIDE_TESSELLATION_FACTOR";
 
 					case Registers::DomainLocation:
 						return "DOMAIN_LOCATION";

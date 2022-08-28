@@ -26,7 +26,7 @@ namespace Engine
 			IntrinsicsBuilder::Initialize(DeviceType);
 		}
 
-		void ASTCompilerBase::Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+		void ASTCompilerBase::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 		{
 			m_OpenScopeCount = 0;
 			m_LastFunction = 0;
@@ -61,7 +61,7 @@ namespace Engine
 			m_Variables.Clear();
 		}
 
-		void ASTCompilerBase::BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			m_LastFunction = nullptr;
 			m_ReturnValueAlreadyBuilt = false;
@@ -72,37 +72,37 @@ namespace Engine
 
 			BuildStructs(Structs, Stage, Shader);
 
-			BuildVariables(Variables, Stage, Shader);
+			BuildGlobalVariables(Variables, Stage, Shader);
 
 			BuildFunctions(Functions, Stage, Shader);
 		}
 
-		void ASTCompilerBase::BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildVertexShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			BuildStageShader(Stages::Vertex, Structs, Variables, Functions, Shader);
 		}
 
-		void ASTCompilerBase::BuildHullShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildHullShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			BuildStageShader(Stages::Hull, Structs, Variables, Functions, Shader);
 		}
 
-		void ASTCompilerBase::BuildDomainShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildDomainShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			BuildStageShader(Stages::Domain, Structs, Variables, Functions, Shader);
 		}
 
-		void ASTCompilerBase::BuildGeometryShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildGeometryShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			BuildStageShader(Stages::Geometry, Structs, Variables, Functions, Shader);
 		}
 
-		void ASTCompilerBase::BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildFragmentShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			BuildStageShader(Stages::Fragment, Structs, Variables, Functions, Shader);
 		}
 
-		void ASTCompilerBase::BuildComputeShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildComputeShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
 			BuildStageShader(Stages::Compute, Structs, Variables, Functions, Shader);
 		}
@@ -122,13 +122,19 @@ namespace Engine
 				BuildStruct(structType, Stage, Shader);
 		}
 
-		void ASTCompilerBase::BuildVariables(const VariableList& Variables, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildStructVariables(const StructVariableList& Variables, Stages Stage, String& Shader)
+		{
+			for (auto variable : Variables)
+				BuildStructVariable(variable, Stage, Shader);
+		}
+
+		void ASTCompilerBase::BuildGlobalVariables(const GlobalVariableList& Variables, Stages Stage, String& Shader)
 		{
 			for (auto variable : Variables)
 			{
 				m_Variables[variable->GetName()] = variable->GetDataType();
 
-				BuildVariable(variable, Stage, Shader);
+				BuildGlobalVariable(variable, Stage, Shader);
 			}
 		}
 
@@ -143,7 +149,19 @@ namespace Engine
 					if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
 						continue;
 
+					if (funcType == FunctionType::Types::HullMain && Stage != Stages::Hull)
+						continue;
+
+					if (funcType == FunctionType::Types::DomainMain && Stage != Stages::Domain)
+						continue;
+
+					if (funcType == FunctionType::Types::GeometryMain && Stage != Stages::Geometry)
+						continue;
+
 					if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
+						continue;
+
+					if (funcType == FunctionType::Types::ComputeMain && Stage != Stages::Compute)
 						continue;
 				}
 
@@ -165,6 +183,76 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 			}
+		}
+
+		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			for (auto attribute : Attributes)
+			{
+				BuildAttribute(attribute, Type, Stage, Shader);
+
+				ADD_NEW_LINE();
+			}
+		}
+
+		void ASTCompilerBase::BuildAttribute(BaseAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			if (IsAssignableFrom(Attribute, DomainAttributeType))
+			{
+				DomainAttributeType* stm = ReinterpretCast(DomainAttributeType*, Attribute);
+
+				BuildDomainAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, PartitioningAttributeType))
+			{
+				PartitioningAttributeType* stm = ReinterpretCast(PartitioningAttributeType*, Attribute);
+
+				BuildPartitioningAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, TopologyAttributeType))
+			{
+				TopologyAttributeType* stm = ReinterpretCast(TopologyAttributeType*, Attribute);
+
+				BuildTopologyAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, ControlPointsAttributeType))
+			{
+				ControlPointsAttributeType* stm = ReinterpretCast(ControlPointsAttributeType*, Attribute);
+
+				BuildControlPointsAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, ConstantEntrypointAttributeType))
+			{
+				ConstantEntrypointAttributeType* stm = ReinterpretCast(ConstantEntrypointAttributeType*, Attribute);
+
+				BuildConstantEntrypointAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, ThreadCountAttributeType))
+			{
+				ThreadCountAttributeType* stm = ReinterpretCast(ThreadCountAttributeType*, Attribute);
+
+				BuildThreadCountAttributeType(stm, Type, Stage, Shader);
+			}
+		}
+
+		void ASTCompilerBase::BuildParameters(const ParameterList& Parameters, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			bool isFirst = true;
+			for (auto parameter : Parameters)
+			{
+				if (!isFirst)
+					Shader += ", ";
+				isFirst = false;
+
+				BuildParameter(parameter, Type, Stage, Shader);
+			}
+		}
+
+		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			BuildDataTypeStatement(Parameter->GetDataType(), Shader);
+			Shader += " ";
+			Shader += Parameter->GetName();
 		}
 
 		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -641,7 +729,7 @@ namespace Engine
 		{
 			if (Stage != Stages::Fragment)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
-			
+
 			Shader += "discard;";
 			ADD_NEW_LINE();
 		}
@@ -716,11 +804,6 @@ namespace Engine
 			return false;
 		}
 
-		bool ASTCompilerBase::ContainsVariable(const String& Name)
-		{
-			return m_Variables.Contains(Name);
-		}
-
 		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
 		{
 			if (Statement == nullptr)
@@ -743,17 +826,20 @@ namespace Engine
 		{
 			static ProgramDataTypes MULTIPLY_RESULT[(uint8)ProgramDataTypes::Unknown][(uint8)ProgramDataTypes::Unknown] =
 			{
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float,ProgramDataTypes::Double,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double,ProgramDataTypes::Double,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Float2,ProgramDataTypes::Double2,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Double2,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double3,ProgramDataTypes::Double3,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Double4,ProgramDataTypes::Double4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown },
-				{ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Matrix4,ProgramDataTypes::Matrix4,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Unknown,ProgramDataTypes::Float4,ProgramDataTypes::Double4,ProgramDataTypes::Matrix4 },
+				//					Void						Bool						Integer						UnsignedInteger						Float						Double						Float2						Double2						Float3						Double3						Float4						Double4						Matrix4
+				/*Void*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,			ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown},
+				/*Bool*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,			ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Integer*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Integer,	ProgramDataTypes::Integer,			ProgramDataTypes::Float,	ProgramDataTypes::Double,	ProgramDataTypes::Float2,	ProgramDataTypes::Double2,	ProgramDataTypes::Float3,	ProgramDataTypes::Double3,	ProgramDataTypes::Float4,	ProgramDataTypes::Double4,	ProgramDataTypes::Matrix4 },
+				/*UnsignedInteger*/ {ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Integer,	ProgramDataTypes::UnsignedInteger,	ProgramDataTypes::Float,	ProgramDataTypes::Double,	ProgramDataTypes::Float2,	ProgramDataTypes::Double2,	ProgramDataTypes::Float3,	ProgramDataTypes::Double3,	ProgramDataTypes::Float4,	ProgramDataTypes::Double4,	ProgramDataTypes::Matrix4 },
+				/*Float*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float,	ProgramDataTypes::Float,			ProgramDataTypes::Float,	ProgramDataTypes::Double,	ProgramDataTypes::Float2,	ProgramDataTypes::Double2,	ProgramDataTypes::Float3,	ProgramDataTypes::Double3,	ProgramDataTypes::Float4,	ProgramDataTypes::Double4,	ProgramDataTypes::Matrix4 },
+				/*Double*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Double,	ProgramDataTypes::Double,			ProgramDataTypes::Double,	ProgramDataTypes::Double,	ProgramDataTypes::Double2,	ProgramDataTypes::Double2,	ProgramDataTypes::Double3,	ProgramDataTypes::Double3,	ProgramDataTypes::Double4,	ProgramDataTypes::Double4,	ProgramDataTypes::Matrix4 },
+				/*Float2*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float2,	ProgramDataTypes::Float2,			ProgramDataTypes::Float2,	ProgramDataTypes::Double2,	ProgramDataTypes::Float2,	ProgramDataTypes::Double2,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Double2*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Double2,	ProgramDataTypes::Double2,			ProgramDataTypes::Double2,	ProgramDataTypes::Double2,	ProgramDataTypes::Double2,	ProgramDataTypes::Double2,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Float3*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float3,	ProgramDataTypes::Float3,			ProgramDataTypes::Float3,	ProgramDataTypes::Double3,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float3,	ProgramDataTypes::Double3,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Double3*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Double3,	ProgramDataTypes::Double3,			ProgramDataTypes::Double3,	ProgramDataTypes::Double3,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Double3,	ProgramDataTypes::Double3,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Float4*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float4,	ProgramDataTypes::Float4,			ProgramDataTypes::Float4,	ProgramDataTypes::Double4,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float4,	ProgramDataTypes::Double4,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Double4*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Double4,	ProgramDataTypes::Double4,			ProgramDataTypes::Double4,	ProgramDataTypes::Double4,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Double4,	ProgramDataTypes::Double4,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown },
+				/*Matrix4*/			{ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Matrix4,	ProgramDataTypes::Matrix4,			ProgramDataTypes::Matrix4,	ProgramDataTypes::Matrix4,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Unknown,	ProgramDataTypes::Float4,	ProgramDataTypes::Double4,	ProgramDataTypes::Matrix4 },
 			};
 
 			if (IsAssignableFrom(CurrentStatement, OperatorStatement))
@@ -843,6 +929,8 @@ namespace Engine
 							return *variableType->GetDataType();
 					}
 				}
+
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't evaluate result of the statement", stm->ToString());
 			}
 			else if (IsAssignableFrom(CurrentStatement, ArrayElementAccessStatement))
 			{
@@ -941,10 +1029,6 @@ namespace Engine
 
 				BuildStatement(argument, Type, Stage, Shader);
 			}
-		}
-
-		void ASTCompilerBase::InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register)
-		{
 		}
 
 #undef ADD_NEW_LINE

@@ -32,9 +32,23 @@ namespace Engine
 
 				virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override;
 
-				virtual void BuildVariable(VariableType* Variable, Stages Stage, String& Shader) override;
+				virtual void BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader) override;
+
+				virtual void BuildGlobalVariable(GlobalVariableType* Variable, Stages Stage, String& Shader) override;
 
 				virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override;
+
+				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)  override;
+
+				virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)  override;
+
+				virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override;
+
+				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override;
+
+				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)  override;
+
+				virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)  override;
 
 				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
@@ -43,8 +57,6 @@ namespace Engine
 				virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
-
-				void BuildVariable(const String& Name, StructVariableType::Registers Register, uint8 RegisterIndex, DataTypeStatement* DataType, String& Shader);
 
 				static cstr GetRootSignatureDefineName(void);
 

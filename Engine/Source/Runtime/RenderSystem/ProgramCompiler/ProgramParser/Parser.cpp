@@ -315,6 +315,8 @@ namespace Engine
 
 			VariableType->SetName(nameToken.GetIdentifier());
 
+			ParsePostArrayDataType(dataType);
+
 			if (MatchSymbol(COLON))
 			{
 				Token registerToken;
@@ -341,6 +343,12 @@ namespace Engine
 					reg = StructVariableType::Registers::Color;
 				else if (registerName == "UV")
 					reg = StructVariableType::Registers::UV;
+				else if (registerName == "PRIMITIVE_ID")
+					reg = StructVariableType::Registers::PrimitiveID;
+				else if (registerName == "TESSELLATION_FACTOR")
+					reg = StructVariableType::Registers::TessellationFactor;
+				else if (registerName == "INSIDE_TESSELLATION_FACTOR")
+					reg = StructVariableType::Registers::InsideTessellationFactor;
 				else if (registerName == "DOMAIN_LOCATION")
 					reg = StructVariableType::Registers::DomainLocation;
 				else if (registerName == "INSTANCE_ID")
@@ -363,7 +371,7 @@ namespace Engine
 				VariableType->SetRegister(reg);
 
 				if (indexStartIndex != identifier.GetLength())
-					VariableType->SetRegisterIndex(StringUtility::ToUInt8(identifier.SubString(indexStartIndex)));
+					VariableType->SetRegisterIndex(StringUtility::ToInt8(identifier.SubString(indexStartIndex)));
 			}
 
 			RequireSymbol(SEMICOLON, "variable");
@@ -685,25 +693,32 @@ namespace Engine
 					THROW_PROGRAM_PARSER_EXCEPTION("No data type found", DeclarationToken);
 			}
 
-			Statement* elementCountStatement = nullptr;
-			if (MatchSymbol(OPEN_SQUARE_BRACKET))
-			{
-				Token elementCountToken;
-				RequireToken(elementCountToken);
-
-				elementCountStatement = ParseExpression(elementCountToken, EndConditions::Bracket);
-
-				RequireToken(elementCountToken);
-
-				RequireSymbol(CLOSE_BRACKET, "data type definition");
-			}
-
-			DataTypeStatement* stm = Allocate<DataTypeStatement>();
+			DataTypeStatement* stm = Allocate<DataTypeStatement>(primitiveType);
 
 			if (primitiveType == ProgramDataTypes::Unknown)
-				Construct(stm, m_Allocator, userDefinedType, elementCountStatement);
-			else
-				Construct(stm, primitiveType, elementCountStatement);
+				Construct(stm, m_Allocator, userDefinedType);
+
+			stm->SetElementCount(ParseArrayElementCountStatement());
+
+			return stm;
+		}
+
+		void Parser::ParsePostArrayDataType(DataTypeStatement* DataType)
+		{
+			DataType->SetPostElementCount(ParseArrayElementCountStatement());
+		}
+
+		Statement* Parser::ParseArrayElementCountStatement(void)
+		{
+			if (!MatchSymbol(OPEN_SQUARE_BRACKET))
+				return nullptr;
+
+			Token elementCountToken;
+			RequireToken(elementCountToken);
+
+			Statement* stm = ParseExpression(elementCountToken, EndConditions::SquareBracket);
+
+			RequireSymbol(CLOSE_SQUARE_BRACKET, "data type definition");
 
 			return stm;
 		}
@@ -1411,6 +1426,8 @@ namespace Engine
 
 				dataTypesName["void"] = ProgramDataTypes::Void;
 				dataTypesName["bool"] = ProgramDataTypes::Bool;
+				dataTypesName["int"] = ProgramDataTypes::Integer;
+				dataTypesName["uint"] = ProgramDataTypes::UnsignedInteger;
 				dataTypesName["float"] = ProgramDataTypes::Float;
 				dataTypesName["double"] = ProgramDataTypes::Double;
 				dataTypesName["float2"] = ProgramDataTypes::Float2;

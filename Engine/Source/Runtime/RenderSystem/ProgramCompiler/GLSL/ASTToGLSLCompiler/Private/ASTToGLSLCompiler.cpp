@@ -107,18 +107,110 @@ namespace Engine
 
 				for (auto variable : variables)
 				{
-					BuildVariable(variable, Stage, Shader);
+					BuildStructVariable(variable, Stage, Shader);
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildVariable(VariableType* Variable, Stages Stage, String& Shader)
+			void ASTToGLSLCompiler::BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader)
 			{
-				BuildVariable(Variable->GetName(), StructVariableType::Registers::None, Variable->GetDataType(), false, Shader);
+				String name = Variable->GetName();
+				DataTypeStatement* dataType = Variable->GetDataType();
+
+				if (Variable->GetRegister() != StructVariableType::Registers::None)
+				{
+					int8 location = 0;
+
+					if (m_Outputs.Contains(name))
+					{
+						name = m_Outputs[name];
+
+						location = m_AdditionalLayoutCount++;
+					}
+
+					Shader += "layout(location=";
+					Shader += StringUtility::ToString<char8>(location);
+					Shader += ")";
+					//Shader += (IsOutputMode ? "out " : "in ");
+					Shader += "in ";
+				}
+
+				if (dataType->GetUserDefined() != String::Empty)
+				{
+					int32 index = GetStructs().FindIf([dataType](auto item) { return item->GetName() == dataType->GetUserDefined(); });
+					if (index != -1)
+					{
+						BuildUniformBlock(GetStructs()[index], name, Stages::Vertex, Shader);
+
+						return;
+					}
+				}
+
+				for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+				{
+					if (allowedDataType == dataType->GetType())
+						continue;
+
+					Shader += "uniform ";
+					break;
+				}
+
+				BuildDataTypeStatement(dataType, Shader);
+				Shader += " ";
+				Shader += name;
+				Shader += ";";
+
+				ADD_NEW_LINE();
+			}
+
+			void ASTToGLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, Stages Stage, String& Shader)
+			{
+				const String& name = Variable->GetName();
+				DataTypeStatement* dataType = Variable->GetDataType();
+
+				if (dataType->GetUserDefined() != String::Empty)
+				{
+					int32 index = GetStructs().FindIf([dataType](auto item) { return item->GetName() == dataType->GetUserDefined(); });
+					if (index != -1)
+					{
+						BuildUniformBlock(GetStructs()[index], name, Stages::Vertex, Shader);
+
+						return;
+					}
+				}
+
+				for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+				{
+					if (allowedDataType != dataType->GetType())
+						continue;
+
+					if (allowedDataType == ProgramDataTypes::Texture2D)
+					{
+						Shader += "layout(location=";
+						Shader += StringUtility::ToString<char8>(m_BindingCount);
+						Shader += ",binding=";
+						Shader += StringUtility::ToString<char8>(m_BindingCount);
+						Shader += ")";
+
+						++m_BindingCount;
+					}
+
+					Shader += "uniform ";
+					break;
+				}
+
+				BuildDataTypeStatement(dataType, Shader);
+				Shader += " ";
+				Shader += name;
+				Shader += ";";
+
+				ADD_NEW_LINE();
 			}
 
 			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, Stages Stage, String& Shader)
 			{
 				FunctionType::Types funcType = Function->GetType();
+
+				ASTCompilerBase::BuildAttributes(Function->GetAttributes(), funcType, Stage, Shader);
 
 				if (funcType == FunctionType::Types::FragmentMain)
 				{
@@ -155,19 +247,7 @@ namespace Engine
 				if (Function->IsEntrypoint())
 					m_Parameters.AddRange(Function->GetParameters());
 				else
-				{
-					bool isFirst = true;
-					for (auto par : Function->GetParameters())
-					{
-						if (!isFirst)
-							Shader += ",";
-						isFirst = false;
-
-						BuildDataTypeStatement(par->GetDataType(), Shader);
-						Shader += " ";
-						Shader += par->GetName();
-					}
-				}
+					BuildParameters(Function->GetParameters(), funcType, Stage, Shader);
 
 				Shader += ")";
 
@@ -187,6 +267,30 @@ namespace Engine
 				Shader += "}";
 
 				ADD_NEW_LINE();
+			}
+
+			void ASTToGLSLCompiler::BuildDomainAttributeType(DomainAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
+			void ASTToGLSLCompiler::BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
+			void ASTToGLSLCompiler::BuildTopologyAttributeType(TopologyAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
+			void ASTToGLSLCompiler::BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
+			void ASTToGLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
+			void ASTToGLSLCompiler::BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
 			}
 
 			void ASTToGLSLCompiler::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -405,6 +509,14 @@ namespace Engine
 					Shader += "bool";
 					break;
 
+				case ProgramDataTypes::Integer:
+					Shader += "int";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger:
+					Shader += "uint";
+					break;
+
 				case ProgramDataTypes::Float:
 					Shader += "float";
 					break;
@@ -447,82 +559,6 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildVariable(String Name, StructVariableType::Registers Register, DataTypeStatement* DataType, bool IsOutputMode, String& Shader)
-			{
-				bool buildOutVarialbe = false;
-
-				bool doesBoundToRegister = (Register != StructVariableType::Registers::None);
-
-				if (doesBoundToRegister)
-				{
-					int8 location = 0;
-
-					if (m_Outputs.Contains(Name))
-					{
-						Name = m_Outputs[Name];
-
-						location = m_AdditionalLayoutCount++;
-					}
-					//else
-					//{
-					//	m_Outputs[Name] = Name + "Out";
-
-					//	location = SubMeshInfo::GetLayoutIndex(GetLayout(Register));
-
-					//	buildOutVarialbe = true;
-					//}
-
-					//if (location < 0)
-					//	THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't fine layout", Register);
-
-					Shader += "layout(location=";
-					Shader += StringUtility::ToString<char8>(location);
-					Shader += ")";
-					Shader += (IsOutputMode ? "out " : "in ");
-				}
-
-				if (DataType->GetUserDefined() != String::Empty)
-				{
-					int32 index = GetStructs().FindIf([&DataType](auto item) { return item->GetName() == DataType->GetUserDefined(); });
-					if (index != -1)
-					{
-						BuildUniformBlock(GetStructs()[index], Name, Stages::Vertex, Shader);
-
-						return;
-					}
-				}
-
-				for (auto dataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
-				{
-					if (dataType != DataType->GetType())
-						continue;
-
-					if (dataType == ProgramDataTypes::Texture2D)
-					{
-						Shader += "layout(location=";
-						Shader += StringUtility::ToString<char8>(m_BindingCount);
-						Shader += ",binding=";
-						Shader += StringUtility::ToString<char8>(m_BindingCount);
-						Shader += ")";
-
-						++m_BindingCount;
-					}
-
-					Shader += "uniform ";
-					break;
-				}
-
-				BuildDataTypeStatement(DataType, Shader);
-				Shader += " ";
-				Shader += Name;
-				Shader += ";";
-
-				ADD_NEW_LINE();
-
-				if (buildOutVarialbe)
-					BuildVariable(Name, Register, DataType, true, Shader);
-			}
-
 			void ASTToGLSLCompiler::BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader)
 			{
 				auto variables = Struct->GetItems();
@@ -553,7 +589,7 @@ namespace Engine
 
 					offset += size;
 
-					BuildVariable(variable, Stage, Shader);
+					BuildStructVariable(variable, Stage, Shader);
 				}
 
 				Shader += "}";

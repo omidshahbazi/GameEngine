@@ -7,7 +7,14 @@
 #include <APIIntrinsic\IntrinsicsBuilder.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\StructType.h>
+#include <ProgramParser\AbstractSyntaxTree\GlobalVariableType.h>
 #include <ProgramParser\AbstractSyntaxTree\FunctionType.h>
+#include <ProgramParser\AbstractSyntaxTree\DomainAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\PartitioningAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\TopologyAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\SwitchStatement.h>
@@ -54,22 +61,22 @@ namespace Engine
 
 			virtual void Initialize(DeviceTypes DeviceType);
 
-			virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, OutputInfo& Output);
+			virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output);
 
 		protected:
-			virtual void BuildStageShader(Stages Stage, const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildVertexShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildVertexShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildHullShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildHullShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildDomainShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildDomainShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildGeometryShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildGeometryShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildFragmentShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildFragmentShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
-			virtual void BuildComputeShader(const StructList& Structs, const VariableList& Variables, const FunctionList& Functions, String& Shader);
+			virtual void BuildComputeShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader);
 
 			virtual void ResetPerStageValues(Stages Stage);
 
@@ -79,13 +86,37 @@ namespace Engine
 
 			virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) = 0;
 
-			virtual void BuildVariables(const VariableList& Variables, Stages Stage, String& Shader);
+			virtual void BuildStructVariables(const StructVariableList& Variables, Stages Stage, String& Shader);
 
-			virtual void BuildVariable(VariableType* VariableType, Stages Stage, String& Shader) = 0;
+			virtual void BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildGlobalVariables(const GlobalVariableList& Variables, Stages Stage, String& Shader);
+
+			virtual void BuildGlobalVariable(GlobalVariableType* Variable, Stages Stage, String& Shader) = 0;
 
 			virtual void BuildFunctions(const FunctionList& Functions, Stages Stage, String& Shader);
 
 			virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildAttribute(BaseAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildParameters(const ParameterList& Parameters, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildParameter(ParameterType* Parameter, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader);
 
@@ -126,7 +157,7 @@ namespace Engine
 			virtual void BuildWhileStatement(WhileStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildContinueStatement(ContinueStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
-			
+
 			virtual void BuildBreakStatement(BreakStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
@@ -142,7 +173,6 @@ namespace Engine
 			virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 
 			bool ContainsReturnStatement(StatementItemHolder* Statement);
-			bool ContainsVariable(const String& Name);
 
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
@@ -155,7 +185,6 @@ namespace Engine
 			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
 
 			void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) override;
-			virtual void InjectParameterIntoTopFunction(ProgramDataTypes Type, const String& Name, const String& Register) override;
 
 			AllocatorBase* GetAllocator(void) const
 			{

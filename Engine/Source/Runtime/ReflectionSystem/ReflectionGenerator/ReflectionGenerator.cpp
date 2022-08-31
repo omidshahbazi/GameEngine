@@ -1,12 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <ReflectionTool\ReflectionGenerator.h>
-#include <ReflectionTool\HeaderParser.h>
+#include <ReflectionGenerator\ReflectionGenerator.h>
+#include <ReflectionGenerator\HeaderParser.h>
+#include <ReflectionGenerator\MetaEnum.h>
+#include <ReflectionGenerator\MetaConstructor.h>
+#include <ReflectionGenerator\MetaFunction.h>
+#include <ReflectionGenerator\MetaProperty.h>
 #include <Containers\StringUtility.h>
-#include <ReflectionTool\MetaEnum.h>
-#include <ReflectionTool\MetaConstructor.h>
-#include <ReflectionTool\MetaFunction.h>
-#include <ReflectionTool\MetaProperty.h>
-#include <ReflectionTool\ReflectionToolAllocators.h>
 #include <FileUtility\Path.h>
 #include <Platform\PlatformFile.h>
 
@@ -15,7 +14,7 @@ namespace Engine
 	using namespace FileUtility;
 	using namespace Platform;
 
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
 		const cstr FILE_HEADER = "// Copyright 2016-2020 ?????????????. All Rights Reserved.\n// This file generated with ?????????????? based on what\n// you wrote in the original file, do not change it manually\n";
 
@@ -41,10 +40,17 @@ namespace Engine
 			PlatformFile::Close(handle);
 		}
 
+		ReflectionGenerator::ReflectionGenerator(AllocatorBase* Allocator, const WString& FilePath, const WString& OutputBaseFileName) :
+			m_Allocator(Allocator),
+			m_FilePath(FilePath),
+			m_OutputBaseFileName(OutputBaseFileName)
+		{
+		}
+
 		bool ReflectionGenerator::Generate(void)
 		{
 			String content = ReadFromFile(m_FilePath.ChangeType<char16>());
-			HeaderParser hp(content);
+			HeaderParser hp(m_Allocator, content);
 
 			TypeList types;
 			hp.Parse(types);
@@ -64,14 +70,17 @@ namespace Engine
 			WriteToFile(m_OutputBaseFileName + L".cpp", compileContent);
 
 			for (auto& type : types)
-				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+			{
+				Destruct(type);
+				DeallocateMemory(m_Allocator, type);
+			}
 
 			return true;
 		}
 
 		void ReflectionGenerator::GenerateHeaderFile(String& HeaderContent, const TypeList& Types)
 		{
-			//HeaderContent += "\n#include <ReflectionTool\\RTTI.h>\n";
+			//HeaderContent += "\n#include <ReflectionGenerator\\RTTI.h>\n";
 
 			for (auto& t : Types)
 			{

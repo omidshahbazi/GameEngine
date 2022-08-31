@@ -1,30 +1,16 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <ReflectionTool\HeaderParser.h>
-#include <ReflectionTool\MetaDataStructure.h>
-#include <ReflectionTool\MetaEnum.h>
-#include <ReflectionTool\MetaConstructor.h>
-#include <ReflectionTool\MetaFunction.h>
-#include <ReflectionTool\MetaProperty.h>
-#include <ReflectionTool\ReflectionToolAllocators.h>
-#include <Debugging\CoreDebug.h>
+#include <ReflectionGenerator\HeaderParser.h>
+#include <ReflectionGenerator\MetaDataStructure.h>
+#include <ReflectionGenerator\MetaEnum.h>
+#include <ReflectionGenerator\MetaConstructor.h>
+#include <ReflectionGenerator\MetaFunction.h>
+#include <ReflectionGenerator\MetaProperty.h>
+#include <ReflectionGenerator\ReflectionGeneratorException.h>
 
 namespace Engine
 {
-	using namespace Debugging;
-
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		INLINE AccessSpecifiers ParseAccessSpecifier(Token& Token)
-		{
-			static const String AccessSpecifiersName[] = { "", "xx", "private", "xx", "protected", "xx", "xx", "xx", "public" };
-
-			for (AccessSpecifiers res = AccessSpecifiers((int)AccessSpecifiers::None + 1); res != AccessSpecifiers::Count; res = AccessSpecifiers((int32)res + 1))
-				if (Token.Matches(AccessSpecifiersName[(int)res], Token::SearchCases::CaseSensitive))
-					return res;
-
-			return AccessSpecifiers::None;
-		}
-
 		void HeaderParser::Parse(TypeList& Types)
 		{
 			CodePageParser::Parse(Types);
@@ -32,16 +18,15 @@ namespace Engine
 			m_CurrentDataStructure = nullptr;
 			m_BlockLevel = 0;
 
-			//String str;
 			do
 			{
 				Token token;
 				if (!GetToken(token))
 					return;
-				else if (!CompileDeclaration(Types, token))
-					CoreDebugLogError(Categories::ReflectionTool, (TEXT("'") + token.GetIdentifier() + "': Bad command or expression").GetValue());
 
-				//str += token.GetIdentifier() + "\n";
+				else if (!CompileDeclaration(Types, token))
+					THROW_REFLECTION_TOOL_EXCEPTION("'" + token.GetName() + "': Bad command or expression");
+
 			} while (true);
 		}
 
@@ -80,7 +65,7 @@ namespace Engine
 			{
 				m_BlockLevel--;
 
-				if (MatchSymbol(SEMICOLON))
+				if (MatchSemiColon())
 				{
 					if (m_CurrentDataStructure != nullptr && m_BlockLevel == m_CurrentDataStructure->GetBlockLevel())
 						m_CurrentDataStructure = (MetaDataStructure*)m_CurrentDataStructure->GetTopNest();
@@ -99,8 +84,8 @@ namespace Engine
 
 		void HeaderParser::CompileTypeDeclaration(const Token& Declaration, TypeList& Types)
 		{
-			MetaDataStructure* type = ReflectionToolAllocators::TypesAllocator_Allocate<MetaDataStructure>();
-			Construct(type, m_CurrentDataStructure);
+			MetaDataStructure* type = ReinterpretCast(MetaDataStructure*, AllocateMemory(m_Allocator, sizeof(MetaDataStructure)));
+			Construct(type, m_Allocator, m_CurrentDataStructure);
 
 			type->SetNamespace(GetNamespaces());
 
@@ -113,14 +98,14 @@ namespace Engine
 				if (!GetToken(token, true))
 					break;
 
-				if (MatchSymbol(SEMICOLON))
+				if (MatchSemiColon())
 				{
-					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+					DeallocateMemory(m_Allocator, type);
 					return;
 				}
 				else if ((hasParent = MatchSymbol(COLON)) || MatchSymbol(OPEN_BRACKET))
 				{
-					type->SetName(token.GetIdentifier());
+					type->SetName(token.GetName());
 					break;
 				}
 
@@ -143,12 +128,12 @@ namespace Engine
 					AccessSpecifiers access = ParseAccessSpecifier(token);
 
 					if (access == AccessSpecifiers::None)
-						type->AddParentName(token.GetIdentifier());
+						type->AddParentName(token.GetName(), AccessSpecifiers::Private);
 					else
 					{
 						Token token;
 						GetToken(token);
-						type->AddParentName(token.GetIdentifier());
+						type->AddParentName(token.GetName(), access);
 					}
 				}
 			}
@@ -158,7 +143,7 @@ namespace Engine
 			if (!objectDeclMacroToken.Matches(type->GetDeclarationMacroName(), Token::SearchCases::CaseSensitive))
 			{
 				AddBlockLevel();
-				ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+				DeallocateMemory(m_Allocator, type);
 				return;
 			}
 
@@ -179,7 +164,7 @@ namespace Engine
 
 		void HeaderParser::CompileEnumDeclaration(TypeList& Types)
 		{
-			MetaEnum* type = ReflectionToolAllocators::TypesAllocator_Allocate<MetaEnum>();
+			MetaEnum* type = ReinterpretCast(MetaEnum*, AllocateMemory(m_Allocator, sizeof(MetaEnum)));
 			Construct(type);
 
 			ReadSpecifiers(type, "enum");
@@ -187,16 +172,16 @@ namespace Engine
 			Token nameToken;
 			while (GetToken(nameToken, true))
 			{
-				if (MatchSymbol(SEMICOLON))
+				if (MatchSemiColon())
 					return;
+
 				if (MatchSymbol(OPEN_BRACKET))
 					break;
 
-				nameToken.SetName("");
 				nameToken.SetIdentifier("");
 			}
 
-			type->SetName(nameToken.GetIdentifier());
+			type->SetName(nameToken.GetName());
 
 			uint8 membersCount = 0;
 			do
@@ -220,7 +205,7 @@ namespace Engine
 					GetToken(member);
 				}
 
-				type->AddItem(member.GetIdentifier());
+				type->AddItem(member.GetName());
 				membersCount++;
 
 				if (bracketPresent)
@@ -235,19 +220,19 @@ namespace Engine
 
 			if (membersCount == 0)
 				Finalize:
-			ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+			DeallocateMemory(m_Allocator, type);
 		}
 
 		void HeaderParser::CompileConstructorDeclaration(void)
 		{
-			MetaConstructor* ctor = ReflectionToolAllocators::TypesAllocator_Allocate<MetaConstructor>();
+			MetaConstructor* ctor = ReinterpretCast(MetaConstructor*, AllocateMemory(m_Allocator, sizeof(MetaConstructor)));
 			Construct(ctor, m_CurrentDataStructure);
 
 			ctor->SetName(m_CurrentDataStructure->GetName());
 
 			if (!MatchSymbol(OPEN_BRACE))
 			{
-				ReflectionToolAllocators::TypesAllocator_Deallocate(ctor);
+				DeallocateMemory(m_Allocator, ctor);
 				return;
 			}
 
@@ -260,14 +245,14 @@ namespace Engine
 				Token paramName;
 				GetToken(paramName);
 
-				ctor->AddParameter(paramDataType, paramName.GetIdentifier());
+				ctor->AddParameter(paramDataType, paramName.GetName());
 			}
 
 			m_CurrentDataStructure->AddConstructor(ctor);
 
 			while (true)
 			{
-				if (MatchSymbol(SEMICOLON) || MatchSymbol(CLOSE_BRACKET))
+				if (MatchSemiColon() || MatchSymbol(CLOSE_BRACKET))
 					break;
 
 				Token token;
@@ -277,7 +262,7 @@ namespace Engine
 
 		void HeaderParser::CompileFunctionDeclaration(void)
 		{
-			MetaFunction* func = ReflectionToolAllocators::TypesAllocator_Allocate<MetaFunction>();
+			MetaFunction* func = ReinterpretCast(MetaFunction*, AllocateMemory(m_Allocator, sizeof(MetaFunction)));
 			Construct(func, m_CurrentDataStructure);
 
 			ReadSpecifiers(func, "function");
@@ -285,18 +270,18 @@ namespace Engine
 			DataType returnType;
 			if (!GetDataType(returnType))
 			{
-				ReflectionToolAllocators::TypesAllocator_Deallocate(func);
+				DeallocateMemory(m_Allocator, func);
 				return;
 			}
 			func->SetReturnType(returnType);
 
 			Token nameToken;
 			GetToken(nameToken);
-			func->SetName(nameToken.GetIdentifier());
+			func->SetName(nameToken.GetName());
 
 			if (!MatchSymbol(OPEN_BRACE))
 			{
-				ReflectionToolAllocators::TypesAllocator_Deallocate(func);
+				DeallocateMemory(m_Allocator, func);
 				return;
 			}
 
@@ -309,7 +294,7 @@ namespace Engine
 				Token paramName;
 				GetToken(paramName);
 
-				func->AddParameter(paramDataType, paramName.GetIdentifier());
+				func->AddParameter(paramDataType, paramName.GetName());
 			}
 
 			if (MatchIdentifier(CONST))
@@ -320,7 +305,7 @@ namespace Engine
 
 		void HeaderParser::CompileVariableDeclaration(void)
 		{
-			MetaProperty* property = ReflectionToolAllocators::TypesAllocator_Allocate<MetaProperty>();
+			MetaProperty* property = ReinterpretCast(MetaProperty*, AllocateMemory(m_Allocator, sizeof(MetaProperty)));
 			Construct(property, m_CurrentDataStructure);
 
 			ReadSpecifiers(property, "property");
@@ -329,17 +314,29 @@ namespace Engine
 			GetDataType(dataType);
 			if (dataType.GetValueType() == ValueTypes::None && dataType.GetExtraValueType() == String::Empty)
 			{
-				ReflectionToolAllocators::TypesAllocator_Deallocate(property);
+				DeallocateMemory(m_Allocator, property);
 				return;
 			}
 
 			Token nameToken;
 			GetToken(nameToken);
 
-			property->SetName(nameToken.GetIdentifier());
+			property->SetName(nameToken.GetName());
 			property->SetDataType(dataType);
 
 			m_CurrentDataStructure->AddProperty(property);
+		}
+
+		AccessSpecifiers HeaderParser::ParseAccessSpecifier(Token& Token)
+		{
+			if (Token.GetName() == "private")
+				return AccessSpecifiers::Private;
+			else if (Token.GetName() == "protected")
+				return AccessSpecifiers::Protected;
+			else if (Token.GetName() == "public")
+				return AccessSpecifiers::Public;
+
+			return AccessSpecifiers::None;
 		}
 
 		AccessSpecifiers HeaderParser::GetAccessSpecifier(Token& Token)
@@ -347,7 +344,7 @@ namespace Engine
 			AccessSpecifiers access = ParseAccessSpecifier(Token);
 
 			if (access != AccessSpecifiers::None)
-				RequireSymbol(COLON, "after " + Token.GetIdentifier(), SymbolParseOptions::Normal);
+				RequireSymbol(COLON, "after " + Token.GetName(), SymbolParseOptions::Normal);
 
 			return access;
 		}
@@ -360,7 +357,7 @@ namespace Engine
 			if (!MatchSymbol(OPEN_BRACKET))
 				return;
 
-			m_Namespaces.Add(nameToken.GetIdentifier());
+			m_Namespaces.Add(nameToken.GetName());
 		}
 
 		String HeaderParser::GetNamespaces(void) const

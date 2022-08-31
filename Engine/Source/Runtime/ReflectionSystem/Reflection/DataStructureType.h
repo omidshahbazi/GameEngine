@@ -16,9 +16,7 @@ namespace Engine
 			None = 0,
 			Private = 2,
 			Protected = 4,
-			Public = 8,
-
-			Count
+			Public = 8
 		};
 
 		class REFLECTION_API DataStructureType : public Type

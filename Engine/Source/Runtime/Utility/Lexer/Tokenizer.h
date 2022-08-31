@@ -21,7 +21,7 @@ namespace Engine
 			{
 			}
 
-			virtual void Parse(void);
+			virtual void Reset(void);
 
 		protected:
 			virtual bool GetToken(Token& Token);
@@ -36,58 +36,65 @@ namespace Engine
 			}
 
 			virtual char8 GetLeadingChar(void);
-
 			virtual char8 PeekChar(void) const
 			{
 				return (m_CurrentIndex < m_Text.GetLength() ? m_Text[m_CurrentIndex] : '\0');
 			}
 
 			virtual void RequireToken(Token& Token);
-			virtual void RequireIdentifierToken(Token& Token);
+
 			virtual bool MatchIdentifierToken(Token& Token);
+			virtual void RequireIdentifierToken(Token& Token);
 
-			virtual void RequireSymbol(const String& Match, const String& Tag);
-			virtual bool MatchSymbol(const String& Match);
-
-			virtual void RequireIdentifier(const String& Match, const String& Tag);
 			virtual bool MatchIdentifier(const String& Match);
+			virtual void RequireIdentifier(const String& Match, const String& Tag);
 
-			INLINE bool IsDigit(char8 c) const
+			virtual bool MatchSymbol(const String& Match);
+			virtual void RequireSymbol(const String& Match, const String& Tag);
+
+			virtual bool MatchSemiColon(void);
+
+			INLINE uint32 GetPrevIndex(void) const
 			{
-				return (c >= CHAR_0 && c <= CHAR_9);
+				return m_PrevIndex;
 			}
 
-			INLINE bool IsEOL(char8 c) const
+			INLINE uint32 GetCurrentIndex(void) const
 			{
-				return (c == RETURN || c == NEWLINE || c == '\0');
+				return m_CurrentIndex;
 			}
 
-			INLINE bool IsWhitespace(char8 c) const
+			INLINE uint32 GetPrevLineIndex(void) const
 			{
-				return (c == SPACE || c == TAB || c == RETURN || c == NEWLINE);
+				return m_PrevLineIndex;
 			}
 
-			INLINE bool IsAlphabetic(char8 c) const
+			INLINE uint32 GetCurrentLineIndex(void) const
 			{
-				return ((c >= UPPER_A && c <= UPPER_Z) || (c >= LOWER_A && c <= LOWER_Z) || c == UNDERLINE);
+				return m_CurrentLineIndex;
 			}
 
-			INLINE bool IsAlphanumeric(char8 c) const
+			INLINE uint32 GetPrevColumnIndex(void) const
 			{
-				return (IsAlphabetic(c) || IsDigit(c));
+				return m_PrevColumnIndex;
 			}
 
-		protected:
+			INLINE uint32 GetCurrentColumnIndex(void) const
+			{
+				return m_CurrentColumnIndex;
+			}
+
+		private:
 			String m_Text;
 
-			uint32 m_CurrentIndex;
 			uint32 m_PrevIndex;
+			uint32 m_CurrentIndex;
 
-			uint32 m_CurrentLineIndex;
 			uint32 m_PrevLineIndex;
+			uint32 m_CurrentLineIndex;
 
-			uint32 m_CurrentColumnIndex;
 			uint32 m_PrevColumnIndex;
+			uint32 m_CurrentColumnIndex;
 		};
 	}
 }

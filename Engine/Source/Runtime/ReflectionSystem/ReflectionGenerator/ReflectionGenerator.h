@@ -1,27 +1,25 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #ifndef REFLECTION_GENERATOR_H
 #define REFLECTION_GENERATOR_H
+#include <Allocators\AllocatorBase.h>
 #include <Reflection\Private\ImplementDataStructureType.h>
 #include <Reflection\Private\ImplementEnumType.h>
 #include <Reflection\Private\ImplementPropertyType.h>
-#include <ReflectionTool\MetaDataStructure.h>
+#include <ReflectionGenerator\MetaDataStructure.h>
 #include <Containers\StringUtility.h>
 
 namespace Engine
 {
+	using namespace Allocators;
 	using namespace Reflection;
 	using namespace Containers;
 
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		class REFLECTIONTOOL_API ReflectionGenerator
+		class REFLECTIONGENERATOR_API ReflectionGenerator
 		{
 		public:
-			ReflectionGenerator(const WString& FilePath, const WString& OutputBaseFileName) :
-				m_FilePath(FilePath),
-				m_OutputBaseFileName(OutputBaseFileName)
-			{
-			}
+			ReflectionGenerator(AllocatorBase* Allocator, const WString& FilePath, const WString& OutputBaseFileName);
 
 			bool Generate(void);
 
@@ -34,12 +32,12 @@ namespace Engine
 			void GenerateFunctionsDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access);
 			void GenerateVariablesDefinition(String& Content, const TypeList& Types, AccessSpecifiers Access);
 
-			static String GetPointerName(Type* Type)
+			INLINE static String GetPointerName(Type* Type)
 			{
 				return (Type->GetType() == Type::Types::DataStructure ? ((MetaDataStructure*)Type)->GetUniqueName() : Type->GetName()) + "Ptr";
 			}
 
-			static String GetAccessText(AccessSpecifiers Access)
+			INLINE static String GetAccessText(AccessSpecifiers Access)
 			{
 				return (Access == AccessSpecifiers::Public ? "AccessSpecifiers::Public" : "AccessSpecifiers::Private");
 			}
@@ -172,6 +170,7 @@ namespace Engine
 			}
 
 		private:
+			AllocatorBase* m_Allocator;
 			WString m_FilePath;
 			WString m_OutputBaseFileName;
 			String m_OutputClassName;

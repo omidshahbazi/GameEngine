@@ -6,9 +6,9 @@
 
 namespace Engine
 {
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		class REFLECTIONTOOL_API MetaConstructor : public Type
+		class REFLECTIONGENERATOR_API MetaConstructor : public Type
 		{
 		public:
 			MetaConstructor(Type *TopNest) :

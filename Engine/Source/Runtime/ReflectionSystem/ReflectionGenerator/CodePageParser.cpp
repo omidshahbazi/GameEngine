@@ -1,24 +1,20 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <ReflectionTool\CodePageParser.h>
+#include <ReflectionGenerator\CodePageParser.h>
+#include <ReflectionGenerator\ReflectionGeneratorException.h>
 #include <Common\CharacterUtility.h>
-#include <Debugging\CoreDebug.h>
 #include <Containers\StringUtility.h>
 
 namespace Engine
 {
 	using namespace Common;
-	using namespace Debugging;
 	using namespace Reflection;
 	using namespace Containers;
 
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
 		void CodePageParser::Parse(TypeList& Types)
 		{
-			m_CurrentIndex = 0;
-			m_PrevIndex = 0;
-			m_CurrentLineIndex = 0;
-			m_PrevLineIndex = 0;
+			Reset();
 		}
 
 		bool CodePageParser::GetToken(Token& Token, bool NoConst, SymbolParseOptions ParseTemplateCloseBracket)
@@ -32,21 +28,22 @@ namespace Engine
 				return false;
 			}
 
-			Token.SetStartIndex(m_PrevIndex);
-			Token.SetLineIndex(m_PrevLineIndex);
+			Token.SetStartIndex(GetPrevIndex());
+			Token.SetLineIndex(GetPrevLineIndex());
 
-			if (IsAlphabetic(c))
+			String name = Token.GetName();
+
+			if (CharacterUtility::IsAlphabetic(c))
 			{
 				do
 				{
-					Token.GetIdentifier() += c;
+					name += c;
 					c = GetChar();
-				} while (IsAlphanumeric(c));
+				} while (CharacterUtility::IsAlphanumeric(c));
 
 				UngetChar();
 
-				Token.SetType(Token::Types::Identifier);
-				Token.SetName(Token.GetName());
+				Token.SetIdentifier(name);
 
 				if (!NoConst)
 				{
@@ -64,7 +61,7 @@ namespace Engine
 
 				return true;
 			}
-			else if (!NoConst && (IsDigit(c) || ((c == PLUS || c == MINES) && IsDigit(p))))
+			else if (CharacterUtility::IsDigit(c) || ((c == PLUS || c == MINES) && CharacterUtility::IsDigit(p)))
 			{
 				bool isFloat = false;
 				bool isHex = false;
@@ -77,21 +74,21 @@ namespace Engine
 					if (c == UPPER_X || c == LOWER_X)
 						isHex = true;
 
-					Token.GetIdentifier() += c;
+					name += c;
 
 					c = CharacterUtility::ToUpper(GetChar());
 
-				} while (IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
+				} while (CharacterUtility::IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
 
 				if (isFloat || c != UPPER_F)
 					UngetChar();
 
 				if (isFloat)
-					Token.SetConstantFloat32(StringUtility::ToFloat32(Token.GetIdentifier()));
+					Token.SetConstantFloat32(StringUtility::ToFloat32(name));
 				else if (isHex)
-					Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
+					Token.SetConstantInt32(StringUtility::ToInt32(name));
 				else
-					Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
+					Token.SetConstantInt32(StringUtility::ToInt32(name));
 
 				return true;
 			}
@@ -99,13 +96,13 @@ namespace Engine
 			{
 				String temp;
 				c = GetChar(true);
-				while (c != DOUBLE_QUOTATION && !IsEOL(c))
+				while (c != DOUBLE_QUOTATION && !CharacterUtility::IsEOL(c))
 				{
 					if (c == BACK_SLASH)
 					{
 						c = GetChar(true);
 
-						if (IsEOL(c))
+						if (CharacterUtility::IsEOL(c))
 							break;
 						else if (c == 'n')
 							c = '\n';
@@ -122,7 +119,7 @@ namespace Engine
 			}
 			else
 			{
-				Token.GetIdentifier() += c;
+				name += c;
 
 #define PAIR(cc, dd) (c == cc && d == dd)
 
@@ -147,12 +144,12 @@ namespace Engine
 					PAIR(':', ':') ||
 					PAIR('*', '*'))
 				{
-					Token.GetIdentifier() += d;
+					name += d;
 
 					if (c == '>' && d == '>')
 					{
 						if (GetChar() == '>')
-							Token.GetIdentifier() += '>';
+							name += '>';
 						else
 							UngetChar();
 					}
@@ -162,12 +159,24 @@ namespace Engine
 
 #undef PAIR
 
-				Token.SetType(Token::Types::Symbol);
-
-				Token.SetName(Token.GetIdentifier());
+				Token.SetSymbol(name);
 
 				return true;
 			}
+		}
+
+		bool CodePageParser::MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket)
+		{
+			Token token;
+			if (!GetToken(token, true, ParseTemplateCloseBracket))
+				return false;
+
+			if (token.GetType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
+				return true;
+
+			UngetToken(token);
+
+			return false;
 		}
 
 		bool CodePageParser::RequireSymbol(const String& Match, const String& Tag, SymbolParseOptions ParseTemplateCloseBracket)
@@ -175,34 +184,7 @@ namespace Engine
 			if (MatchSymbol(Match, ParseTemplateCloseBracket))
 				return true;
 
-			CoreDebugLogError(Categories::ReflectionTool, (TEXT("Missing '") + Match + "' in " + Tag).GetValue());
-
-			return false;
-		}
-
-		bool CodePageParser::MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket)
-		{
-			Token token;
-
-			if (GetToken(token, true, ParseTemplateCloseBracket))
-				if (token.GetTokenType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
-					return true;
-				else
-					UngetToken(token);
-
-			return false;
-		}
-
-		bool CodePageParser::MatchSemiColon(void)
-		{
-			if (MatchSymbol(SEMICOLON))
-				return true;
-
-			Token token;
-			if (GetToken(token))
-				CoreDebugLogError(Categories::ReflectionTool, (TEXT("Missing ';' before '") + token.GetIdentifier() + "'").GetValue());
-			else
-				CoreDebugLogError(Categories::ReflectionTool, "Missing ';'");
+			THROW_REFLECTION_TOOL_EXCEPTION("Missing symbol '" + Match + "' in " + Tag);
 
 			return false;
 		}
@@ -210,22 +192,21 @@ namespace Engine
 		void CodePageParser::ReadSpecifiers(Specifiers* Specifiers, const String& TypeName)
 		{
 			uint16 specifiersCount = 0;
-			String error = TypeName + " declaration specifier";
 
-			RequireSymbol(OPEN_BRACE, error);
+			RequireSymbol(OPEN_BRACE, TypeName + " declaration specifier");
 
 			while (!MatchSymbol(CLOSE_BRACE))
 			{
 				if (specifiersCount > 0)
-					RequireSymbol(COMMA, error);
+					RequireSymbol(COMMA, TypeName + " declaration specifier");
 
 				specifiersCount++;
 
 				Token specifier;
 				if (!GetToken(specifier))
-					CoreDebugLogError(Categories::ReflectionTool, (TEXT("Expected ") + error).GetValue());
+					THROW_REFLECTION_TOOL_EXCEPTION("Expected " + TypeName + " declaration specifier");
 
-				Specifiers->AddSpecifier(specifier.GetIdentifier());
+				Specifiers->AddSpecifier(specifier.GetName());
 			}
 		}
 
@@ -236,9 +217,11 @@ namespace Engine
 				Token token;
 				GetToken(token);
 
-				ValueTypes valueType = ParseValueType(token.GetIdentifier());
+				ValueTypes valueType = ParseValueType(token.GetName());
+
 				if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 					return false;
+
 				if (valueType != ValueTypes::None)
 					DataType.SetValueType(valueType);
 				else if (token.Matches(STAR, Token::SearchCases::CaseSensitive))
@@ -265,7 +248,7 @@ namespace Engine
 						break;
 					}
 					else
-						DataType.SetExtraValueType(token.GetIdentifier());
+						DataType.SetExtraValueType(token.GetName());
 			}
 
 			return true;

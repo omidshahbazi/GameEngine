@@ -2,34 +2,33 @@
 #ifndef META_TYPE_H
 #define META_TYPE_H
 #include <Reflection\Private\ImplementDataStructureType.h>
-#include <ReflectionTool\Specifiers.h>
-#include <ReflectionTool\ReflectionToolAllocators.h>
-#include <Lexer\Token.h>
+#include <ReflectionGenerator\Specifiers.h>
+#include <Allocators\AllocatorBase.h>
 
 namespace Engine
 {
 	using namespace Reflection::Private;
-	using namespace Lexer;
 	using namespace Reflection;
 
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		class REFLECTIONTOOL_API MetaDataStructure : public ImplementDataStructureType, public Specifiers
+		class REFLECTIONGENERATOR_API MetaDataStructure : public ImplementDataStructureType, public Specifiers
 		{
 		public:
-			MetaDataStructure(DataStructureType* TopNest) :
-				ImplementDataStructureType(ReflectionToolAllocators::TypesAllocator, TopNest),
+			MetaDataStructure(AllocatorBase* Allocator, DataStructureType* TopNest) :
+				m_Allocator(Allocator),
+				ImplementDataStructureType(Allocator, TopNest),
 				m_BlockLevel(0),
 				m_LastAccessSpecifier(AccessSpecifiers::None)
 			{
 			}
 			virtual ~MetaDataStructure(void)
 			{
-				for (auto& type : m_PublicConstructors)
-					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+				for (auto type : m_PublicConstructors)
+					DeallocateMemory(m_Allocator, type);
 
-				for (auto& type : m_NonPublicConstructors)
-					ReflectionToolAllocators::TypesAllocator_Deallocate(type);
+				for (auto type : m_NonPublicConstructors)
+					DeallocateMemory(m_Allocator, type);
 			}
 
 			INLINE uint16 GetBlockLevel(void) const
@@ -51,9 +50,9 @@ namespace Engine
 				m_NameSpace = Namespace;
 			}
 
-			INLINE void AddParentName(const String& Value)
+			INLINE void AddParentName(const String& Value, AccessSpecifiers AccessSpecifier)
 			{
-				ImplementDataStructureType::AddParentName(Value, m_LastAccessSpecifier);
+				ImplementDataStructureType::AddParentName(Value, AccessSpecifier);
 			}
 			INLINE void GetParentsName(AccessSpecifiers AccessFlags, StringList& List) const
 			{
@@ -115,6 +114,7 @@ namespace Engine
 			}
 
 		private:
+			AllocatorBase* m_Allocator;
 			uint16 m_BlockLevel;
 			AccessSpecifiers m_LastAccessSpecifier;
 			TypeList m_PublicConstructors;

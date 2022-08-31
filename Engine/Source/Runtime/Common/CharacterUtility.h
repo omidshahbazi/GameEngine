@@ -51,6 +51,24 @@ namespace Engine
 			}
 
 			template<typename T>
+			static INLINE bool IsNewLine(T C)
+			{
+				return (C == Character<T, '\n'>::Value || C == Character<T, '\r'>::Value);
+			}
+
+			template<typename T>
+			static INLINE bool IsEOL(T C)
+			{
+				return (IsNewLine(C) || C == Character<T, '\0'>::Value);
+			}
+
+			template<typename T>
+			static INLINE bool IsWhitespace(T C)
+			{
+				return (C == Character<T, ' '>::Value || C == Character<T, '\t'>::Value || IsNewLine(C));
+			}
+
+			template<typename T>
 			static INLINE bool IsDigit(T Value)
 			{
 				return (Character<T, '0'>::Value <= Value && Value <= Character<T, '9'>::Value);
@@ -71,12 +89,6 @@ namespace Engine
 				}
 
 				return true;
-			}
-
-			template<typename T>
-			static INLINE bool IsNewLine(T C)
-			{
-				return (C == Character<T, '\n'>::Value || C == Character<T, '\r'>::Value);
 			}
 
 			template<typename T>
@@ -103,11 +115,19 @@ namespace Engine
 			}
 
 			template<typename T>
+			static INLINE bool IsAlphabetic(T C)
+			{
+				return (IsLetter(C) || C == Character<T, '_'>::Value);
+			}
+
+			static INLINE bool IsAlphanumeric(char8 c)
+			{
+				return (IsAlphabetic(c) || IsDigit(c));
+			}
+
+			template<typename T>
 			static INLINE T ToLower(T C)
 			{
-				if (Character<T, 'a'>::Value <= C && C <= Character<T, 'z'>::Value)
-					return C;
-
 				if (Character<T, 'A'>::Value <= C && C <= Character<T, 'Z'>::Value)
 					return (T)(C + 32);
 
@@ -117,9 +137,6 @@ namespace Engine
 			template<typename T>
 			static INLINE T ToUpper(T C)
 			{
-				if (Character<T, 'A'>::Value <= C && C <= Character<T, 'Z'>::Value)
-					return C;
-
 				if (Character<T, 'a'>::Value <= C && C <= Character<T, 'z'>::Value)
 					return (T)(C - 32);
 

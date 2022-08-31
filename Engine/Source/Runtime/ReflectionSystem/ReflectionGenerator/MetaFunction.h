@@ -2,13 +2,13 @@
 #ifndef META_FUNCTION_H
 #define META_FUNCTION_H
 #include <Reflection\Private\ImplementFunctionType.h>
-#include <ReflectionTool\Specifiers.h>
+#include <ReflectionGenerator\Specifiers.h>
 
 namespace Engine
 {
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		class REFLECTIONTOOL_API MetaFunction : public ImplementFunctionType, public Specifiers
+		class REFLECTIONGENERATOR_API MetaFunction : public ImplementFunctionType, public Specifiers
 		{
 		public:
 			MetaFunction(Type *TopNest) :

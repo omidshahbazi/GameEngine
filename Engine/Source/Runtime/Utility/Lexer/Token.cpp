@@ -5,8 +5,6 @@ namespace Engine
 {
 	namespace Lexer
 	{
-		//http://stackoverflow.com/questions/12251545/how-do-i-implement-a-lexer-given-that-i-have-already-implemented-a-basic-regular
-
 		Token::Token(void) :
 			m_Type(Types::None),
 			m_StartIndex(0),
@@ -33,22 +31,20 @@ namespace Engine
 
 		bool Token::Matches(const String& Value, SearchCases SearchCase) const
 		{
-			return ((m_Type == Types::Identifier || m_Type == Types::Symbol) && ((SearchCase == SearchCases::CaseSensitive) ? m_Identifier == Value : m_Identifier.ToLower() == Value.ToLower()));
+			return ((m_Type == Types::Identifier || m_Type == Types::Symbol) && ((SearchCase == SearchCases::CaseSensitive) ? m_Name == Value : m_Name.ToLower() == Value.ToLower()));
 		}
 
 		Token& Token::operator=(const Token& Token)
 		{
 			m_Type = Token.m_Type;
 			m_Name = Token.m_Name;
-			m_Identifier = Token.m_Identifier;
+
+			m_Float64 = Token.m_Float64;
+			m_String = Token.m_String;
 
 			m_StartIndex = Token.m_StartIndex;
 			m_LineIndex = Token.m_LineIndex;
 			m_ColumnIndex = Token.m_ColumnIndex;
-
-			m_Float64 = Token.m_Float64;
-
-			m_String = Token.m_String;
 
 			return *this;
 		}

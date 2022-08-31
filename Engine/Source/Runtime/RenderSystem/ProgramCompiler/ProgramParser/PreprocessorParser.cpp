@@ -40,7 +40,7 @@ namespace Engine
 
 		void PreprocessorParser::Process(Parameters& Parameters)
 		{
-			Tokenizer::Parse();
+			Tokenizer::Reset();
 
 			Process(Parameters, EndConditions::None);
 		}
@@ -85,20 +85,20 @@ namespace Engine
 				if (ParsePreprocessor(token, Parameters))
 					continue;
 
-				switch (token.GetTokenType())
+				switch (token.GetType())
 				{
 				case Token::Types::Identifier:
 				case Token::Types::Symbol:
-					ADD_TO_RESULT(token.GetIdentifier());
+					ADD_TO_RESULT(token.GetName());
 					break;
 
 				case Token::Types::Constant:
 				{
-					if (token.GetIdentifier() == "true")
-						ADD_TO_RESULT(token.GetIdentifier());
-					else if (token.GetIdentifier() == "false")
-						ADD_TO_RESULT(token.GetIdentifier());
-					else if (token.GetIdentifier().Contains("."))
+					if (token.GetName() == "true")
+						ADD_TO_RESULT(token.GetName());
+					else if (token.GetName() == "false")
+						ADD_TO_RESULT(token.GetName());
+					else if (token.GetName().Contains("."))
 						ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat32()));
 					else
 						ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt32()));
@@ -129,7 +129,7 @@ namespace Engine
 					if (token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
 						break;
 
-					fileName += token.GetIdentifier();
+					fileName += token.GetName();
 				}
 
 				String source;
@@ -149,14 +149,14 @@ namespace Engine
 
 				bool isDuplicate = false;
 				for (const auto& define : Parameters.Defines)
-					if (define == nameToken.GetIdentifier())
+					if (define == nameToken.GetName())
 					{
 						isDuplicate = true;
 						break;
 					}
 
 				if (!isDuplicate)
-					Parameters.Defines.Add({ nameToken.GetIdentifier() });
+					Parameters.Defines.Add({ nameToken.GetName() });
 
 				return true;
 			}
@@ -167,7 +167,7 @@ namespace Engine
 				RequireToken(nameToken);
 
 				for (uint32 i = 0; i < Parameters.Defines.GetSize(); ++i)
-					if (Parameters.Defines[i] == nameToken.GetIdentifier())
+					if (Parameters.Defines[i] == nameToken.GetName())
 						Parameters.Defines.RemoveAt(i--);
 
 				return true;
@@ -179,7 +179,7 @@ namespace Engine
 				Token nameToken;
 				RequireToken(nameToken);
 
-				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetIdentifier()) == isNotDef);
+				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetName()) == isNotDef);
 
 				ParsePreprocessorBlock(Parameters, shouldRemoveBlock);
 

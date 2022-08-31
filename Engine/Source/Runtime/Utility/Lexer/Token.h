@@ -33,35 +33,7 @@ namespace Engine
 			Token(const Token& Token);
 			~Token(void);
 
-			bool Matches(const String& Name) const;
-			bool Matches(const String& Value, SearchCases SearchCase) const;
-
-			INLINE bool GetConstantBool(void) const
-			{
-				return m_Bool;
-			}
-
-			INLINE int32 GetConstantInt32(void) const
-			{
-				return m_Int32;
-			}
-
-			INLINE float32 GetConstantFloat32(void) const
-			{
-				return m_Float32;
-			}
-
-			INLINE const float64& GetConstantFloat64(void) const
-			{
-				return m_Float64;
-			}
-
-			INLINE const String& GetConstantString(void) const
-			{
-				return m_String;
-			}
-
-			INLINE Types GetTokenType(void) const
+			INLINE Types GetType(void) const
 			{
 				return m_Type;
 			}
@@ -71,31 +43,21 @@ namespace Engine
 				return m_Name;
 			}
 
-			INLINE const String& GetIdentifier(void) const
+			INLINE void SetIdentifier(const String& Value)
 			{
-				return m_Identifier;
+				m_Name = Value;
+				m_Type = Types::Identifier;
 			}
 
-			INLINE uint32 GetStartIndex(void) const
+			INLINE void SetSymbol(const String& Value)
 			{
-				return m_StartIndex;
+				m_Name = Value;
+				m_Type = Types::Symbol;
 			}
 
-			INLINE uint32 GetLineIndex(void) const
+			INLINE bool GetConstantBool(void) const
 			{
-				return m_LineIndex;
-			}
-
-			INLINE uint32 GetColumnIndex(void) const
-			{
-				return m_ColumnIndex;
-			}
-
-			Token& operator=(const Token& Token);
-
-			INLINE String& GetIdentifier(void)
-			{
-				return m_Identifier;
+				return m_Bool;
 			}
 
 			INLINE void SetConstantBool(bool Value)
@@ -104,10 +66,20 @@ namespace Engine
 				m_Type = Types::Constant;
 			}
 
+			INLINE int32 GetConstantInt32(void) const
+			{
+				return m_Int32;
+			}
+
 			INLINE void SetConstantInt32(int32 Value)
 			{
 				m_Int32 = Value;
 				m_Type = Types::Constant;
+			}
+
+			INLINE float32 GetConstantFloat32(void) const
+			{
+				return m_Float32;
 			}
 
 			INLINE void SetConstantFloat32(float32 Value)
@@ -116,10 +88,20 @@ namespace Engine
 				m_Type = Types::Constant;
 			}
 
+			INLINE const float64& GetConstantFloat64(void) const
+			{
+				return m_Float64;
+			}
+
 			INLINE void SetConstantFloat64(float64 Value)
 			{
 				m_Float64 = Value;
 				m_Type = Types::Constant;
+			}
+
+			INLINE const String& GetConstantString(void) const
+			{
+				return m_String;
 			}
 
 			INLINE void SetConstantString(const String& Value)
@@ -128,19 +110,9 @@ namespace Engine
 				m_Type = Types::Constant;
 			}
 
-			INLINE void SetType(Types Value)
+			INLINE uint32 GetStartIndex(void) const
 			{
-				m_Type = Value;
-			}
-
-			INLINE void SetName(const String& Value)
-			{
-				m_Name = Value;
-			}
-
-			INLINE void SetIdentifier(const String& Value)
-			{
-				m_Identifier = Value;
+				return m_StartIndex;
 			}
 
 			INLINE void SetStartIndex(uint32 Value)
@@ -148,9 +120,19 @@ namespace Engine
 				m_StartIndex = Value;
 			}
 
+			INLINE uint32 GetLineIndex(void) const
+			{
+				return m_LineIndex;
+			}
+
 			INLINE void SetLineIndex(uint32 Value)
 			{
 				m_LineIndex = Value;
+			}
+
+			INLINE uint32 GetColumnIndex(void) const
+			{
+				return m_ColumnIndex;
 			}
 
 			INLINE void SetColumnIndex(uint32 Value)
@@ -158,15 +140,14 @@ namespace Engine
 				m_ColumnIndex = Value;
 			}
 
+			bool Matches(const String& Name) const;
+			bool Matches(const String& Value, SearchCases SearchCase) const;
+
+			Token& operator=(const Token& Token);
+
 		private:
 			Types m_Type;
-
 			String m_Name;
-			String m_Identifier;
-
-			uint32 m_StartIndex;
-			uint32 m_LineIndex;
-			uint32 m_ColumnIndex;
 
 			union
 			{
@@ -179,6 +160,9 @@ namespace Engine
 			};
 
 			String m_String;
+			uint32 m_StartIndex;
+			uint32 m_LineIndex;
+			uint32 m_ColumnIndex;
 		};
 	}
 }

@@ -25,9 +25,9 @@ namespace Engine
 			{
 				Token token;
 				if (Tokenizer::GetToken(token))
-					THROW_JSON_EXCEPTION(StringUtility::Format(String("Unexpected token %S in %l"), token.GetIdentifier(), token.GetLineIndex()), m_CurrentLineIndex);
+					THROW_JSON_EXCEPTION(StringUtility::Format(String("Unexpected token %S in %l"), token.GetName(), token.GetLineIndex()), GetCurrentLineIndex());
 
-				THROW_JSON_EXCEPTION("Unexpected end of stream", m_CurrentLineIndex);
+				THROW_JSON_EXCEPTION("Unexpected end of stream", GetCurrentLineIndex());
 			}
 
 			bool MatchASymbol(const String& Symbol)
@@ -51,7 +51,7 @@ namespace Engine
 				if (!GetToken(token))
 					ThrowException();
 
-				if (token.GetTokenType() != Token::Types::Constant || token.GetConstantString() == String::Empty)
+				if (token.GetType() != Token::Types::Constant || token.GetConstantString() == String::Empty)
 				{
 					UngetToken(token);
 					ThrowException();
@@ -65,7 +65,7 @@ namespace Engine
 				if (!GetToken(Token))
 					ThrowException();
 
-				if (Token.GetTokenType() != Token::Types::Constant)
+				if (Token.GetType() != Token::Types::Constant)
 				{
 					UngetToken(Token);
 					ThrowException();
@@ -137,7 +137,7 @@ namespace Engine
 			Token token;
 			Tokenizer->RequireAConstant(token);
 
-			const String& value = token.GetIdentifier();
+			const String& value = token.GetName();
 
 			if (value == "true")
 				*Data = true;
@@ -147,7 +147,7 @@ namespace Engine
 				*Data = StringUtility::ToFloat64(value);
 			else if (CharacterUtility::IsDigit(value.GetValue()))
 				*Data = StringUtility::ToInt64(value);
-			else if (token.GetTokenType() == Token::Types::Constant)
+			else if (token.GetType() == Token::Types::Constant)
 			{
 				const WString wString = WString(Allocator, token.GetConstantString().ChangeType<char16>());
 				if (ForceWString || CharacterUtility::ContainsAnyWideChar(wString.GetValue()))
@@ -205,7 +205,6 @@ namespace Engine
 		void JSONParser::Parse(AllocatorBase* Allocator, const String& Value, JSONBasic* Basic, bool ForceWString)
 		{
 			JSONTokenizer tokenizer(Value);
-			tokenizer.Parse();
 
 			ParseBasic(Allocator, &tokenizer, Basic, ForceWString);
 		}

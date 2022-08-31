@@ -114,6 +114,12 @@ namespace Engine.Frontend.System.Build
 						GenerateRenderDocSettings();
 				}
 			}
+			catch (FrontendException ex)
+			{
+				ConsoleHelper.WriteError($"Building {Module.Name} has failed details: ({ex.Message})");
+
+				State = States.Failed;
+			}
 			catch
 			{
 				ConsoleHelper.WriteError($"Building {Module.Name} has failed");

@@ -189,7 +189,7 @@ namespace Engine
 
 		void Parser::Parse(Parameters& Parameters)
 		{
-			Tokenizer::Parse();
+			Tokenizer::Reset();
 
 			m_Parameters = &Parameters;
 
@@ -216,7 +216,7 @@ namespace Engine
 
 		bool Parser::ParseStruct(const Token& DeclarationToken)
 		{
-			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+			if (DeclarationToken.GetType() != Token::Types::Identifier)
 			{
 				UngetToken(DeclarationToken);
 				return false;
@@ -229,7 +229,7 @@ namespace Engine
 
 			Token nameToken;
 			RequireIdentifierToken(nameToken);
-			structType->SetName(nameToken.GetIdentifier());
+			structType->SetName(nameToken.GetName());
 
 			RequireSymbol(OPEN_BRACKET, "struct");
 
@@ -279,16 +279,16 @@ namespace Engine
 				return false;
 			}
 
-			variableType->SetName(nameToken.GetIdentifier());
+			variableType->SetName(nameToken.GetName());
 
 			if (MatchSymbol(COLON))
 			{
 				Token registerToken;
 				RequireIdentifierToken(registerToken);
-				if (variableType->GetName() == registerToken.GetIdentifier())
+				if (variableType->GetName() == registerToken.GetName())
 					THROW_PROGRAM_PARSER_EXCEPTION("Variable name cannot be same as register", nameToken);
 
-				variableType->SetRegister(registerToken.GetIdentifier());
+				variableType->SetRegister(registerToken.GetName());
 			}
 
 			RequireSymbol(SEMICOLON, "variable");
@@ -350,7 +350,7 @@ namespace Engine
 
 			functionType->SetReturnDataType(dataType);
 
-			const String& name = nameToken.GetIdentifier();
+			const String& name = nameToken.GetName();
 
 			if (name.ToLower() == Constants::VERTEX_ENTRY_POINT_NAME)
 				functionType->SetType(FunctionType::Types::VertexMain);
@@ -396,13 +396,13 @@ namespace Engine
 			Token nameToken;
 			RequireIdentifierToken(nameToken);
 
-			Parameter->SetName(nameToken.GetIdentifier());
+			Parameter->SetName(nameToken.GetName());
 
 			if (MatchSymbol(COLON))
 			{
 				Token registerToken;
 				RequireIdentifierToken(registerToken);
-				Parameter->SetRegister(registerToken.GetIdentifier());
+				Parameter->SetRegister(registerToken.GetName());
 			}
 
 			return true;
@@ -410,9 +410,9 @@ namespace Engine
 
 		DataTypeStatement* Parser::ParseDataType(const Token& DeclarationToken)
 		{
-			const String& identifier = DeclarationToken.GetIdentifier();
+			const String& identifier = DeclarationToken.GetName();
 
-			if (DeclarationToken.GetTokenType() != Token::Types::Identifier)
+			if (DeclarationToken.GetType() != Token::Types::Identifier)
 				THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", DeclarationToken);
 
 			ProgramDataTypes primitiveType = GetPrimitiveDataType(identifier);
@@ -690,8 +690,8 @@ namespace Engine
 
 				Statement* bodyStm = nullptr;
 
-				if (m_KeywordParsers.Contains(token.GetIdentifier()))
-					bodyStm = (*m_KeywordParsers[token.GetIdentifier()])(token);
+				if (m_KeywordParsers.Contains(token.GetName()))
+					bodyStm = (*m_KeywordParsers[token.GetName()])(token);
 				else
 				{
 					bodyStm = ParseExpression(token, EndConditions::Semicolon);
@@ -711,7 +711,7 @@ namespace Engine
 
 		Statement* Parser::ParseVariableStatement(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
-			if (DeclarationToken.GetTokenType() == Token::Types::Symbol)
+			if (DeclarationToken.GetType() == Token::Types::Symbol)
 				return nullptr;
 
 			Token nameToken;
@@ -720,7 +720,7 @@ namespace Engine
 
 			VariableStatement* stm = Allocate<VariableStatement>(m_Allocator);
 			stm->SetDataType(ParseDataType(DeclarationToken));
-			stm->SetName(nameToken.GetIdentifier());
+			stm->SetName(nameToken.GetName());
 
 			if (MatchSymbol(EQUAL))
 			{
@@ -756,7 +756,7 @@ namespace Engine
 			if (token.Matches(INCREMENT, Token::SearchCases::CaseSensitive) ||
 				token.Matches(DECREMENT, Token::SearchCases::CaseSensitive))
 			{
-				UnaryOperatorStatement::Operators op = GetUnaryOperator(token.GetIdentifier(), true);
+				UnaryOperatorStatement::Operators op = GetUnaryOperator(token.GetName(), true);
 				if (op == UnaryOperatorStatement::Operators::Unknown)
 					THROW_PROGRAM_PARSER_EXCEPTION("Unrecognized operator", token);
 
@@ -802,7 +802,7 @@ namespace Engine
 				return ParseArrayExpression(DeclarationToken, ConditionMask);
 			}
 
-			if (DeclarationToken.GetTokenType() == Token::Types::Identifier)
+			if (DeclarationToken.GetType() == Token::Types::Identifier)
 			{
 				Statement* stm = ParseFunctionCallStatement(DeclarationToken);
 				if (stm != nullptr)
@@ -829,7 +829,7 @@ namespace Engine
 				return stm;
 			}
 
-			if (DeclarationToken.GetTokenType() == Token::Types::Constant)
+			if (DeclarationToken.GetType() == Token::Types::Constant)
 			{
 				return ParseConstantStatement(DeclarationToken);
 			}
@@ -845,7 +845,7 @@ namespace Engine
 			if (IsEndCondition(token, ConditionMask))
 				return nullptr;
 
-			UnaryOperatorStatement::Operators op = GetUnaryOperator(DeclarationToken.GetIdentifier(), false);
+			UnaryOperatorStatement::Operators op = GetUnaryOperator(DeclarationToken.GetName(), false);
 			if (op == UnaryOperatorStatement::Operators::Unknown)
 				THROW_PROGRAM_PARSER_EXCEPTION("Unrecognized operator", DeclarationToken);
 
@@ -867,7 +867,7 @@ namespace Engine
 				if (IsEndCondition(token, ConditionMask))
 					break;
 
-				OperatorStatement::Operators op = GetOperator(token.GetIdentifier());
+				OperatorStatement::Operators op = GetOperator(token.GetName());
 				if (op == OperatorStatement::Operators::Unknown)
 				{
 					UngetToken(token);
@@ -890,7 +890,7 @@ namespace Engine
 				Token nextToken;
 				RequireToken(nextToken);
 
-				op = GetOperator(nextToken.GetIdentifier());
+				op = GetOperator(nextToken.GetName());
 				int8 rightPrecedence = GetOperatorPrecedence(op);
 				UngetToken(nextToken);
 
@@ -937,11 +937,11 @@ namespace Engine
 		{
 			ConstantStatement* stm = Allocate<ConstantStatement>();
 
-			if (DeclarationToken.GetIdentifier() == "true")
+			if (DeclarationToken.GetName() == "true")
 				stm->SetBool(true);
-			else if (DeclarationToken.GetIdentifier() == "false")
+			else if (DeclarationToken.GetName() == "false")
 				stm->SetBool(false);
-			else if (DeclarationToken.GetIdentifier().Contains("."))
+			else if (DeclarationToken.GetName().Contains("."))
 				stm->SetFloat32(DeclarationToken.GetConstantFloat32());
 			else
 				stm->SetFloat32(DeclarationToken.GetConstantInt32());
@@ -953,7 +953,7 @@ namespace Engine
 		{
 			VariableAccessStatement* stm = Allocate<VariableAccessStatement>(m_Allocator);
 
-			stm->SetName(DeclarationToken.GetIdentifier());
+			stm->SetName(DeclarationToken.GetName());
 
 			Token token;
 			RequireToken(token);
@@ -1001,7 +1001,7 @@ namespace Engine
 
 			FunctionCallStatement* stm = Allocate<FunctionCallStatement>(m_Allocator);
 
-			stm->SetFunctionName(DeclarationToken.GetIdentifier());
+			stm->SetFunctionName(DeclarationToken.GetName());
 
 			while (true)
 			{

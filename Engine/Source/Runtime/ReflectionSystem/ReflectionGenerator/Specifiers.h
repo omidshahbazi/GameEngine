@@ -8,9 +8,9 @@ namespace Engine
 {
 	using namespace Containers;
 
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		class REFLECTIONTOOL_API Specifiers
+		class REFLECTIONGENERATOR_API Specifiers
 		{
 		public:
 			void AddSpecifier(const String &Value)

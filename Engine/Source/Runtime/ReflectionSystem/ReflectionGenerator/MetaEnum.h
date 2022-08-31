@@ -2,13 +2,13 @@
 #ifndef META_ENUM_H
 #define META_ENUM_H
 #include <Reflection\Private\ImplementEnumType.h>
-#include <ReflectionTool\Specifiers.h>
+#include <ReflectionGenerator\Specifiers.h>
 
 namespace Engine
 {
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		class REFLECTIONTOOL_API MetaEnum : public ImplementEnumType, public Specifiers
+		class REFLECTIONGENERATOR_API MetaEnum : public ImplementEnumType, public Specifiers
 		{
 		public:
 			MetaEnum(void) :

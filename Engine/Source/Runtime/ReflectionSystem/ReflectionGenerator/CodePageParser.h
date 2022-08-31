@@ -3,7 +3,7 @@
 #define CODE_PAGE_PARSER_H
 
 #include <Lexer\Tokenizer.h>
-#include <ReflectionTool\Specifiers.h>
+#include <ReflectionGenerator\Specifiers.h>
 #include <Reflection\Type.h>
 #include <Reflection\DataType.h>
 
@@ -13,14 +13,8 @@ namespace Engine
 	using namespace Reflection;
 	using namespace Lexer;
 
-	namespace ReflectionTool
+	namespace ReflectionGenerator
 	{
-		enum class SymbolParseOptions
-		{
-			Normal = 0,
-			CloseTemplateBracket
-		};
-
 		const cstr CONST(STRINGIZE(const));
 		const cstr CLASS(_CRT_STRINGIZE(class));
 		const cstr STRUCT(STRINGIZE(struct));
@@ -31,8 +25,15 @@ namespace Engine
 		const cstr REFLECTION_FUNCTION_TEXT(STRINGIZE(REFLECTION_FUNCTION));
 		const cstr REFLECTION_PROPERTY_TEXT(STRINGIZE(REFLECTION_PROPERTY));
 
-		class REFLECTIONTOOL_API CodePageParser : public Tokenizer
+		class REFLECTIONGENERATOR_API CodePageParser : public Tokenizer
 		{
+		protected:
+			enum class SymbolParseOptions
+			{
+				Normal = 0,
+				CloseTemplateBracket
+			};
+
 		public:
 			CodePageParser(const String& Text) :
 				Tokenizer(Text)
@@ -47,10 +48,8 @@ namespace Engine
 		protected:
 			virtual bool GetToken(Token& Token, bool NoConst = false, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 
-			virtual bool RequireSymbol(const String& Match, const String& Tag, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 			virtual bool MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
-
-			virtual bool MatchSemiColon(void);
+			virtual bool RequireSymbol(const String& Match, const String& Tag, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 
 			virtual void ReadSpecifiers(Specifiers* Specifiers, const String& TypeName);
 

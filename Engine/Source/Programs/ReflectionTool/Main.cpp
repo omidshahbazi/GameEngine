@@ -19,21 +19,21 @@ BEGIN_ENTRY_POINT
 
 	DynamicSizeAllocator allocator("Types Allocator", RootAllocator::GetInstance(), 10 * MegaByte);
 
-	ArgumentParser args(ArgumentCount, Arguments, true);
-	if (args.GetCount() < 2)
-	{
-		return 2;
-	}
+	//ArgumentParser args(ArgumentCount, Arguments, true);
+	//if (args.GetCount() < 2)
+	//{
+	//	return 2;
+	//}
 
-	WString filePath = args.GetAsWString(0);
-	WString outputBaseFileName = args.GetAsWString(1);
+	//WString filePath = args.GetAsWString(0);
+	//WString outputBaseFileName = args.GetAsWString(1);
 
-	filePath = L"D:\\Projects\\GameEngine\\Engine\\Source\\Runtime\\ResourceSystem\\ResourceImportExport\\ImporterExporter.h";
-	outputBaseFileName = L"D:\\Projects\\GameEngine\\Engine\\Intermediate\\ResourceImportExport\\Generated\\ImExporter.Reflection";
+	WString filePath = LR"(D:\Projects\GameEngine1\Engine\Source\Runtime\RenderSystem\ProgramCompiler\ProgramParser\Parser.h)";
+	WString outputBaseFileName = LR"(D:\Projects\GameEngine1\Engine\Intermediate\ProgramParser\Generated\Parser.Reflection)";
 
 	try
 	{
-		ReflectionGenerator rg(&allocator, args.GetAsWString(0), args.GetAsWString(1));
+		ReflectionGenerator rg(&allocator, filePath, outputBaseFileName);
 		return (rg.Generate() ? 0 : 1);
 	}
 	catch (const Exception& ex)

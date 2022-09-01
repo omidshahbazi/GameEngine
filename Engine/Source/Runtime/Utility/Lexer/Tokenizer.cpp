@@ -329,7 +329,7 @@ namespace Engine
 			if (MatchIdentifier(Match))
 				return;
 
-			THROW_LEXER_EXCEPTION("Missing identifier '" + Match + "' in " + Tag);
+			ThrowMissingException(Match, Tag);
 		}
 
 		bool Tokenizer::MatchSymbol(const String& Match)
@@ -351,21 +351,16 @@ namespace Engine
 			if (MatchSymbol(Match))
 				return;
 
-			THROW_LEXER_EXCEPTION("Missing symbol '" + Match + "' in " + Tag);
+			ThrowMissingException(Match, Tag);
 		}
 
-		bool Tokenizer::MatchSemiColon(void)
+		void Tokenizer::ThrowMissingException(const String& Match, const String& Tag)
 		{
-			if (MatchSymbol(SEMICOLON))
-				return true;
-
 			Token token;
 			if (GetToken(token))
-				THROW_LEXER_EXCEPTION("Missing ';' before '" + token.GetName() + "'");
+				THROW_LEXER_EXCEPTION("Missing '" + Match + "' before '" + token.GetName() + "' " + Tag);
 			else
-				THROW_LEXER_EXCEPTION("Missing ';'");
-
-			return false;
+				THROW_LEXER_EXCEPTION("Missing '" + Match + "' " + Tag);
 		}
 	}
 }

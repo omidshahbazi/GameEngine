@@ -65,7 +65,7 @@ namespace Engine
 			{
 				m_BlockLevel--;
 
-				if (MatchSemiColon())
+				if (MatchSymbol(SEMICOLON))
 				{
 					if (m_CurrentDataStructure != nullptr && m_BlockLevel == m_CurrentDataStructure->GetBlockLevel())
 						m_CurrentDataStructure = (MetaDataStructure*)m_CurrentDataStructure->GetTopNest();
@@ -98,7 +98,7 @@ namespace Engine
 				if (!GetToken(token, true))
 					break;
 
-				if (MatchSemiColon())
+				if (MatchSymbol(SEMICOLON))
 				{
 					DeallocateMemory(m_Allocator, type);
 					return;
@@ -172,7 +172,7 @@ namespace Engine
 			Token nameToken;
 			while (GetToken(nameToken, true))
 			{
-				if (MatchSemiColon())
+				if (MatchSymbol(SEMICOLON))
 					return;
 
 				if (MatchSymbol(OPEN_BRACKET))
@@ -252,7 +252,7 @@ namespace Engine
 
 			while (true)
 			{
-				if (MatchSemiColon() || MatchSymbol(CLOSE_BRACKET))
+				if (MatchSymbol(SEMICOLON) || MatchSymbol(CLOSE_BRACKET))
 					break;
 
 				Token token;

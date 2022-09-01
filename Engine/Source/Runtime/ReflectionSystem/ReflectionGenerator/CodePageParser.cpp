@@ -184,7 +184,7 @@ namespace Engine
 			if (MatchSymbol(Match, ParseTemplateCloseBracket))
 				return true;
 
-			THROW_REFLECTION_TOOL_EXCEPTION("Missing symbol '" + Match + "' in " + Tag);
+			ThrowMissingException(Match, Tag);
 
 			return false;
 		}

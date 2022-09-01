@@ -17,9 +17,9 @@ namespace Engine
 		{
 		public:
 			HeaderParser(AllocatorBase* Allocator, const String& Text) :
+				CodePageParser(Text),
 				m_Allocator(Allocator),
 				m_BlockLevel(0),
-				CodePageParser(Text),
 				m_CurrentDataStructure(nullptr)
 			{
 			}

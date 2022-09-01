@@ -52,7 +52,7 @@ namespace Engine
 			virtual bool MatchSymbol(const String& Match);
 			virtual void RequireSymbol(const String& Match, const String& Tag);
 
-			virtual bool MatchSemiColon(void);
+			virtual void ThrowMissingException(const String& Match, const String& Tag);
 
 			INLINE uint32 GetPrevIndex(void) const
 			{

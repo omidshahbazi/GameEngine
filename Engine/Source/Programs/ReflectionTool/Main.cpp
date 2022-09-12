@@ -28,13 +28,17 @@ BEGIN_ENTRY_POINT
 	//WString filePath = args.GetAsWString(0);
 	//WString outputBaseFileName = args.GetAsWString(1);
 
-	WString filePath = LR"(D:\Projects\GameEngine1\Engine\Source\Runtime\RenderSystem\ProgramCompiler\ProgramParser\Parser.h)";
-	WString outputBaseFileName = LR"(D:\Projects\GameEngine1\Engine\Intermediate\ProgramParser\Generated\Parser.Reflection)";
+	//WString filePath = LR"(D:\Projects\GameEngine1\Engine\Source\Runtime\RenderSystem\ProgramCompiler\ProgramParser\Parser.h)";
+	//WString outputBaseFileName = LR"(D:\Projects\GameEngine1\Engine\Intermediate\ProgramParser\Generated\Parser.Reflection)";
+
+	WString filePath = LR"(D:\ReflectionTest\Test.h)";
+	WString outputBaseFileName = LR"(D:\ReflectionTest\Generated\Test.Reflection)";
 
 	try
 	{
-		ReflectionGenerator rg(&allocator, filePath, outputBaseFileName);
-		return (rg.Generate() ? 0 : 1);
+		bool result = ReflectionGenerator::Generate(& allocator, filePath, outputBaseFileName);
+
+		return (result ? 0 : 1);
 	}
 	catch (const Exception& ex)
 	{

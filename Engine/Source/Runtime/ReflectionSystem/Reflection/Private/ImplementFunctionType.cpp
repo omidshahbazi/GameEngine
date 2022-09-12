@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			ImplementFunctionType::ImplementFunctionType(Type *TopNest) :
+			ImplementFunctionType::ImplementFunctionType(ObjectType* TopNest) :
 				FunctionType(TopNest)
 			{
 			}

@@ -18,43 +18,36 @@ namespace Engine
 				{
 				}
 
-				Item(int32 Value, const String& Name) :
-					m_Value(Value),
-					m_Name(Name)
-				{
-				}
-
-				~Item(void)
+				Item(const String& Name, int32 Value) :
+					m_Name(Name),
+					m_Value(Value)
 				{
 				}
 
 			public:
-				int32 GetValue(void) const
-				{
-					return m_Value;
-				}
-
 				const String& GetName(void) const
 				{
 					return m_Name;
 				}
 
+				int32 GetValue(void) const
+				{
+					return m_Value;
+				}
+
 			private:
-				int32 m_Value;
 				String m_Name;
+				int32 m_Value;
 			};
 
-			typedef List<Item> ItemsList;
+			typedef Vector<Item> ItemsList;
+
+		protected:
+			EnumType(ObjectType* TopNest);
 
 		public:
-			EnumType(void);
 			virtual ~EnumType(void)
 			{
-			}
-
-			INLINE Types GetType(void) const
-			{
-				return Types::Enum;
 			}
 
 			INLINE const ItemsList& GetItems(void) const

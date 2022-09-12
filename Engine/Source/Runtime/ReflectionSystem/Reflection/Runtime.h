@@ -3,6 +3,7 @@
 #define RUNTIME_H
 
 #include <Reflection\Type.h>
+#include <Reflection\ObjectType.h>
 
 namespace Engine
 {
@@ -27,6 +28,10 @@ namespace Engine
 			static void* CreateInstance(const String& FullQualifiedTypeName);
 			static void* CreateInstance(const String& FullQualifiedTypeName, const AnyDataType& Argument);
 			static void* CreateInstance(const String& FullQualifiedTypeName, const ArgumentsList& Arguments);
+
+			static void* CreateInstance(const ObjectType* Type);
+			static void* CreateInstance(const ObjectType* Type, const AnyDataType& Argument);
+			static void* CreateInstance(const ObjectType* Type, const ArgumentsList& Arguments);
 		};
 	}
 }

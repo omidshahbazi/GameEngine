@@ -10,30 +10,33 @@ namespace Engine
 
 	namespace ReflectionGenerator
 	{
-		class ReflectionGeneratorException : public Exception
+		namespace Private
 		{
-		public:
-			ReflectionGeneratorException(const String& What, uint32 LineNumber, uint32 ColumnNumber) :
-				Exception(Categories::Utilities, What, "", LineNumber, ""),
-				m_ColumnNumber(ColumnNumber)
+			class ReflectionGeneratorException : public Exception
 			{
-			}
+			public:
+				ReflectionGeneratorException(const String& What, uint32 LineNumber, uint32 ColumnNumber) :
+					Exception(Categories::Utilities, What, "", LineNumber, ""),
+					m_ColumnNumber(ColumnNumber)
+				{
+				}
 
-			uint32 GetColumnNumber(void) const
-			{
-				return m_ColumnNumber;
-			}
+				uint32 GetColumnNumber(void) const
+				{
+					return m_ColumnNumber;
+				}
 
-			virtual String ToString(void) const override
-			{
-				return GetWhat() + " at (" + StringUtility::ToString<char8>(GetLineNumber()) + ", " + StringUtility::ToString<char8>(m_ColumnNumber) + ")";
-			}
+				virtual String ToString(void) const override
+				{
+					return GetWhat() + " at (" + StringUtility::ToString<char8>(GetLineNumber()) + ", " + StringUtility::ToString<char8>(m_ColumnNumber) + ")";
+				}
 
-		private:
-			uint32 m_ColumnNumber;
-		};
+			private:
+				uint32 m_ColumnNumber;
+			};
 
-#define THROW_REFLECTION_TOOL_EXCEPTION(What) throw ReflectionGeneratorException(What, GetCurrentLineIndex(), GetCurrentColumnIndex())
+#define THROW_REFLECTION_GENERATOR_EXCEPTION(What) throw ReflectionGeneratorException(What, GetCurrentLineIndex(), GetCurrentColumnIndex())
+		}
 	}
 }
 #endif

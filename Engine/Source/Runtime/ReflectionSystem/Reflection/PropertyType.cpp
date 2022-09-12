@@ -6,8 +6,7 @@ namespace Engine
 {
 	namespace Reflection
 	{
-
-		PropertyType::PropertyType(Type* TopNest) :
+		PropertyType::PropertyType(ObjectType* TopNest) :
 			Type(TopNest),
 			m_Offset(0)
 		{

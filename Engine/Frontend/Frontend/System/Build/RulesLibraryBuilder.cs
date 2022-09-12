@@ -16,8 +16,6 @@ namespace Engine.Frontend.System.Build
 		{
 		}
 
-		private bool alreadyBuilt = false;
-
 		private TypeList moduleTypes = null;
 		private TypeList targetTypes = null;
 
@@ -36,6 +34,12 @@ namespace Engine.Frontend.System.Build
 			get { return targetTypes.ToArray(); }
 		}
 
+		public bool Built
+		{
+			get;
+			private set;
+		}
+
 		public RulesLibraryBuilder(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture) :
 			base(Configuration, Architecture)
 		{
@@ -49,13 +53,13 @@ namespace Engine.Frontend.System.Build
 		{
 			if (ForceToRebuild)
 			{
-				alreadyBuilt = false;
+				Built = false;
 
 				moduleTypes.Clear();
 				targetTypes.Clear();
 			}
 
-			if (alreadyBuilt)
+			if (Built)
 				return;
 
 			CSProject csproj = new CSProject();
@@ -99,7 +103,7 @@ namespace Engine.Frontend.System.Build
 
 			ConsoleHelper.WriteInfo($"Building rules took {(DateTime.Now - startTime).ToHHMMSS()}");
 
-			alreadyBuilt = true;
+			Built = true;
 		}
 
 		protected override void CreateDirectories()

@@ -2,7 +2,7 @@
 #ifndef TYPE_H
 #define TYPE_H
 #include <Containers\AnyDataType.h>
-#include <Containers\List.h>
+#include <Containers\Vector.h>
 
 namespace Engine
 {
@@ -10,20 +10,12 @@ namespace Engine
 
 	namespace Reflection
 	{
+		class ObjectType;
+
 		class REFLECTION_API Type
 		{
 		public:
-			enum class Types
-			{
-				DataStructure = 0,
-				Enum,
-				Property,
-				Constructor,
-				Function
-			};
-
-		public:
-			Type(Type *TopNest);
+			Type(ObjectType* TopNest);
 			virtual ~Type(void)
 			{
 			}
@@ -33,19 +25,14 @@ namespace Engine
 				return m_TypeID;
 			}
 
-			virtual Types GetType(void) const = 0;
-
-			INLINE const String &GetName(void) const
+			INLINE const String& GetName(void) const
 			{
 				return m_Name;
 			}
 
-			INLINE String GetFullQualifiedName(void) const
-			{
-				return (m_TopNest == nullptr ? "" : m_TopNest->GetFullQualifiedName() + "::") + m_Name;
-			}
+			String GetFullQualifiedName(void) const;
 
-			INLINE Type *GetTopNest(void)
+			INLINE ObjectType* GetTopNest(void)
 			{
 				return m_TopNest;
 			}
@@ -53,11 +40,10 @@ namespace Engine
 		protected:
 			uint32 m_TypeID;
 			String m_Name;
-			Type *m_TopNest;
+			ObjectType* m_TopNest;
 		};
 
 		typedef Vector<Type*> TypeList;
-		typedef List<AnyDataType> ArgumentsList;
 	}
 }
 #endif

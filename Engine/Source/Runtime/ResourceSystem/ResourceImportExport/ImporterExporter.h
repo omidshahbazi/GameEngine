@@ -5,7 +5,6 @@
 
 #include <Containers\Strings.h>
 #include <Containers\GUID.h>
-#include <Common\Definitions.h>
 #include <Platform\PlatformFile.h>
 #include <Reflection\PropertyType.h>
 #include <JSON\JSONObject.h>
@@ -19,8 +18,8 @@ namespace Engine
 
 	namespace ResourceImportExport
 	{
-		REFLECTION_STRUCT()
-			class RESOURCEIMPORTEXPORT_API ImporterExporter
+		REFLECTION_CLASS()
+		class RESOURCEIMPORTEXPORT_API ImporterExporter
 		{
 			IMPORTEREXPORTER_OBJECT()
 

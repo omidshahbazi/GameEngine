@@ -13,41 +13,58 @@ namespace Engine
 
 		void* Runtime::CreateInstance(const String& FullQualifiedTypeName)
 		{
-			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
+			auto type = RuntimeImplementation::GetObjectType(FullQualifiedTypeName);
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Couldn't find " + FullQualifiedTypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Type doesn't exists");
-
-			AnyDataType data = type->CreateInstance();
-
-			if (data.GetValueType() == ValueTypes::VoidPointer)
-				return data.GetAsVoid();
-
-			return nullptr;
+			return CreateInstance(type);
 		}
-
 
 		void* Runtime::CreateInstance(const String& FullQualifiedTypeName, const AnyDataType& Argument)
 		{
-			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
+			auto type = RuntimeImplementation::GetObjectType(FullQualifiedTypeName);
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Couldn't find " + FullQualifiedTypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, " doesn't exists");
-
-			AnyDataType data = type->CreateInstance(Argument);
-
-			if (data.GetValueType() == ValueTypes::VoidPointer)
-				return data.GetAsVoid();
-
-			return nullptr;
+			return CreateInstance(type, Argument);
 		}
 
 
 		void* Runtime::CreateInstance(const String& FullQualifiedTypeName, const ArgumentsList& Arguments)
 		{
-			const DataStructureType const* type = RuntimeImplementation::GetDataStructureType(FullQualifiedTypeName);
+			auto type = RuntimeImplementation::GetObjectType(FullQualifiedTypeName);
+			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, "Couldn't find " + FullQualifiedTypeName);
 
-			THROW_IF_EXCEPTION(Categories::Reflection, type == nullptr, " doesn't exists");
+			return CreateInstance(type, Arguments);
+		}
 
-			AnyDataType data = type->CreateInstance(Arguments);
+		void* Runtime::CreateInstance(const ObjectType* Type)
+		{
+			THROW_IF_EXCEPTION(Categories::Reflection, Type == nullptr, "Type is null");
+
+			AnyDataType data = Type->CreateInstance();
+
+			if (data.GetValueType() == ValueTypes::VoidPointer)
+				return data.GetAsVoid();
+
+			return nullptr;
+		}
+
+		void* Runtime::CreateInstance(const ObjectType* Type, const AnyDataType& Argument)
+		{
+			THROW_IF_EXCEPTION(Categories::Reflection, Type == nullptr, "Type is null");
+
+			AnyDataType data = Type->CreateInstance(Argument);
+
+			if (data.GetValueType() == ValueTypes::VoidPointer)
+				return data.GetAsVoid();
+
+			return nullptr;
+		}
+
+		void* Runtime::CreateInstance(const ObjectType* Type, const ArgumentsList& Arguments)
+		{
+			THROW_IF_EXCEPTION(Categories::Reflection, Type == nullptr, "Type is null");
+
+			AnyDataType data = Type->CreateInstance(Arguments);
 
 			if (data.GetValueType() == ValueTypes::VoidPointer)
 				return data.GetAsVoid();

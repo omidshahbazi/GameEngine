@@ -1,5 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Reflection\DataStructureType.h>
+#include <Reflection\ObjectType.h>
 #include <Reflection\Private\RuntimeImplementation.h>
 
 namespace Engine
@@ -8,7 +8,7 @@ namespace Engine
 	{
 		using namespace Private;
 
-		DataStructureType::DataStructureType(AllocatorBase* Allocator, Type* TopNest) :
+		ObjectType::ObjectType(AllocatorBase* Allocator, ObjectType* TopNest) :
 			Type(TopNest),
 			m_PublicParentsName(Allocator),
 			m_NonPublicParentsName(Allocator),
@@ -21,22 +21,61 @@ namespace Engine
 		{
 		}
 
-		void DataStructureType::GetParents(AccessSpecifiers AccessFlags, TypeList& List) const
+		ObjectType::~ObjectType(void)
+		{
+			for (auto type : m_PublicNestedTypes)
+			{
+				Destruct(type);
+				DeallocateMemory(m_PublicNestedTypes.GetAllocator(), type);
+			}
+
+			for (auto type : m_NonPublicNestedTypes)
+			{
+				Destruct(type);
+				DeallocateMemory(m_NonPublicNestedTypes.GetAllocator(), type);
+			}
+
+			for (auto type : m_PublicFunctions)
+			{
+				Destruct(type);
+				DeallocateMemory(m_PublicFunctions.GetAllocator(), type);
+			}
+
+			for (auto type : m_NonPublicFunctions)
+			{
+				Destruct(type);
+				DeallocateMemory(m_NonPublicFunctions.GetAllocator(), type);
+			}
+
+			for (auto type : m_PublicProperties)
+			{
+				Destruct(type);
+				DeallocateMemory(m_PublicProperties.GetAllocator(), type);
+			}
+
+			for (auto type : m_NonPublicProperties)
+			{
+				Destruct(type);
+				DeallocateMemory(m_NonPublicProperties.GetAllocator(), type);
+			}
+		}
+
+		void ObjectType::GetParents(AccessSpecifiers AccessFlags, ObjectTypeList& List) const
 		{
 #define ITERATE(ListName) \
 			for (const auto parentName : ListName) \
 			{ \
-				const DataStructureType* type = RuntimeImplementation::FindDataStructureType(parentName); \
+				const auto* type = RuntimeImplementation::FindObjectType(parentName); \
 				if (type == nullptr) \
 					continue; \
-				List.Add(ConstCast(DataStructureType*, type)); \
+				List.Add(ConstCast(ObjectType*, type)); \
 			}
 
 			ITERATE(m_PublicParentsName);
 			ITERATE(m_NonPublicParentsName);
 		}
 
-		void DataStructureType::GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const
+		void ObjectType::GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const
 		{
 			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 				List.AddRange(m_NonPublicNestedTypes);
@@ -44,7 +83,7 @@ namespace Engine
 				List.AddRange(m_PublicNestedTypes);
 		}
 
-		void DataStructureType::GetFunctions(AccessSpecifiers AccessFlags, TypeList& List) const
+		void ObjectType::GetFunctions(AccessSpecifiers AccessFlags, FunctionTypeList& List) const
 		{
 			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 				List.AddRange(m_NonPublicFunctions);
@@ -52,7 +91,7 @@ namespace Engine
 				List.AddRange(m_PublicFunctions);
 		}
 
-		const FunctionType* const DataStructureType::GetFunction(const String& Name, AccessSpecifiers Access) const
+		const FunctionType* const ObjectType::GetFunction(const String& Name, AccessSpecifiers Access) const
 		{
 			for (auto type : (Access == AccessSpecifiers::Public ? m_PublicFunctions : m_NonPublicFunctions))
 				if (type->GetName() == Name)
@@ -61,7 +100,7 @@ namespace Engine
 			return nullptr;
 		}
 
-		void DataStructureType::GetProperties(AccessSpecifiers AccessFlags, TypeList& List) const
+		void ObjectType::GetProperties(AccessSpecifiers AccessFlags, PropertyTypeList& List) const
 		{
 			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
 				List.AddRange(m_NonPublicProperties);
@@ -69,14 +108,14 @@ namespace Engine
 				List.AddRange(m_PublicProperties);
 		}
 
-		AnyDataType DataStructureType::CreateInstance(void) const
+		AnyDataType ObjectType::CreateInstance(void) const
 		{
 			AnyDataType returnValue;
 			CreateInstanceInternal(returnValue, nullptr);
 			return returnValue;
 		}
 
-		AnyDataType DataStructureType::CreateInstance(const AnyDataType& Argument) const
+		AnyDataType ObjectType::CreateInstance(const AnyDataType& Argument) const
 		{
 			ArgumentsList args;
 			args.Add(Argument);
@@ -86,7 +125,7 @@ namespace Engine
 			return returnValue;
 		}
 
-		AnyDataType DataStructureType::CreateInstance(const ArgumentsList& Arguments) const
+		AnyDataType ObjectType::CreateInstance(const ArgumentsList& Arguments) const
 		{
 			AnyDataType returnValue;
 			CreateInstanceInternal(returnValue, &Arguments);

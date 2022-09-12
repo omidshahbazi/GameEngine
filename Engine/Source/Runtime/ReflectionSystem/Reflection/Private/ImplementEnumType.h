@@ -12,24 +12,25 @@ namespace Engine
 			class REFLECTION_API ImplementEnumType : public EnumType
 			{
 			public:
-				ImplementEnumType(void);
+				ImplementEnumType(ObjectType* TopNest);
+
 				virtual ~ImplementEnumType(void)
 				{
 				}
 
-				INLINE void SetName(const String &Value)
+				INLINE void SetName(const String& Value)
 				{
 					m_Name = Value;
 				}
 
-				INLINE void AddItem(const String &Value)
+				INLINE void AddItem(const String& Value)
 				{
-					m_Items.Add(Item(0, Value));
+					m_Items.Add(Item(Value, 0));
 				}
 
-				INLINE void AddItem(int32 Value, const String &Name)
+				INLINE void AddItem(const String& Name, int32 Value)
 				{
-					m_Items.Add(Item(Value, Name));
+					m_Items.Add(Item(Name, Value));
 				}
 			};
 		}

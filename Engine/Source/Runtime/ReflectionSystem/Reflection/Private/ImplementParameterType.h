@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#ifndef IMPLEMENT_PROPERTY_TYPE_H
-#define IMPLEMENT_PROPERTY_TYPE_H
-#include <Reflection\PropertyType.h>
+#ifndef IMPLEMENT_PARAMETER_TYPE_H
+#define IMPLEMENT_PARAMETER_TYPE_H
+#include <Reflection\ParameterType.h>
 
 namespace Engine
 {
@@ -9,11 +9,11 @@ namespace Engine
 	{
 		namespace Private
 		{
-			class REFLECTION_API ImplementPropertyType : public PropertyType
+			class REFLECTION_API ImplementParameterType : public ParameterType
 			{
 			public:
-				ImplementPropertyType(ObjectType* TopNest);
-				virtual ~ImplementPropertyType(void)
+				ImplementParameterType(void);
+				virtual ~ImplementParameterType(void)
 				{
 				}
 
@@ -25,11 +25,6 @@ namespace Engine
 				INLINE void SetDataType(const DataType& Value)
 				{
 					m_DataType = Value;
-				}
-
-				INLINE void SetOffset(uint32 Value)
-				{
-					m_Offset = Value;
 				}
 			};
 		}

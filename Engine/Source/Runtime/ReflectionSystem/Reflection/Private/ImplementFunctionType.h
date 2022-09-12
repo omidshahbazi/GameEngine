@@ -12,24 +12,24 @@ namespace Engine
 			class REFLECTION_API ImplementFunctionType : public FunctionType
 			{
 			public:
-				ImplementFunctionType(Type *TopNest);
+				ImplementFunctionType(ObjectType* TopNest);
 				virtual ~ImplementFunctionType(void)
 				{
 				}
 
-				INLINE void SetName(const String &Value)
+				INLINE void SetName(const String& Value)
 				{
 					m_Name = Value;
 				}
 
-				INLINE void SetReturnType(const DataType &Value)
+				INLINE void SetReturnType(const DataType& Value)
 				{
 					m_ReturnType = Value;
 				}
 
-				INLINE void AddParameter(const DataType &DataType, const String &Name)
+				INLINE void AddParameter(const ParameterType& Parameter)
 				{
-					m_Parameters.Add(Parameter(DataType, Name));
+					m_Parameters.Add(Parameter);
 				}
 
 				INLINE void SetIsConst(bool Value)

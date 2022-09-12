@@ -10,20 +10,16 @@ namespace Engine
 	{
 		class REFLECTION_API PropertyType : public Type
 		{
-		public:
-			PropertyType(Type* TopNest);
+		protected:
+			PropertyType(ObjectType* TopNest);
 
+		public:
 			virtual ~PropertyType(void)
 			{
 			}
 
 			AnyDataType GetValue(const void* TargetObject) const;
 			void SetValue(void* TargetObject, const AnyDataType& Value);
-
-			INLINE Types GetType(void) const
-			{
-				return Types::Property;
-			}
 
 			INLINE const DataType& GetDataType(void) const
 			{
@@ -34,6 +30,8 @@ namespace Engine
 			uint32 m_Offset;
 			DataType m_DataType;
 		};
+
+		typedef Vector<PropertyType*> PropertyTypeList;
 	}
 }
 

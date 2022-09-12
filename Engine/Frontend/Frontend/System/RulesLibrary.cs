@@ -101,7 +101,8 @@ namespace Engine.Frontend.System
 
 		public void Build(bool ForceToRebuild)
 		{
-			BuildInternal(ForceToRebuild);
+			if (!BuildInternal(ForceToRebuild))
+				return;
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures architecture in BuildSystemHelper.PlatformTypes)
@@ -116,7 +117,8 @@ namespace Engine.Frontend.System
 
 		public void Build(bool ForceToRebuild, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
-			BuildInternal(ForceToRebuild);
+			if (!BuildInternal(ForceToRebuild))
+				return;
 
 			LoadModules(Configuration, Architecture);
 
@@ -153,12 +155,19 @@ namespace Engine.Frontend.System
 			throw new FrontendException($"Couldn't find {Name} target rules");
 		}
 
-		private void BuildInternal(bool ForceToRebuild)
+		private bool BuildInternal(bool ForceToRebuild)
 		{
+			bool built = builder.Built && !ForceToRebuild;
+
 			builder.Build(ForceToRebuild);
+
+			if (built)
+				return false;
 
 			moduleRules.Clear();
 			targetRules.Clear();
+
+			return true;
 		}
 
 		private void LoadModules(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

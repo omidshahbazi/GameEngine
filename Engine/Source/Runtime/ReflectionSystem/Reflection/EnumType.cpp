@@ -5,8 +5,8 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		EnumType::EnumType(void) :
-			Type(nullptr)
+		EnumType::EnumType(ObjectType* TopNest) :
+			Type(TopNest)
 		{
 		}
 	}

@@ -3,7 +3,7 @@
 #define RUNTIME_IMPLEMENTATION_H
 
 #include <Containers\Map.h>
-#include <Reflection\DataStructureType.h>
+#include <Reflection\ObjectType.h>
 #include <Reflection\EnumType.h>
 
 namespace Engine
@@ -29,9 +29,9 @@ namespace Engine
 				typedef Map<String, Type*> TypeMap;
 
 			public:
-				static const DataStructureType* const GetDataStructureType(const String& FullQualifiedTypeName);
-				static const DataStructureType* const FindDataStructureType(const String& TypeName);
-				static const EnumType* const GetEnumType(const String& TypeName);
+				static const ObjectType* GetObjectType(const String& FullQualifiedTypeName);
+				static const ObjectType* FindObjectType(const String& TypeName);
+				static const EnumType* GetEnumType(const String& TypeName);
 
 				static void RegisterMeta(IMetaObject* Meta);
 				static void InitializeMeta(void);
@@ -41,10 +41,10 @@ namespace Engine
 
 			private:
 				static SpinLock m_Lock;
-				static IMetaObject* m_Metas[2048];
-				static uint16 m_MetaIndex;
-				static TypeMap *m_DataStructureTypes;
-				static TypeMap *m_EnumTypes;
+				static IMetaObject* m_MetaObjects[2048];
+				static uint16 m_MetaObjectCount;
+				static TypeMap* m_ObjectTypes;
+				static TypeMap* m_EnumTypes;
 			};
 		}
 	}

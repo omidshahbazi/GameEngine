@@ -7,7 +7,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			ImplementPropertyType::ImplementPropertyType(Type *TopNest) :
+			ImplementPropertyType::ImplementPropertyType(ObjectType* TopNest) :
 				PropertyType(TopNest)
 			{
 			}

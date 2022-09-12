@@ -1,5 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
-#include <Reflection\Private\ImplementEnumType.h>
+#include <Reflection\Private\ImplementParameterType.h>
 
 namespace Engine
 {
@@ -7,8 +7,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			ImplementEnumType::ImplementEnumType(ObjectType* TopNest) :
-				EnumType(TopNest)
+			ImplementParameterType::ImplementParameterType(void)
 			{
 			}
 		}

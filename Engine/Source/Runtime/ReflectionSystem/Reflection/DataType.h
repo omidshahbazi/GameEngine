@@ -2,13 +2,26 @@
 #ifndef DATA_TYPE_H
 #define DATA_TYPE_H
 #include <Common\ValueTypes.h>
+#include <Common\PrimitiveTypes.h>
+#include <Containers\AnyDataType.h>
 
 namespace Engine
 {
+	using namespace Common;
+	using namespace Containers;
+
 	namespace Reflection
 	{
+		class PropertyType;
+		class FunctionType;
+		class ParameterType;
+
 		class REFLECTION_API DataType
 		{
+			friend class PropertyType;
+			friend class FunctionType;
+			friend class ParameterType;
+
 		public:
 			enum class PassesTypes
 			{
@@ -17,7 +30,7 @@ namespace Engine
 				Pointer
 			};
 
-		public:
+		protected:
 			DataType(void) :
 				m_ValueType(ValueTypes::None),
 				m_PassType(PassesTypes::Value),
@@ -25,6 +38,8 @@ namespace Engine
 				m_IsConstValue(false)
 			{
 			}
+
+		public:
 			virtual ~DataType(void)
 			{
 			}
@@ -33,45 +48,25 @@ namespace Engine
 			{
 				return m_ValueType;
 			}
-			INLINE void SetValueType(ValueTypes Value)
-			{
-				m_ValueType = Value;
-			}
 
 			INLINE PassesTypes GetPassType(void) const
 			{
 				return m_PassType;
-			}
-			INLINE void SetPassType(PassesTypes Value)
-			{
-				m_PassType = Value;
 			}
 
 			INLINE const String& GetExtraValueType(void) const
 			{
 				return m_ExtraValueType;
 			}
-			INLINE void SetExtraValueType(const String& Value)
-			{
-				m_ExtraValueType = Value;
-			}
 
 			INLINE bool GetIsConst(void) const
 			{
 				return m_IsConst;
 			}
-			INLINE void SetIsConst(bool Value)
-			{
-				m_IsConst = Value;
-			}
 
 			INLINE bool GetIsConstValue(void) const
 			{
 				return m_IsConstValue;
-			}
-			INLINE void SetIsConstValue(bool Value)
-			{
-				m_IsConstValue = Value;
 			}
 
 			INLINE uint8 GetDataSize(void) const
@@ -80,22 +75,6 @@ namespace Engine
 					return AnyDataType::GetDataSize(m_ValueType);
 
 				return sizeof(void*);
-			}
-
-			INLINE void GetSignature(String& Signature) const
-			{
-				if (m_IsConst)
-					Signature += "const ";
-
-				Signature += (m_ValueType == ValueTypes::None ? m_ExtraValueType : AnyDataType::GetValueTypeText(m_ValueType)) + " ";
-
-				if (m_IsConstValue)
-					Signature += "const ";
-
-				if (m_PassType == PassesTypes::Reference)
-					Signature += "& ";
-				else if (m_PassType == PassesTypes::Pointer)
-					Signature += "* ";
 			}
 
 		protected:

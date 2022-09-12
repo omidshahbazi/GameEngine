@@ -2,35 +2,30 @@
 #ifndef REFLECTION_FUNCTION_TYPE_H
 #define REFLECTION_FUNCTION_TYPE_H
 #include <Reflection\Type.h>
-#include <Reflection\Parameter.h>
+#include <Reflection\ParameterType.h>
 
 namespace Engine
 {
 	namespace Reflection
 	{
+		typedef List<AnyDataType> ArgumentsList;
+
 		class REFLECTION_API FunctionType : public Type
 		{
+		protected:
+			FunctionType(ObjectType* TopNest);
+
 		public:
-			FunctionType(Type *TopNest) :
-				Type(TopNest),
-				m_IsConst(false)
-			{
-			}
 			virtual ~FunctionType(void)
 			{
 			}
 
-			INLINE Types GetType(void) const
-			{
-				return Types::Function;
-			}
-
-			INLINE const DataType &GetReturnType(void) const
+			INLINE const DataType& GetReturnType(void) const
 			{
 				return m_ReturnType;
 			}
 
-			INLINE const ParameterList &GetParameters(void) const
+			INLINE const ParameterTypeList& GetParameters(void) const
 			{
 				return m_Parameters;
 			}
@@ -40,18 +35,20 @@ namespace Engine
 				return m_IsConst;
 			}
 
-			AnyDataType Invoke(void *TargetObject) const;
-			AnyDataType Invoke(void *TargetObject, const AnyDataType &Argument) const;
-			AnyDataType Invoke(void *TargetObject, const ArgumentsList &Arguments) const;
+			AnyDataType Invoke(void* TargetObject) const;
+			AnyDataType Invoke(void* TargetObject, const AnyDataType& Argument) const;
+			AnyDataType Invoke(void* TargetObject, const ArgumentsList& Arguments) const;
 
 		protected:
-			virtual void InvokeInternal(void *TargetObject, AnyDataType &ReturnValue, const ArgumentsList *Arguments) const = 0;
+			virtual void InvokeInternal(void* TargetObject, AnyDataType& ReturnValue, const ArgumentsList* Arguments) const = 0;
 
 		protected:
 			DataType m_ReturnType;
-			ParameterList m_Parameters;
+			ParameterTypeList m_Parameters;
 			bool m_IsConst;
 		};
+
+		typedef Vector<FunctionType*> FunctionTypeList;
 	}
 }
 #endif

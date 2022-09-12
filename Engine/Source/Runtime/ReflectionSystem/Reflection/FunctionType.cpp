@@ -5,15 +5,20 @@ namespace Engine
 {
 	namespace Reflection
 	{
-		AnyDataType FunctionType::Invoke(void *TargetObject) const
+		FunctionType::FunctionType(ObjectType* TopNest) :
+			Type(TopNest),
+			m_IsConst(false)
+		{
+		}
+
+		AnyDataType FunctionType::Invoke(void* TargetObject) const
 		{
 			AnyDataType returnValue;
 			InvokeInternal(TargetObject, returnValue, nullptr);
 			return returnValue;
 		}
 
-
-		AnyDataType FunctionType::Invoke(void *TargetObject, const AnyDataType &Argument) const
+		AnyDataType FunctionType::Invoke(void* TargetObject, const AnyDataType& Argument) const
 		{
 			ArgumentsList args;
 			args.Add(Argument);
@@ -23,8 +28,7 @@ namespace Engine
 			return returnValue;
 		}
 
-
-		AnyDataType FunctionType::Invoke(void *TargetObject, const ArgumentsList &Arguments) const
+		AnyDataType FunctionType::Invoke(void* TargetObject, const ArgumentsList& Arguments) const
 		{
 			AnyDataType returnValue;
 			InvokeInternal(TargetObject, returnValue, &Arguments);

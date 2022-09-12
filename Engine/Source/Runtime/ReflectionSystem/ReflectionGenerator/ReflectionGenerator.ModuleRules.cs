@@ -20,11 +20,11 @@ namespace Engine.Programs
 			PrivateDependencyModuleNames.Add("FileUtility");
 			PrivateDependencyModuleNames.Add("EntryPointUtility");
 			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("Reflection");
+			PrivateDependencyModuleNames.Add("Lexer");
 
 			PublicDependencyModuleNames.Add("Allocators");
 			PublicDependencyModuleNames.Add("Containers");
-			PublicDependencyModuleNames.Add("Reflection");
-			PublicDependencyModuleNames.Add("Lexer");
 		}
 	}
 }

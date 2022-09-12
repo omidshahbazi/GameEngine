@@ -16,10 +16,10 @@ namespace Engine
 			public:
 				~Destructor(void)
 				{
-					if (RuntimeImplementation::m_DataStructureTypes != nullptr)
+					if (RuntimeImplementation::m_ObjectTypes != nullptr)
 					{
-						Destruct(RuntimeImplementation::m_DataStructureTypes);
-						DeallocateMemory(RootAllocator::GetInstance(), RuntimeImplementation::m_DataStructureTypes);
+						Destruct(RuntimeImplementation::m_ObjectTypes);
+						DeallocateMemory(RootAllocator::GetInstance(), RuntimeImplementation::m_ObjectTypes);
 					}
 
 					if (RuntimeImplementation::m_EnumTypes != nullptr)
@@ -33,9 +33,9 @@ namespace Engine
 			Destructor destructor;
 
 			SpinLock RuntimeImplementation::m_Lock;
-			uint16 RuntimeImplementation::m_MetaIndex;
-			RuntimeImplementation::IMetaObject* RuntimeImplementation::m_Metas[];
-			RuntimeImplementation::TypeMap* RuntimeImplementation::m_DataStructureTypes = nullptr;
+			uint16 RuntimeImplementation::m_MetaObjectCount;
+			RuntimeImplementation::IMetaObject* RuntimeImplementation::m_MetaObjects[];
+			RuntimeImplementation::TypeMap* RuntimeImplementation::m_ObjectTypes = nullptr;
 			RuntimeImplementation::TypeMap* RuntimeImplementation::m_EnumTypes = nullptr;
 
 #define MAP_INITIALIZER(Map) \
@@ -45,32 +45,32 @@ namespace Engine
 				Construct(Map); \
 			}
 
-			const DataStructureType* const RuntimeImplementation::GetDataStructureType(const String& FullQualifiedTypeName)
+			const ObjectType* RuntimeImplementation::GetObjectType(const String& FullQualifiedTypeName)
 			{
-				MAP_INITIALIZER(m_DataStructureTypes);
+				MAP_INITIALIZER(m_ObjectTypes);
 
-				if (m_DataStructureTypes->Contains(FullQualifiedTypeName))
-					return ReinterpretCast(DataStructureType*, (*m_DataStructureTypes)[FullQualifiedTypeName]);
+				if (m_ObjectTypes->Contains(FullQualifiedTypeName))
+					return ReinterpretCast(ObjectType*, (*m_ObjectTypes)[FullQualifiedTypeName]);
 
 				return nullptr;
 			}
 
-			const DataStructureType* const RuntimeImplementation::FindDataStructureType(const String& TypeName)
+			const ObjectType* RuntimeImplementation::FindObjectType(const String& TypeName)
 			{
-				MAP_INITIALIZER(m_DataStructureTypes);
+				MAP_INITIALIZER(m_ObjectTypes);
 
-				for (const auto& elem : (*m_DataStructureTypes))
+				for (const auto& elem : (*m_ObjectTypes))
 				{
 					if (!elem.GetFirst().EndsWith(TypeName))
 						continue;
 
-					return ReinterpretCast(DataStructureType*, elem.GetSecond());
+					return ReinterpretCast(ObjectType*, elem.GetSecond());
 				}
 
 				return nullptr;
 			}
 
-			const EnumType* const RuntimeImplementation::GetEnumType(const String& TypeName)
+			const EnumType* RuntimeImplementation::GetEnumType(const String& TypeName)
 			{
 				MAP_INITIALIZER(m_EnumTypes);
 
@@ -82,7 +82,7 @@ namespace Engine
 
 			void RuntimeImplementation::RegisterMeta(IMetaObject* Meta)
 			{
-				m_Metas[m_MetaIndex++] = Meta;
+				m_MetaObjects[m_MetaObjectCount++] = Meta;
 			}
 
 			void RuntimeImplementation::InitializeMeta(void)
@@ -94,8 +94,8 @@ namespace Engine
 				{
 					initialized = true;
 
-					for (uint16 i = 0; i < m_MetaIndex; ++i)
-						m_Metas[i]->Initialize();
+					for (uint16 i = 0; i < m_MetaObjectCount; ++i)
+						m_MetaObjects[i]->Initialize();
 				}
 
 				m_Lock.Release();
@@ -103,18 +103,18 @@ namespace Engine
 
 			void RuntimeImplementation::RegisterTypeInfo(Type* Type)
 			{
-				MAP_INITIALIZER(m_DataStructureTypes);
+				MAP_INITIALIZER(m_ObjectTypes);
 				MAP_INITIALIZER(m_EnumTypes);
 
-				if (Type->GetType() == Type::Types::DataStructure)
+				if (IsTypeOf(Type, ObjectType))
 				{
 					String scopedName = Type->GetFullQualifiedName();
 
-					THROW_IF_EXCEPTION(Categories::Reflection, m_DataStructureTypes->Contains(scopedName), "Type already exists");
+					THROW_IF_EXCEPTION(Categories::Reflection, m_ObjectTypes->Contains(scopedName), "Type already exists");
 
-					m_DataStructureTypes->Add(scopedName, Type);
+					m_ObjectTypes->Add(scopedName, Type);
 				}
-				else if (Type->GetType() == Type::Types::Enum)
+				else if (IsTypeOf(Type, EnumType))
 				{
 					const String& name = Type->GetName();
 
@@ -126,12 +126,12 @@ namespace Engine
 
 			void RuntimeImplementation::UnregisterTypeInfo(Type* Type)
 			{
-				MAP_INITIALIZER(m_DataStructureTypes);
+				MAP_INITIALIZER(m_ObjectTypes);
 				MAP_INITIALIZER(m_EnumTypes);
 
-				if (Type->GetType() == Type::Types::DataStructure)
-					m_DataStructureTypes->Remove(Type->GetFullQualifiedName());
-				else if (Type->GetType() == Type::Types::Enum)
+				if (IsTypeOf(Type, ObjectType))
+					m_ObjectTypes->Remove(Type->GetFullQualifiedName());
+				else if (IsTypeOf(Type, EnumType))
 					m_EnumTypes->Remove(Type->GetName());
 			}
 		}

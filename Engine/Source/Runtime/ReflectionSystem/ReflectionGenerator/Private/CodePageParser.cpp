@@ -235,6 +235,9 @@ namespace Engine
 
 						if (MatchSymbol(CLOSE_BRACE))
 							return;
+
+						Token token;
+						GetToken(token);
 					}
 				}
 			}

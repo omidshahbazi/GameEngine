@@ -100,6 +100,15 @@ namespace Engine
 				Token nameToken;
 				RequireIdentifierToken(nameToken);
 
+				bool hasParent = false;
+				if (!((hasParent = MatchSymbol(COLON)) || MatchSymbol(OPEN_BRACKET)))
+				{
+					nameToken.SetIdentifier(String::Empty);
+					RequireIdentifierToken(nameToken);
+
+					hasParent = MatchSymbol(COLON);
+				}
+
 				type->SetName(nameToken.GetName());
 
 				if (MatchSymbol(SEMICOLON))
@@ -108,15 +117,14 @@ namespace Engine
 					return;
 				}
 
-				bool hasParent = false;
-				if ((hasParent = MatchSymbol(COLON)))
+				if (hasParent)
 				{
 					uint8 parentCount = 0;
 
 					while (!MatchSymbol(OPEN_BRACKET))
 					{
 						if (parentCount++ > 0)
-							RequireSymbol(COMMA, "missing in parent list");
+							RequireSymbol(COMMA, "in parent list parsing");
 
 						Token token;
 						RequireIdentifierToken(token);
@@ -135,7 +143,9 @@ namespace Engine
 					}
 				}
 
-				RequireIdentifier(type->GetDeclarationMacroName(), "object");
+				RequireIdentifier(type->GetDeclarationMacroName(), "in object parsing");
+				RequireSymbol(OPEN_BRACE, "in object parsing");
+				RequireSymbol(CLOSE_BRACE, "in object parsing");
 
 				if (m_CurrentObject == nullptr)
 					Types.Add(type);

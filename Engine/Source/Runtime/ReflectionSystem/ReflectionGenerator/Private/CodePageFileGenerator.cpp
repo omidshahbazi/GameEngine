@@ -15,7 +15,7 @@ namespace Engine
 
 		void CodePageFileGenerator::GenerateDataType(const DataType& Type, const String& VariableName, String& Content)
 		{
-			const String DATA_TYPE(STRINGIZE(Engine::Reflection::DataType));
+			const String DATA_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementDataType));
 
 #define ADD_NEW_LINE() Content += "\n"
 

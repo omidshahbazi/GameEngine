@@ -2,6 +2,7 @@
 #include <ReflectionGenerator\Private\CompileFileGenerator.h>
 #include <ReflectionGenerator\Private\MetaFunction.h>
 #include <ReflectionGenerator\Private\MetaProperty.h>
+#include <ReflectionGenerator\Private\MetaParameter.h>
 #include <Reflection\Private\RuntimeImplementation.h>
 #include <FileUtility\Path.h>
 
@@ -40,6 +41,18 @@ namespace Engine
 			ADD_NEW_LINE();
 
 			Content += R"(#include <Reflection\Private\RuntimeImplementation.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ImplementDataType.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ImplementObjectType.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ImplementEnumType.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ImplementFunctionType.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ImplementParameterType.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ImplementPropertyType.h>)";
 			ADD_NEW_LINE();
 
 			ADD_NEW_LINE();
@@ -98,6 +111,7 @@ namespace Engine
 
 		void CompileFileGenerator::GenerateObjectCode(MetaObject* Type, String& Content)
 		{
+			const String RUNTIME_IMPLEMENTATION_INITIALIZE_META(STRINGIZE(Engine::Reflection::Private::RuntimeImplementation::InitializeMeta));
 			const String RUNTIME_IMPLEMENTATION_REGISTER_META(STRINGIZE(Engine::Reflection::Private::RuntimeImplementation::RegisterMeta));
 			const String I_META_OBJECT(STRINGIZE(Engine::Reflection::Private::RuntimeImplementation::IMetaObject));
 			const String OBJECT_TYPE(STRINGIZE(Engine::Reflection::ObjectType));
@@ -242,7 +256,7 @@ namespace Engine
 				Content += "	}";
 				ADD_NEW_LINE();
 
-				Content += "	void CreateInstanceInternal(const " + ARGUMENT_LIST + "* Arguments, " + ANY_DATA_TYPE + "& ReturnValue) override";
+				Content += "	void CreateInstanceInternal(const " + ARGUMENT_LIST + "* Arguments, " + ANY_DATA_TYPE + "& ReturnValue) const override";
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();
@@ -283,7 +297,7 @@ namespace Engine
 				ADD_NEW_LINE();
 				Content += "{";
 				ADD_NEW_LINE();
-				Content += "	RuntimeImplementation::InitializeMeta();";
+				Content += "	" + RUNTIME_IMPLEMENTATION_INITIALIZE_META + "(); ";
 				ADD_NEW_LINE();
 				Content += "	return *" + IMPLEMENT_POINTER_NAME + ";";
 				Content += "\n}";
@@ -362,7 +376,7 @@ namespace Engine
 		void CompileFileGenerator::GenerateFunctionCode(MetaFunction* Type, String& Content)
 		{
 			const String IMPLEMENT_FUNCTION_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementFunctionType));
-			const String IMPLEMENT_PARAMETER_TYPE(STRINGIZE(Engine::Reflection::ImplementParameterType));
+			const String IMPLEMENT_PARAMETER_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementParameterType));
 			const String IMPLEMENT_NAME = GetImplementType(Type);
 			const String IMPLEMENT_POINTER_NAME = GetImplementTypePointerName(Type);
 			const String RETURN_DATA_TYPE_VARIALBE_NAME = "returnDataType";

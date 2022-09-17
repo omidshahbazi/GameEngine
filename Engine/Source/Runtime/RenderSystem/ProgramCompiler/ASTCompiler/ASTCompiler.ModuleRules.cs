@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ASTCompilerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ASTCompilerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("RenderCommon");
 			PrivateDependencyModuleNames.Add("DataUtility");

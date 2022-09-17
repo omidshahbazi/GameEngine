@@ -22,6 +22,11 @@ namespace Engine
 				class IMetaObject
 				{
 				public:
+					virtual ~IMetaObject(void)
+					{
+
+					}
+
 					virtual void Initialize(void) = 0;
 				};
 

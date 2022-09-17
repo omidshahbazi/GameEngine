@@ -54,26 +54,14 @@ namespace Engine
 					m_LastAccessSpecifier = Value;
 				}
 
-				INLINE void SetNamespace(const String& Namespace)
+				INLINE void GetParentNames(AccessSpecifiers AccessFlags, StringList& List) const
 				{
-					m_Namespace = Namespace;
-				}
-
-				INLINE const String& GetNamespace(void) const
-				{
-					return m_Namespace;
-				}
-
-				INLINE void AddParentName(const String& Value, AccessSpecifiers AccessSpecifier)
-				{
-					ImplementObjectType::AddParentName(Value, AccessSpecifier);
-				}
-				INLINE void GetParentsName(AccessSpecifiers AccessFlags, StringList& List) const
-				{
-					if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
-						List.AddRange(m_NonPublicParentsName);
-					if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
-						List.AddRange(m_PublicParentsName);
+					if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) && m_ParentNames.Contains(AccessSpecifiers::Private))
+						List.AddRange(m_ParentNames[AccessSpecifiers::Private]);
+					if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected) && m_ParentNames.Contains(AccessSpecifiers::Protected))
+						List.AddRange(m_ParentNames[AccessSpecifiers::Protected]);
+					if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public) && m_ParentNames.Contains(AccessSpecifiers::Public))
+						List.AddRange(m_ParentNames[AccessSpecifiers::Public]);
 				}
 
 				INLINE void AddNestedType(Type* Value)
@@ -109,7 +97,7 @@ namespace Engine
 
 				INLINE String GetUniqueName(void) const
 				{
-					return (m_TopNest == nullptr ? "" : m_TopNest->GetName() + "_") + m_Name;
+					return (m_TopNest == nullptr ? "" : (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_") + m_Name;
 				}
 
 				INLINE String GetDeclarationMacroName(void) const
@@ -118,7 +106,7 @@ namespace Engine
 				}
 
 			protected:
-				void CreateInstanceInternal(AnyDataType& ReturnValue, const ArgumentsList* Argumetns) const override
+				void CreateInstanceInternal(const ArgumentsList* Argumetns, AnyDataType& ReturnValue) const override
 				{
 				}
 
@@ -126,7 +114,6 @@ namespace Engine
 				AllocatorBase* m_Allocator;
 				uint16 m_BlockLevel;
 				AccessSpecifiers m_LastAccessSpecifier;
-				String m_Namespace;
 
 				FunctionTypeList m_PublicConstructors;
 				FunctionTypeList m_NonPublicConstructors;

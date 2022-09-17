@@ -14,7 +14,7 @@ namespace Engine
 		AnyDataType FunctionType::Invoke(void* TargetObject) const
 		{
 			AnyDataType returnValue;
-			InvokeInternal(TargetObject, returnValue, nullptr);
+			InvokeInternal(TargetObject, nullptr, returnValue);
 			return returnValue;
 		}
 
@@ -24,14 +24,14 @@ namespace Engine
 			args.Add(Argument);
 
 			AnyDataType returnValue;
-			InvokeInternal(TargetObject, returnValue, &args);
+			InvokeInternal(TargetObject, &args, returnValue);
 			return returnValue;
 		}
 
 		AnyDataType FunctionType::Invoke(void* TargetObject, const ArgumentsList& Arguments) const
 		{
 			AnyDataType returnValue;
-			InvokeInternal(TargetObject, returnValue, &Arguments);
+			InvokeInternal(TargetObject, &Arguments, returnValue);
 			return returnValue;
 		}
 	}

@@ -40,7 +40,7 @@ namespace Engine
 				return false;
 
 			HeaderFileGenerator::Generate(types, OutputBaseFileName + L".h");
-			//CompileFileGenerator::Generate(types, OutputBaseFileName + L".cpp");
+			CompileFileGenerator::Generate(types, OutputBaseFileName + L".cpp");
 
 			for (auto& type : types)
 			{

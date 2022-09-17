@@ -99,9 +99,9 @@ namespace Engine.Frontend.System
 			targetRules = new RulesRepository<TargetRules>();
 		}
 
-		public void Build(bool ForceToRebuild)
+		public void Build(bool ForceToRebuild, params string[] AdditionalPreprocessors)
 		{
-			if (!BuildInternal(ForceToRebuild))
+			if (!BuildInternal(ForceToRebuild, AdditionalPreprocessors))
 				return;
 
 			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
@@ -115,9 +115,9 @@ namespace Engine.Frontend.System
 				}
 		}
 
-		public void Build(bool ForceToRebuild, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		public void Build(bool ForceToRebuild, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture, params string[] AdditionalPreprocessors)
 		{
-			if (!BuildInternal(ForceToRebuild))
+			if (!BuildInternal(ForceToRebuild, AdditionalPreprocessors))
 				return;
 
 			LoadModules(Configuration, Architecture);
@@ -155,11 +155,11 @@ namespace Engine.Frontend.System
 			throw new FrontendException($"Couldn't find {Name} target rules");
 		}
 
-		private bool BuildInternal(bool ForceToRebuild)
+		private bool BuildInternal(bool ForceToRebuild, params string[] AdditionalPreprocessors)
 		{
 			bool built = builder.Built && !ForceToRebuild;
 
-			builder.Build(ForceToRebuild);
+			builder.Build(ForceToRebuild, AdditionalPreprocessors);
 
 			if (built)
 				return false;
@@ -174,13 +174,14 @@ namespace Engine.Frontend.System
 		{
 			ConsoleHelper.WriteInfo($"Loading Modules for {Configuration} {Architecture}");
 
+			BaseRules.OperatingSystems operatingSystem = GetOperatingSystem();
 			BaseRules.Configurations configuration = GetConfiguration(Configuration);
 			BaseRules.Platforms platform = GetPlatform(Architecture);
 
 			List<int> nameHashes = new List<int>();
 			foreach (Type moduleType in builder.ModuleTupes)
 			{
-				ModuleRules module = (ModuleRules)Activator.CreateInstance(moduleType, configuration, platform);
+				ModuleRules module = (ModuleRules)Activator.CreateInstance(moduleType, operatingSystem, configuration, platform);
 
 				if (nameHashes.Find((int item) => item == module.Name.GetHashCode()) != 0)
 					throw new FrontendException($"A module with same name of {module.Name} already exists");
@@ -207,7 +208,7 @@ namespace Engine.Frontend.System
 		{
 			ConsoleHelper.WriteInfo($"Loading Targets for {Configuration} {Architecture}");
 
-			TargetRules.OperatingSystems operatingSystem = GetOperatingSystem();
+			BaseRules.OperatingSystems operatingSystem = GetOperatingSystem();
 			BaseRules.Configurations configuration = GetConfiguration(Configuration);
 			BaseRules.Platforms platform = GetPlatform(Architecture);
 
@@ -241,15 +242,15 @@ namespace Engine.Frontend.System
 			ModuleNameStack.Pop();
 		}
 
-		private static TargetRules.OperatingSystems GetOperatingSystem()
+		private static BaseRules.OperatingSystems GetOperatingSystem()
 		{
 			switch (EnvironmentHelper.OperatingSystem)
 			{
 				case EnvironmentHelper.OperatingSystems.Windows:
-					return TargetRules.OperatingSystems.Windows;
+					return BaseRules.OperatingSystems.Windows;
 
 				case EnvironmentHelper.OperatingSystems.Linux:
-					return TargetRules.OperatingSystems.Linux;
+					return BaseRules.OperatingSystems.Linux;
 
 				default:
 					throw new NotImplementedException($"Handler for {EnvironmentHelper.OperatingSystem} has not implemented");

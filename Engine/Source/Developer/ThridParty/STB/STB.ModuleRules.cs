@@ -13,8 +13,8 @@ namespace Engine.Developer.ThirdParty
 			get { return UseTypes.StaticLibrary; }
 		}
 
-		public STBModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public STBModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 		}
     }

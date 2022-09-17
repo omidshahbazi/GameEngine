@@ -13,8 +13,8 @@ namespace Engine.Editor
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public EditorGUIModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public EditorGUIModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("WindowUtility");
 			PrivateDependencyModuleNames.Add("RenderSystem");

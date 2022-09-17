@@ -10,54 +10,40 @@ namespace Engine
 
 		ObjectType::ObjectType(AllocatorBase* Allocator, ObjectType* TopNest) :
 			Type(TopNest),
-			m_PublicParentsName(Allocator),
-			m_NonPublicParentsName(Allocator),
-			m_PublicNestedTypes(Allocator),
-			m_NonPublicNestedTypes(Allocator),
-			m_PublicFunctions(Allocator),
-			m_NonPublicFunctions(Allocator),
-			m_PublicProperties(Allocator),
-			m_NonPublicProperties(Allocator)
+			m_ParentNames(Allocator),
+			m_NestedTypes(Allocator),
+			m_Functions(Allocator),
+			m_Properties(Allocator)
 		{
 		}
 
 		ObjectType::~ObjectType(void)
 		{
-			for (auto type : m_PublicNestedTypes)
-			{
-				Destruct(type);
-				DeallocateMemory(m_PublicNestedTypes.GetAllocator(), type);
-			}
+			for (auto list : m_NestedTypes)
+				for (auto type : list.GetSecond())
+				{
+					Destruct(type);
+					DeallocateMemory(m_NestedTypes.GetAllocator(), type);
+				}
 
-			for (auto type : m_NonPublicNestedTypes)
-			{
-				Destruct(type);
-				DeallocateMemory(m_NonPublicNestedTypes.GetAllocator(), type);
-			}
+			for (auto list : m_Functions)
+				for (auto type : list.GetSecond())
+				{
+					Destruct(type);
+					DeallocateMemory(m_Functions.GetAllocator(), type);
+				}
 
-			for (auto type : m_PublicFunctions)
-			{
-				Destruct(type);
-				DeallocateMemory(m_PublicFunctions.GetAllocator(), type);
-			}
+			for (auto list : m_Properties)
+				for (auto type : list.GetSecond())
+				{
+					Destruct(type);
+					DeallocateMemory(m_Properties.GetAllocator(), type);
+				}
+		}
 
-			for (auto type : m_NonPublicFunctions)
-			{
-				Destruct(type);
-				DeallocateMemory(m_NonPublicFunctions.GetAllocator(), type);
-			}
-
-			for (auto type : m_PublicProperties)
-			{
-				Destruct(type);
-				DeallocateMemory(m_PublicProperties.GetAllocator(), type);
-			}
-
-			for (auto type : m_NonPublicProperties)
-			{
-				Destruct(type);
-				DeallocateMemory(m_NonPublicProperties.GetAllocator(), type);
-			}
+		String ObjectType::GetFullQualifiedName(void) const
+		{
+			return m_Namespace + "::" + Type::GetFullQualifiedName();
 		}
 
 		void ObjectType::GetParents(AccessSpecifiers AccessFlags, ObjectTypeList& List) const
@@ -71,65 +57,39 @@ namespace Engine
 				List.Add(ConstCast(ObjectType*, type)); \
 			}
 
-			ITERATE(m_PublicParentsName);
-			ITERATE(m_NonPublicParentsName);
+			for (const auto& parents : m_ParentNames)
+				if (BitwiseUtils::IsEnabled(AccessFlags, parents.GetFirst()))
+					ITERATE(parents.GetSecond());
 		}
 
 		void ObjectType::GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const
 		{
-			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
-				List.AddRange(m_NonPublicNestedTypes);
-			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
-				List.AddRange(m_PublicNestedTypes);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) && m_NestedTypes.Contains(AccessSpecifiers::Private))
+				List.AddRange(m_NestedTypes[AccessSpecifiers::Private]);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected) && m_NestedTypes.Contains(AccessSpecifiers::Protected))
+				List.AddRange(m_NestedTypes[AccessSpecifiers::Protected]);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public) && m_NestedTypes.Contains(AccessSpecifiers::Public))
+				List.AddRange(m_NestedTypes[AccessSpecifiers::Public]);
 		}
 
 		void ObjectType::GetFunctions(AccessSpecifiers AccessFlags, FunctionTypeList& List) const
 		{
-			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
-				List.AddRange(m_NonPublicFunctions);
-			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
-				List.AddRange(m_PublicFunctions);
-		}
-
-		const FunctionType* const ObjectType::GetFunction(const String& Name, AccessSpecifiers Access) const
-		{
-			for (auto type : (Access == AccessSpecifiers::Public ? m_PublicFunctions : m_NonPublicFunctions))
-				if (type->GetName() == Name)
-					return (FunctionType*)&type;
-
-			return nullptr;
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) && m_Functions.Contains(AccessSpecifiers::Private))
+				List.AddRange(m_Functions[AccessSpecifiers::Private]);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected) && m_Functions.Contains(AccessSpecifiers::Protected))
+				List.AddRange(m_Functions[AccessSpecifiers::Protected]);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public) && m_Functions.Contains(AccessSpecifiers::Public))
+				List.AddRange(m_Functions[AccessSpecifiers::Public]);
 		}
 
 		void ObjectType::GetProperties(AccessSpecifiers AccessFlags, PropertyTypeList& List) const
 		{
-			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) || BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected))
-				List.AddRange(m_NonPublicProperties);
-			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public))
-				List.AddRange(m_PublicProperties);
-		}
-
-		AnyDataType ObjectType::CreateInstance(void) const
-		{
-			AnyDataType returnValue;
-			CreateInstanceInternal(returnValue, nullptr);
-			return returnValue;
-		}
-
-		AnyDataType ObjectType::CreateInstance(const AnyDataType& Argument) const
-		{
-			ArgumentsList args;
-			args.Add(Argument);
-
-			AnyDataType returnValue;
-			CreateInstanceInternal(returnValue, &args);
-			return returnValue;
-		}
-
-		AnyDataType ObjectType::CreateInstance(const ArgumentsList& Arguments) const
-		{
-			AnyDataType returnValue;
-			CreateInstanceInternal(returnValue, &Arguments);
-			return returnValue;
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Private) && m_Properties.Contains(AccessSpecifiers::Private))
+				List.AddRange(m_Properties[AccessSpecifiers::Private]);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Protected) && m_Properties.Contains(AccessSpecifiers::Protected))
+				List.AddRange(m_Properties[AccessSpecifiers::Protected]);
+			if (BitwiseUtils::IsEnabled(AccessFlags, AccessSpecifiers::Public) && m_Properties.Contains(AccessSpecifiers::Public))
+				List.AddRange(m_Properties[AccessSpecifiers::Public]);
 		}
 	}
 }

@@ -281,17 +281,17 @@ namespace Engine
 			return '\0';
 		}
 
-		void Tokenizer::RequireToken(Token& Token)
+		void Tokenizer::RequireToken(Token& Token, const String& Tag)
 		{
 			if (GetToken(Token))
 				return;
 
-			THROW_LEXER_EXCEPTION("Token required");
+			ThrowRequiredException(Tag);
 		}
 
 		bool Tokenizer::MatchIdentifierToken(Token& Token)
 		{
-			RequireToken(Token);
+			RequireToken(Token, "identifier token parsing");
 
 			if (Token.GetType() != Token::Types::Identifier)
 			{
@@ -302,12 +302,12 @@ namespace Engine
 			return true;
 		}
 
-		void Tokenizer::RequireIdentifierToken(Token& Token)
+		void Tokenizer::RequireIdentifierToken(Token& Token, const String& Tag)
 		{
 			if (MatchIdentifierToken(Token))
 				return;
 
-			THROW_LEXER_EXCEPTION("Missing an identifier");
+			ThrowRequiredException(Tag);
 		}
 
 		bool Tokenizer::MatchIdentifier(const String& Match)
@@ -352,6 +352,15 @@ namespace Engine
 				return;
 
 			ThrowMissingException(Match, Tag);
+		}
+
+		void Tokenizer::ThrowRequiredException(const String& Tag)
+		{
+			Token token;
+			if (GetToken(token))
+				THROW_LEXER_EXCEPTION("Missing token before '" + token.GetName() + "' " + Tag);
+			else
+				THROW_LEXER_EXCEPTION("Missing token " + Tag);
 		}
 
 		void Tokenizer::ThrowMissingException(const String& Match, const String& Tag)

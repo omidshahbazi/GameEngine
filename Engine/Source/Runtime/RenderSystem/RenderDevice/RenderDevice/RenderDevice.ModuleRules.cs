@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public RenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public RenderDeviceModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("MathContainers");
 

@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public RenderCommonModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public RenderCommonModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Allocators");
 			PublicDependencyModuleNames.Add("Containers");

@@ -13,8 +13,8 @@ namespace Engine.Runtime.Utility
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ThreadingModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ThreadingModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Platform");

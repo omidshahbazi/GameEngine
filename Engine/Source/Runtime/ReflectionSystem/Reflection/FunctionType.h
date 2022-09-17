@@ -40,7 +40,7 @@ namespace Engine
 			AnyDataType Invoke(void* TargetObject, const ArgumentsList& Arguments) const;
 
 		protected:
-			virtual void InvokeInternal(void* TargetObject, AnyDataType& ReturnValue, const ArgumentsList* Arguments) const = 0;
+			virtual void InvokeInternal(void* TargetObject, const ArgumentsList* Arguments, AnyDataType& ReturnValue) const = 0;
 
 		protected:
 			DataType m_ReturnType;

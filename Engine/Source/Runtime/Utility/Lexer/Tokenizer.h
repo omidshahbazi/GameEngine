@@ -41,10 +41,10 @@ namespace Engine
 				return (m_CurrentIndex < m_Text.GetLength() ? m_Text[m_CurrentIndex] : '\0');
 			}
 
-			virtual void RequireToken(Token& Token);
+			virtual void RequireToken(Token& Token, const String& Tag);
 
 			virtual bool MatchIdentifierToken(Token& Token);
-			virtual void RequireIdentifierToken(Token& Token);
+			virtual void RequireIdentifierToken(Token& Token, const String& Tag);
 
 			virtual bool MatchIdentifier(const String& Match);
 			virtual void RequireIdentifier(const String& Match, const String& Tag);
@@ -52,6 +52,7 @@ namespace Engine
 			virtual bool MatchSymbol(const String& Match);
 			virtual void RequireSymbol(const String& Match, const String& Tag);
 
+			virtual void ThrowRequiredException(const String& Tag);
 			virtual void ThrowMissingException(const String& Match, const String& Tag);
 
 			INLINE uint32 GetPrevIndex(void) const

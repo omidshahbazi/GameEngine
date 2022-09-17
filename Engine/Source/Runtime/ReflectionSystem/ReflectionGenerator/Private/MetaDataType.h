@@ -17,6 +17,11 @@ namespace Engine
 				virtual ~MetaDataType(void)
 				{
 				}
+
+				bool GetIsEmpty(void)
+				{
+					return (m_ValueType == ValueTypes::None && m_ExtraValueType == String::Empty);
+				}
 			};
 		}
 	}

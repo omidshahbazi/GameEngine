@@ -13,8 +13,8 @@ namespace Engine.Developer.ThirdParty
 			get { return UseTypes.UseOnly; }
 		}
 
-		public FreeTypeModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public FreeTypeModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			IncludePaths.Add("include/");
 

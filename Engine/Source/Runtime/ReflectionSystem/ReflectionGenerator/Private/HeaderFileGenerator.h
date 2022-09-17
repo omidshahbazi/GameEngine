@@ -17,6 +17,9 @@ namespace Engine
 
 		private:
 			static void GenerateHeaderCode(const TypeList& Types, String& Content);
+			static void GenerateTypesCode(const TypeList& Types, String& Content);
+			static void GenerateTypeCode(Type* Type, String& Content);
+			static void GenerateObjectCode(MetaObject* Type, String& Content);
 		};
 	}
 }

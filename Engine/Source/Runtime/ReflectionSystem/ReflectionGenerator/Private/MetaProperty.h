@@ -25,6 +25,11 @@ namespace Engine
 				virtual ~MetaProperty(void)
 				{
 				}
+
+				INLINE String GetUniqueName(void) const
+				{
+					return (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_" + m_Name;
+				}
 			};
 		}
 	}

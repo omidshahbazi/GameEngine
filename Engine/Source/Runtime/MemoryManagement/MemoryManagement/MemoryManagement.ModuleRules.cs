@@ -13,8 +13,8 @@ namespace Engine.Runtime.MemoryManagement
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public MemoryManagementModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public MemoryManagementModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Common");
 			PublicDependencyModuleNames.Add("Allocators");

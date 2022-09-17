@@ -13,8 +13,8 @@ namespace Engine.Runtime.DynamicModuleSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public DynamicModuleSystemModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public DynamicModuleSystemModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("FileUtility");
 

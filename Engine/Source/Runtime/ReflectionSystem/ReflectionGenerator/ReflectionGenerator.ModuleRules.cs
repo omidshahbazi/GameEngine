@@ -13,8 +13,8 @@ namespace Engine.Programs
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ReflectionGeneratorModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ReflectionGeneratorModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("FileUtility");

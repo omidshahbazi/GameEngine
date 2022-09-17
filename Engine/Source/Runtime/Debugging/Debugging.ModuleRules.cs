@@ -13,8 +13,8 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public DebuggingModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public DebuggingModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Platform");
 			PrivateDependencyModuleNames.Add("FileUtility");

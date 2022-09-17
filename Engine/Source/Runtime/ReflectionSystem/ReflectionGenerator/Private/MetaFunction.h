@@ -3,6 +3,7 @@
 #define META_FUNCTION_H
 #include <Reflection\ObjectType.h>
 #include <Reflection\Private\ImplementFunctionType.h>
+#include <ReflectionGenerator\Private\MetaObject.h>
 #include <ReflectionGenerator\Private\Specifiers.h>
 
 namespace Engine
@@ -25,13 +26,13 @@ namespace Engine
 				{
 				}
 
-				INLINE void GetUniqueName(String& Name) const
+				INLINE String GetUniqueName(void) const
 				{
-					Name = (m_TopNest->GetName() + "_") + m_Name;
+					return (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_" + m_Name;
 				}
 
 			protected:
-				void InvokeInternal(void* TargetObject, AnyDataType& ReturnValue, const ArgumentsList* Argumetns) const override
+				void InvokeInternal(void* TargetObject, const ArgumentsList* Argumetns, AnyDataType& ReturnValue) const override
 				{
 				}
 			};

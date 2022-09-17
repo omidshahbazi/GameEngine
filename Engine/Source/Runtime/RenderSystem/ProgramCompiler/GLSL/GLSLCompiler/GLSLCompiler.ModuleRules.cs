@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public GLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public GLSLCompilerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Platform");

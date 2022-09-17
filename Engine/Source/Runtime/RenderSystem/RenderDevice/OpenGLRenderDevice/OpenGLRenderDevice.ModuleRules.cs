@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public OpenGLRenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public OpenGLRenderDeviceModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Containers");

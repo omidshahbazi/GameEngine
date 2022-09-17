@@ -40,17 +40,19 @@ namespace Engine
 				virtual void CompileEnumDeclaration(TypeList& Types);
 				virtual void CompileConstructorDeclaration(void);
 				virtual void CompileFunctionDeclaration(void);
-				virtual void CompileVariableDeclaration(void);
+				virtual void CompilePropertyDeclaration(void);
 
 				virtual void PushNamespace(void);
 				virtual void PopNamespace(void);
 				String GetFullNamespace(void) const;
 
-				virtual AccessSpecifiers ParseAccessSpecifier(Token& Token);
-
-				virtual void AddBlockLevel(void)
+				virtual void IncreaseBlockLevel(void)
 				{
-					m_BlockLevel++;
+					++m_BlockLevel;
+				}
+				virtual void DecreaseBlockLevel(void)
+				{
+					--m_BlockLevel;
 				}
 
 			private:

@@ -48,26 +48,26 @@ namespace Engine
 					CompileObjectDeclaration(DelarationToken, Types, false);
 				else if (DelarationToken.Matches(REFLECTION_STRUCT_TEXT, Token::SearchCases::CaseSensitive))
 					CompileObjectDeclaration(DelarationToken, Types, true);
-				else if (m_CurrentObject != nullptr && DelarationToken.Matches(m_CurrentObject->GetName(), Token::SearchCases::CaseSensitive))
-					CompileConstructorDeclaration();
 				else if (DelarationToken.Matches(REFLECTION_ENUM_TEXT, Token::SearchCases::CaseSensitive))
 					CompileEnumDeclaration(Types);
-				else if (DelarationToken.Matches(REFLECTION_FUNCTION_TEXT, Token::SearchCases::CaseSensitive))
+				else if (m_CurrentObject != nullptr && DelarationToken.Matches(m_CurrentObject->GetName(), Token::SearchCases::CaseSensitive))
+					CompileConstructorDeclaration();
+				else if (DelarationToken.Matches(REFLECTION_FUNCTION_TEXT, Token::SearchCases::CaseSensitive) && m_CurrentObject != nullptr)
 					CompileFunctionDeclaration();
-				else if (DelarationToken.Matches(REFLECTION_PROPERTY_TEXT, Token::SearchCases::CaseSensitive))
-					CompileVariableDeclaration();
+				else if (DelarationToken.Matches(REFLECTION_PROPERTY_TEXT, Token::SearchCases::CaseSensitive) && m_CurrentObject != nullptr)
+					CompilePropertyDeclaration();
 				else if (DelarationToken.Matches(OPEN_BRACKET, Token::SearchCases::CaseSensitive))
-					AddBlockLevel();
+					IncreaseBlockLevel();
 				else if (DelarationToken.Matches(CLOSE_BRACKET, Token::SearchCases::CaseSensitive))
 				{
-					m_BlockLevel--;
+					DecreaseBlockLevel();
 
 					if (MatchSymbol(SEMICOLON))
 					{
 						if (m_CurrentObject != nullptr && m_BlockLevel == m_CurrentObject->GetBlockLevel())
 							m_CurrentObject = ReinterpretCast(MetaObject*, m_CurrentObject->GetTopNest());
 					}
-					else
+					else if (m_CurrentObject == nullptr)
 						PopNamespace();
 				}
 				else if (DelarationToken.Matches(NAMESPACE, Token::SearchCases::CaseSensitive))
@@ -98,13 +98,13 @@ namespace Engine
 				}
 
 				Token nameToken;
-				RequireIdentifierToken(nameToken);
+				RequireIdentifierToken(nameToken, "object");
 
 				bool hasParent = false;
 				if (!((hasParent = MatchSymbol(COLON)) || MatchSymbol(OPEN_BRACKET)))
 				{
 					nameToken.SetIdentifier(String::Empty);
-					RequireIdentifierToken(nameToken);
+					RequireIdentifierToken(nameToken, "object");
 
 					hasParent = MatchSymbol(COLON);
 				}
@@ -127,7 +127,7 @@ namespace Engine
 							RequireSymbol(COMMA, "in parent list parsing");
 
 						Token token;
-						RequireIdentifierToken(token);
+						RequireIdentifierToken(token, "object");
 
 						AccessSpecifiers access = ParseAccessSpecifier(token);
 
@@ -136,7 +136,7 @@ namespace Engine
 						else
 						{
 							Token token;
-							RequireIdentifierToken(token);
+							RequireIdentifierToken(token, "object");
 
 							type->AddParentName(token.GetName(), access);
 						}
@@ -155,7 +155,7 @@ namespace Engine
 				m_CurrentObject = type;
 				m_CurrentObject->SetBlockLevel(m_BlockLevel);
 
-				AddBlockLevel();
+				IncreaseBlockLevel();
 			}
 
 			void HeaderParser::CompileEnumDeclaration(TypeList& Types)
@@ -163,41 +163,43 @@ namespace Engine
 				MetaEnum* type = ReinterpretCast(MetaEnum*, AllocateMemory(m_Allocator, sizeof(MetaEnum)));
 				Construct(type, m_CurrentObject);
 
-				ParseSpecifiers(type, "enum");
+				type->SetNamespace(GetFullNamespace());
 
-				RequireIdentifier(ENUM, "enum");
+				ParseSpecifiers(type, "in enum");
+
+				RequireIdentifier(ENUM, "in enum");
 
 				MatchIdentifier(CLASS);
 
 				Token nameToken;
-				RequireIdentifierToken(nameToken);
+				RequireIdentifierToken(nameToken, "object");
 				type->SetName(nameToken.GetName());
 
-				uint8 membersCount = 0;
-				int32 prevItemValue = 0;
-				while (true)
+				RequireSymbol(OPEN_BRACKET, "in enum");
+
+				bool metCloseBracket = false;
+				while (!metCloseBracket)
 				{
-					Token itemNameToken;
-					RequireIdentifierToken(itemNameToken);
-
-					if (MatchSymbol(EQUAL))
+					Token itemToken;
+					while (true)
 					{
-						Token itemValueToken;
-						RequireToken(itemValueToken);
+						if (MatchSymbol(COMMA))
+							break;
 
-						prevItemValue = itemValueToken.GetConstantInt32();
+						if (MatchSymbol(CLOSE_BRACKET))
+						{
+							metCloseBracket = true;
+							break;
+						}
+
+						RequireToken(itemToken, "in enum", true);
 					}
 
-					type->AddItem(itemNameToken.GetName(), prevItemValue);
-
-					++prevItemValue;
-
-					if (MatchSymbol(COMMA))
-						continue;
-
-					if (MatchSymbol(CLOSE_BRACKET))
-						break;
+					if (itemToken.GetName() != String::Empty)
+						type->AddItem(itemToken.GetName(), 0);
 				}
+
+				RequireSymbol(SEMICOLON, "in enum");
 
 				if (m_CurrentObject == nullptr)
 					Types.Add(type);
@@ -228,14 +230,12 @@ namespace Engine
 
 				MetaDataType returnType;
 				if (!ParseDataType(returnType))
-				{
-					DeallocateMemory(m_Allocator, func);
-					return;
-				}
+					THROW_REFLECTION_GENERATOR_EXCEPTION("Unrecognized data type");
+
 				func->SetReturnType(returnType);
 
 				Token nameToken;
-				GetToken(nameToken);
+				RequireIdentifierToken(nameToken, "function");
 				func->SetName(nameToken.GetName());
 
 				if (!MatchSymbol(OPEN_BRACE))
@@ -252,7 +252,7 @@ namespace Engine
 				m_CurrentObject->AddFunction(func);
 			}
 
-			void HeaderParser::CompileVariableDeclaration(void)
+			void HeaderParser::CompilePropertyDeclaration(void)
 			{
 				MetaProperty* property = ReinterpretCast(MetaProperty*, AllocateMemory(m_Allocator, sizeof(MetaProperty)));
 				Construct(property, m_CurrentObject);
@@ -260,16 +260,14 @@ namespace Engine
 				ParseSpecifiers(property, "property");
 
 				MetaDataType dataType;
-				ParseDataType(dataType);
+				if (!ParseDataType(dataType))
+					THROW_REFLECTION_GENERATOR_EXCEPTION("Unrecognized data type");
 
-				if (dataType.GetValueType() == ValueTypes::None && dataType.GetExtraValueType() == String::Empty)
-					THROW_REFLECTION_GENERATOR_EXCEPTION("Unexpected token");
+				property->SetDataType(dataType);
 
 				Token nameToken;
-				GetToken(nameToken);
-
+				RequireIdentifierToken(nameToken, "property");
 				property->SetName(nameToken.GetName());
-				property->SetDataType(dataType);
 
 				m_CurrentObject->AddProperty(property);
 			}
@@ -277,10 +275,9 @@ namespace Engine
 			void HeaderParser::PushNamespace(void)
 			{
 				Token nameToken;
-				GetToken(nameToken);
 
-				if (!MatchSymbol(OPEN_BRACKET))
-					return;
+				while (!MatchSymbol(OPEN_BRACKET))
+					RequireToken(nameToken, "reading namespace");
 
 				m_Namespaces.Push(nameToken.GetName());
 			}
@@ -298,26 +295,13 @@ namespace Engine
 				for (auto& name : m_Namespaces)
 				{
 					if (!isFirst)
-						str += "::";
-
+						str = "::" + str;
 					isFirst = false;
 
-					str += name;
+					str = name + str;
 				}
 
 				return str;
-			}
-
-			AccessSpecifiers HeaderParser::ParseAccessSpecifier(Token& Token)
-			{
-				if (Token.GetName() == "private")
-					return AccessSpecifiers::Private;
-				else if (Token.GetName() == "protected")
-					return AccessSpecifiers::Protected;
-				else if (Token.GetName() == "public")
-					return AccessSpecifiers::Public;
-
-				return AccessSpecifiers::None;
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Engine::Containers::AnyDataType">
-    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::VoidPointer">{m_Data.VoidPointer}</DisplayString>
+    <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Void">{m_Data.Void}</DisplayString>
     <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int8">{m_Data.Int8}</DisplayString>
     <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int16">{m_Data.Int16}</DisplayString>
     <DisplayString Condition="m_ValueType == Engine::Common::ValueTypes::Int32">{m_Data.Int32}</DisplayString>

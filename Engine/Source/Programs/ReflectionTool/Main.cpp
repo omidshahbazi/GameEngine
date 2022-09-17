@@ -36,7 +36,7 @@ BEGIN_ENTRY_POINT
 
 	try
 	{
-		bool result = ReflectionGenerator::Generate(& allocator, filePath, outputBaseFileName);
+		bool result = ReflectionGenerator::Generate(&allocator, filePath, outputBaseFileName);
 
 		return (result ? 0 : 1);
 	}

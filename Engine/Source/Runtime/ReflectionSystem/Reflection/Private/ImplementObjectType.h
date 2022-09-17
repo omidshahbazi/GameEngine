@@ -23,6 +23,11 @@ namespace Engine
 					m_Name = Value;
 				}
 
+				INLINE void SetNamespace(const String& Namespace)
+				{
+					m_Namespace = Namespace;
+				}
+
 				INLINE void SetIsStruct(bool Value)
 				{
 					m_IsStruct = Value;

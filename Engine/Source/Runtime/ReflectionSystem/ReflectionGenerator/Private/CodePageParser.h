@@ -3,8 +3,6 @@
 #define CODE_PAGE_PARSER_H
 
 #include <Lexer\Tokenizer.h>
-#include <ReflectionGenerator\Private\Specifiers.h>
-#include <Reflection\Type.h>
 #include <ReflectionGenerator\Private\MetaDataType.h>
 #include <ReflectionGenerator\Private\MetaFunction.h>
 
@@ -54,14 +52,20 @@ namespace Engine
 			protected:
 				virtual bool GetToken(Token& Token, bool NoConst = false, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 
+				virtual void RequireToken(Token& Token, const String& Tag, bool NoConst = false);
+
 				virtual bool MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 				virtual bool RequireSymbol(const String& Match, const String& Tag, SymbolParseOptions ParseTemplateCloseBracket = SymbolParseOptions::Normal);
 
 				virtual void ParseSpecifiers(Specifiers* Specifiers, const String& TypeName);
 
 				virtual void ParseParameters(MetaFunction* Function);
+
 				virtual bool ParseDataType(MetaDataType& DataType);
+
 				static ValueTypes ParseValueType(const String& Value);
+
+				virtual AccessSpecifiers ParseAccessSpecifier(Token& Token);
 			};
 		}
 	}

@@ -2,13 +2,13 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define REFLECTION_CLASS(...) ;
-#define REFLECTION_STRUCT(...) ;
-#define REFLECTION_ENUM(...) ;
-#define REFLECTION_PROPERTY(...) ;
-#define REFLECTION_FUNCTION(...) ;
+#define REFLECTION_CLASS(...)
+#define REFLECTION_STRUCT(...)
+#define REFLECTION_ENUM(...)
+#define REFLECTION_PROPERTY(...)
+#define REFLECTION_FUNCTION(...)
 
-#define REFLECTION_ABSTRACT ;
+#define REFLECTION_ABSTRACT
 
 #define TypeOf(Type) Type::GetType()
 

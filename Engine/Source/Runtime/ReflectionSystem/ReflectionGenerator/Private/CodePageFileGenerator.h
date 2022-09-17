@@ -7,13 +7,6 @@
 #include <Reflection\Definitions.h>
 #include <Containers\Strings.h>
 
-//#include <Allocators\AllocatorBase.h>
-//#include <Reflection\Private\ImplementObjectType.h>
-//#include <Reflection\Private\ImplementEnumType.h>
-//#include <Reflection\Private\ImplementPropertyType.h>
-//#include <ReflectionGenerator\Private\MetaObject.h>
-//#include <Containers\StringUtility.h>
-
 namespace Engine
 {
 	using namespace Allocators;
@@ -30,22 +23,18 @@ namespace Engine
 			static const cstr FILE_HEADER;
 
 		protected:
-			static String GetUniqueClassName(MetaObject* Object);
+			static void GenerateDataType(const DataType& Type, const String& VariableName, String& Content);
 
-			//static void GetSignature(const DataType& DataType, String& Signature);
-			//static void GetSignature(FunctionType* Function, String& Signature, String& SignatureName);
-			//static void GetSignature(const ParameterType& Parameter, String& Signature);
-			//
-			//static String GetPointerName(Type* Type);
-			//	   
-			//static String GetAccessSpecifier(AccessSpecifiers Access);
-			//	   
-			//static String GetArgumentsDataTypeText(const ParameterTypeList& Parameters);
-			//static String GetArgumentDataTypeText(int32 Index, const DataType& Type);
-			//	   
-			//static String GetVariableDataTypeText(const String& Name, const DataType& Type);
-			//	   
-			//static String GetValueType(ValueTypes Type);
+			static String GetPassType(DataType::PassesTypes Type);
+			static String GetAccessSpecifier(AccessSpecifiers Access);
+
+			static String GetValueType(ValueTypes Type);
+			static String GetValueTypeName(ValueTypes Type);
+
+			static String GetImplementType(Type* Type);
+			static String GetImplementTypePointerName(Type* Type);
+			static String GetRegistryTypeName(ObjectType* Type);
+			static String GetRegistryTypePointerName(ObjectType* Type);
 
 			static void WriteToFile(const WString& FilePath, const String& Data);
 		};

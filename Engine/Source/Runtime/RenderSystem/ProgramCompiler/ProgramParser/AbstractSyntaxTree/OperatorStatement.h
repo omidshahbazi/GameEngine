@@ -109,44 +109,44 @@ namespace Engine
 					switch (Operator)
 					{
 					case Operators::Multiplication:
-						return "*";
+						return STRINGIZE(*);
 					case Operators::Division:
-						return "/";
+						return STRINGIZE(/);
 					case Operators::Remainder:
-						return "%";
+						return STRINGIZE(%);
 					case Operators::Addition:
-						return "+";
+						return STRINGIZE(+);
 					case Operators::Subtraction:
-						return "-";
+						return STRINGIZE(-);
 					case Operators::Assignment:
-						return "=";
+						return STRINGIZE(=);
 					case Operators::AdditionAssignment:
-						return "+=";
+						return STRINGIZE(+=);
 					case Operators::SubtractionAssignment:
-						return "+=";
+						return STRINGIZE(-=);
 					case Operators::MultiplicationAssignment:
-						return "*=";
+						return STRINGIZE(*=);
 					case Operators::DivisionAssignment:
-						return "/=";
+						return STRINGIZE(/=);
 					case Operators::EqualCheck:
-						return "==";
+						return STRINGIZE(==);
 					case Operators::NotEqualCheck:
-						return "!=";
+						return STRINGIZE(!=);
 					case Operators::LessCheck:
-						return "<";
+						return STRINGIZE(<);
 					case Operators::LessEqualCheck:
-						return "<=";
+						return STRINGIZE(<=);
 					case Operators::GreaterCheck:
-						return ">";
+						return STRINGIZE(>);
 					case Operators::GreaterEqualCheck:
-						return ">=";
+						return STRINGIZE(>=);
 					case Operators::LogicalAnd:
-						return "&&";
+						return STRINGIZE(&&);
 					case Operators::LogicalOr:
-						return "||";
+						return STRINGIZE(||);
 					}
 
-					return "";
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 			private:

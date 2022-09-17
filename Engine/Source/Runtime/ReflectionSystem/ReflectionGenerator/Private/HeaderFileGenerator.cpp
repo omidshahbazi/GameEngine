@@ -7,6 +7,12 @@ namespace Engine
 
 	namespace ReflectionGenerator
 	{
+#ifdef DEBUG_MODE
+#define ADD_NEW_LINE() Content += "\n";
+#else
+#define ADD_NEW_LINE()
+#endif
+
 		using namespace Private;
 
 		void HeaderFileGenerator::Generate(const TypeList& Types, const WString& OutputFilePath)
@@ -14,59 +20,94 @@ namespace Engine
 			String content = FILE_HEADER;
 
 			GenerateHeaderCode(Types, content);
+			GenerateTypesCode(Types, content);
 
 			WriteToFile(OutputFilePath, content);
 		}
 
 		void HeaderFileGenerator::GenerateHeaderCode(const TypeList& Types, String& Content)
 		{
-#ifdef DEBUG_MODE
-#define ADD_NEW_LINE() Content += "\n";
-#else
-#define ADD_NEW_LINE()
-#endif
+			ADD_NEW_LINE();
 
-			const String OBJECTTYPE(STRINGIZE(Engine::Reflection::ObjectType));
+			Content += R"(#include <Reflection\Definitions.h>)";
+			ADD_NEW_LINE();
 
+			Content += R"(#include <Reflection\ObjectType.h>)";
+			ADD_NEW_LINE();
+
+			ADD_NEW_LINE();
+		}
+
+		void HeaderFileGenerator::GenerateTypesCode(const TypeList& Types, String& Content)
+		{
 			for (auto& t : Types)
+				GenerateTypeCode(t, Content);
+		}
+
+		void HeaderFileGenerator::GenerateTypeCode(Type* Type, String& Content)
+		{
+			if (IsTypeOf(Type, ObjectType))
+				GenerateObjectCode(ReinterpretCast(MetaObject*, Type), Content);
+		}
+
+		void HeaderFileGenerator::GenerateObjectCode(MetaObject* Type, String& Content)
+		{
+			const String OBJECT_TYPE(STRINGIZE(Engine::Reflection::ObjectType));
+			const String MACRO_NAME = Type->GetDeclarationMacroName();
+			const String IMPLEMENT_OBJECT_TYPE = GetImplementType(Type);
+
+			Content += "#ifdef " + MACRO_NAME;
+			ADD_NEW_LINE();
+			Content += "#undef " + MACRO_NAME;
+			ADD_NEW_LINE();
+			Content += "#endif";
+			ADD_NEW_LINE();
+			Content += "#define " + MACRO_NAME + "() \\";
+			ADD_NEW_LINE();
+			Content += "	friend class " + IMPLEMENT_OBJECT_TYPE + "; \\";
+			ADD_NEW_LINE();
+
+			auto generateFriendClassForFunctions = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 			{
-				Content += "\n";
+				FunctionTypeList items;
+				Type->GetFunctions(AccessLevel, items);
 
-				if (IsTypeOf(t, ObjectType))
+				for (auto& item : items)
 				{
-					MetaObject* type = ReinterpretCast(MetaObject*, t);
+					const String IMPLEMENT_FUNCTION_TYPE = GetImplementType(item);
 
-					const String macroName = type->GetDeclarationMacroName();
-					const String reflectionClassName = GetUniqueClassName(type);
-
-					Content += R"(#include <Reflection\Definitions.h>)";
+					Content += "	friend class " + IMPLEMENT_FUNCTION_TYPE + "; \\";
 					ADD_NEW_LINE();
-
-					Content += R"(#include <Reflection\DataStructureType.h>)";
-					ADD_NEW_LINE();
-
-					Content += "using namespace ;";
-					ADD_NEW_LINE();
-
-					Content += "#ifdef " + macroName;
-					ADD_NEW_LINE();
-					Content += "#undef " + macroName;
-					ADD_NEW_LINE();
-					Content += "#endif";
-					ADD_NEW_LINE();
-					Content += "#define " + macroName + "() \\";
-					ADD_NEW_LINE();
-					Content += "	friend class " + reflectionClassName + "; \\";
-					ADD_NEW_LINE();
-					Content += "public: \\";
-					ADD_NEW_LINE();
-					Content += "		static const " + OBJECTTYPE + "& GetType(void);";
-
-					TypeList nestedTypes;
-					type->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, nestedTypes);
-					GenerateHeaderCode(nestedTypes, Content);
 				}
-			}
+			};
+
+			auto generateFriendClassForNProperties = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
+			{
+				PropertyTypeList items;
+				Type->GetProperties(AccessLevel, items);
+
+				for (auto& item : items)
+				{
+					const String IMPLEMENT_PROPERTY_TYPE = GetImplementType(item);
+
+					Content += "	friend class " + IMPLEMENT_PROPERTY_TYPE + "; \\";
+					ADD_NEW_LINE();
+				}
+			};
+
+			generateFriendClassForFunctions(Type, AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public);
+			generateFriendClassForNProperties(Type, AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public);
+
+			Content += "public: \\";
+			ADD_NEW_LINE();
+			Content += "		static const " + OBJECT_TYPE + "& GetType(void);";
+			ADD_NEW_LINE();
+
+			ADD_NEW_LINE();
+
+			TypeList nestedTypes;
+			Type->GetNestedTypes(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, nestedTypes);
+			GenerateTypesCode(nestedTypes, Content);
 
 #undef ADD_NEW_LINE
 		}

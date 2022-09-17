@@ -9,14 +9,16 @@ namespace Engine.Frontend.System.Generator
 {
 	static class EngineProjectFileCreator
 	{
+		private const string DebugModeProjectPreprocessor = "DEBUG_MODE_PROJECT";
+
 		private static string ProjectFilePath
 		{
 			get { return EnvironmentHelper.EngineDirectory + "Engine.vcxproj"; }
 		}
 
-		public static bool Generate()
+		public static bool Generate(bool DebugModeProject)
 		{
-			RulesLibrary.Instance.Build(false);
+			RulesLibrary.Instance.Build(false, (DebugModeProject ? DebugModeProjectPreprocessor : ""));
 
 			TargetRules[] targets = RulesLibrary.Instance.GetTargetRules(ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.PlatformArchitectures.x64);
 
@@ -86,6 +88,17 @@ namespace Engine.Frontend.System.Generator
 			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CompileFileSearchPattern);
 			foreach (string file in files)
 				projectFile.AddCompileFile(file);
+
+			if (DebugModeProject)
+			{
+				files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.IntermediateDirectory, EnvironmentHelper.HeaderFileSearchPattern);
+				foreach (string file in files)
+					projectFile.AddIncludeFile(file.Replace(EnvironmentHelper.EngineDirectory, ""));
+
+				files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.IntermediateDirectory, EnvironmentHelper.CompileFileSearchPattern);
+				foreach (string file in files)
+					projectFile.AddCompileFile(file.Replace(EnvironmentHelper.EngineDirectory, ""));
+			}
 
 			MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
 			generator.ToolsVersion = MSBuildProcess.Info.ToolsVersion;

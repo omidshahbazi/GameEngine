@@ -19,8 +19,8 @@ namespace Engine.Runtime.ThirdParty
 			get { return UseTypes.UseOnly; }
 		}
 
-		public GLSLANGModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public GLSLANGModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			IncludePaths.Add("include/");
 

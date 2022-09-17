@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <Reflection\PropertyType.h>
 #include <Reflection\Enum.h>
+#include <Containers\Exception.h>
 
 namespace Engine
 {
@@ -22,8 +23,11 @@ namespace Engine
 
 			switch (m_DataType.GetValueType())
 			{
-			case ValueTypes::VoidPointer:
-				return ReinterpretCast(void*, target);
+			case ValueTypes::Void:
+			{
+				if (m_DataType.GetPassType() == DataType::PassesTypes::Pointer)
+					return ReinterpretCast(void*, target);
+			}
 			case ValueTypes::Bool:
 				return *ReinterpretCast(bool*, target);
 			case ValueTypes::Int8:
@@ -64,7 +68,7 @@ namespace Engine
 				return *ReinterpretCast(Matrix4F*, target);
 			}
 
-			return AnyDataType();
+			THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
 		}
 
 		void PropertyType::SetValue(void* TargetObject, const AnyDataType& Value)

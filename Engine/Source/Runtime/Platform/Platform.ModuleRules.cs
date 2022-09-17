@@ -1,11 +1,11 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 namespace Engine.Runtime
 {
-    class PlatformModuleRules : ModuleRules
-    {
-        public override string Name
-        {
-            get { return "Platform"; }
+	class PlatformModuleRules : ModuleRules
+	{
+		public override string Name
+		{
+			get { return "Platform"; }
 		}
 
 		public override UseTypes UseType
@@ -13,17 +13,21 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public PlatformModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public PlatformModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("GLEW");
 
-			DependencyStaticLibraries.Add("rpcrt4.lib");
-			DependencyStaticLibraries.Add("opengl32.lib");
-			DependencyStaticLibraries.Add("Shcore.lib");
+			if (OperatingSystem == OperatingSystems.Windows)
+			{
+				DependencyStaticLibraries.Add("rpcrt4.lib");
+				DependencyStaticLibraries.Add("opengl32.lib");
+				DependencyStaticLibraries.Add("Shcore.lib");
+				DependencyStaticLibraries.Add("Version.lib");
 
-			PreprocessorDefinitions.Add("_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING");
+				PreprocessorDefinitions.Add("_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING");
+			}
 		}
-    }
+	}
 }

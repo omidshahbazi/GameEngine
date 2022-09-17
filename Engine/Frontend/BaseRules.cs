@@ -4,6 +4,12 @@ namespace Engine
 {
 	public abstract class BaseRules
 	{
+		public enum OperatingSystems
+		{
+			Windows = 0,
+			Linux
+		}
+
 		public enum Configurations
 		{
 			Debug = 0,

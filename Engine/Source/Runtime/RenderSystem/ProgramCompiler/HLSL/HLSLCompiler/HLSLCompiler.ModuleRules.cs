@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public HLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public HLSLCompilerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Platform");

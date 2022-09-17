@@ -5,12 +5,6 @@ namespace Engine
 {
 	public abstract class TargetRules : BaseRules
 	{
-		public enum OperatingSystems
-		{
-			Windows = 0,
-			Linux
-		}
-
 		internal const string FilePostfix = ".TargetRules.cs";
 
 		public abstract string ModuleName

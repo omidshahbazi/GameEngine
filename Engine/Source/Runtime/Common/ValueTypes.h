@@ -10,7 +10,7 @@ namespace Engine
 		{
 			None = 0,
 
-			VoidPointer,
+			Void,
 
 			Bool,
 

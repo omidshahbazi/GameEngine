@@ -13,8 +13,8 @@ namespace Engine.Programs
 			get { return UseTypes.Executable; }
 		}
 
-		public ReflectionToolModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ReflectionToolModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Allocators");

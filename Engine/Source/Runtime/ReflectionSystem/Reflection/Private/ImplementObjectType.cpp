@@ -14,34 +14,50 @@ namespace Engine
 
 			void ImplementObjectType::AddParentName(const String& Value, AccessSpecifiers Access)
 			{
-				if (Access == AccessSpecifiers::Public)
-					m_PublicParentsName.Add(Value);
-				else
-					m_NonPublicParentsName.Add(Value);
+				if (m_ParentNames.Contains(Access))
+				{
+					m_ParentNames[Access].Add(Value);
+					return;
+				}
+
+				auto& list = m_ParentNames[Access] = StringList(m_ParentNames.GetAllocator());
+				list.Add(Value);
 			}
 
 			void ImplementObjectType::AddNestedType(Type* Value, AccessSpecifiers Access)
 			{
-				if (Access == AccessSpecifiers::Public)
-					m_PublicNestedTypes.Add(Value);
-				else
-					m_NonPublicNestedTypes.Add(Value);
+				if (m_NestedTypes.Contains(Access))
+				{
+					m_NestedTypes[Access].Add(Value);
+					return;
+				}
+
+				auto& list = m_NestedTypes[Access] = TypeList(m_ParentNames.GetAllocator());
+				list.Add(Value);
 			}
 
 			void ImplementObjectType::AddFunction(FunctionType* Value, AccessSpecifiers Access)
 			{
-				if (Access == AccessSpecifiers::Public)
-					m_PublicFunctions.Add(Value);
-				else
-					m_NonPublicFunctions.Add(Value);
+				if (m_Functions.Contains(Access))
+				{
+					m_Functions[Access].Add(Value);
+					return;
+				}
+
+				auto& list = m_Functions[Access] = FunctionTypeList(m_ParentNames.GetAllocator());
+				list.Add(Value);
 			}
 
 			void ImplementObjectType::AddProperty(PropertyType* Value, AccessSpecifiers Access)
 			{
-				if (Access == AccessSpecifiers::Public)
-					m_PublicProperties.Add(Value);
-				else
-					m_NonPublicProperties.Add(Value);
+				if (m_Properties.Contains(Access))
+				{
+					m_Properties[Access].Add(Value);
+					return;
+				}
+
+				auto& list = m_Properties[Access] = PropertyTypeList(m_ParentNames.GetAllocator());
+				list.Add(Value);
 			}
 		}
 	}

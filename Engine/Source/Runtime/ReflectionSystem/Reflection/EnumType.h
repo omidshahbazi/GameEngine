@@ -50,12 +50,19 @@ namespace Engine
 			{
 			}
 
+			INLINE const String& GetNamespace(void) const
+			{
+				return m_Namespace;
+			}
+
 			INLINE const ItemsList& GetItems(void) const
 			{
 				return m_Items;
 			}
 
 		protected:
+			String m_Namespace;
+
 			ItemsList m_Items;
 		};
 	}

@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public RenderSystemModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public RenderSystemModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("RenderCommon");
 			PrivateDependencyModuleNames.Add("MemoryManagement");

@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.Pipelines
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public DeferredPipelineModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public DeferredPipelineModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("RenderDevice");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");

@@ -27,7 +27,6 @@ namespace Engine
 			return CreateInstance(type, Argument);
 		}
 
-
 		void* Runtime::CreateInstance(const String& FullQualifiedTypeName, const ArgumentsList& Arguments)
 		{
 			auto type = RuntimeImplementation::GetObjectType(FullQualifiedTypeName);
@@ -40,10 +39,11 @@ namespace Engine
 		{
 			THROW_IF_EXCEPTION(Categories::Reflection, Type == nullptr, "Type is null");
 
-			AnyDataType data = Type->CreateInstance();
+			AnyDataType returnValue;
+			Type->CreateInstanceInternal(nullptr, returnValue);
 
-			if (data.GetValueType() == ValueTypes::VoidPointer)
-				return data.GetAsVoid();
+			if (returnValue.GetValueType() == ValueTypes::Void)
+				return returnValue.GetAsVoid();
 
 			return nullptr;
 		}
@@ -52,10 +52,14 @@ namespace Engine
 		{
 			THROW_IF_EXCEPTION(Categories::Reflection, Type == nullptr, "Type is null");
 
-			AnyDataType data = Type->CreateInstance(Argument);
+			ArgumentsList args;
+			args.Add(Argument);
 
-			if (data.GetValueType() == ValueTypes::VoidPointer)
-				return data.GetAsVoid();
+			AnyDataType returnValue;
+			Type->CreateInstanceInternal(&args, returnValue);
+
+			if (returnValue.GetValueType() == ValueTypes::Void)
+				return returnValue.GetAsVoid();
 
 			return nullptr;
 		}
@@ -64,10 +68,11 @@ namespace Engine
 		{
 			THROW_IF_EXCEPTION(Categories::Reflection, Type == nullptr, "Type is null");
 
-			AnyDataType data = Type->CreateInstance(Arguments);
+			AnyDataType returnValue;
+			Type->CreateInstanceInternal(&Arguments, returnValue);
 
-			if (data.GetValueType() == ValueTypes::VoidPointer)
-				return data.GetAsVoid();
+			if (returnValue.GetValueType() == ValueTypes::Void)
+				return returnValue.GetAsVoid();
 
 			return nullptr;
 		}

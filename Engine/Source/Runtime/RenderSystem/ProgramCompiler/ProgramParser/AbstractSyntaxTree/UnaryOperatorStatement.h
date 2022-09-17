@@ -76,16 +76,16 @@ namespace Engine
 					switch (Operator)
 					{
 					case Operators::Exlamation:
-						return "!";
+						return STRINGIZE(!);
 					case Operators::Minus:
-						return "-";
+						return STRINGIZE(-);
 					case Operators::PrefixIncrement:
-						return "++";
+						return STRINGIZE(++);
 					case Operators::PrefixDecrement:
-						return "--";
+						return STRINGIZE(--);
 					}
 
-					return "";
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 				static String GetPostfixOperatorSymbol(Operators Operator)
@@ -93,12 +93,12 @@ namespace Engine
 					switch (Operator)
 					{
 					case Operators::PostfixIncrement:
-						return "++";
+						return STRINGIZE(++);
 					case Operators::PostfixDecrement:
-						return "--";
+						return STRINGIZE(--);
 					}
 
-					return "";
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 			private:

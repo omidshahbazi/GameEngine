@@ -13,8 +13,8 @@ namespace Engine.Test
 			get { return UseTypes.Executable; }
 		}
 
-		public TestParallelizingModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public TestParallelizingModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Debugging");

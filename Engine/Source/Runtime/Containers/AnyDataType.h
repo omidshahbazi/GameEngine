@@ -6,6 +6,7 @@
 #include <Common\ValueTypes.h>
 #include <Containers\Strings.h>
 #include <Containers\Color.h>
+#include <Containers\Exception.h>
 #include <MathContainers\MathContainers.h>
 
 namespace Engine
@@ -30,7 +31,7 @@ namespace Engine
 				{
 				}
 
-				void* VoidPointer;
+				void* Void;
 
 				bool Bool;
 
@@ -213,9 +214,9 @@ namespace Engine
 
 			INLINE void* GetAsVoid(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::VoidPointer, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::Void, "Value type is different");
 
-				return m_Data.VoidPointer;
+				return m_Data.Void;
 			}
 
 			INLINE bool GetAsBool(void) const
@@ -379,10 +380,10 @@ namespace Engine
 
 			INLINE AnyDataType& operator=(void* Value)
 			{
-				HardAssert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::VoidPointer, "Value types are mismatched");
+				HardAssert(m_ValueType == ValueTypes::None || m_ValueType == ValueTypes::Void, "Value types are mismatched");
 
-				m_Data.VoidPointer = Value;
-				m_ValueType = ValueTypes::VoidPointer;
+				m_Data.Void = Value;
+				m_ValueType = ValueTypes::Void;
 
 				return *this;
 			}
@@ -600,7 +601,7 @@ namespace Engine
 				{
 				case ValueTypes::None:
 					return 0;
-				case ValueTypes::VoidPointer:
+				case ValueTypes::Void:
 					return sizeof(void*);
 				case ValueTypes::Bool:
 					return sizeof(bool);
@@ -670,55 +671,6 @@ namespace Engine
 				}
 
 				return false;
-			}
-
-			INLINE static String GetValueTypeText(ValueTypes Type)
-			{
-				switch (Type)
-				{
-				case ValueTypes::VoidPointer:
-					return "void";
-
-				case ValueTypes::Bool:
-					return "bool";
-
-				case ValueTypes::UInt8:
-					return  "uint8";
-				case ValueTypes::UInt16:
-					return  "uint16";
-				case ValueTypes::UInt32:
-					return  "uint32";
-				case ValueTypes::UInt64:
-					return  "uint64";
-
-				case ValueTypes::Int8:
-					return "int8";
-				case ValueTypes::Int16:
-					return "int16";
-				case ValueTypes::Int32:
-					return "int32";
-				case ValueTypes::Int64:
-					return  "int64";
-
-				case ValueTypes::Float32:
-					return "float32";
-				case ValueTypes::Float64:
-					return "float64";
-
-				case ValueTypes::String:
-					return "String";
-				case ValueTypes::WString:
-					return "WString";
-
-				case ValueTypes::Vector2F:
-					return  "Vector2F";
-				case ValueTypes::Vector3F:
-					return  "Vector3F";
-				case ValueTypes::Matrix4F:
-					return  "Matrix4F";
-				}
-
-				return "";
 			}
 
 		private:

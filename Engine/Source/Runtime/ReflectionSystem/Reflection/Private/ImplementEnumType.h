@@ -23,9 +23,9 @@ namespace Engine
 					m_Name = Value;
 				}
 
-				INLINE void AddItem(const String& Value)
+				INLINE void SetNamespace(const String& Namespace)
 				{
-					m_Items.Add(Item(Value, 0));
+					m_Namespace = Namespace;
 				}
 
 				INLINE void AddItem(const String& Name, int32 Value)

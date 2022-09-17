@@ -86,18 +86,22 @@ namespace Engine
 					if (isFloat || c != UPPER_F)
 						UngetChar();
 
-					if (isFloat)
-						Token.SetConstantFloat32(StringUtility::ToFloat32(name));
-					else if (isHex)
-						Token.SetConstantInt32(StringUtility::ToInt32(name));
+					if (NoConst)
+						Token.SetIdentifier(name);
 					else
-						Token.SetConstantInt32(StringUtility::ToInt32(name));
+					{
+						if (isFloat)
+							Token.SetConstantFloat32(StringUtility::ToFloat32(name));
+						else if (isHex)
+							Token.SetConstantInt32(StringUtility::ToInt32(name));
+						else
+							Token.SetConstantInt32(StringUtility::ToInt32(name));
+					}
 
 					return true;
 				}
 				else if (c == DOUBLE_QUOTATION)
 				{
-					String temp;
 					c = GetChar(true);
 					while (c != DOUBLE_QUOTATION && !CharacterUtility::IsEOL(c))
 					{
@@ -111,12 +115,15 @@ namespace Engine
 								c = '\n';
 						}
 
-						temp += c;
+						name += c;
 
 						c = GetChar(true);
 					}
 
-					Token.SetConstantString(temp);
+					if (NoConst)
+						Token.SetIdentifier(name);
+					else
+						Token.SetConstantString(name);
 
 					return true;
 				}
@@ -162,16 +169,27 @@ namespace Engine
 
 #undef PAIR
 
-					Token.SetSymbol(name);
+					if (NoConst)
+						Token.SetIdentifier(name);
+					else
+						Token.SetSymbol(name);
 
 					return true;
 				}
 			}
 
+			void CodePageParser::RequireToken(Token& Token, const String& Tag, bool NoConst)
+			{
+				if (GetToken(Token, NoConst))
+					return;
+
+				ThrowRequiredException(Tag);
+			}
+
 			bool CodePageParser::MatchSymbol(const String& Match, SymbolParseOptions ParseTemplateCloseBracket)
 			{
 				Token token;
-				if (!GetToken(token, true, ParseTemplateCloseBracket))
+				if (!GetToken(token, false, ParseTemplateCloseBracket))
 					return false;
 
 				if (token.GetType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
@@ -204,10 +222,12 @@ namespace Engine
 					isFirstOne = false;
 
 					Token specifier;
-					RequireIdentifierToken(specifier);
+					RequireIdentifierToken(specifier, TypeName + " declaration specifier");
 
 					Specifiers->AddSpecifier(specifier.GetName());
 				}
+
+				RequireSymbol(SEMICOLON, TypeName + " declaration specifier");
 			}
 
 			void CodePageParser::ParseParameters(MetaFunction* Function)
@@ -220,7 +240,7 @@ namespace Engine
 						continue;
 
 					Token paramName;
-					RequireIdentifierToken(paramName);
+					RequireIdentifierToken(paramName, Function->GetName() + " declaration specifier");
 
 					MetaParameter parameter;
 					parameter.SetDataType(paramDataType);
@@ -249,10 +269,14 @@ namespace Engine
 					Token token;
 					GetToken(token);
 
-					ValueTypes valueType = ParseValueType(token.GetName());
+					MetaDataType templateParameterDataType;
+					if (MatchSymbol('<'))
+					{
+						ParseDataType(templateParameterDataType);
+						RequireSymbol('>', "parse template parameters");
+					}
 
-					if (token.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
-						return false;
+					ValueTypes valueType = ParseValueType(token.GetName());
 
 					if (valueType != ValueTypes::None)
 						DataType.SetValueType(valueType);
@@ -276,13 +300,17 @@ namespace Engine
 					else
 					{
 						if (MatchSymbol(OPEN_BRACE) || MatchSymbol(CLOSE_BRACE) || MatchSymbol(SEMICOLON) || MatchSymbol(COMMA))
+						{
+							UngetToken(token);
+
 							break;
+						}
 						else
 							DataType.SetExtraValueType(token.GetName());
 					}
 				}
 
-				return true;
+				return !DataType.GetIsEmpty();
 			}
 
 			ValueTypes CodePageParser::ParseValueType(const String& Value)
@@ -290,7 +318,7 @@ namespace Engine
 				ValueTypes type = ValueTypes::None;
 
 				if (Value == "void")
-					type = ValueTypes::VoidPointer;
+					type = ValueTypes::Void;
 
 				if (Value == "bool")
 					type = ValueTypes::Bool;
@@ -328,6 +356,18 @@ namespace Engine
 				//	type = ValueTypes::Matrix4;
 
 				return type;
+			}
+
+			AccessSpecifiers CodePageParser::ParseAccessSpecifier(Token& Token)
+			{
+				if (Token.GetName() == "private")
+					return AccessSpecifiers::Private;
+				else if (Token.GetName() == "protected")
+					return AccessSpecifiers::Protected;
+				else if (Token.GetName() == "public")
+					return AccessSpecifiers::Public;
+
+				return AccessSpecifiers::None;
 			}
 		}
 	}

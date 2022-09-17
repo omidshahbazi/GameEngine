@@ -31,10 +31,9 @@ namespace Engine
 			static void UnloadModule(Handle Handle);
 
 			static Handle GetModuleInstance(cwstr ModuleName);
+			static Handle GetExecutingModuleInstance(void);
 
 			static void* GetProcedureAddress(Handle Handle, cstr Name);
-
-			static Handle GetExecutingModuleInstance(void);
 
 			static void GetExecutablePath(wstr Path);
 

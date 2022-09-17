@@ -16,8 +16,8 @@ namespace Engine.Runtime.ThirdParty
 			get { return UseTypes.UseOnly; }
 		}
 
-		public GLEWModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public GLEWModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			if (Platform == Platforms.x86)
 			{

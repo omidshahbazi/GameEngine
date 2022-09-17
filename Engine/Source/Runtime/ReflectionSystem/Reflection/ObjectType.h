@@ -6,6 +6,7 @@
 #include <Reflection\FunctionType.h>
 #include <Reflection\PropertyType.h>
 #include <Common\BitwiseUtils.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
@@ -13,17 +14,33 @@ namespace Engine
 
 	namespace Reflection
 	{
+		class Runtime;
 		class ObjectType;
 
 		typedef Vector<ObjectType*> ObjectTypeList;
 
 		class REFLECTION_API ObjectType : public Type
 		{
+			friend class Runtime;
+
+		private:
+			typedef Map<AccessSpecifiers, StringList> ParentsMap;
+			typedef Map<AccessSpecifiers, TypeList> NestedTypesMap;
+			typedef Map<AccessSpecifiers, FunctionTypeList> FunctionTypesMap;
+			typedef Map<AccessSpecifiers, PropertyTypeList> PropertyTypesMap;
+
 		protected:
 			ObjectType(AllocatorBase* Allocator, ObjectType* TopNest);
 
 		public:
 			virtual ~ObjectType(void);
+
+			virtual String GetFullQualifiedName(void) const override;
+
+			INLINE const String& GetNamespace(void) const
+			{
+				return m_Namespace;
+			}
 
 			INLINE bool GetIsStruct(void) const
 			{
@@ -36,31 +53,20 @@ namespace Engine
 
 			void GetFunctions(AccessSpecifiers AccessFlags, FunctionTypeList& List) const;
 
-			const FunctionType* const GetFunction(const String& Name, AccessSpecifiers Access) const;
-
 			void GetProperties(AccessSpecifiers AccessFlags, PropertyTypeList& List) const;
 
-			AnyDataType CreateInstance(void) const;
-			AnyDataType CreateInstance(const AnyDataType& Argument) const;
-			AnyDataType CreateInstance(const ArgumentsList& Arguments) const;
+		protected:
+			virtual void CreateInstanceInternal(const ArgumentsList* Arguments, AnyDataType& ReturnValue) const = 0;
 
 		protected:
-			virtual void CreateInstanceInternal(AnyDataType& ReturnValue, const ArgumentsList* Arguments) const = 0;
+			String m_Namespace;
 
-		protected:
 			bool m_IsStruct;
 
-			StringList m_PublicParentsName;
-			StringList m_NonPublicParentsName;
-
-			TypeList m_PublicNestedTypes;
-			TypeList m_NonPublicNestedTypes;
-
-			FunctionTypeList m_PublicFunctions;
-			FunctionTypeList m_NonPublicFunctions;
-
-			PropertyTypeList m_PublicProperties;
-			PropertyTypeList m_NonPublicProperties;
+			ParentsMap m_ParentNames;
+			NestedTypesMap m_NestedTypes;
+			FunctionTypesMap m_Functions;
+			PropertyTypesMap m_Properties;
 		};
 	}
 }

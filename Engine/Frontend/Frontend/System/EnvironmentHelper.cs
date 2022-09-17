@@ -31,13 +31,15 @@ namespace Engine.Frontend.System
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
-		public static readonly string HeaderFileExtension = ".h";
-		public static readonly string CompileFileExtension = ".cpp";
+		public const string HeaderFileExtension = ".h";
+		public const string CompileFileExtension = ".cpp";
 
 		public static readonly string[] HeaderFileSearchPattern = new string[] { "*.h", "*.hpp" };
 		public static readonly string[] CompileFileSearchPattern = new string[] { "*.cpp", "*.c", "*.cxx" };
 		public static readonly string[] CSharpFileSearchPattern = new string[] { "*.cs" };
 		public static readonly string[] DebugVisualizerFileSearchPattern = new string[] { "*.natvis" };
+
+		public const string DebugModeProjectPreprocessor = "DEBUG_MODE_PROJECT";
 
 		private static string FrontenddToolDirectory
 		{

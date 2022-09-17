@@ -124,7 +124,7 @@ namespace Engine
 				while (true)
 				{
 					Token token;
-					RequireToken(token);
+					RequireToken(token, "parse preprocessor include");
 
 					if (token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
 						break;
@@ -145,7 +145,7 @@ namespace Engine
 			if (MatchIdentifier(PREPROCESSOR_DEFINE))
 			{
 				Token nameToken;
-				RequireToken(nameToken);
+				RequireToken(nameToken, "parse preprocessor definition");
 
 				bool isDuplicate = false;
 				for (const auto& define : Parameters.Defines)
@@ -164,7 +164,7 @@ namespace Engine
 			if (MatchIdentifier(PREPROCESSOR_UNDEF))
 			{
 				Token nameToken;
-				RequireToken(nameToken);
+				RequireToken(nameToken, "parse preprocessor undef");
 
 				for (uint32 i = 0; i < Parameters.Defines.GetSize(); ++i)
 					if (Parameters.Defines[i] == nameToken.GetName())
@@ -177,17 +177,17 @@ namespace Engine
 			if (MatchIdentifier(PREPROCESSOR_IFDEF) || (isNotDef = MatchIdentifier(PREPROCESSOR_IFNDEF)))
 			{
 				Token nameToken;
-				RequireToken(nameToken);
+				RequireToken(nameToken, "parse preprocessor ifdef/ifndef directive");
 
 				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetName()) == isNotDef);
 
 				ParsePreprocessorBlock(Parameters, shouldRemoveBlock);
 
 				Token sharpToken;
-				RequireSymbol(SHARP, "Preprocess ifdef/ifndef directive");
+				RequireSymbol(SHARP, "parse preprocess ifdef/ifndef directive");
 
 				Token preprocessorToken;
-				RequireToken(preprocessorToken);
+				RequireToken(preprocessorToken, "parse preprocess ifdef/ifndef directive");
 
 				if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 					ParsePreprocessorBlock(Parameters, !shouldRemoveBlock);
@@ -208,7 +208,7 @@ namespace Engine
 				while (true)
 				{
 					Token token;
-					RequireToken(token);
+					RequireToken(token, "parse preprocess block");
 
 					if (token.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || token.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
 					{
@@ -236,10 +236,10 @@ namespace Engine
 			Process(Parameters, EndConditions::PreprocessorElse | EndConditions::PreprocessorEndIf);
 
 			Token sharpToken;
-			RequireToken(sharpToken);
+			RequireToken(sharpToken, "parse preprocess block");
 
 			Token preprocessorToken;
-			RequireToken(preprocessorToken);
+			RequireToken(preprocessorToken, "parse preprocess block");
 
 			if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 			{

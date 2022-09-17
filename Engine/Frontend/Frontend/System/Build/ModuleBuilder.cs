@@ -288,7 +288,6 @@ namespace Engine.Frontend.System.Build
 			foreach (string dep in dependencies)
 				AddDependency(profile, dep);
 
-			profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
 			profile.AddPreprocessorDefinition(Module.GetNamePreprocessor());
 			profile.AddPreprocessorDefinition(Module.GetAPIPreprocessor(BuildSystemHelper.APIPreprocessorTypes.Export));
 			profile.AddPreprocessorDefinition(Module.GetExternPreprocessor(BuildSystemHelper.ExternPreprocessorTypes.Fill));

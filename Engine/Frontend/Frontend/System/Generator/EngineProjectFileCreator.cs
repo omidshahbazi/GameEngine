@@ -9,8 +9,6 @@ namespace Engine.Frontend.System.Generator
 {
 	static class EngineProjectFileCreator
 	{
-		private const string DebugModeProjectPreprocessor = "DEBUG_MODE_PROJECT";
-
 		private static string ProjectFilePath
 		{
 			get { return EnvironmentHelper.EngineDirectory + "Engine.vcxproj"; }
@@ -18,7 +16,7 @@ namespace Engine.Frontend.System.Generator
 
 		public static bool Generate(bool DebugModeProject)
 		{
-			RulesLibrary.Instance.Build(false, (DebugModeProject ? DebugModeProjectPreprocessor : ""));
+			RulesLibrary.Instance.Build(false, (DebugModeProject ? EnvironmentHelper.DebugModeProjectPreprocessor : ""));
 
 			TargetRules[] targets = RulesLibrary.Instance.GetTargetRules(ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.PlatformArchitectures.x64);
 
@@ -43,8 +41,6 @@ namespace Engine.Frontend.System.Generator
 						profile.NMakeBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.BuildEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
 						profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
 						profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
-
-						profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
 
 						ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(configuration, architecture);
 						foreach (ModuleRules module in modules)

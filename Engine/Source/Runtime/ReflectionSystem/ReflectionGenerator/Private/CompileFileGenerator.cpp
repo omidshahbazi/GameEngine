@@ -137,7 +137,7 @@ namespace Engine
 				Content += "	}";
 				ADD_NEW_LINE();
 
-				Content += "	virtual Initialize(void) override";
+				Content += "	virtual void Initialize(void) override";
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();

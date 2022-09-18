@@ -25,6 +25,11 @@ namespace Engine
 				virtual ~MetaEnum(void)
 				{
 				}
+
+				INLINE String GetUniqueName(void) const
+				{
+					return (m_TopNest == nullptr ? "" : (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_") + m_Name;
+				}
 			};
 		}
 	}

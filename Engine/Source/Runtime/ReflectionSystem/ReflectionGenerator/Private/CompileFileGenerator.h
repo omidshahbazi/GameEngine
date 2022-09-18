@@ -24,6 +24,7 @@ namespace Engine
 			static void GenerateTypesCode(const TypeList& Types, String& Content);
 			static void GenerateForwardDeclarationsCode(const TypeList& Types, String& Content);
 			static void GenerateTypeCode(Type* Type, String& Content);
+			static void GenerateRegistryCode(Type* Type, String& Content);
 			static void GenerateObjectCode(MetaObject* Type, String& Content);
 			static void GenerateEnumCode(MetaEnum* Type, String& Content);
 			static void GenerateFunctionCode(MetaFunction* Type, String& Content);

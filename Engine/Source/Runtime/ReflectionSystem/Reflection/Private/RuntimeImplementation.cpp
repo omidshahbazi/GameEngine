@@ -34,11 +34,11 @@ namespace Engine
 
 			SpinLock RuntimeImplementation::m_Lock;
 			uint16 RuntimeImplementation::m_MetaObjectCount;
-			RuntimeImplementation::IMetaObject* RuntimeImplementation::m_MetaObjects[];
+			RuntimeImplementation::IMetaType* RuntimeImplementation::m_MetaTypes[];
 			RuntimeImplementation::TypeMap* RuntimeImplementation::m_ObjectTypes = nullptr;
 			RuntimeImplementation::TypeMap* RuntimeImplementation::m_EnumTypes = nullptr;
 
-#define MAP_INITIALIZER(Map) \
+#define INITIALIZE_MAP(Map) \
 			if (Map == nullptr) \
 			{ \
 				Map = ReinterpretCast(RuntimeImplementation::TypeMap*, AllocateMemory(RootAllocator::GetInstance(), sizeof(RuntimeImplementation::TypeMap))); \
@@ -47,7 +47,7 @@ namespace Engine
 
 			const ObjectType* RuntimeImplementation::GetObjectType(const String& FullQualifiedTypeName)
 			{
-				MAP_INITIALIZER(m_ObjectTypes);
+				INITIALIZE_MAP(m_ObjectTypes);
 
 				if (m_ObjectTypes->Contains(FullQualifiedTypeName))
 					return ReinterpretCast(ObjectType*, (*m_ObjectTypes)[FullQualifiedTypeName]);
@@ -57,7 +57,7 @@ namespace Engine
 
 			const ObjectType* RuntimeImplementation::FindObjectType(const String& TypeName)
 			{
-				MAP_INITIALIZER(m_ObjectTypes);
+				INITIALIZE_MAP(m_ObjectTypes);
 
 				for (const auto& elem : (*m_ObjectTypes))
 				{
@@ -72,7 +72,7 @@ namespace Engine
 
 			const EnumType* RuntimeImplementation::GetEnumType(const String& TypeName)
 			{
-				MAP_INITIALIZER(m_EnumTypes);
+				INITIALIZE_MAP(m_EnumTypes);
 
 				if (m_EnumTypes->Contains(TypeName))
 					return (EnumType*)(*m_EnumTypes)[TypeName];
@@ -80,9 +80,9 @@ namespace Engine
 				return nullptr;
 			}
 
-			void RuntimeImplementation::RegisterMeta(IMetaObject* Meta)
+			void RuntimeImplementation::RegisterMeta(IMetaType* Meta)
 			{
-				m_MetaObjects[m_MetaObjectCount++] = Meta;
+				m_MetaTypes[m_MetaObjectCount++] = Meta;
 			}
 
 			void RuntimeImplementation::InitializeMeta(void)
@@ -95,16 +95,16 @@ namespace Engine
 					initialized = true;
 
 					for (uint16 i = 0; i < m_MetaObjectCount; ++i)
-						m_MetaObjects[i]->Initialize();
+						m_MetaTypes[i]->Initialize();
 				}
 
 				m_Lock.Release();
 			}
 
-			void RuntimeImplementation::RegisterTypeInfo(Type* Type)
+			void RuntimeImplementation::RegisterType(Type* Type)
 			{
-				MAP_INITIALIZER(m_ObjectTypes);
-				MAP_INITIALIZER(m_EnumTypes);
+				INITIALIZE_MAP(m_ObjectTypes);
+				INITIALIZE_MAP(m_EnumTypes);
 
 				if (IsTypeOf(Type, ObjectType))
 				{
@@ -116,24 +116,30 @@ namespace Engine
 				}
 				else if (IsTypeOf(Type, EnumType))
 				{
-					const String& name = Type->GetName();
+					const String& name = Type->GetFullQualifiedName();
 
 					THROW_IF_EXCEPTION(Categories::Reflection, m_EnumTypes->Contains(name), "Type already exists");
 
 					m_EnumTypes->Add(name, Type);
 				}
+				else
+					CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 			}
 
-			void RuntimeImplementation::UnregisterTypeInfo(Type* Type)
+			void RuntimeImplementation::UnregisterType(Type* Type)
 			{
-				MAP_INITIALIZER(m_ObjectTypes);
-				MAP_INITIALIZER(m_EnumTypes);
+				INITIALIZE_MAP(m_ObjectTypes);
+				INITIALIZE_MAP(m_EnumTypes);
 
 				if (IsTypeOf(Type, ObjectType))
 					m_ObjectTypes->Remove(Type->GetFullQualifiedName());
 				else if (IsTypeOf(Type, EnumType))
-					m_EnumTypes->Remove(Type->GetName());
+					m_EnumTypes->Remove(Type->GetFullQualifiedName());
+				else
+					CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 			}
+
+#undef INITIALIZE_MAP
 		}
 	}
 }

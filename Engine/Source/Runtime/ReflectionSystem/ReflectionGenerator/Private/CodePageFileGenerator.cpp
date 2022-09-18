@@ -4,6 +4,7 @@
 #include <ReflectionGenerator\Private\MetaFunction.h>
 #include <ReflectionGenerator\Private\MetaProperty.h>
 #include <Reflection\Private\ImplementDataType.h>
+#include <Debugging\CoreDebug.h>
 #include <Platform\PlatformFile.h>
 
 namespace Engine
@@ -67,10 +68,9 @@ namespace Engine
 
 			case DataType::PassesTypes::Value:
 				return STRINGIZE(DataType::PassesTypes::Value);
-
-			default:
-				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
 			}
+
+			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
 
 		String CodePageFileGenerator::GetAccessSpecifier(AccessSpecifiers Access)
@@ -85,10 +85,9 @@ namespace Engine
 
 			case AccessSpecifiers::Public:
 				return STRINGIZE(AccessSpecifiers::Public);
-
-			default:
-				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
 			}
+
+			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
 
 		String CodePageFileGenerator::GetValueType(ValueTypes Type)
@@ -140,7 +139,7 @@ namespace Engine
 				return STRINGIZE(ValueTypes::Matrix4F);
 			}
 
-			THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
+			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
 
 		String CodePageFileGenerator::GetValueTypeName(ValueTypes Type)
@@ -192,19 +191,35 @@ namespace Engine
 				return "Matrix4F";
 			}
 
-			THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
+			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
+		}
+
+		String CodePageFileGenerator::GetUniqueName(Type* Type)
+		{
+			if (IsTypeOf(Type, MetaObject))
+				return ReinterpretCast(MetaObject*, Type)->GetUniqueName();
+			else if (IsTypeOf(Type, MetaEnum))
+				return ReinterpretCast(MetaEnum*, Type)->GetUniqueName();
+			else if (IsTypeOf(Type, MetaFunction))
+				return ReinterpretCast(MetaFunction*, Type)->GetUniqueName();
+			else if (IsTypeOf(Type, MetaProperty))
+				return ReinterpretCast(MetaProperty*, Type)->GetUniqueName();
+
+			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
 
 		String CodePageFileGenerator::GetImplementType(Type* Type)
 		{
+			String uniqueName = GetUniqueName(Type);
+
 			if (IsTypeOf(Type, MetaObject))
-				return ReinterpretCast(MetaObject*, Type)->GetUniqueName() + "_" + STRINGIZE(ImplementObjectType);
+				return uniqueName + "_" + STRINGIZE(ImplementObjectType);
 			else if (IsTypeOf(Type, MetaEnum))
-				return ReinterpretCast(MetaObject*, Type)->GetUniqueName() + "_" + STRINGIZE(ImplementEnumType);
+				return uniqueName + "_" + STRINGIZE(ImplementEnumType);
 			else if (IsTypeOf(Type, MetaFunction))
-				return ReinterpretCast(MetaFunction*, Type)->GetUniqueName() + "_" + STRINGIZE(ImplementFunctionType);
+				return uniqueName + "_" + STRINGIZE(ImplementFunctionType);
 			else if (IsTypeOf(Type, MetaProperty))
-				return ReinterpretCast(MetaProperty*, Type)->GetUniqueName() + "_" + STRINGIZE(ImplementPropertyType);
+				return uniqueName + "_" + STRINGIZE(ImplementPropertyType);
 
 			return "";
 		}
@@ -217,12 +232,12 @@ namespace Engine
 			return "g_" + GetImplementType(Type);
 		}
 
-		String CodePageFileGenerator::GetRegistryTypeName(ObjectType* Type)
+		String CodePageFileGenerator::GetRegistryTypeName(Type* Type)
 		{
-			return ReinterpretCast(MetaObject*, Type)->GetUniqueName() + "_Registry";
+			return GetUniqueName(Type) + "_Registry";
 		}
 
-		String CodePageFileGenerator::GetRegistryTypePointerName(ObjectType* Type)
+		String CodePageFileGenerator::GetRegistryTypePointerName(Type* Type)
 		{
 			if (Type == nullptr)
 				return STRINGIZE(nullptr);

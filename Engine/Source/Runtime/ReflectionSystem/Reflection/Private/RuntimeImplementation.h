@@ -19,10 +19,10 @@ namespace Engine
 				friend class Destructor;
 
 			public:
-				class IMetaObject
+				class IMetaType
 				{
 				public:
-					virtual ~IMetaObject(void)
+					virtual ~IMetaType(void)
 					{
 
 					}
@@ -38,15 +38,15 @@ namespace Engine
 				static const ObjectType* FindObjectType(const String& TypeName);
 				static const EnumType* GetEnumType(const String& TypeName);
 
-				static void RegisterMeta(IMetaObject* Meta);
+				static void RegisterMeta(IMetaType* Meta);
 				static void InitializeMeta(void);
 
-				static void RegisterTypeInfo(Type* Type);
-				static void UnregisterTypeInfo(Type* Type);
+				static void RegisterType(Type* Type);
+				static void UnregisterType(Type* Type);
 
 			private:
 				static SpinLock m_Lock;
-				static IMetaObject* m_MetaObjects[2048];
+				static IMetaType* m_MetaTypes[2048];
 				static uint16 m_MetaObjectCount;
 				static TypeMap* m_ObjectTypes;
 				static TypeMap* m_EnumTypes;

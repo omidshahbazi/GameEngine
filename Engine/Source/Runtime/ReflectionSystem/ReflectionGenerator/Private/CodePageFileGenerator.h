@@ -31,10 +31,11 @@ namespace Engine
 			static String GetValueType(ValueTypes Type);
 			static String GetValueTypeName(ValueTypes Type);
 
+			static String GetUniqueName(Type* Type);
 			static String GetImplementType(Type* Type);
 			static String GetImplementTypePointerName(Type* Type);
-			static String GetRegistryTypeName(ObjectType* Type);
-			static String GetRegistryTypePointerName(ObjectType* Type);
+			static String GetRegistryTypeName(Type* Type);
+			static String GetRegistryTypePointerName(Type* Type);
 
 			static void WriteToFile(const WString& FilePath, const String& Data);
 		};

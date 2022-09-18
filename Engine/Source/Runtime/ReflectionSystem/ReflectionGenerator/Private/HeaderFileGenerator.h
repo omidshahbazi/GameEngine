@@ -13,7 +13,7 @@ namespace Engine
 		class REFLECTIONGENERATOR_API HeaderFileGenerator : protected CodePageFileGenerator
 		{
 		public:
-			static void Generate(const TypeList& Types, const WString& OutputFilePath);
+			static void Generate(const TypeList& Types, const WString& FilePath, const WString& OutputFilePath);
 
 		private:
 			static void GenerateHeaderCode(const TypeList& Types, String& Content);

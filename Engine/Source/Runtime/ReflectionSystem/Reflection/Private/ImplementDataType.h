@@ -42,6 +42,16 @@ namespace Engine
 				{
 					m_IsConstValue = Value;
 				}
+
+				INLINE void SetIsTemplate(bool Value)
+				{
+					m_IsTemplate = Value;
+				}
+
+				INLINE void AddTemplateParameter(const DataType& Value)
+				{
+					m_TemplateParameters.Add(Value);
+				}
 			};
 		}
 	}

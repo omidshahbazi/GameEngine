@@ -30,7 +30,7 @@ namespace Engine
 
 		bool ReflectionGenerator::Generate(AllocatorBase* Allocator, const WString& FilePath, const WString& OutputBaseFileName)
 		{
-			String content = ReadFromFile(FilePath.ChangeType<char16>());
+			String content = ReadFromFile(FilePath);
 			HeaderParser hp(Allocator, content);
 
 			TypeList types;
@@ -39,8 +39,8 @@ namespace Engine
 			if (types.GetSize() == 0)
 				return false;
 
-			HeaderFileGenerator::Generate(types, OutputBaseFileName + L".h");
-			CompileFileGenerator::Generate(types, OutputBaseFileName + L".cpp");
+			HeaderFileGenerator::Generate(types, FilePath, OutputBaseFileName + L".h");
+			CompileFileGenerator::Generate(types, FilePath, OutputBaseFileName + L".cpp");
 
 			for (auto& type : types)
 			{

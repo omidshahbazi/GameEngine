@@ -14,7 +14,7 @@ namespace Engine
 
 		String Type::GetFullQualifiedName(void) const
 		{
-			return (m_TopNest == nullptr ? "" : m_TopNest->GetFullQualifiedName() + "::") + m_Name;
+			return (m_TopNest == nullptr ? String::Empty : m_TopNest->GetFullQualifiedName() + "::") + m_Name;
 		}
 	}
 }

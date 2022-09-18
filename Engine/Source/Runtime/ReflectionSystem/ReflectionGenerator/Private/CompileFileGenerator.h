@@ -17,10 +17,10 @@ namespace Engine
 		class REFLECTIONGENERATOR_API CompileFileGenerator : protected CodePageFileGenerator
 		{
 		public:
-			static void Generate(const TypeList& Types, const WString& OutputFilePath);
+			static void Generate(const TypeList& Types, const WString& FilePath, const WString& OutputFilePath);
 
 		private:
-			static void GenerateHeaderCode(const TypeList& Types, const String& HeaderFilePath, String& Content);
+			static void GenerateHeaderCode(const TypeList& Types, const String& FilePath, const String& HeaderFilePath, String& Content);
 			static void GenerateTypesCode(const TypeList& Types, String& Content);
 			static void GenerateForwardDeclarationsCode(const TypeList& Types, String& Content);
 			static void GenerateTypeCode(Type* Type, String& Content);
@@ -29,6 +29,8 @@ namespace Engine
 			static void GenerateFunctionCode(MetaFunction* Type, String& Content);
 			static void GenerateArgumentListCode(const ParameterTypeList& Parameters, String& Content);
 			static void GeneratePropertyCode(MetaProperty* Type, String& Content);
+			static void GenerateNamespaceHeader(Type* Type, String& Content);
+			static void GenerateNamespaceFooter(Type* Type, String& Content);
 		};
 	}
 }

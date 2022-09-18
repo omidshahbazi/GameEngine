@@ -269,11 +269,24 @@ namespace Engine
 					Token token;
 					GetToken(token);
 
-					MetaDataType templateParameterDataType;
-					if (MatchSymbol('<'))
+					if (MatchSymbol(OPEN_ANGLE_BRACKET))
 					{
-						ParseDataType(templateParameterDataType);
-						RequireSymbol('>', "parse template parameters");
+						DataType.SetIsTemplate(true);
+
+						while (true)
+						{
+							MetaDataType templateParameterDataType;
+							if (!ParseDataType(templateParameterDataType))
+								return false;
+
+							DataType.AddTemplateParameter(templateParameterDataType);
+
+							if (MatchSymbol(COMMA))
+								continue;
+
+							if (MatchSymbol(CLOSE_ANGLE_BRACKET))
+								break;
+						}
 					}
 
 					ValueTypes valueType = ParseValueType(token.GetName());
@@ -299,7 +312,11 @@ namespace Engine
 					}
 					else
 					{
-						if (MatchSymbol(OPEN_BRACE) || MatchSymbol(CLOSE_BRACE) || MatchSymbol(SEMICOLON) || MatchSymbol(COMMA))
+						if (MatchSymbol(OPEN_BRACE) ||
+							MatchSymbol(CLOSE_BRACE) ||
+							MatchSymbol(SEMICOLON) ||
+							MatchSymbol(COMMA) ||
+							token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
 						{
 							UngetToken(token);
 

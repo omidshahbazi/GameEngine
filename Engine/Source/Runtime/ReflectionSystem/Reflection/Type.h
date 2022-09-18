@@ -32,7 +32,7 @@ namespace Engine
 
 			virtual String GetFullQualifiedName(void) const;
 
-			INLINE ObjectType* GetTopNest(void)
+			INLINE ObjectType* GetTopNest(void) const
 			{
 				return m_TopNest;
 			}

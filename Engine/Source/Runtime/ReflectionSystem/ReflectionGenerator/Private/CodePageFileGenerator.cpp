@@ -3,6 +3,7 @@
 #include <ReflectionGenerator\Private\MetaEnum.h>
 #include <ReflectionGenerator\Private\MetaFunction.h>
 #include <ReflectionGenerator\Private\MetaProperty.h>
+#include <Reflection\Private\ImplementDataType.h>
 #include <Platform\PlatformFile.h>
 
 namespace Engine
@@ -15,27 +16,41 @@ namespace Engine
 
 		void CodePageFileGenerator::GenerateDataType(const DataType& Type, const String& VariableName, String& Content)
 		{
-			const String DATA_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementDataType));
+			const String DATA_TYPE(STRINGIZE(ImplementDataType));
 
 #define ADD_NEW_LINE() Content += "\n"
 
-			Content += "		" + DATA_TYPE + " " + VariableName + ";";
+			Content += "			" + DATA_TYPE + " " + VariableName + ";";
 			ADD_NEW_LINE();
 
-			Content += "		" + VariableName + ".SetValueType(" + GetValueType(Type.GetValueType()) + ");";
+			Content += "			" + VariableName + ".SetValueType(" + GetValueType(Type.GetValueType()) + ");";
 			ADD_NEW_LINE();
 
-			Content += "		" + VariableName + ".SetPassType(" + GetPassType(Type.GetPassType()) + ");";
+			Content += "			" + VariableName + ".SetPassType(" + GetPassType(Type.GetPassType()) + ");";
 			ADD_NEW_LINE();
 
-			Content += "		" + VariableName + ".SetExtraValueType(\"" + Type.GetExtraValueType() + "\");";
+			Content += "			" + VariableName + ".SetExtraValueType(\"" + Type.GetExtraValueType() + "\");";
 			ADD_NEW_LINE();
 
-			Content += "		" + VariableName + ".SetIsConst(" + StringUtility::ToString<char8>(Type.GetIsConst()).ToLower() + ");";
+			Content += "			" + VariableName + ".SetIsConst(" + StringUtility::ToString<char8>(Type.GetIsConst()).ToLower() + ");";
 			ADD_NEW_LINE();
 
-			Content += "		" + VariableName + ".SetIsConstValue(" + StringUtility::ToString<char8>(Type.GetIsConstValue()).ToLower() + ");";
+			Content += "			" + VariableName + ".SetIsConstValue(" + StringUtility::ToString<char8>(Type.GetIsConstValue()).ToLower() + ");";
 			ADD_NEW_LINE();
+
+			Content += "			" + VariableName + ".SetIsTemplate(" + StringUtility::ToString<char8>(Type.GetIsTemplate()).ToLower() + ");";
+			ADD_NEW_LINE();
+
+			uint32 index = 0;
+			for (auto templateParam : Type.GetTemplateParameters())
+			{
+				const String varName = VariableName + "_Template_" + StringUtility::ToString<char8>(index++);
+
+				GenerateDataType(templateParam, varName, Content);
+
+				Content += "			" + VariableName + ".AddTemplateParameter(" + varName + ");";
+				ADD_NEW_LINE();
+			}
 
 #undef ADD_NEW_LINE
 		}
@@ -45,13 +60,13 @@ namespace Engine
 			switch (Type)
 			{
 			case DataType::PassesTypes::Pointer:
-				return STRINGIZE(Engine::Reflection::DataType::PassesTypes::Pointer);
+				return STRINGIZE(DataType::PassesTypes::Pointer);
 
 			case DataType::PassesTypes::Reference:
-				return STRINGIZE(Engine::Reflection::DataType::PassesTypes::Reference);
+				return STRINGIZE(DataType::PassesTypes::Reference);
 
 			case DataType::PassesTypes::Value:
-				return STRINGIZE(Engine::Reflection::DataType::PassesTypes::Value);
+				return STRINGIZE(DataType::PassesTypes::Value);
 
 			default:
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
@@ -63,13 +78,13 @@ namespace Engine
 			switch (Access)
 			{
 			case AccessSpecifiers::Private:
-				return STRINGIZE(Engine::Reflection::AccessSpecifiers::Private);
+				return STRINGIZE(AccessSpecifiers::Private);
 
 			case AccessSpecifiers::Protected:
-				return STRINGIZE(Engine::Reflection::AccessSpecifiers::Protected);
+				return STRINGIZE(AccessSpecifiers::Protected);
 
 			case AccessSpecifiers::Public:
-				return STRINGIZE(Engine::Reflection::AccessSpecifiers::Public);
+				return STRINGIZE(AccessSpecifiers::Public);
 
 			default:
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
@@ -81,48 +96,48 @@ namespace Engine
 			switch (Type)
 			{
 			case ValueTypes::None:
-				return STRINGIZE(Engine::Common::ValueTypes::None);
+				return STRINGIZE(ValueTypes::None);
 
 			case ValueTypes::Void:
-				return STRINGIZE(Engine::Common::ValueTypes::Void);
+				return STRINGIZE(ValueTypes::Void);
 
 			case ValueTypes::Bool:
-				return STRINGIZE(Engine::Common::ValueTypes::Bool);
+				return STRINGIZE(ValueTypes::Bool);
 
 			case ValueTypes::UInt8:
-				return STRINGIZE(Engine::Common::ValueTypes::UInt8);
+				return STRINGIZE(ValueTypes::UInt8);
 			case ValueTypes::UInt16:
-				return STRINGIZE(Engine::Common::ValueTypes::UInt16);
+				return STRINGIZE(ValueTypes::UInt16);
 			case ValueTypes::UInt32:
-				return STRINGIZE(Engine::Common::ValueTypes::UInt32);
+				return STRINGIZE(ValueTypes::UInt32);
 			case ValueTypes::UInt64:
-				return STRINGIZE(Engine::Common::ValueTypes::UInt64);
+				return STRINGIZE(ValueTypes::UInt64);
 
 			case ValueTypes::Int8:
-				return STRINGIZE(Engine::Common::ValueTypes::Int8);
+				return STRINGIZE(ValueTypes::Int8);
 			case ValueTypes::Int16:
-				return STRINGIZE(Engine::Common::ValueTypes::Int16);
+				return STRINGIZE(ValueTypes::Int16);
 			case ValueTypes::Int32:
-				return STRINGIZE(Engine::Common::ValueTypes::NoInt32ne);
+				return STRINGIZE(ValueTypes::NoInt32ne);
 			case ValueTypes::Int64:
-				return STRINGIZE(Engine::Common::ValueTypes::Int64);
+				return STRINGIZE(ValueTypes::Int64);
 
 			case ValueTypes::Float32:
-				return STRINGIZE(Engine::Common::ValueTypes::Float32);
+				return STRINGIZE(ValueTypes::Float32);
 			case ValueTypes::Float64:
-				return STRINGIZE(Engine::Common::ValueTypes::Float64);
+				return STRINGIZE(ValueTypes::Float64);
 
 			case ValueTypes::String:
-				return STRINGIZE(Engine::Common::ValueTypes::String);
+				return STRINGIZE(ValueTypes::String);
 			case ValueTypes::WString:
-				return STRINGIZE(Engine::Common::ValueTypes::WString);
+				return STRINGIZE(ValueTypes::WString);
 
 			case ValueTypes::Vector2F:
-				return STRINGIZE(Engine::Common::ValueTypes::Vector2F);
+				return STRINGIZE(ValueTypes::Vector2F);
 			case ValueTypes::Vector3F:
-				return STRINGIZE(Engine::Common::ValueTypes::Vector3F);
+				return STRINGIZE(ValueTypes::Vector3F);
 			case ValueTypes::Matrix4F:
-				return STRINGIZE(Engine::Common::ValueTypes::Matrix4F);
+				return STRINGIZE(ValueTypes::Matrix4F);
 			}
 
 			THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection);
@@ -225,107 +240,3 @@ namespace Engine
 		}
 	}
 }
-
-
-
-//void CodePageFileGenerator::GetSignature(const DataType& DataType, String& Signature)
-//{
-//	if (DataType.GetIsConst())
-//		Signature += "const ";
-
-//	Signature += (DataType.GetValueType() == ValueTypes::None ? DataType.GetExtraValueType() : AnyDataType::GetValueTypeText(DataType.GetValueType())) + " ";
-
-//	if (DataType.GetIsConst())
-//		Signature += "const ";
-
-//	switch (DataType.GetPassType())
-//	{
-//	case DataType::PassesTypes::Reference:
-//		Signature += "& ";
-//		break;
-
-//	case DataType::PassesTypes::Pointer:
-//		Signature += "* ";
-//		break;
-
-//	default:
-//		THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::Reflection";
-//	}
-//}
-
-//void CodePageFileGenerator::GetSignature(FunctionType* Function, String& Signature, String& SignatureName)
-//{
-//	GetSignature(Function->GetReturnType(), Signature";
-
-//	SignatureName = Function->GetName() + "Signature";
-
-//	Signature += "(" + Function->GetTopNest()->GetFullQualifiedName() + "::*" + SignatureName + ")";
-
-//	Signature += "(";
-
-//	bool isFirst = true;
-//	for (auto& param : Function->GetParameters())
-//	{
-//		if (!isFirst)
-//			Signature += ", ";
-//		isFirst = false;
-
-//		GetSignature(param, Signature";
-//	}
-
-//	Signature += ")";
-
-//	if (Function->GetIsConst())
-//		Signature += " const";
-//}
-
-//void CodePageFileGenerator::GetSignature(const ParameterType& Parameter, String& Signature)
-//{
-//	GetSignature(Parameter.GetDataType(), Signature";
-//}
-
-//String CodePageFileGenerator::GetPointerName(Type* Type)
-//{
-//	return (IsTypeOf(Type, MetaObject) ? ReinterpretCast(MetaObject*, Type)->GetUniqueName() : Type->GetName()) + "Ptr";
-////}
-//
-//
-//String GetArgumentsDataTypeText(const ParameterTypeList& Parameters)
-//{
-//	String ret;
-//
-//	if (Parameters.GetSize() != 0)
-//	{
-//		for (uint8 i = 0; i < Parameters.GetSize("; i++)
-//		{
-//			const Parameter& param = Parameters[i];
-//
-//			ret += GetArgumentDataTypeText(i, param.GetDataType()";
-//
-//			if (i < Parameters.GetSize() - 1)
-//				ret += ",";
-//		}
-//	}
-//
-//	return ret;
-//}
-//
-//String GetArgumentDataTypeText(int32 Index, const DataType& Type)
-//{
-//	String ret;
-//
-//	if (Type.GetValueType() == ValueTypes::None)
-//		if (Type.GetPassType() == DataType::PassesTypes::Pointer)
-//			ret += "(" + Type.GetExtraValueType() + "*)";
-//
-//	ret += "(*Arguments)[" + StringUtility::ToString<char8>(Index) + "].GetAs";
-//
-//	if (Type.GetPassType() == DataType::PassesTypes::Pointer)
-//		ret += GetValueTypeText(ValueTypes::VoidPointer";
-//	else
-//		ret += GetValueTypeText(Type.GetValueType(), false";
-//
-//	ret += "()";
-//
-//	return ret;
-//}

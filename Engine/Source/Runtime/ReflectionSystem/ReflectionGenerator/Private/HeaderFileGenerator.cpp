@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ReflectionGenerator\Private\HeaderFileGenerator.h>
+#include <functional>
 
 namespace Engine
 {
@@ -15,7 +16,7 @@ namespace Engine
 
 		using namespace Private;
 
-		void HeaderFileGenerator::Generate(const TypeList& Types, const WString& OutputFilePath)
+		void HeaderFileGenerator::Generate(const TypeList& Types, const WString& FilePath, const WString& OutputFilePath)
 		{
 			String content = FILE_HEADER;
 
@@ -67,7 +68,7 @@ namespace Engine
 			Content += "	friend class " + IMPLEMENT_OBJECT_TYPE + "; \\";
 			ADD_NEW_LINE();
 
-			auto generateFriendClassForFunctions = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
+			std::function<void(MetaObject*, AccessSpecifiers)> generateFriendClassForFunctions = [&generateFriendClassForFunctions, &Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 			{
 				FunctionTypeList items;
 				Type->GetFunctions(AccessLevel, items);
@@ -79,9 +80,16 @@ namespace Engine
 					Content += "	friend class " + IMPLEMENT_FUNCTION_TYPE + "; \\";
 					ADD_NEW_LINE();
 				}
+
+				TypeList nestedTypes;
+				Type->GetNestedTypes(AccessLevel, nestedTypes);
+
+				for (auto& item : nestedTypes)
+					if (IsTypeOf(item, MetaObject))
+						generateFriendClassForFunctions(ReinterpretCast(MetaObject*, item), AccessLevel);
 			};
 
-			auto generateFriendClassForNProperties = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
+			std::function<void(MetaObject*, AccessSpecifiers)> generateFriendClassForNProperties = [&generateFriendClassForNProperties, &Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 			{
 				PropertyTypeList items;
 				Type->GetProperties(AccessLevel, items);
@@ -93,6 +101,13 @@ namespace Engine
 					Content += "	friend class " + IMPLEMENT_PROPERTY_TYPE + "; \\";
 					ADD_NEW_LINE();
 				}
+
+				TypeList nestedTypes;
+				Type->GetNestedTypes(AccessLevel, nestedTypes);
+
+				for (auto& item : nestedTypes)
+					if (IsTypeOf(item, MetaObject))
+						generateFriendClassForNProperties(ReinterpretCast(MetaObject*, item), AccessLevel);
 			};
 
 			generateFriendClassForFunctions(Type, AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public);

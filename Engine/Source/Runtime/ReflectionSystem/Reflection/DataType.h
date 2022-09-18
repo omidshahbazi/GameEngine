@@ -30,16 +30,18 @@ namespace Engine
 				Pointer
 			};
 
-		protected:
+			typedef Vector<DataType> TemplateParameterList;
+
+		public:
 			DataType(void) :
 				m_ValueType(ValueTypes::None),
 				m_PassType(PassesTypes::Value),
 				m_IsConst(false),
-				m_IsConstValue(false)
+				m_IsConstValue(false),
+				m_IsTemplate(false)
 			{
 			}
 
-		public:
 			virtual ~DataType(void)
 			{
 			}
@@ -77,12 +79,24 @@ namespace Engine
 				return sizeof(void*);
 			}
 
+			INLINE bool GetIsTemplate(void) const
+			{
+				return m_IsTemplate;
+			}
+
+			INLINE const TemplateParameterList& GetTemplateParameters(void) const
+			{
+				return m_TemplateParameters;
+			}
+
 		protected:
 			ValueTypes m_ValueType;
 			PassesTypes m_PassType;
 			String m_ExtraValueType;
 			bool m_IsConst;
 			bool m_IsConstValue;
+			bool m_IsTemplate;
+			TemplateParameterList m_TemplateParameters;
 		};
 	}
 }

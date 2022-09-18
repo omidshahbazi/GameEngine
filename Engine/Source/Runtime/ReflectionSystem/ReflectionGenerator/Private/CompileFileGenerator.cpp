@@ -4,10 +4,12 @@
 #include <ReflectionGenerator\Private\MetaProperty.h>
 #include <ReflectionGenerator\Private\MetaParameter.h>
 #include <Reflection\Private\RuntimeImplementation.h>
+#include <Reflection\Private\ReflectionAllocators.h>
 #include <FileUtility\Path.h>
 
 namespace Engine
 {
+	using namespace Common;
 	using namespace FileUtility;
 
 	namespace ReflectionGenerator
@@ -20,26 +22,34 @@ namespace Engine
 
 		using namespace Private;
 
-		void CompileFileGenerator::Generate(const TypeList& Types, const WString& OutputFilePath)
+		void CompileFileGenerator::Generate(const TypeList& Types, const WString& FilePath, const WString& OutputFilePath)
 		{
 			String content = FILE_HEADER;
 
-			GenerateHeaderCode(Types, Path::ChangeExtension<char8>(OutputFilePath.ChangeType<char8>(), ".h"), content);
+			GenerateHeaderCode(Types, FilePath.ChangeType<char8>(), Path::ChangeExtension<char8>(OutputFilePath.ChangeType<char8>(), ".h"), content);
 			GenerateForwardDeclarationsCode(Types, content);
 			GenerateTypesCode(Types, content);
 
 			WriteToFile(OutputFilePath, content);
 		}
 
-		void CompileFileGenerator::GenerateHeaderCode(const TypeList& Types, const String& HeaderFilePath, String& Content)
+		void CompileFileGenerator::GenerateHeaderCode(const TypeList& Types, const String& FilePath, const String& HeaderFilePath, String& Content)
 		{
+			const String ENGINE_COMMON(STRINGIZE(Engine::Common));
+			const String ENGINE_CONTAINERS(STRINGIZE(Engine::Containers));
+			const String ENGINE_REFLECTION(STRINGIZE(Engine::Reflection));
+			const String ENGINE_REFLECTION_PRIVATE(STRINGIZE(Engine::Reflection::Private));
+
 			ADD_NEW_LINE();
 
-			Content += "#include <";
-			Content += HeaderFilePath;
-			Content += ">";
+			Content += "#include <" + FilePath + ">";
 			ADD_NEW_LINE();
-
+			Content += "#include <" + HeaderFilePath + ">";
+			ADD_NEW_LINE();
+			Content += R"(#include <Common\TypeTraits.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Containers\Exception.h>)";
+			ADD_NEW_LINE();
 			Content += R"(#include <Reflection\Private\RuntimeImplementation.h>)";
 			ADD_NEW_LINE();
 			Content += R"(#include <Reflection\Private\ImplementDataType.h>)";
@@ -53,6 +63,19 @@ namespace Engine
 			Content += R"(#include <Reflection\Private\ImplementParameterType.h>)";
 			ADD_NEW_LINE();
 			Content += R"(#include <Reflection\Private\ImplementPropertyType.h>)";
+			ADD_NEW_LINE();
+			Content += R"(#include <Reflection\Private\ReflectionAllocators.h>)";
+			ADD_NEW_LINE();
+
+			ADD_NEW_LINE();
+
+			Content += "using namespace " + ENGINE_COMMON + ";";
+			ADD_NEW_LINE();
+			Content += "using namespace " + ENGINE_CONTAINERS + ";";
+			ADD_NEW_LINE();
+			Content += "using namespace " + ENGINE_REFLECTION + ";";
+			ADD_NEW_LINE();
+			Content += "using namespace " + ENGINE_REFLECTION_PRIVATE + ";";
 			ADD_NEW_LINE();
 
 			ADD_NEW_LINE();
@@ -68,12 +91,14 @@ namespace Engine
 		{
 			for (auto& type : Types)
 			{
+				GenerateNamespaceHeader(type, Content);
+
 				const String IMPLEMENT_NAME = GetImplementType(type);
 				const String IMPLEMENT_POINTER_NAME = GetImplementTypePointerName(type);
 
-				Content += "class " + IMPLEMENT_NAME + ";";
+				Content += "	class " + IMPLEMENT_NAME + ";";
 				ADD_NEW_LINE();
-				Content += IMPLEMENT_NAME + "* " + IMPLEMENT_POINTER_NAME + " = nullptr;";
+				Content += "	" + IMPLEMENT_NAME + "* " + IMPLEMENT_POINTER_NAME + " = nullptr;";
 				ADD_NEW_LINE();
 
 				ADD_NEW_LINE();
@@ -94,6 +119,8 @@ namespace Engine
 					metaObject->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, properties);
 					GenerateForwardDeclarationsCode(properties.Cast<Type*>(), Content);
 				}
+
+				GenerateNamespaceFooter(type, Content);
 			}
 		}
 
@@ -111,82 +138,84 @@ namespace Engine
 
 		void CompileFileGenerator::GenerateObjectCode(MetaObject* Type, String& Content)
 		{
-			const String RUNTIME_IMPLEMENTATION_INITIALIZE_META(STRINGIZE(Engine::Reflection::Private::RuntimeImplementation::InitializeMeta));
-			const String RUNTIME_IMPLEMENTATION_REGISTER_META(STRINGIZE(Engine::Reflection::Private::RuntimeImplementation::RegisterMeta));
-			const String I_META_OBJECT(STRINGIZE(Engine::Reflection::Private::RuntimeImplementation::IMetaObject));
-			const String OBJECT_TYPE(STRINGIZE(Engine::Reflection::ObjectType));
-			const String IMPLEMENT_OBJECT_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementObjectType));
-			const String ARGUMENT_LIST(STRINGIZE(Engine::Reflection::ArgumentsList));
-			const String ANY_DATA_TYPE(STRINGIZE(Engine::Containers::AnyDataType));
+			const String RUNTIME_IMPLEMENTATION_INITIALIZE_META(STRINGIZE(RuntimeImplementation::InitializeMeta));
+			const String RUNTIME_IMPLEMENTATION_REGISTER_META(STRINGIZE(RuntimeImplementation::RegisterMeta));
+			const String I_META_OBJECT(STRINGIZE(RuntimeImplementation::IMetaObject));
+			const String OBJECT_TYPE(STRINGIZE(ObjectType));
+			const String IMPLEMENT_OBJECT_TYPE(STRINGIZE(ImplementObjectType));
+			const String AUTO_GENERATED_ALLOCATOR(STRINGIZE(ReflectionAllocators::AutoGeneratedAllocator));
+			const String ARGUMENT_LIST(STRINGIZE(ArgumentsList));
+			const String ANY_DATA_TYPE(STRINGIZE(AnyDataType));
 
 			const String IMPLEMENT_NAME = GetImplementType(Type);
 			const String IMPLEMENT_POINTER_NAME = GetImplementTypePointerName(Type);
 			const String REGISTRY_NAME = GetRegistryTypeName(Type);
 			const String REGISTRY_POINTER_NAME = GetRegistryTypePointerName(Type);
 
+			GenerateNamespaceHeader(Type, Content);
 			{
-				Content += "class " + REGISTRY_NAME + " : private " + I_META_OBJECT;
-				ADD_NEW_LINE();
-				Content += "{";
-				ADD_NEW_LINE();
-
-				Content += "private:";
-				ADD_NEW_LINE();
-				Content += "	" + REGISTRY_NAME + "(void)";
+				Content += "	class " + REGISTRY_NAME + " : public " + I_META_OBJECT;
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();
 
-				Content += "		" + RUNTIME_IMPLEMENTATION_REGISTER_META + "(this);";
+				Content += "	private:";
+				ADD_NEW_LINE();
+				Content += "		" + REGISTRY_NAME + "(void)";
+				ADD_NEW_LINE();
+				Content += "		{";
 				ADD_NEW_LINE();
 
-				Content += "	}";
+				Content += "			" + RUNTIME_IMPLEMENTATION_REGISTER_META + "(this);";
 				ADD_NEW_LINE();
 
-				Content += "	virtual ~" + REGISTRY_NAME + "(void)";
-				ADD_NEW_LINE();
-				Content += "	{";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "	}";
+				Content += "		virtual ~" + REGISTRY_NAME + "(void)";
+				ADD_NEW_LINE();
+				Content += "		{";
 				ADD_NEW_LINE();
 
-				Content += "	virtual void Initialize(void) override";
-				ADD_NEW_LINE();
-				Content += "	{";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "	}";
+				Content += "		virtual void Initialize(void) override";
+				ADD_NEW_LINE();
+				Content += "		{";
 				ADD_NEW_LINE();
 
-				Content += "};";
+				Content += "		}";
 				ADD_NEW_LINE();
-				Content += REGISTRY_NAME + " " + REGISTRY_POINTER_NAME + ";";
+
+				Content += "	};";
+				ADD_NEW_LINE();
+				Content += "	" + REGISTRY_NAME + " " + REGISTRY_POINTER_NAME + ";";
 				ADD_NEW_LINE();
 			}
 
 			ADD_NEW_LINE();
 
 			{
-				Content += "class " + IMPLEMENT_NAME + " : private " + IMPLEMENT_OBJECT_TYPE;
-				ADD_NEW_LINE();
-				Content += "{";
-				ADD_NEW_LINE();
-
-				Content += "private:";
-				ADD_NEW_LINE();
-				Content += "	" + IMPLEMENT_NAME + "(void) :";
-				ADD_NEW_LINE();
-				Content += "		" + IMPLEMENT_OBJECT_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				Content += "	class " + IMPLEMENT_NAME + " : public " + IMPLEMENT_OBJECT_TYPE;
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();
 
-				Content += "		SetName(\"" + Type->GetName() + "\");";
+				Content += "	private:";
 				ADD_NEW_LINE();
-				Content += "		SetNamespace(\"" + Type->GetNamespace() + "\");";
+				Content += "		" + IMPLEMENT_NAME + "(void) :";
 				ADD_NEW_LINE();
-				Content += "		SetIsStruct(" + StringUtility::ToString<char8>(Type->GetIsStruct()).ToLower() + ");";
+				Content += "			" + IMPLEMENT_OBJECT_TYPE + "(" + AUTO_GENERATED_ALLOCATOR + ", " + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				ADD_NEW_LINE();
+				Content += "		{";
+				ADD_NEW_LINE();
+
+				Content += "			SetName(\"" + Type->GetName() + "\");";
+				ADD_NEW_LINE();
+				Content += "			SetNamespace(\"" + Type->GetNamespace() + "\");";
+				ADD_NEW_LINE();
+				Content += "			SetIsStruct(" + StringUtility::ToString<char8>(Type->GetIsStruct()).ToLower() + ");";
 				ADD_NEW_LINE();
 
 				auto generateAddParents = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
@@ -196,7 +225,7 @@ namespace Engine
 
 					for (auto& item : items)
 					{
-						Content += "		AddParentName(\"" + item + "\", " + GetAccessSpecifier(AccessLevel) + ");";
+						Content += "			AddParentName(\"" + item + "\", " + GetAccessSpecifier(AccessLevel) + ");";
 						ADD_NEW_LINE();
 					}
 				};
@@ -208,7 +237,7 @@ namespace Engine
 
 					for (auto& item : items)
 					{
-						Content += "		AddNestedType(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
+						Content += "			AddNestedType(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
 						ADD_NEW_LINE();
 					}
 				};
@@ -220,7 +249,7 @@ namespace Engine
 
 					for (auto& item : items)
 					{
-						Content += "		AddFunction(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
+						Content += "			AddFunction(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
 						ADD_NEW_LINE();
 					}
 				};
@@ -232,7 +261,7 @@ namespace Engine
 
 					for (auto& item : items)
 					{
-						Content += "		AddProperty(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
+						Content += "			AddProperty(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
 						ADD_NEW_LINE();
 					}
 				};
@@ -253,12 +282,12 @@ namespace Engine
 				generateAddNProperties(Type, AccessSpecifiers::Protected);
 				generateAddNProperties(Type, AccessSpecifiers::Public);
 
-				Content += "	}";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "	void CreateInstanceInternal(const " + ARGUMENT_LIST + "* Arguments, " + ANY_DATA_TYPE + "& ReturnValue) const override";
+				Content += "		void CreateInstanceInternal(const " + ARGUMENT_LIST + "* Arguments, " + ANY_DATA_TYPE + "& ReturnValue) const override";
 				ADD_NEW_LINE();
-				Content += "	{";
+				Content += "		{";
 				ADD_NEW_LINE();
 
 				//	Content += "\nvoid CreateInstanceInternal(AnyDataType &ReturnValue, const ArgumentsList *Arguments) const";
@@ -281,26 +310,27 @@ namespace Engine
 
 //	Content += "\n}";
 
-				Content += "	}";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "};";
+				Content += "	};";
 				ADD_NEW_LINE();
 			}
 
 			ADD_NEW_LINE();
 
 			{
-				Content += "const ";
+				Content += "	const ";
 				Content += OBJECT_TYPE;
 				Content += "& " + Type->GetFullQualifiedName() + "::GetType(void)";
 				ADD_NEW_LINE();
-				Content += "{";
+				Content += "	{";
 				ADD_NEW_LINE();
-				Content += "	" + RUNTIME_IMPLEMENTATION_INITIALIZE_META + "(); ";
+				Content += "		" + RUNTIME_IMPLEMENTATION_INITIALIZE_META + "();";
 				ADD_NEW_LINE();
-				Content += "	return *" + IMPLEMENT_POINTER_NAME + ";";
-				Content += "\n}";
+				Content += "		return *" + IMPLEMENT_POINTER_NAME + ";";
+				ADD_NEW_LINE();
+				Content += "	}";
 				ADD_NEW_LINE();
 			}
 
@@ -317,35 +347,39 @@ namespace Engine
 			PropertyTypeList properties;
 			Type->GetProperties(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, properties);
 			GenerateTypesCode(properties.Cast<Reflection::Type*>(), Content);
+
+			GenerateNamespaceFooter(Type, Content);
 		}
 
 		void CompileFileGenerator::GenerateEnumCode(MetaEnum* Type, String& Content)
 		{
-			const String IMPLEMENT_ENUM_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementEnumType));
+			const String IMPLEMENT_ENUM_TYPE(STRINGIZE(ImplementEnumType));
+			const String INT32 = STRINGIZE(int32);
 			const String IMPLEMENT_NAME = GetImplementType(Type);
 			const String ITEM_VALUE_VARIABLE_NAME = "itemValue";
 
+			GenerateNamespaceHeader(Type, Content);
 			{
-				Content += "class " + IMPLEMENT_NAME + " : private " + IMPLEMENT_ENUM_TYPE;
-				ADD_NEW_LINE();
-				Content += "{";
-				ADD_NEW_LINE();
-
-				Content += "private:";
-				ADD_NEW_LINE();
-				Content += "	" + IMPLEMENT_NAME + "(void) :";
-				ADD_NEW_LINE();
-				Content += "		" + IMPLEMENT_ENUM_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				Content += "	class " + IMPLEMENT_NAME + " : public " + IMPLEMENT_ENUM_TYPE;
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();
 
-				Content += "		SetName(\"" + Type->GetName() + "\");";
+				Content += "	private:";
 				ADD_NEW_LINE();
-				Content += "		SetNamespace(\"" + Type->GetNamespace() + "\");";
+				Content += "		" + IMPLEMENT_NAME + "(void) :";
+				ADD_NEW_LINE();
+				Content += "			" + IMPLEMENT_ENUM_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				ADD_NEW_LINE();
+				Content += "		{";
 				ADD_NEW_LINE();
 
-				Content += "		" + String(STRINGIZE(int32)) + " " + ITEM_VALUE_VARIABLE_NAME + " = -1;";
+				Content += "			SetName(\"" + Type->GetName() + "\");";
+				ADD_NEW_LINE();
+				Content += "			SetNamespace(\"" + Type->GetNamespace() + "\");";
+				ADD_NEW_LINE();
+
+				Content += "			" + INT32 + " " + ITEM_VALUE_VARIABLE_NAME + " = -1;";
 				ADD_NEW_LINE();
 
 				for (auto& item : Type->GetItems())
@@ -353,56 +387,57 @@ namespace Engine
 					StringList parts = item.GetName().Split("=");
 
 					if (parts.GetSize() == 1)
-						Content += "		++" + ITEM_VALUE_VARIABLE_NAME + ";";
+						Content += "			++" + ITEM_VALUE_VARIABLE_NAME + ";";
 					else
-						Content += "		" + ITEM_VALUE_VARIABLE_NAME + " = " + parts[1] + ";";
+						Content += "			" + ITEM_VALUE_VARIABLE_NAME + " = " + parts[1] + ";";
 
 					ADD_NEW_LINE();
 
-					Content += "		AddItem(\"" + parts[0] + "\", " + ITEM_VALUE_VARIABLE_NAME + ");";
+					Content += "			AddItem(\"" + parts[0] + "\", " + ITEM_VALUE_VARIABLE_NAME + ");";
 					ADD_NEW_LINE();
 				}
 
-				Content += "	}";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "};";
+				Content += "	};";
 				ADD_NEW_LINE();
 			}
+			GenerateNamespaceFooter(Type, Content);
 
 			ADD_NEW_LINE();
 		}
 
 		void CompileFileGenerator::GenerateFunctionCode(MetaFunction* Type, String& Content)
 		{
-			const String IMPLEMENT_FUNCTION_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementFunctionType));
-			const String IMPLEMENT_PARAMETER_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementParameterType));
+			const String IMPLEMENT_FUNCTION_TYPE(STRINGIZE(ImplementFunctionType));
+			const String IMPLEMENT_PARAMETER_TYPE(STRINGIZE(ImplementParameterType));
 			const String IMPLEMENT_NAME = GetImplementType(Type);
 			const String IMPLEMENT_POINTER_NAME = GetImplementTypePointerName(Type);
 			const String RETURN_DATA_TYPE_VARIALBE_NAME = "returnDataType";
-			const String ARGUMENT_LIST(STRINGIZE(Engine::Reflection::ArgumentsList));
-			const String ANY_DATA_TYPE(STRINGIZE(Engine::Containers::AnyDataType));
+			const String ARGUMENT_LIST(STRINGIZE(ArgumentsList));
+			const String ANY_DATA_TYPE(STRINGIZE(AnyDataType));
 
 			{
-				Content += "class " + IMPLEMENT_NAME + " : private " + IMPLEMENT_FUNCTION_TYPE;
-				ADD_NEW_LINE();
-				Content += "{";
-				ADD_NEW_LINE();
-
-				Content += "private:";
-				ADD_NEW_LINE();
-				Content += "	" + IMPLEMENT_NAME + "(void) :";
-				ADD_NEW_LINE();
-				Content += "		" + IMPLEMENT_FUNCTION_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				Content += "	class " + IMPLEMENT_NAME + " : public " + IMPLEMENT_FUNCTION_TYPE;
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();
 
-				Content += "		SetName(\"" + Type->GetName() + "\");";
+				Content += "	private:";
+				ADD_NEW_LINE();
+				Content += "		" + IMPLEMENT_NAME + "(void) :";
+				ADD_NEW_LINE();
+				Content += "			" + IMPLEMENT_FUNCTION_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				ADD_NEW_LINE();
+				Content += "		{";
+				ADD_NEW_LINE();
+
+				Content += "			SetName(\"" + Type->GetName() + "\");";
 				ADD_NEW_LINE();
 
 				GenerateDataType(Type->GetReturnType(), RETURN_DATA_TYPE_VARIALBE_NAME, Content);
-				Content += "		SetReturnType(" + RETURN_DATA_TYPE_VARIALBE_NAME + ");";
+				Content += "			SetReturnType(" + RETURN_DATA_TYPE_VARIALBE_NAME + ");";
 				ADD_NEW_LINE();
 
 				uint32 index = 0;
@@ -413,38 +448,38 @@ namespace Engine
 
 					GenerateDataType(parameter.GetDataType(), PARAMETER_DATA_TYPE_VARIALBE_NAME, Content);
 
-					Content += "		" + IMPLEMENT_PARAMETER_TYPE + " " + PARAMETER_VARIALBE_NAME + ";";
+					Content += "			" + IMPLEMENT_PARAMETER_TYPE + " " + PARAMETER_VARIALBE_NAME + ";";
 					ADD_NEW_LINE();
 
-					Content += "		" + PARAMETER_VARIALBE_NAME + ".SetName(\"" + parameter.GetName() + "\");";
+					Content += "			" + PARAMETER_VARIALBE_NAME + ".SetName(\"" + parameter.GetName() + "\");";
 					ADD_NEW_LINE();
 
-					Content += "		" + PARAMETER_VARIALBE_NAME + ".SetDataType(" + PARAMETER_DATA_TYPE_VARIALBE_NAME + ");";
+					Content += "			" + PARAMETER_VARIALBE_NAME + ".SetDataType(" + PARAMETER_DATA_TYPE_VARIALBE_NAME + ");";
 					ADD_NEW_LINE();
 
-					Content += "		AddParameter(" + PARAMETER_VARIALBE_NAME + ");";
+					Content += "			AddParameter(" + PARAMETER_VARIALBE_NAME + ");";
 					ADD_NEW_LINE();
 				}
 
-				Content += "		SetIsConst(\"" + StringUtility::ToString<char8>(Type->GetIsConst()).ToLower() + "\");";
+				Content += "			SetIsConst(\"" + StringUtility::ToString<char8>(Type->GetIsConst()).ToLower() + "\");";
 				ADD_NEW_LINE();
 
-				Content += "	}";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "	void InvokeInternal(void* TargetObject, const " + ARGUMENT_LIST + "* Arguments, " + ANY_DATA_TYPE + "& ReturnValue) const override";
+				Content += "		void InvokeInternal(void* TargetObject, const " + ARGUMENT_LIST + "* Arguments, " + ANY_DATA_TYPE + "& ReturnValue) const override";
 				ADD_NEW_LINE();
-				Content += "	{";
-				ADD_NEW_LINE();
-
-				Content += "		THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
-				ADD_NEW_LINE();
-				Content += "		THROW_IF_EXCEPTION(Categories::Reflection, Arguments == nullptr && m_Parameters.GetSize() != 0, \"Arguments are not compatible with the parameters\");";
-				ADD_NEW_LINE();
-				Content += "		THROW_IF_EXCEPTION(Categories::Reflection, Arguments->GetSize() != m_Parameters.GetSize(), \"Arguments are not compatible with the parameters\");";
+				Content += "		{";
 				ADD_NEW_LINE();
 
-				Content += "		";
+				Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
+				ADD_NEW_LINE();
+				Content += "			THROW_IF_EXCEPTION(Categories::Reflection, Arguments == nullptr && m_Parameters.GetSize() != 0, \"Arguments are not compatible with the parameters\");";
+				ADD_NEW_LINE();
+				Content += "			THROW_IF_EXCEPTION(Categories::Reflection, Arguments->GetSize() != m_Parameters.GetSize(), \"Arguments are not compatible with the parameters\");";
+				ADD_NEW_LINE();
+
+				Content += "			";
 
 				if (!(Type->GetReturnType().GetValueType() == ValueTypes::Void && Type->GetReturnType().GetPassType() != DataType::PassesTypes::Pointer))
 					Content += "ReturnValue = ";
@@ -456,10 +491,10 @@ namespace Engine
 				Content += ");";
 				ADD_NEW_LINE();
 
-				Content += "	}";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "};";
+				Content += "	};";
 				ADD_NEW_LINE();
 			}
 
@@ -498,84 +533,100 @@ namespace Engine
 			}
 		}
 
-		//String GetArgumentsDataTypeText(const ParameterTypeList& Parameters)
-		//{
-		//	String ret;
-
-		//	if (Parameters.GetSize() != 0)
-		//	{
-		//		for (uint8 i = 0; i < Parameters.GetSize(); i++)
-		//		{
-		//			const Parameter& param = Parameters[i];
-
-		//			ret += GetArgumentDataTypeText(i, param.GetDataType());
-
-		//			if (i < Parameters.GetSize() - 1)
-		//				ret += ",";
-		//		}
-		//	}
-
-		//	return ret;
-		//}
-
-		//String GetArgumentDataTypeText(int32 Index, const DataType& Type)
-		//{
-		//	String ret;
-
-		//	if (Type.GetValueType() == ValueTypes::None)
-		//		if (Type.GetPassType() == DataType::PassesTypes::Pointer)
-		//			ret += "(" + Type.GetExtraValueType() + "*)";
-
-		//	ret += "(*Arguments)[" + StringUtility::ToString<char8>(Index) + "].GetAs";
-
-		//	if (Type.GetPassType() == DataType::PassesTypes::Pointer)
-		//		ret += GetValueTypeText(ValueTypes::VoidPointer);
-		//	else
-		//		ret += GetValueTypeText(Type.GetValueType(), false);
-
-		//	ret += "()";
-
-		//	return ret;
-		//}
-
 		void CompileFileGenerator::GeneratePropertyCode(MetaProperty* Type, String& Content)
 		{
-			const String IMPLEMENT_PROPERTY_TYPE(STRINGIZE(Engine::Reflection::Private::ImplementPropertyType));
+			const String IMPLEMENT_PROPERTY_TYPE(STRINGIZE(ImplementPropertyType));
+			const String OFFSET_OF(STRINGIZE(OffsetOf));
 			const String IMPLEMENT_NAME = GetImplementType(Type);
 			const String DATA_TYPE_VARIALBE_NAME = "dataType";
 
 			{
-				Content += "class " + IMPLEMENT_NAME + " : private " + IMPLEMENT_PROPERTY_TYPE;
-				ADD_NEW_LINE();
-				Content += "{";
-				ADD_NEW_LINE();
-
-				Content += "private:";
-				ADD_NEW_LINE();
-				Content += "	" + IMPLEMENT_NAME + "(void) :";
-				ADD_NEW_LINE();
-				Content += "		" + IMPLEMENT_PROPERTY_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				Content += "	class " + IMPLEMENT_NAME + " : public " + IMPLEMENT_PROPERTY_TYPE;
 				ADD_NEW_LINE();
 				Content += "	{";
 				ADD_NEW_LINE();
 
-				Content += "		SetName(\"" + Type->GetName() + "\");";
+				Content += "	private:";
+				ADD_NEW_LINE();
+				Content += "		" + IMPLEMENT_NAME + "(void) :";
+				ADD_NEW_LINE();
+				Content += "			" + IMPLEMENT_PROPERTY_TYPE + "(" + GetImplementTypePointerName(Type->GetTopNest()) + ")";
+				ADD_NEW_LINE();
+				Content += "		{";
+				ADD_NEW_LINE();
+
+				Content += "			SetName(\"" + Type->GetName() + "\");";
 				ADD_NEW_LINE();
 
 				GenerateDataType(Type->GetDataType(), DATA_TYPE_VARIALBE_NAME, Content);
-				Content += "		SetDataType(" + DATA_TYPE_VARIALBE_NAME + ");";
+				Content += "			SetDataType(" + DATA_TYPE_VARIALBE_NAME + ");";
 				ADD_NEW_LINE();
 
-				Content += "		SetOffset(OffsetOf(&" + Type->GetFullQualifiedName() + "));";
+				Content += "			SetOffset(" + OFFSET_OF + "(&" + Type->GetFullQualifiedName() + "));";
 				ADD_NEW_LINE();
 
-				Content += "	}";
+				Content += "		}";
 				ADD_NEW_LINE();
 
-				Content += "};";
+				Content += "	};";
 				ADD_NEW_LINE();
 			}
 
+			ADD_NEW_LINE();
+		}
+
+		void CompileFileGenerator::GenerateNamespaceHeader(Type* Type, String& Content)
+		{
+			String ns = String::Empty;
+			if (IsTypeOf(Type, MetaObject))
+			{
+				if (Type->GetTopNest() != nullptr)
+					return;
+
+				ns = ReinterpretCast(MetaObject*, Type)->GetNamespace();
+			}
+			else if (IsTypeOf(Type, EnumType))
+			{
+				if (Type->GetTopNest() != nullptr)
+					return;
+
+				ns = ReinterpretCast(EnumType*, Type)->GetNamespace();
+			}
+
+			if (ns == String::Empty)
+				return;
+
+			Content += "namespace " + ns;
+
+			ADD_NEW_LINE();
+
+			Content += "{";
+			ADD_NEW_LINE();
+		}
+
+		void CompileFileGenerator::GenerateNamespaceFooter(Type* Type, String& Content)
+		{
+			bool shouldProceed = false;
+
+			if (IsTypeOf(Type, MetaObject))
+			{
+				if (Type->GetTopNest() != nullptr)
+					return;
+
+				shouldProceed = true;
+			}
+			else if (IsTypeOf(Type, EnumType))
+			{
+				if (Type->GetTopNest() != nullptr)
+					return;
+
+				shouldProceed = true;
+			}
+
+			if (!shouldProceed)
+				return;
+
+			Content += "}";
 			ADD_NEW_LINE();
 		}
 

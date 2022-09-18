@@ -43,7 +43,9 @@ namespace Engine
 
 		String ObjectType::GetFullQualifiedName(void) const
 		{
-			return m_Namespace + "::" + Type::GetFullQualifiedName();
+			String temp = (GetTopNest() == nullptr ? m_Namespace : GetTopNest()->GetFullQualifiedName());
+
+			return  temp + (temp == String::Empty ? String::Empty : "::") + GetName();
 		}
 
 		void ObjectType::GetParents(AccessSpecifiers AccessFlags, ObjectTypeList& List) const

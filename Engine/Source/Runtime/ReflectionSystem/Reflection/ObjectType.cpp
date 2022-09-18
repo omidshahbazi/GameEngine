@@ -13,7 +13,9 @@ namespace Engine
 			m_ParentNames(Allocator),
 			m_NestedTypes(Allocator),
 			m_Functions(Allocator),
-			m_Properties(Allocator)
+			m_Properties(Allocator),
+			m_IsStruct(false),
+			m_IsAbstract(false)
 		{
 		}
 

@@ -316,14 +316,15 @@ namespace Engine
 							MatchSymbol(CLOSE_BRACE) ||
 							MatchSymbol(SEMICOLON) ||
 							MatchSymbol(COMMA) ||
-							token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
+							token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive) ||
+							!DataType.GetIsEmpty())
 						{
 							UngetToken(token);
 
 							break;
 						}
-						else
-							DataType.SetExtraValueType(token.GetName());
+
+						DataType.SetExtraValueType(token.GetName());
 					}
 				}
 

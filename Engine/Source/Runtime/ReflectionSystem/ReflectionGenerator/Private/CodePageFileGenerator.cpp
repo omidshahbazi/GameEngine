@@ -117,7 +117,7 @@ namespace Engine
 			case ValueTypes::Int16:
 				return STRINGIZE(ValueTypes::Int16);
 			case ValueTypes::Int32:
-				return STRINGIZE(ValueTypes::NoInt32ne);
+				return STRINGIZE(ValueTypes::Int32);
 			case ValueTypes::Int64:
 				return STRINGIZE(ValueTypes::Int64);
 
@@ -169,7 +169,7 @@ namespace Engine
 			case ValueTypes::Int16:
 				return "Int16";
 			case ValueTypes::Int32:
-				return "NoInt32ne";
+				return "Int32";
 			case ValueTypes::Int64:
 				return "Int64";
 

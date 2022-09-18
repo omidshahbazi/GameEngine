@@ -33,6 +33,11 @@ namespace Engine
 					m_IsStruct = Value;
 				}
 
+				INLINE void SetIsAbstract(bool Value)
+				{
+					m_IsAbstract = Value;
+				}
+
 				void AddParentName(const String& Value, AccessSpecifiers Access);
 
 				void AddNestedType(Type* Value, AccessSpecifiers Access);

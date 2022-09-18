@@ -47,6 +47,11 @@ namespace Engine
 				return m_IsStruct;
 			}
 
+			INLINE bool GetIsAbstract(void) const
+			{
+				return m_IsAbstract;
+			}
+
 			void GetParents(AccessSpecifiers AccessFlags, ObjectTypeList& List) const;
 
 			void GetNestedTypes(AccessSpecifiers AccessFlags, TypeList& List) const;
@@ -62,6 +67,7 @@ namespace Engine
 			String m_Namespace;
 
 			bool m_IsStruct;
+			bool m_IsAbstract;
 
 			ParentsMap m_ParentNames;
 			NestedTypesMap m_NestedTypes;

@@ -84,6 +84,8 @@ namespace Engine
 
 				ParseSpecifiers(type, "object");
 
+				type->SetIsAbstract(type->GetSpecifiers().Contains(STRINGIZE(REFLECTION_ABSTRACT)));
+
 				if (IsStruct)
 				{
 					RequireIdentifier(STRUCT, "object");

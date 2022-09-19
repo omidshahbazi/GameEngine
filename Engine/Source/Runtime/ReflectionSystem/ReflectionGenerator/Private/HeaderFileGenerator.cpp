@@ -68,6 +68,23 @@ namespace Engine
 			Content += "	friend class " + IMPLEMENT_OBJECT_TYPE + "; \\";
 			ADD_NEW_LINE();
 
+			std::function<void(MetaObject*, AccessSpecifiers)> generateFriendClassForNesteds = [&generateFriendClassForNesteds, &Content](MetaObject* Type, AccessSpecifiers AccessLevel)
+			{
+				TypeList items;
+				Type->GetNestedTypes(AccessLevel, items);
+
+				for (auto& item : items)
+				{
+					const String IMPLEMENT_NESTED_TYPE = GetImplementType(item);
+
+					Content += "	friend class " + IMPLEMENT_NESTED_TYPE + "; \\";
+					ADD_NEW_LINE();
+
+					if (IsTypeOf(item, MetaObject))
+						generateFriendClassForNesteds(ReinterpretCast(MetaObject*, item), AccessLevel);
+				}
+			};
+
 			std::function<void(MetaObject*, AccessSpecifiers)> generateFriendClassForFunctions = [&generateFriendClassForFunctions, &Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 			{
 				FunctionTypeList items;
@@ -110,6 +127,7 @@ namespace Engine
 						generateFriendClassForNProperties(ReinterpretCast(MetaObject*, item), AccessLevel);
 			};
 
+			generateFriendClassForNesteds(Type, AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public);
 			generateFriendClassForFunctions(Type, AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public);
 			generateFriendClassForNProperties(Type, AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public);
 

@@ -77,7 +77,7 @@ namespace Engine
 				Content += " const";
 		}
 
-		void CodePageFileGenerator::GenerateSignature(MetaFunction* Type, String& Content)
+		void CodePageFileGenerator::GenerateSignature(FunctionType* Type, String& Content)
 		{
 			GenerateSignature(Type->GetReturnType(), Content);
 
@@ -96,7 +96,7 @@ namespace Engine
 			Content += ")";
 		}
 
-		uint32 CodePageFileGenerator::GetSignatureID(MetaFunction* Type)
+		uint32 CodePageFileGenerator::GetSignatureID(FunctionType* Type)
 		{
 			String content;
 			GenerateSignature(Type, content);

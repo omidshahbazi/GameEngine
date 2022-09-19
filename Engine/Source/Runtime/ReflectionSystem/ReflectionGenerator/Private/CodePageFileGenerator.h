@@ -28,9 +28,9 @@ namespace Engine
 			static void GenerateDataType(const DataType& Type, const String& VariableName, String& Content);
 
 			static void GenerateSignature(const DataType& Type, String& Content);
-			static void GenerateSignature(MetaFunction* Type, String& Content);
+			static void GenerateSignature(FunctionType* Type, String& Content);
 
-			static uint32 GetSignatureID(MetaFunction* Type);
+			static uint32 GetSignatureID(FunctionType* Type);
 
 			static String GetPassType(DataType::PassesTypes Type);
 			static String GetAccessSpecifier(AccessSpecifiers Access);

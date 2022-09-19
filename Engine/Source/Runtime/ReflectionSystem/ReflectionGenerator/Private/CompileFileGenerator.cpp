@@ -370,22 +370,21 @@ namespace Engine
 						}
 						else
 						{
-							Content += "			switch (0)";
+							Content += "			switch (Arguments->GetSize())";
 							ADD_NEW_LINE();
 							Content += "			{";
 							ADD_NEW_LINE();
 
 							for (auto& ctor : ctors)
 							{
-								Content += "			case " + StringUtility::ToString<char8>(GetSignatureID(ctor)) + ":";
+								Content += "			case " + StringUtility::ToString<char8>(ctor->GetParameters().GetSize()) + ":";
 								ADD_NEW_LINE();
 								{
-									Content += "				ConstructMacro(" + Type->GetFullQualifiedName() + ", " + INSTANCE_NAME;
-									Content += ");";
+									Content += "				ConstructMacro(" + Type->GetFullQualifiedName() + ", " + INSTANCE_NAME + ", ";
 
-									//String arguments = GetArgumentsDataTypeText(type->GetParameters());
-									//if (arguments != String::Empty)
-									//	Content += "," + arguments;
+									GenerateArgumentListCode(ctor->GetParameters(), Content);
+
+									Content += ");";
 
 									ADD_NEW_LINE();
 								}
@@ -630,7 +629,12 @@ namespace Engine
 					Content += "ReinterpretCast(" + dataType.GetExtraValueType() + "*, ";
 				}
 
-				Content += "(*Arguments)[" + StringUtility::ToString<char8>(index++) + "].Get<" + GetValueTypeType(dataType.GetValueType()) + ">()";
+				Content += "(*Arguments)[" + StringUtility::ToString<char8>(index++) + "].Get<" + GetValueTypeType(dataType.GetValueType());
+
+				if (dataType.GetPassType() == DataType::PassesTypes::Pointer)
+					Content += "*";
+
+				Content += ">()";
 
 				if (dataType.GetValueType() == ValueTypes::None)
 					Content += ")";

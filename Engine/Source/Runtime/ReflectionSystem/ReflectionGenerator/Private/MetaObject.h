@@ -95,11 +95,6 @@ namespace Engine
 					ImplementObjectType::AddProperty(Value, m_LastAccessSpecifier);
 				}
 
-				INLINE String GetUniqueName(void) const
-				{
-					return (m_TopNest == nullptr ? "" : (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_") + m_Name;
-				}
-
 				INLINE String GetDeclarationMacroName(void) const
 				{
 					return m_Name.ToUpper() + "_OBJECT";

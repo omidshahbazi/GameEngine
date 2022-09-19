@@ -6,10 +6,12 @@
 #include <Reflection\Private\ImplementDataType.h>
 #include <Debugging\CoreDebug.h>
 #include <Platform\PlatformFile.h>
+#include <DataUtility\Hash.h>
 
 namespace Engine
 {
 	using namespace Platform;
+	using namespace DataUtility;
 
 	namespace ReflectionGenerator
 	{
@@ -54,6 +56,52 @@ namespace Engine
 			}
 
 #undef ADD_NEW_LINE
+		}
+
+		void CodePageFileGenerator::GenerateSignature(const DataType& Type, String& Content)
+		{
+			if (Type.GetIsConst())
+				Content += "const ";
+
+			if (Type.GetValueType() == ValueTypes::None)
+				Content += Type.GetExtraValueType();
+			else
+				Content += GetValueTypeType(Type.GetValueType());
+
+			if (Type.GetPassType() == DataType::PassesTypes::Pointer)
+				Content += "*";
+			else if (Type.GetPassType() == DataType::PassesTypes::Reference)
+				Content += "&";
+
+			if (Type.GetIsConstValue())
+				Content += " const";
+		}
+
+		void CodePageFileGenerator::GenerateSignature(MetaFunction* Type, String& Content)
+		{
+			GenerateSignature(Type->GetReturnType(), Content);
+
+			Content += "(";
+
+			bool isFirstOne = true;
+			for (auto& param : Type->GetParameters())
+			{
+				if (!isFirstOne)
+					Content += ", ";
+				isFirstOne = false;
+
+				GenerateSignature(param.GetDataType(), Content);
+			}
+
+			Content += ")";
+		}
+
+		uint32 CodePageFileGenerator::GetSignatureID(MetaFunction* Type)
+		{
+			String content;
+			GenerateSignature(Type, content);
+
+			return Hash::CRC32(content.GetValue(), content.GetLength());
 		}
 
 		String CodePageFileGenerator::GetPassType(DataType::PassesTypes Type)
@@ -192,68 +240,36 @@ namespace Engine
 			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
 
-		//String CodePageFileGenerator::GetValueTypeName(ValueTypes Type)
-		//{
-		//	switch (Type)
-		//	{
-		//	case ValueTypes::None:
-		//		return "None";
+		String CodePageFileGenerator::GetUniqueName(ObjectType* Type)
+		{
+			return (Type->GetTopNest() == nullptr ? String::Empty : GetUniqueName(Type->GetTopNest()) + "_") + Type->GetName();
+		}
 
-		//	case ValueTypes::Void:
-		//		return "Void";
+		String CodePageFileGenerator::GetUniqueName(EnumType* Type)
+		{
+			return (Type->GetTopNest() == nullptr ? String::Empty : GetUniqueName(Type->GetTopNest()) + "_") + Type->GetName();
+		}
 
-		//	case ValueTypes::Bool:
-		//		return "Bool";
+		String CodePageFileGenerator::GetUniqueName(FunctionType* Type)
+		{
+			return GetUniqueName(Type->GetTopNest()) + "_" + Type->GetName() + "_" + StringUtility::ToString<char8>(GetSignatureID(ReinterpretCast(MetaFunction*, Type)));
+		}
 
-		//	case ValueTypes::UInt8:
-		//		return "UInt8";
-		//	case ValueTypes::UInt16:
-		//		return "UInt16";
-		//	case ValueTypes::UInt32:
-		//		return "UInt32";
-		//	case ValueTypes::UInt64:
-		//		return "UInt64";
-
-		//	case ValueTypes::Int8:
-		//		return "Int8";
-		//	case ValueTypes::Int16:
-		//		return "Int16";
-		//	case ValueTypes::Int32:
-		//		return "Int32";
-		//	case ValueTypes::Int64:
-		//		return "Int64";
-
-		//	case ValueTypes::Float32:
-		//		return "Float32";
-		//	case ValueTypes::Float64:
-		//		return "Float64";
-
-		//	case ValueTypes::String:
-		//		return "String";
-		//	case ValueTypes::WString:
-		//		return "WString";
-
-		//	case ValueTypes::Vector2F:
-		//		return "Vector2F";
-		//	case ValueTypes::Vector3F:
-		//		return "Vector3F";
-		//	case ValueTypes::Matrix4F:
-		//		return "Matrix4F";
-		//	}
-
-		//	CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
-		//}
+		String CodePageFileGenerator::GetUniqueName(PropertyType* Type)
+		{
+			return GetUniqueName(Type->GetTopNest()) + "_" + Type->GetName();
+		}
 
 		String CodePageFileGenerator::GetUniqueName(Type* Type)
 		{
 			if (IsTypeOf(Type, MetaObject))
-				return ReinterpretCast(MetaObject*, Type)->GetUniqueName();
+				return GetUniqueName(ReinterpretCast(MetaObject*, Type));
 			else if (IsTypeOf(Type, MetaEnum))
-				return ReinterpretCast(MetaEnum*, Type)->GetUniqueName();
+				return  GetUniqueName(ReinterpretCast(MetaEnum*, Type));
 			else if (IsTypeOf(Type, MetaFunction))
-				return ReinterpretCast(MetaFunction*, Type)->GetUniqueName();
+				return GetUniqueName(ReinterpretCast(MetaFunction*, Type));
 			else if (IsTypeOf(Type, MetaProperty))
-				return ReinterpretCast(MetaProperty*, Type)->GetUniqueName();
+				return  GetUniqueName(ReinterpretCast(MetaProperty*, Type));
 
 			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}

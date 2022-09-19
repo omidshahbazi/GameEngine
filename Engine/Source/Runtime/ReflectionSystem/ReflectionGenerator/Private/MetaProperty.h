@@ -26,11 +26,6 @@ namespace Engine
 				{
 				}
 
-				INLINE String GetUniqueName(void) const
-				{
-					return (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_" + m_Name;
-				}
-
 				AnyDataType GetValue(const void* TargetObject) const override
 				{
 					return {};

@@ -22,6 +22,7 @@ namespace Engine.Programs
 			PrivateDependencyModuleNames.Add("MemoryManagement");
 			PrivateDependencyModuleNames.Add("Reflection");
 			PrivateDependencyModuleNames.Add("Lexer");
+			PrivateDependencyModuleNames.Add("DataUtility");
 
 			PublicDependencyModuleNames.Add("Allocators");
 			PublicDependencyModuleNames.Add("Containers");

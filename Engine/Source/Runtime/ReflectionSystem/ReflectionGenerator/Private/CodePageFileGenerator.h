@@ -3,7 +3,9 @@
 #define CODE_PAGE_FILE_GENERATOR_H
 #include <ReflectionGenerator\ReflectionGeneratorException.h>
 #include <ReflectionGenerator\Private\MetaObject.h>
-#include <Reflection\FunctionType.h>
+#include <ReflectionGenerator\Private\MetaEnum.h>
+#include <ReflectionGenerator\Private\MetaFunction.h>
+#include <ReflectionGenerator\Private\MetaProperty.h>
 #include <Reflection\Definitions.h>
 #include <Containers\Strings.h>
 
@@ -25,13 +27,23 @@ namespace Engine
 		protected:
 			static void GenerateDataType(const DataType& Type, const String& VariableName, String& Content);
 
+			static void GenerateSignature(const DataType& Type, String& Content);
+			static void GenerateSignature(MetaFunction* Type, String& Content);
+
+			static uint32 GetSignatureID(MetaFunction* Type);
+
 			static String GetPassType(DataType::PassesTypes Type);
 			static String GetAccessSpecifier(AccessSpecifiers Access);
 
 			static String GetValueType(ValueTypes Type);
 			static String GetValueTypeType(ValueTypes Type);
 
+			static String GetUniqueName(ObjectType* Type);
+			static String GetUniqueName(EnumType* Type);
+			static String GetUniqueName(FunctionType* Type);
+			static String GetUniqueName(PropertyType* Type);
 			static String GetUniqueName(Type* Type);
+
 			static String GetImplementType(Type* Type);
 			static String GetImplementTypePointerName(Type* Type);
 			static String GetRegistryTypeName(Type* Type);

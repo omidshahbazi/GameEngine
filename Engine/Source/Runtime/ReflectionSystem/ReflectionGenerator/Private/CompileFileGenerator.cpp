@@ -348,13 +348,11 @@ namespace Engine
 
 					if (Type->GetIsStatic() || Type->GetIsAbstract())
 					{
-						Content += "			THROW_EXCEPTION(Categories::Reflection, \"Creating an instance of an static/absract class is not applicable\");";
+						Content += "			THROW_EXCEPTION(Categories::Reflection, \"Creating an instance of an static/abstract class is not applicable\");";
 						ADD_NEW_LINE();
 					}
 					else
 					{
-						//FUNCTION and ctor signature
-						//	Function overloading
 						//	ctor overloading
 
 //	for (auto& t : Types)

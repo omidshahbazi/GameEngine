@@ -30,6 +30,15 @@ namespace Engine
 				{
 					return (ReinterpretCast(MetaObject*, m_TopNest)->GetUniqueName()) + "_" + m_Name;
 				}
+
+				AnyDataType GetValue(const void* TargetObject) const override
+				{
+					return {};
+				}
+
+				void SetValue(void* TargetObject, const AnyDataType& Value) override
+				{
+				}
 			};
 		}
 	}

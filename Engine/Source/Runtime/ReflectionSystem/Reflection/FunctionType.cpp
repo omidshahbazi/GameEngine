@@ -7,8 +7,24 @@ namespace Engine
 	{
 		FunctionType::FunctionType(ObjectType* TopNest) :
 			Type(TopNest),
-			m_IsConst(false)
+			m_IsConst(false),
+			m_IsStatic(false)
 		{
+		}
+
+		AnyDataType FunctionType::Invoke(void) const
+		{
+			return Invoke(nullptr);
+		}
+
+		AnyDataType FunctionType::Invoke(const AnyDataType& Argument) const
+		{
+			return Invoke(nullptr, Argument);
+		}
+
+		AnyDataType FunctionType::Invoke(const ArgumentsList& Arguments) const
+		{
+			return Invoke(nullptr, Arguments);
 		}
 
 		AnyDataType FunctionType::Invoke(void* TargetObject) const

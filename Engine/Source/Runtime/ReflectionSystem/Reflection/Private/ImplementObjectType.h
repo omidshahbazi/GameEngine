@@ -38,6 +38,11 @@ namespace Engine
 					m_IsAbstract = Value;
 				}
 
+				INLINE void SetIsStatic(bool Value)
+				{
+					m_IsStatic = Value;
+				}
+
 				void AddParentName(const String& Value, AccessSpecifiers Access);
 
 				void AddNestedType(Type* Value, AccessSpecifiers Access);

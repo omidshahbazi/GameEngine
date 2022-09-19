@@ -47,8 +47,6 @@ namespace Engine
 			ADD_NEW_LINE();
 			Content += "#include <" + HeaderFilePath + ">";
 			ADD_NEW_LINE();
-			Content += R"(#include <Common\TypeTraits.h>)";
-			ADD_NEW_LINE();
 			Content += R"(#include <Containers\Exception.h>)";
 			ADD_NEW_LINE();
 			Content += R"(#include <Reflection\Private\RuntimeImplementation.h>)";
@@ -273,6 +271,8 @@ namespace Engine
 					ADD_NEW_LINE();
 					Content += "			SetIsAbstract(" + StringUtility::ToString<char8>(Type->GetIsAbstract()).ToLower() + ");";
 					ADD_NEW_LINE();
+					Content += "			SetIsStatic(" + StringUtility::ToString<char8>(Type->GetIsStatic()).ToLower() + ");";
+					ADD_NEW_LINE();
 
 					auto generateAddParents = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 					{
@@ -346,21 +346,17 @@ namespace Engine
 					Content += "		{";
 					ADD_NEW_LINE();
 
-					if (Type->GetIsAbstract())
+					if (Type->GetIsStatic() || Type->GetIsAbstract())
 					{
-						Content += "			THROW_EXCEPTION(Categories::Reflection, \"Creating an instance of an absract class is not applicable\");";
+						Content += "			THROW_EXCEPTION(Categories::Reflection, \"Creating an instance of an static/absract class is not applicable\");";
 						ADD_NEW_LINE();
 					}
 					else
 					{
-
 						//FUNCTION and ctor signature
 						//	Function overloading
 						//	ctor overloading
-						//	Parameter default value
-						// 
-						// 
-						// 
+
 //	for (auto& t : Types)
 //	{
 //		MetaConstructor* type = (MetaConstructor*)t;
@@ -532,7 +528,10 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 
-				Content += "			SetIsConst(\"" + StringUtility::ToString<char8>(Type->GetIsConst()).ToLower() + "\");";
+				Content += "			SetIsConst(" + StringUtility::ToString<char8>(Type->GetIsConst()).ToLower() + ");";
+				ADD_NEW_LINE();
+
+				Content += "			SetIsStatic(" + StringUtility::ToString<char8>(Type->GetIsStatic()).ToLower() + ");";
 				ADD_NEW_LINE();
 
 				Content += "		}";
@@ -543,8 +542,12 @@ namespace Engine
 				Content += "		{";
 				ADD_NEW_LINE();
 
-				Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
+				if (Type->GetIsStatic())
+					Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject != nullptr, \"TargetObject must be null\");";
+				else
+					Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
 				ADD_NEW_LINE();
+
 				Content += "			THROW_IF_EXCEPTION(Categories::Reflection, Arguments == nullptr && m_Parameters.GetSize() != 0, \"Arguments are not compatible with the parameters\");";
 				ADD_NEW_LINE();
 				Content += "			THROW_IF_EXCEPTION(Categories::Reflection, Arguments->GetSize() != m_Parameters.GetSize(), \"Arguments are not compatible with the parameters\");";
@@ -555,7 +558,12 @@ namespace Engine
 				if (!(Type->GetReturnType().GetValueType() == ValueTypes::Void && Type->GetReturnType().GetPassType() != DataType::PassesTypes::Pointer))
 					Content += "ReturnValue = ";
 
-				Content += "ReinterpretCast(" + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->" + Type->GetName() + "(";
+				if (Type->GetIsStatic())
+					Content += Type->GetTopNest()->GetFullQualifiedName() + "::";
+				else
+					Content += "ReinterpretCast(" + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->";
+
+				Content += Type->GetName() + "(";
 
 				GenerateArgumentListCode(Type->GetParameters(), Content);
 
@@ -590,14 +598,7 @@ namespace Engine
 					Content += "ReinterpretCast(" + dataType.GetExtraValueType() + "*, ";
 				}
 
-				Content += "(*Arguments)[" + StringUtility::ToString<char8>(index++) + "].GetAs";
-
-				if (dataType.GetValueType() == ValueTypes::None)
-					Content += GetValueTypeName(ValueTypes::Void);
-				else
-					Content += GetValueTypeName(dataType.GetValueType());
-
-				Content += "()";
+				Content += "(*Arguments)[" + StringUtility::ToString<char8>(index++) + "].Get<" + GetValueTypeType(dataType.GetValueType()) + ">()";
 
 				if (dataType.GetValueType() == ValueTypes::None)
 					Content += ")";
@@ -633,7 +634,86 @@ namespace Engine
 				Content += "			SetDataType(" + DATA_TYPE_VARIALBE_NAME + ");";
 				ADD_NEW_LINE();
 
-				Content += "			SetOffset(" + OFFSET_OF + "(&" + Type->GetFullQualifiedName() + "));";
+				Content += "			SetIsReadOnly(" + StringUtility::ToString<char8>(Type->GetIsReadOnly()).ToLower() + ");";
+				ADD_NEW_LINE();
+
+				Content += "		}";
+				ADD_NEW_LINE();
+
+				Content += "		AnyDataType GetValue(const void* TargetObject) const override";
+				ADD_NEW_LINE();
+				Content += "		{";
+				ADD_NEW_LINE();
+
+				if (Type->GetIsStatic())
+					Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject != nullptr, \"TargetObject must be null\");";
+				else
+					Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
+				ADD_NEW_LINE();
+
+				Content += "			";
+
+				Content += "return ";
+
+				if (Type->GetDataType().GetValueType() == ValueTypes::None)
+					Content += "StaticCast(" + String(STRINGIZE(int32)) + ", ";
+
+				if (Type->GetIsStatic())
+					Content += Type->GetTopNest()->GetFullQualifiedName() + "::";
+				else
+					Content += "ReinterpretCast(const " + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->";
+
+				Content += Type->GetName();
+
+				if (Type->GetDataType().GetValueType() == ValueTypes::None)
+					Content += ")";
+
+				Content += ";";
+				ADD_NEW_LINE();
+
+				Content += "		}";
+				ADD_NEW_LINE();
+
+				Content += "		void SetValue(void* TargetObject, const AnyDataType& Value) override";
+				ADD_NEW_LINE();
+				Content += "		{";
+				ADD_NEW_LINE();
+
+				if (Type->GetIsReadOnly() || Type->GetDataType().GetIsConstValue())
+				{
+					Content += "			THROW_IF_EXCEPTION(Categories::Reflection, false, \"Property is readonly or const value\");";
+				}
+				else
+				{
+					if (Type->GetIsStatic())
+						Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject != nullptr, \"TargetObject must be null\");";
+					else
+						Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
+					ADD_NEW_LINE();
+
+					Content += "			";
+
+					if (Type->GetIsStatic())
+						Content += Type->GetTopNest()->GetFullQualifiedName() + "::";
+					else
+						Content += "ReinterpretCast(" + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->";
+
+					Content += Type->GetName() + " = ";
+
+					if (Type->GetDataType().GetValueType() == ValueTypes::None)
+					{
+						Content += "StaticCast(" + Type->GetDataType().GetExtraValueType();
+
+						if (Type->GetDataType().GetPassType() == DataType::PassesTypes::Pointer)
+							Content += "*";
+
+						Content += ", Value.Get<" + String(STRINGIZE(int32)) + ">())";
+					}
+					else
+						Content += "Value.Get<" + GetValueTypeType(Type->GetDataType().GetValueType()) + ">()";
+
+					Content += ";";
+				}
 				ADD_NEW_LINE();
 
 				Content += "		}";

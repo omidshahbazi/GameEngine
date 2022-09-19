@@ -142,57 +142,107 @@ namespace Engine
 			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
 
-		String CodePageFileGenerator::GetValueTypeName(ValueTypes Type)
+		String CodePageFileGenerator::GetValueTypeType(ValueTypes Type)
 		{
 			switch (Type)
 			{
 			case ValueTypes::None:
-				return "None";
-
 			case ValueTypes::Void:
-				return "Void";
+				return STRINGIZE(void);
 
 			case ValueTypes::Bool:
-				return "Bool";
+				return STRINGIZE(bool);
 
 			case ValueTypes::UInt8:
-				return "UInt8";
+				return STRINGIZE(uint8);
 			case ValueTypes::UInt16:
-				return "UInt16";
+				return STRINGIZE(uint16);
 			case ValueTypes::UInt32:
-				return "UInt32";
+				return STRINGIZE(uint32);
 			case ValueTypes::UInt64:
-				return "UInt64";
+				return STRINGIZE(uint64);
 
 			case ValueTypes::Int8:
-				return "Int8";
+				return STRINGIZE(int8);
 			case ValueTypes::Int16:
-				return "Int16";
+				return STRINGIZE(int16);
 			case ValueTypes::Int32:
-				return "Int32";
+				return STRINGIZE(int32);
 			case ValueTypes::Int64:
-				return "Int64";
+				return STRINGIZE(int64);
 
 			case ValueTypes::Float32:
-				return "Float32";
+				return STRINGIZE(float32);
 			case ValueTypes::Float64:
-				return "Float64";
+				return STRINGIZE(float64);
 
 			case ValueTypes::String:
-				return "String";
+				return STRINGIZE(String);
 			case ValueTypes::WString:
-				return "WString";
+				return STRINGIZE(WString);
 
 			case ValueTypes::Vector2F:
-				return "Vector2F";
+				return STRINGIZE(Vector2F);
 			case ValueTypes::Vector3F:
-				return "Vector3F";
+				return STRINGIZE(Vector3F);
 			case ValueTypes::Matrix4F:
-				return "Matrix4F";
+				return STRINGIZE(Matrix4F);
 			}
 
 			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
 		}
+
+		//String CodePageFileGenerator::GetValueTypeName(ValueTypes Type)
+		//{
+		//	switch (Type)
+		//	{
+		//	case ValueTypes::None:
+		//		return "None";
+
+		//	case ValueTypes::Void:
+		//		return "Void";
+
+		//	case ValueTypes::Bool:
+		//		return "Bool";
+
+		//	case ValueTypes::UInt8:
+		//		return "UInt8";
+		//	case ValueTypes::UInt16:
+		//		return "UInt16";
+		//	case ValueTypes::UInt32:
+		//		return "UInt32";
+		//	case ValueTypes::UInt64:
+		//		return "UInt64";
+
+		//	case ValueTypes::Int8:
+		//		return "Int8";
+		//	case ValueTypes::Int16:
+		//		return "Int16";
+		//	case ValueTypes::Int32:
+		//		return "Int32";
+		//	case ValueTypes::Int64:
+		//		return "Int64";
+
+		//	case ValueTypes::Float32:
+		//		return "Float32";
+		//	case ValueTypes::Float64:
+		//		return "Float64";
+
+		//	case ValueTypes::String:
+		//		return "String";
+		//	case ValueTypes::WString:
+		//		return "WString";
+
+		//	case ValueTypes::Vector2F:
+		//		return "Vector2F";
+		//	case ValueTypes::Vector3F:
+		//		return "Vector3F";
+		//	case ValueTypes::Matrix4F:
+		//		return "Matrix4F";
+		//	}
+
+		//	CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
+		//}
 
 		String CodePageFileGenerator::GetUniqueName(Type* Type)
 		{

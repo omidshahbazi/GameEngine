@@ -36,6 +36,11 @@ namespace Engine
 				{
 					m_IsConst = Value;
 				}
+
+				INLINE void SetIsStatic(bool Value)
+				{
+					m_IsStatic = Value;
+				}
 			};
 		}
 	}

@@ -18,7 +18,7 @@ namespace Engine
 
 	namespace ResourceImportExport
 	{
-		REFLECTION_CLASS();
+		REFLECTION_OBJECT();
 		class RESOURCEIMPORTEXPORT_API ImporterExporter
 		{
 			IMPORTEREXPORTER_OBJECT();
@@ -28,7 +28,7 @@ namespace Engine
 			static const int8 META_FILE_FORMAT_VERSION;
 
 		public:
-			REFLECTION_STRUCT();
+			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API Settings
 			{
 				SETTINGS_OBJECT();
@@ -47,7 +47,7 @@ namespace Engine
 				int8 FileFormatVersion;
 			};
 
-			REFLECTION_STRUCT();
+			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API TextSettings : public Settings
 			{
 				TEXTSETTINGS_OBJECT()
@@ -58,7 +58,7 @@ namespace Engine
 				}
 			};
 
-			REFLECTION_STRUCT();
+			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API TextureSettings : public Settings
 			{
 				TEXTURESETTINGS_OBJECT()
@@ -131,7 +131,7 @@ namespace Engine
 				int32 BorderBottom;
 			};
 
-			REFLECTION_STRUCT();
+			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API ProgramSettings : public Settings
 			{
 				PROGRAMSETTINGS_OBJECT()
@@ -149,7 +149,7 @@ namespace Engine
 					bool DebugMode;
 			};
 
-			REFLECTION_STRUCT();
+			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API MeshSettings : public Settings
 			{
 				MESHSETTINGS_OBJECT();
@@ -160,7 +160,7 @@ namespace Engine
 				}
 			};
 
-			REFLECTION_STRUCT();
+			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API FontSettings : public Settings
 			{
 				FONTSETTINGS_OBJECT()

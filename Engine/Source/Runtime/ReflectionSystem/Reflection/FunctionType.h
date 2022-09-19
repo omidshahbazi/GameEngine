@@ -35,6 +35,15 @@ namespace Engine
 				return m_IsConst;
 			}
 
+			INLINE bool GetIsStatic(void) const
+			{
+				return m_IsStatic;
+			}
+
+			AnyDataType Invoke(void) const;
+			AnyDataType Invoke(const AnyDataType& Argument) const;
+			AnyDataType Invoke(const ArgumentsList& Arguments) const;
+
 			AnyDataType Invoke(void* TargetObject) const;
 			AnyDataType Invoke(void* TargetObject, const AnyDataType& Argument) const;
 			AnyDataType Invoke(void* TargetObject, const ArgumentsList& Arguments) const;
@@ -46,6 +55,7 @@ namespace Engine
 			DataType m_ReturnType;
 			ParameterTypeList m_Parameters;
 			bool m_IsConst;
+			bool m_IsStatic;
 		};
 
 		typedef Vector<FunctionType*> FunctionTypeList;

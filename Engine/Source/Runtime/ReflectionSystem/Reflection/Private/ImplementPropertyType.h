@@ -27,9 +27,14 @@ namespace Engine
 					m_DataType = Value;
 				}
 
-				INLINE void SetOffset(uint32 Value)
+				INLINE void SetIsReadOnly(bool Value)
 				{
-					m_Offset = Value;
+					m_IsReadOnly = Value;
+				}
+
+				INLINE void SetIsStatic(bool Value)
+				{
+					m_IsStatic = Value;
 				}
 			};
 		}

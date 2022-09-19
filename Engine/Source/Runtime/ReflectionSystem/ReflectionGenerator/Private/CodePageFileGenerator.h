@@ -29,7 +29,7 @@ namespace Engine
 			static String GetAccessSpecifier(AccessSpecifiers Access);
 
 			static String GetValueType(ValueTypes Type);
-			static String GetValueTypeName(ValueTypes Type);
+			static String GetValueTypeType(ValueTypes Type);
 
 			static String GetUniqueName(Type* Type);
 			static String GetImplementType(Type* Type);

@@ -44,10 +44,8 @@ namespace Engine
 							m_CurrentObject->SetLastAccessSpecifier(access);
 					}
 				}
-				else if (DelarationToken.Matches(REFLECTION_CLASS_TEXT, Token::SearchCases::CaseSensitive))
-					CompileObjectDeclaration(DelarationToken, Types, false);
-				else if (DelarationToken.Matches(REFLECTION_STRUCT_TEXT, Token::SearchCases::CaseSensitive))
-					CompileObjectDeclaration(DelarationToken, Types, true);
+				else if (DelarationToken.Matches(REFLECTION_OBJECT_TEXT, Token::SearchCases::CaseSensitive))
+					CompileObjectDeclaration(DelarationToken, Types);
 				else if (DelarationToken.Matches(REFLECTION_ENUM_TEXT, Token::SearchCases::CaseSensitive))
 					CompileEnumDeclaration(Types);
 				else if (m_CurrentObject != nullptr && DelarationToken.Matches(m_CurrentObject->GetName(), Token::SearchCases::CaseSensitive))
@@ -74,30 +72,31 @@ namespace Engine
 					PushNamespace();
 			}
 
-			void HeaderParser::CompileObjectDeclaration(const Token& Declaration, TypeList& Types, bool IsStruct)
+			void HeaderParser::CompileObjectDeclaration(const Token& Declaration, TypeList& Types)
 			{
 				MetaObject* type = ReinterpretCast(MetaObject*, AllocateMemory(m_Allocator, sizeof(MetaObject)));
 				Construct(type, m_Allocator, m_CurrentObject);
 
 				type->SetNamespace(GetFullNamespace());
-				type->SetIsStruct(IsStruct);
 
 				ParseSpecifiers(type, "object");
 
 				type->SetIsAbstract(type->GetSpecifiers().Contains(STRINGIZE(REFLECTION_ABSTRACT)));
 
-				if (IsStruct)
-				{
-					RequireIdentifier(STRUCT, "object");
+				type->SetIsStatic(MatchIdentifier(STATIC));
 
+				if (MatchIdentifier(CLASS))
+				{
+					type->SetIsStruct(false);
 					type->SetLastAccessSpecifier(AccessSpecifiers::Public);
 				}
-				else
+				else if (MatchIdentifier(STRUCT))
 				{
-					RequireIdentifier(CLASS, "object");
-
+					type->SetIsStruct(true);
 					type->SetLastAccessSpecifier(AccessSpecifiers::Private);
 				}
+				else
+					ThrowMissingException("class/struct", "object");
 
 				Token nameToken;
 				RequireIdentifierToken(nameToken, "object");
@@ -230,6 +229,8 @@ namespace Engine
 
 				ParseSpecifiers(func, "function");
 
+				func->SetIsStatic(MatchIdentifier(STATIC));
+
 				MetaDataType returnType;
 				if (!ParseDataType(returnType))
 					THROW_REFLECTION_GENERATOR_EXCEPTION("Unrecognized data type");
@@ -260,6 +261,10 @@ namespace Engine
 				Construct(property, m_CurrentObject);
 
 				ParseSpecifiers(property, "property");
+
+				property->SetIsReadOnly(property->GetSpecifiers().Contains(STRINGIZE(REFLECTION_READONLY)));
+
+				property->SetIsStatic(MatchIdentifier(STATIC));
 
 				MetaDataType dataType;
 				if (!ParseDataType(dataType))

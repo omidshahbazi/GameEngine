@@ -15,7 +15,8 @@ namespace Engine
 			m_Functions(Allocator),
 			m_Properties(Allocator),
 			m_IsStruct(false),
-			m_IsAbstract(false)
+			m_IsAbstract(false),
+			m_IsStatic(false)
 		{
 		}
 

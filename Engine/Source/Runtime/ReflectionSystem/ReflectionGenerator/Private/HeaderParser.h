@@ -36,7 +36,7 @@ namespace Engine
 
 			protected:
 				virtual void CompileDeclaration(TypeList& Types, Token& Token);
-				virtual void CompileObjectDeclaration(const Token& Declaration, TypeList& Types, bool IsStruct);
+				virtual void CompileObjectDeclaration(const Token& Declaration, TypeList& Types);
 				virtual void CompileEnumDeclaration(TypeList& Types);
 				virtual void CompileConstructorDeclaration(void);
 				virtual void CompileFunctionDeclaration(void);

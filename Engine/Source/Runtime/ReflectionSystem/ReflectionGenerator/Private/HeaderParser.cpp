@@ -79,7 +79,7 @@ namespace Engine
 
 				type->SetNamespace(GetFullNamespace());
 
-				ParseSpecifiers(type, "object");
+				ParseSpecifiers(type, "in object parsing");
 
 				type->SetIsAbstract(type->GetSpecifiers().Contains(STRINGIZE(REFLECTION_ABSTRACT)));
 
@@ -96,16 +96,16 @@ namespace Engine
 					type->SetLastAccessSpecifier(AccessSpecifiers::Private);
 				}
 				else
-					ThrowMissingException("class/struct", "object");
+					ThrowMissingException("class/struct", "in object parsing");
 
 				Token nameToken;
-				RequireIdentifierToken(nameToken, "object");
+				RequireIdentifierToken(nameToken, "in object parsing");
 
 				bool hasParent = false;
 				if (!((hasParent = MatchSymbol(COLON)) || MatchSymbol(OPEN_BRACKET)))
 				{
 					nameToken.SetIdentifier(String::Empty);
-					RequireIdentifierToken(nameToken, "object");
+					RequireIdentifierToken(nameToken, "in object parsing");
 
 					hasParent = MatchSymbol(COLON);
 				}
@@ -128,7 +128,7 @@ namespace Engine
 							RequireSymbol(COMMA, "in parent list parsing");
 
 						Token token;
-						RequireIdentifierToken(token, "object");
+						RequireIdentifierToken(token, "in object parsing");
 
 						AccessSpecifiers access = ParseAccessSpecifier(token);
 
@@ -137,16 +137,19 @@ namespace Engine
 						else
 						{
 							Token token;
-							RequireIdentifierToken(token, "object");
+							RequireIdentifierToken(token, "in object parsing");
 
 							type->AddParentName(token.GetName(), access);
 						}
 					}
 				}
+				else
+					RequireSymbol(OPEN_BRACKET, "in object parsing");
 
 				RequireIdentifier(type->GetDeclarationMacroName(), "in object parsing");
 				RequireSymbol(OPEN_BRACE, "in object parsing");
 				RequireSymbol(CLOSE_BRACE, "in object parsing");
+				RequireSymbol(SEMICOLON, "in object parsing");
 
 				if (m_CurrentObject == nullptr)
 					Types.Add(type);
@@ -275,6 +278,8 @@ namespace Engine
 				Token nameToken;
 				RequireIdentifierToken(nameToken, "property");
 				property->SetName(nameToken.GetName());
+
+				RequireSymbol(SEMICOLON, "property");
 
 				m_CurrentObject->AddProperty(property);
 			}

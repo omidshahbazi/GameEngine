@@ -239,14 +239,17 @@ namespace Engine
 					if (!ParseDataType(paramDataType))
 						continue;
 
-					Token paramName;
-					RequireIdentifierToken(paramName, Function->GetName() + " declaration specifier");
+					if (!(paramDataType.GetValueType() == ValueTypes::Void && paramDataType.GetPassType() != DataType::PassesTypes::Pointer))
+					{
+						Token paramName;
+						RequireIdentifierToken(paramName, Function->GetName() + " declaration specifier");
 
-					MetaParameter parameter;
-					parameter.SetDataType(paramDataType);
-					parameter.SetName(paramName.GetName());
+						MetaParameter parameter;
+						parameter.SetDataType(paramDataType);
+						parameter.SetName(paramName.GetName());
 
-					Function->AddParameter(parameter);
+						Function->AddParameter(parameter);
+					}
 
 					while (true)
 					{

@@ -50,7 +50,7 @@ namespace Engine
 			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API TextSettings : public Settings
 			{
-				TEXTSETTINGS_OBJECT()
+				TEXTSETTINGS_OBJECT();
 
 			public:
 				TextSettings(void)
@@ -61,7 +61,7 @@ namespace Engine
 			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API TextureSettings : public Settings
 			{
-				TEXTURESETTINGS_OBJECT()
+				TEXTURESETTINGS_OBJECT();
 
 			public:
 				REFLECTION_ENUM();
@@ -134,7 +134,7 @@ namespace Engine
 			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API ProgramSettings : public Settings
 			{
-				PROGRAMSETTINGS_OBJECT()
+				PROGRAMSETTINGS_OBJECT();
 
 			public:
 				ProgramSettings(void)
@@ -145,8 +145,8 @@ namespace Engine
 				//REFLECTION_PROPERTY();
 				Vector<String> Defines;
 
-				REFLECTION_PROPERTY()
-					bool DebugMode;
+				REFLECTION_PROPERTY();
+				bool DebugMode;
 			};
 
 			REFLECTION_OBJECT();
@@ -163,7 +163,7 @@ namespace Engine
 			REFLECTION_OBJECT();
 			struct RESOURCEIMPORTEXPORT_API FontSettings : public Settings
 			{
-				FONTSETTINGS_OBJECT()
+				FONTSETTINGS_OBJECT();
 
 			public:
 				REFLECTION_ENUM();

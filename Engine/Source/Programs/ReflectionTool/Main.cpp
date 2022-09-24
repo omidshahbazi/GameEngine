@@ -28,11 +28,11 @@ BEGIN_ENTRY_POINT
 	//WString filePath = args.GetAsWString(0);
 	//WString outputBaseFileName = args.GetAsWString(1);
 
-	//WString filePath = LR"(D:\Projects\GameEngine1\Engine\Source\Runtime\RenderSystem\ProgramCompiler\ProgramParser\Parser.h)";
-	//WString outputBaseFileName = LR"(D:\Projects\GameEngine1\Engine\Intermediate\ProgramParser\Generated\Parser.Reflection)";
+	WString filePath = LR"(D:\Projects\GameEngine1\Engine\Source\Runtime\ResourceSystem\ResourceImportExport\ImporterExporter.h)";
+	WString outputBaseFileName = LR"(D:\Projects\GameEngine1\Engine\Intermediate\ResourceImportExport\Generated\ImporterExporter.Reflection)";
 
-	WString filePath = LR"(D:\ReflectionTest\Test.h)";
-	WString outputBaseFileName = LR"(D:\ReflectionTest\Generated\Test.Reflection)";
+	//WString filePath = LR"(D:\ReflectionTest\Test.h)";
+	//WString outputBaseFileName = LR"(D:\ReflectionTest\Generated\Test.Reflection)";
 
 	try
 	{

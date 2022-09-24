@@ -16,6 +16,7 @@ namespace Engine
 	{
 		namespace Private
 		{
+			const cstr USING(STRINGIZE(using));
 			const cstr NAMESPACE(STRINGIZE(namespace));
 			const cstr ENUM(_CRT_STRINGIZE(enum));
 			const cstr CLASS(_CRT_STRINGIZE(class));

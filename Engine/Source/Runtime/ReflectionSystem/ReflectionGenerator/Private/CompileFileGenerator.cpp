@@ -380,9 +380,14 @@ namespace Engine
 								Content += "			case " + StringUtility::ToString<char8>(ctor->GetParameters().GetSize()) + ":";
 								ADD_NEW_LINE();
 								{
-									Content += "				ConstructMacro(" + Type->GetFullQualifiedName() + ", " + INSTANCE_NAME + ", ";
+									Content += "				ConstructMacro(" + Type->GetFullQualifiedName() + ", " + INSTANCE_NAME;
 
-									GenerateArgumentListCode(ctor->GetParameters(), Content);
+									if (ctor->GetParameters().GetSize() != 0)
+									{
+										Content += ", ";
+
+										GenerateArgumentListCode(ctor->GetParameters(), Content);
+									}
 
 									Content += ");";
 

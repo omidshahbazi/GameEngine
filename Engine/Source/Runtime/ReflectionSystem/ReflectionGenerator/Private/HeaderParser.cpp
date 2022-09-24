@@ -70,6 +70,8 @@ namespace Engine
 				}
 				else if (DelarationToken.Matches(NAMESPACE, Token::SearchCases::CaseSensitive))
 					PushNamespace();
+				else if (DelarationToken.Matches(USING, Token::SearchCases::CaseSensitive))
+					RequireIdentifier(NAMESPACE, "using");
 			}
 
 			void HeaderParser::CompileObjectDeclaration(const Token& Declaration, TypeList& Types)

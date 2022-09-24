@@ -18,7 +18,7 @@ namespace Engine
 
 	namespace ResourceImportExport
 	{
-		REFLECTION_OBJECT();
+		REFLECTION_OBJECT(REFLECTION_ABSTRACT);
 		class RESOURCEIMPORTEXPORT_API ImporterExporter
 		{
 			IMPORTEREXPORTER_OBJECT();
@@ -28,7 +28,7 @@ namespace Engine
 			static const int8 META_FILE_FORMAT_VERSION;
 
 		public:
-			REFLECTION_OBJECT();
+			REFLECTION_OBJECT(REFLECTION_ABSTRACT);
 			struct RESOURCEIMPORTEXPORT_API Settings
 			{
 				SETTINGS_OBJECT();

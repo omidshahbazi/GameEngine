@@ -524,6 +524,22 @@ namespace Engine
 				return index;
 			}
 
+			template<typename U>
+			INLINE List<U> Cast(void)
+			{
+				List<U> temp(GetAllocator(), m_Size);
+
+				Node* node = m_FirstNode;
+				for (uint32 i = 0; i < m_Size; ++i)
+				{
+					temp.Add(node->Value);
+
+					node = node->Next;
+				}
+
+				return temp;
+			}
+
 			INLINE Iterator GetBegin(void)
 			{
 				return Iterator(m_FirstNode, 0);

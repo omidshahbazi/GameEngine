@@ -301,6 +301,17 @@ namespace Engine
 				return index;
 			}
 
+			template<typename U>
+			INLINE Stack<U> Cast(void)
+			{
+				Stack<U> temp(GetAllocator(), m_Size);
+
+				for (uint32 i = m_Size - 1; i >= 0; --i)
+					temp.Push(m_Items[i]);
+
+				return temp;
+			}
+
 			INLINE Iterator GetBegin(void)
 			{
 				return Iterator(m_Items);

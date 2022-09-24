@@ -228,7 +228,7 @@ namespace Engine
 			StructType* structType = Allocate<StructType>(m_Allocator);
 
 			Token nameToken;
-			RequireIdentifierToken(nameToken);
+			RequireIdentifierToken(nameToken, "struct");
 			structType->SetName(nameToken.GetName());
 
 			RequireSymbol(OPEN_BRACKET, "struct");
@@ -241,7 +241,7 @@ namespace Engine
 					break;
 
 				Token variableToken;
-				RequireToken(variableToken);
+				RequireToken(variableToken, "struct");
 
 				ParseVariable(variableToken);
 			}
@@ -284,7 +284,7 @@ namespace Engine
 			if (MatchSymbol(COLON))
 			{
 				Token registerToken;
-				RequireIdentifierToken(registerToken);
+				RequireIdentifierToken(registerToken, "struct");
 				if (variableType->GetName() == registerToken.GetName())
 					THROW_PROGRAM_PARSER_EXCEPTION("Variable name cannot be same as register", nameToken);
 
@@ -377,7 +377,7 @@ namespace Engine
 				functionType->AddParamaeter(parameterType);
 
 				Token parameterToken;
-				RequireToken(parameterToken);
+				RequireToken(parameterToken, "function");
 
 				ParseFunctionParameter(parameterToken, parameterType);
 			}
@@ -394,14 +394,14 @@ namespace Engine
 			Parameter->SetDataType(dataType);
 
 			Token nameToken;
-			RequireIdentifierToken(nameToken);
+			RequireIdentifierToken(nameToken, "function parameter");
 
 			Parameter->SetName(nameToken.GetName());
 
 			if (MatchSymbol(COLON))
 			{
 				Token registerToken;
-				RequireIdentifierToken(registerToken);
+				RequireIdentifierToken(registerToken, "function parameter");
 				Parameter->SetRegister(registerToken.GetName());
 			}
 
@@ -432,11 +432,11 @@ namespace Engine
 			if (MatchSymbol(OPEN_SQUARE_BRACKET))
 			{
 				Token elementCountToken;
-				RequireToken(elementCountToken);
+				RequireToken(elementCountToken, "data type");
 
 				elementCountStatement = ParseExpression(elementCountToken, EndConditions::Bracket);
 
-				RequireToken(elementCountToken);
+				RequireToken(elementCountToken, "data type");
 
 				RequireSymbol(CLOSE_BRACKET, "data type definition");
 			}
@@ -458,7 +458,7 @@ namespace Engine
 			RequireSymbol(OPEN_BRACE, "if statement");
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "if statement");
 			stm->SetCondition(ParseExpression(token, EndConditions::Brace));
 
 			RequireSymbol(CLOSE_BRACE, "if statement");
@@ -487,7 +487,7 @@ namespace Engine
 			RequireSymbol(OPEN_BRACE, "switch statement");
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "switch statement");
 
 			stm->SetSelector(ParseExpression(token, EndConditions::Brace));
 
@@ -505,7 +505,7 @@ namespace Engine
 			RequireSymbol(COLON, "default statement");
 
 			Token nextToken;
-			RequireToken(nextToken);
+			RequireToken(nextToken, "default statement");
 
 			bool isSingle =
 				nextToken.Matches(CASE, Token::SearchCases::CaseSensitive) ||
@@ -524,14 +524,14 @@ namespace Engine
 			CaseStatement* stm = Allocate<CaseStatement>(m_Allocator);
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "case statement");
 
 			stm->SetCondition(ParseExpression(token, EndConditions::Colon));
 
 			RequireSymbol(COLON, "case statement");
 
 			Token nextToken;
-			RequireToken(nextToken);
+			RequireToken(nextToken, "case statement");
 
 			bool isSingle =
 				nextToken.Matches(CASE, Token::SearchCases::CaseSensitive) ||
@@ -554,7 +554,7 @@ namespace Engine
 			if (!MatchSymbol(SEMICOLON))
 			{
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "for statement");
 
 				stm->SetInitializer(ParseExpression(token, EndConditions::Semicolon));
 
@@ -564,7 +564,7 @@ namespace Engine
 			if (!MatchSymbol(SEMICOLON))
 			{
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "for statement");
 
 				stm->SetCondition(ParseExpression(token, EndConditions::Semicolon));
 
@@ -574,7 +574,7 @@ namespace Engine
 			if (!MatchSymbol(CLOSE_BRACE))
 			{
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "for statement");
 
 				stm->SetStep(ParseExpression(token, EndConditions::Brace));
 
@@ -594,7 +594,7 @@ namespace Engine
 			ParseScopedStatements(stm, false, EndConditions::None);
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "do statement");
 
 			if (!token.Matches(WHILE, Token::SearchCases::CaseSensitive))
 				THROW_PROGRAM_PARSER_EXCEPTION("expected while after do", token);
@@ -611,7 +611,7 @@ namespace Engine
 			RequireSymbol(OPEN_BRACE, "while statement");
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "while statement");
 
 			stm->SetCondition(ParseExpression(token, EndConditions::Brace));
 
@@ -646,7 +646,7 @@ namespace Engine
 			ReturnStatement* stm = Allocate<ReturnStatement>();
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "return statement");
 
 			stm->SetStatement(ParseExpression(token, EndConditions::Semicolon));
 
@@ -678,7 +678,7 @@ namespace Engine
 			while (true)
 			{
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "scoped statement");
 
 				if (IsEndCondition(token, ConditionMask))
 				{
@@ -725,7 +725,7 @@ namespace Engine
 			if (MatchSymbol(EQUAL))
 			{
 				Token initialToken;
-				RequireToken(initialToken);
+				RequireToken(initialToken, "variable statement");
 
 				stm->SetInitialStatement(ParseExpression(initialToken, ConditionMask));
 			}
@@ -752,7 +752,7 @@ namespace Engine
 			Statement* stm = ParseUnaryExpressionPrefix(DeclarationToken, ConditionMask);
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "unary expression");
 			if (token.Matches(INCREMENT, Token::SearchCases::CaseSensitive) ||
 				token.Matches(DECREMENT, Token::SearchCases::CaseSensitive))
 			{
@@ -779,7 +779,7 @@ namespace Engine
 				DeclarationToken.Matches(CLOSE_BRACE, Token::SearchCases::CaseSensitive))
 			{
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "unary expression");
 
 				Statement* stm = ParseExpression(token, EndConditions::Brace);
 
@@ -815,7 +815,7 @@ namespace Engine
 					if (MatchSymbol(OPEN_SQUARE_BRACKET))
 					{
 						Token elementToekn;
-						RequireToken(elementToekn);
+						RequireToken(elementToekn, "unary expression");
 
 						Statement* arrayAccessStm = ParseArrayElementAccessStatement(elementToekn, stm);
 
@@ -840,7 +840,7 @@ namespace Engine
 		Statement* Parser::ParseUnaryOperatorExpression(const Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "unary expression");
 
 			if (IsEndCondition(token, ConditionMask))
 				return nullptr;
@@ -862,7 +862,7 @@ namespace Engine
 			while (true)
 			{
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "binary expression");
 
 				if (IsEndCondition(token, ConditionMask))
 					break;
@@ -883,12 +883,12 @@ namespace Engine
 				stm->SetLeft(LeftHandStatement);
 
 				Token rightHandToken;
-				RequireToken(rightHandToken);
+				RequireToken(rightHandToken, "binary expression");
 
 				Statement* rightHandStm = ParseUnaryExpression(rightHandToken, ConditionMask);
 
 				Token nextToken;
-				RequireToken(nextToken);
+				RequireToken(nextToken, "binary expression");
 
 				op = GetOperator(nextToken.GetName());
 				int8 rightPrecedence = GetOperatorPrecedence(op);
@@ -922,7 +922,7 @@ namespace Engine
 					continue;
 
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "binary expression");
 
 				if (IsEndCondition(token, ConditionMask))
 					return nullptr;
@@ -956,7 +956,7 @@ namespace Engine
 			stm->SetName(DeclarationToken.GetName());
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "variable access statement");
 
 			return ParseMemberAccessStatement(token, stm);
 		}
@@ -982,7 +982,7 @@ namespace Engine
 				stm->SetLeft(LeftStatement);
 
 				Token memberToken;
-				RequireIdentifierToken(memberToken);
+				RequireIdentifierToken(memberToken, "member access statement");
 
 				stm->SetRight(ParseVariableAccessStatement(memberToken));
 
@@ -1012,13 +1012,13 @@ namespace Engine
 					continue;
 
 				Token token;
-				RequireToken(token);
+				RequireToken(token, "function call statement");
 
 				stm->GetArguments()->AddItem(ParseExpression(token, EndConditions::Comma | EndConditions::Brace));
 			}
 
 			Token token;
-			RequireToken(token);
+			RequireToken(token, "function call statement");
 
 			return ParseMemberAccessStatement(token, stm);
 		}

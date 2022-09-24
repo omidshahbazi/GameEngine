@@ -4,9 +4,12 @@
 #define UNARY_OPERATOR_STATEMENT_H
 
 #include <ProgramParser\AbstractSyntaxTree\Statement.h>
+#include <Containers\Exception.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace ProgramParser
 	{
 		namespace AbstractSyntaxTree

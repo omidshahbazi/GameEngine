@@ -125,7 +125,7 @@ namespace Engine
 
 #define THROW_IF_EXCEPTION(CategoryFlags, Condition, Message) \
 		if (Condition) \
-			THROW_EXCEPTION(CategoryFlags, Message, #Condition);
+			THROW_FULL_EXCEPTION(CategoryFlags, Message, #Condition);
 
 #define THROW_NOT_IMPLEMENTED_EXCEPTION(CategoryFlags) throw Engine::Containers::NotImplementedException(CategoryFlags, DEBUG_ARGUMENTS)
 	}

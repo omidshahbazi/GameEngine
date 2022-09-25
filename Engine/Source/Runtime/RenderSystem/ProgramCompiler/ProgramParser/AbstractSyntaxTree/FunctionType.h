@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef FUNCTION_TYPE_H
-#define FUNCTION_TYPE_H
+#ifndef AST_FUNCTION_TYPE_H
+#define AST_FUNCTION_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\ParameterType.h>
 

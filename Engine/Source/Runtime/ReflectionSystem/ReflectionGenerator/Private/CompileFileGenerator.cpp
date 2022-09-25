@@ -288,38 +288,42 @@ namespace Engine
 						}
 					};
 
-					auto generateAddNesteds = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
+					auto generateAddNesteds = [&Content, &IMPLEMENT_OBJECT_TYPE](MetaObject* Type, AccessSpecifiers AccessLevel)
 					{
 						TypeList items;
 						Type->GetNestedTypes(AccessLevel, items);
 
 						for (auto& item : items)
 						{
-							Content += "			AddNestedType(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
+							Content += "			AddNestedType(ReinterpretCast(" + IMPLEMENT_OBJECT_TYPE + "*, " + GetImplementTypePointerName(item) + "), " + GetAccessSpecifier(AccessLevel) + ");";
 							ADD_NEW_LINE();
 						}
 					};
 
 					auto generateAddNFunctions = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 					{
+						const String IMPLEMENT_FUNCTION_TYPE(STRINGIZE(ImplementFunctionType));
+
 						FunctionTypeList items;
 						Type->GetFunctions(AccessLevel, items);
 
 						for (auto& item : items)
 						{
-							Content += "			AddFunction(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
+							Content += "			AddFunction(ReinterpretCast(" + IMPLEMENT_FUNCTION_TYPE + "*, " + GetImplementTypePointerName(item) + "), " + GetAccessSpecifier(AccessLevel) + ");";
 							ADD_NEW_LINE();
 						}
 					};
 
 					auto generateAddNProperties = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
 					{
+						const String IMPLEMENT_PROPERTY_TYPE(STRINGIZE(ImplementPropertyType));
+
 						PropertyTypeList items;
 						Type->GetProperties(AccessLevel, items);
 
 						for (auto& item : items)
 						{
-							Content += "			AddProperty(" + GetImplementTypePointerName(item) + ", " + GetAccessSpecifier(AccessLevel) + ");";
+							Content += "			AddProperty(ReinterpretCast(" + IMPLEMENT_PROPERTY_TYPE + "*, " + GetImplementTypePointerName(item) + "), " + GetAccessSpecifier(AccessLevel) + ");";
 							ADD_NEW_LINE();
 						}
 					};
@@ -432,6 +436,8 @@ namespace Engine
 					Content += "		return *" + IMPLEMENT_POINTER_NAME + ";";
 					ADD_NEW_LINE();
 					Content += "	}";
+					ADD_NEW_LINE();
+
 					ADD_NEW_LINE();
 				}
 
@@ -742,16 +748,23 @@ namespace Engine
 					Content += Type->GetName() + " = ";
 
 					if (Type->GetDataType().GetValueType() == ValueTypes::None)
-					{
-						Content += "StaticCast(" + Type->GetDataType().GetExtraValueType();
-
-						if (Type->GetDataType().GetPassType() == DataType::PassesTypes::Pointer)
-							Content += "*";
-
-						Content += ", Value.Get<" + String(STRINGIZE(int32)) + ">())";
-					}
+						Content += "StaticCast(";
 					else
-						Content += "Value.Get<" + GetValueTypeType(Type->GetDataType().GetValueType()) + ">()";
+						Content += "Value.Get<";
+
+					Content += "decltype(";
+
+					if (Type->GetIsStatic())
+						Content += Type->GetTopNest()->GetFullQualifiedName() + "::";
+					else
+						Content += "ReinterpretCast(" + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->";
+
+					Content += Type->GetName() + ")";
+
+					if (Type->GetDataType().GetValueType() == ValueTypes::None)
+						Content += ", Value.Get<" + String(STRINGIZE(int32)) + ">())";
+					else
+						Content += ">()";
 
 					Content += ";";
 				}

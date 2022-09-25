@@ -197,7 +197,7 @@ namespace Engine
 				if (!PlatformFile::Exists(metaFilePath.GetValue()))
 					return false;
 
-				Reflection::TypeList properties;
+				Reflection::PropertyTypeList properties;
 				GetProperties(T::GetType(), properties);
 
 				ReadMetaFile(metaFilePath, properties, Settings);
@@ -213,7 +213,7 @@ namespace Engine
 
 				Settings->FileFormatVersion = META_FILE_FORMAT_VERSION;
 
-				Reflection::TypeList properties;
+				Reflection::PropertyTypeList properties;
 				GetProperties(T::GetType(), properties);
 
 				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings, Overwrite);
@@ -226,10 +226,10 @@ namespace Engine
 		private:
 			static WString GetMetaFilePath(const WString& FilePath);
 
-			static void GetProperties(const Reflection::ObjectType& Type, Reflection::TypeList& Properties);
+			static void GetProperties(const Reflection::ObjectType& Type, Reflection::PropertyTypeList& Properties);
 			static bool ParseMetaFile(AllocatorBase* Allocator, const WString& FilePath, JSONObject& Object);
-			static bool ReadMetaFile(const WString& FilePath, Reflection::TypeList& Properties, void* SettingObject);
-			static bool WriteMetaFile(const WString& FilePath, Reflection::TypeList& Properties, const void* SettingObject, bool Overwrite);
+			static bool ReadMetaFile(const WString& FilePath, Reflection::PropertyTypeList& Properties, void* SettingObject);
+			static bool WriteMetaFile(const WString& FilePath, Reflection::PropertyTypeList& Properties, const void* SettingObject, bool Overwrite);
 		};
 	}
 }

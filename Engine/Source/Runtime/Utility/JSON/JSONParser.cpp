@@ -21,7 +21,7 @@ namespace Engine
 			}
 
 		public:
-			bool ThrowException()
+			void ThrowException()
 			{
 				Token token;
 				if (Tokenizer::GetToken(token))
@@ -51,7 +51,7 @@ namespace Engine
 				if (!GetToken(token))
 					ThrowException();
 
-				if (token.GetType() != Token::Types::Constant || token.GetConstantString() == String::Empty)
+				if (token.GetType() != Token::Types::ConstantString)
 				{
 					UngetToken(token);
 					ThrowException();
@@ -65,7 +65,7 @@ namespace Engine
 				if (!GetToken(Token))
 					ThrowException();
 
-				if (Token.GetType() != Token::Types::Constant)
+				if (!Token.GetIsConstant())
 				{
 					UngetToken(Token);
 					ThrowException();
@@ -137,17 +137,29 @@ namespace Engine
 			Token token;
 			Tokenizer->RequireAConstant(token);
 
-			const String& value = token.GetName();
+			switch (token.GetType())
+			{
+			case Token::Types::ConstantBool:
+				*Data = token.GetConstantBool();
+				break;
 
-			if (value == "true")
-				*Data = true;
-			else if (value == "false")
-				*Data = AnyDataType(false);
-			else if (value.Contains('.'))
-				*Data = StringUtility::ToFloat64(value);
-			else if (CharacterUtility::IsDigit(value.GetValue()))
-				*Data = StringUtility::ToInt64(value);
-			else if (token.GetType() == Token::Types::Constant)
+			case Token::Types::ConstantInt32:
+				*Data = token.GetConstantInt32();
+				break;
+
+			case Token::Types::ConstantInt64:
+				*Data = token.GetConstantInt64();
+				break;
+
+			case Token::Types::ConstantFloat32:
+				*Data = token.GetConstantFloat32();
+				break;
+
+			case Token::Types::ConstantFloat64:
+				*Data = token.GetConstantFloat64();
+				break;
+
+			case Token::Types::ConstantString:
 			{
 				const WString wString = WString(Allocator, token.GetConstantString().ChangeType<char16>());
 				if (ForceWString || CharacterUtility::ContainsAnyWideChar(wString.GetValue()))
@@ -155,8 +167,12 @@ namespace Engine
 				else
 					*Data = String(Allocator, token.GetConstantString());
 			}
-			else
+			break;
+
+			default:
 				Tokenizer->ThrowException();
+				break;
+			}
 		}
 
 		void ParseObject(AllocatorBase* Allocator, JSONTokenizer* Tokenizer, JSONObject* Object, bool ForceWString)

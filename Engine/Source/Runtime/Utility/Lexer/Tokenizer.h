@@ -27,6 +27,12 @@ namespace Engine
 			virtual bool GetToken(Token& Token);
 			virtual void UngetToken(const Token& Token);
 
+			virtual void FillDebugInfo(Token& Token);
+			virtual bool FillIdentifier(char8 c, bool NoConst, Token& Token);
+			virtual bool FillIntegralConstant(char8 c, bool NoConst, Token& Token);
+			virtual bool FillStringConstant(char8 c, bool NoConst, Token& Token);
+			virtual bool FillSymbol(char8 c, bool NoConst, bool DetectCloseTemplateBracket, Token& Token);
+
 			virtual char8 GetChar(bool Literal = false);
 			virtual void UngetChar(void)
 			{

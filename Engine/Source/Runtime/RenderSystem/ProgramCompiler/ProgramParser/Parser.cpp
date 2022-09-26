@@ -829,7 +829,7 @@ namespace Engine
 				return stm;
 			}
 
-			if (DeclarationToken.GetType() == Token::Types::Constant)
+			if (DeclarationToken.GetIsConstant())
 			{
 				return ParseConstantStatement(DeclarationToken);
 			}

@@ -3,6 +3,7 @@
 #define TOKEN_H
 
 #include <Containers\Strings.h>
+#include <Containers\Exception.h>
 
 namespace Engine
 {
@@ -19,7 +20,12 @@ namespace Engine
 				None = 0,
 				Identifier,
 				Symbol,
-				Constant
+				ConstantBool,
+				ConstantInt32,
+				ConstantInt64,
+				ConstantFloat32,
+				ConstantFloat64,
+				ConstantString
 			};
 
 			enum class SearchCases
@@ -36,6 +42,16 @@ namespace Engine
 			INLINE Types GetType(void) const
 			{
 				return m_Type;
+			}
+
+			INLINE bool GetIsConstant(void) const
+			{
+				return (m_Type == Types::ConstantBool ||
+					m_Type == Types::ConstantInt32 ||
+					m_Type == Types::ConstantInt64 ||
+					m_Type == Types::ConstantFloat32 ||
+					m_Type == Types::ConstantFloat64 ||
+					m_Type == Types::ConstantString);
 			}
 
 			INLINE const String& GetName(void) const
@@ -57,57 +73,80 @@ namespace Engine
 
 			INLINE bool GetConstantBool(void) const
 			{
+				THROW_IF_EXCEPTION(Categories::Utilities, m_Type != Types::ConstantBool, "Token type mismatch");
+
 				return m_Bool;
 			}
 
 			INLINE void SetConstantBool(bool Value)
 			{
 				m_Bool = Value;
-				m_Type = Types::Constant;
+				m_Type = Types::ConstantBool;
 			}
 
 			INLINE int32 GetConstantInt32(void) const
 			{
+				THROW_IF_EXCEPTION(Categories::Utilities, m_Type != Types::ConstantInt32, "Token type mismatch");
+
 				return m_Int32;
 			}
 
 			INLINE void SetConstantInt32(int32 Value)
 			{
 				m_Int32 = Value;
-				m_Type = Types::Constant;
+				m_Type = Types::ConstantInt32;
+			}
+
+			INLINE int64 GetConstantInt64(void) const
+			{
+				THROW_IF_EXCEPTION(Categories::Utilities, m_Type != Types::ConstantInt64, "Token type mismatch");
+
+				return m_Int64;
+			}
+
+			INLINE void SetConstantInt64(int64 Value)
+			{
+				m_Int64 = Value;
+				m_Type = Types::ConstantInt64;
 			}
 
 			INLINE float32 GetConstantFloat32(void) const
 			{
+				THROW_IF_EXCEPTION(Categories::Utilities, m_Type != Types::ConstantFloat32, "Token type mismatch");
+
 				return m_Float32;
 			}
 
 			INLINE void SetConstantFloat32(float32 Value)
 			{
 				m_Float32 = Value;
-				m_Type = Types::Constant;
+				m_Type = Types::ConstantFloat32;
 			}
 
 			INLINE const float64& GetConstantFloat64(void) const
 			{
+				THROW_IF_EXCEPTION(Categories::Utilities, m_Type != Types::ConstantFloat64, "Token type mismatch");
+
 				return m_Float64;
 			}
 
 			INLINE void SetConstantFloat64(float64 Value)
 			{
 				m_Float64 = Value;
-				m_Type = Types::Constant;
+				m_Type = Types::ConstantFloat64;
 			}
 
 			INLINE const String& GetConstantString(void) const
 			{
+				THROW_IF_EXCEPTION(Categories::Utilities, m_Type != Types::ConstantString, "Token type mismatch");
+
 				return m_String;
 			}
 
 			INLINE void SetConstantString(const String& Value)
 			{
 				m_String = Value;
-				m_Type = Types::Constant;
+				m_Type = Types::ConstantString;
 			}
 
 			INLINE uint32 GetStartIndex(void) const
@@ -154,6 +193,7 @@ namespace Engine
 				bool m_Bool;
 
 				int32 m_Int32;
+				int64 m_Int64;
 
 				float32 m_Float32;
 				float64 m_Float64;

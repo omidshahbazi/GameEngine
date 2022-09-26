@@ -43,140 +43,16 @@ namespace Engine
 				return false;
 			}
 
-			Token.SetStartIndex(m_PrevIndex);
-			Token.SetLineIndex(m_PrevLineIndex);
-			Token.SetColumnIndex(m_PrevColumnIndex);
-			Token.SetIdentifier("");
-
-			String name = Token.GetName();
+			FillDebugInfo(Token);
 
 			if (CharacterUtility::IsAlphabetic(c))
-			{
-				do
-				{
-					name += c;
-					c = GetChar();
-				} while (CharacterUtility::IsAlphanumeric(c));
-
-				UngetChar();
-
-				Token.SetIdentifier(name);
-
-				if (Token.Matches("true", Token::SearchCases::CaseSensitive))
-				{
-					Token.SetConstantBool(true);
-					return true;
-				}
-				else if (Token.Matches("false", Token::SearchCases::CaseSensitive))
-				{
-					Token.SetConstantBool(false);
-					return true;
-				}
-
-				return true;
-			}
+				return FillIdentifier(c, false, Token);
 			else if (CharacterUtility::IsDigit(c) || ((c == PLUS || c == MINES) && CharacterUtility::IsDigit(p)))
-			{
-				bool isFloat = false;
-				bool isHex = false;
-
-				do
-				{
-					if (c == DOT)
-						isFloat = true;
-
-					if (c == UPPER_X || c == LOWER_X)
-						isHex = true;
-
-					name += c;
-
-					c = CharacterUtility::ToUpper(GetChar());
-
-				} while (CharacterUtility::IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
-
-				if (isFloat || c != UPPER_F)
-					UngetChar();
-
-				if (isFloat)
-					Token.SetConstantFloat32(StringUtility::ToFloat32(name));
-				else if (isHex)
-					Token.SetConstantInt32(StringUtility::ToInt32(name));
-				else
-					Token.SetConstantInt32(StringUtility::ToInt32(name));
-
-				return true;
-			}
+				return FillIntegralConstant(c, false, Token);
 			else if (c == DOUBLE_QUOTATION)
-			{
-				String temp;
-				c = GetChar(true);
-				while (c != DOUBLE_QUOTATION && !CharacterUtility::IsEOL(c))
-				{
-					if (c == BACK_SLASH)
-					{
-						c = GetChar(true);
-
-						if (CharacterUtility::IsEOL(c))
-							break;
-						else if (c == 'n')
-							c = '\n';
-					}
-
-					temp += c;
-
-					c = GetChar(true);
-				}
-
-				Token.SetConstantString(temp);
-
-				return true;
-			}
+				return FillStringConstant(c, false, Token);
 			else
-			{
-				name += c;
-
-#define PAIR(cc, dd) (c == cc && d == dd)
-
-				char8 d = GetChar();
-
-				if (PAIR('<', '<') ||
-					PAIR('>', '>') ||
-					PAIR('=', '=') ||
-					PAIR('!', '=') ||
-					PAIR('<', '=') ||
-					PAIR('>', '=') ||
-					PAIR('+', '+') ||
-					PAIR('-', '-') ||
-					PAIR('|', '|') ||
-					PAIR('^', '^') ||
-					PAIR('&', '&') ||
-					PAIR('+', '=') ||
-					PAIR('-', '=') ||
-					PAIR('*', '=') ||
-					PAIR('/', '=') ||
-					PAIR('~', '=') ||
-					PAIR(':', ':') ||
-					PAIR('*', '*'))
-				{
-					name += d;
-
-					if (c == '>' && d == '>')
-					{
-						if (GetChar() == '>')
-							name += '>';
-						else
-							UngetChar();
-					}
-				}
-				else
-					UngetChar();
-
-#undef PAIR
-
-				Token.SetSymbol(name);
-
-				return true;
-			}
+				return FillSymbol(c, false, false, Token);
 		}
 
 		void Tokenizer::UngetToken(const Token& Token)
@@ -184,6 +60,172 @@ namespace Engine
 			m_CurrentIndex = Token.GetStartIndex();
 			m_CurrentLineIndex = Token.GetLineIndex();
 			m_CurrentColumnIndex = Token.GetColumnIndex();
+		}
+
+		void Tokenizer::FillDebugInfo(Token& Token)
+		{
+			Token.SetStartIndex(m_PrevIndex);
+			Token.SetLineIndex(m_PrevLineIndex);
+			Token.SetColumnIndex(m_PrevColumnIndex);
+		}
+
+		bool Tokenizer::FillIdentifier(char8 c, bool NoConst, Token& Token)
+		{
+			String name = Token.GetName();
+
+			do
+			{
+				name += c;
+				c = GetChar();
+			} while (CharacterUtility::IsAlphanumeric(c));
+
+			UngetChar();
+
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+			{
+				if (name == "true")
+					Token.SetConstantBool(true);
+				else if (name == "false")
+					Token.SetConstantBool(false);
+				else
+					Token.SetIdentifier(name);
+			}
+
+			return true;
+		}
+
+		bool Tokenizer::FillIntegralConstant(char8 c, bool NoConst, Token& Token)
+		{
+			String name = Token.GetName();
+
+			bool isFloat = false;
+			bool isHex = false;
+
+			do
+			{
+				if (c == DOT)
+					isFloat = true;
+
+				if (c == UPPER_X || c == LOWER_X)
+					isHex = true;
+
+				name += c;
+
+				c = CharacterUtility::ToUpper(GetChar());
+
+			} while (CharacterUtility::IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
+
+			if (isFloat || c != UPPER_F)
+				UngetChar();
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+			{
+				if (isFloat)
+				{
+					float64 value = StringUtility::ToFloat64(name);
+					if (value > 0x7FFFFFFF)
+						Token.SetConstantFloat64(value);
+					else
+						Token.SetConstantFloat32(value);
+				}
+				else
+				{
+					int64 value = StringUtility::ToInt64(name);
+					if (value > 0x7FFFFFFF)
+						Token.SetConstantInt64(value);
+					else
+						Token.SetConstantInt32(value);
+				}
+			}
+
+			return true;
+		}
+
+		bool Tokenizer::FillStringConstant(char8 c, bool NoConst, Token& Token)
+		{
+			String name = Token.GetName();
+
+			c = GetChar(true);
+			while (c != DOUBLE_QUOTATION && !CharacterUtility::IsEOL(c))
+			{
+				if (c == BACK_SLASH)
+				{
+					c = GetChar(true);
+
+					if (CharacterUtility::IsEOL(c))
+						break;
+					else if (c == 'n')
+						c = '\n';
+				}
+
+				name += c;
+
+				c = GetChar(true);
+			}
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+				Token.SetConstantString(name);
+
+			return true;
+		}
+
+		bool Tokenizer::FillSymbol(char8 c, bool NoConst, bool DetectCloseTemplateBracket, Token& Token)
+		{
+			String name = Token.GetName();
+
+			name += c;
+
+#define PAIR(cc, dd) (c == cc && d == dd)
+
+			char8 d = GetChar();
+
+			if (PAIR('<', '<') ||
+				(PAIR('>', '>') && !DetectCloseTemplateBracket) ||
+				PAIR('=', '=') ||
+				PAIR('!', '=') ||
+				PAIR('<', '=') ||
+				PAIR('>', '=') ||
+				PAIR('+', '+') ||
+				PAIR('-', '-') ||
+				PAIR('|', '|') ||
+				PAIR('^', '^') ||
+				PAIR('&', '&') ||
+				PAIR('+', '=') ||
+				PAIR('-', '=') ||
+				PAIR('*', '=') ||
+				PAIR('/', '=') ||
+				PAIR('~', '=') ||
+				PAIR(':', ':') ||
+				PAIR('*', '*'))
+			{
+				name += d;
+
+				if (c == '>' && d == '>')
+				{
+					if (GetChar() == '>')
+						name += '>';
+					else
+						UngetChar();
+				}
+			}
+			else
+				UngetChar();
+
+#undef PAIR
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+				Token.SetSymbol(name);
+
+			return true;
 		}
 
 		char8 Tokenizer::GetChar(bool Literal)

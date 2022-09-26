@@ -22,6 +22,7 @@ namespace Engine.Frontend.System
 		public static readonly ProjectBase.ProfileBase.BuildConfigurations[] BuildConfigurations = { ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.BuildConfigurations.Release };
 		public static readonly ProjectBase.ProfileBase.PlatformArchitectures[] PlatformTypes = { ProjectBase.ProfileBase.PlatformArchitectures.x86, ProjectBase.ProfileBase.PlatformArchitectures.x64 };
 
+		public static readonly string ExportAPIPreprocessor = "EXPORT_API".GetAPIPreprocessorRaw(APIPreprocessorTypes.Export);
 		public static readonly string EmptyModuleNamePreprocessor = ((ModuleRules)null).GetNamePreprocessor();
 
 		public static readonly int IconID = 100;

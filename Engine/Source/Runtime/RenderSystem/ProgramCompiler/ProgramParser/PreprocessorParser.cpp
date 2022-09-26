@@ -92,18 +92,29 @@ namespace Engine
 					ADD_TO_RESULT(token.GetName());
 					break;
 
-				case Token::Types::Constant:
-				{
-					if (token.GetName() == "true")
-						ADD_TO_RESULT(token.GetName());
-					else if (token.GetName() == "false")
-						ADD_TO_RESULT(token.GetName());
-					else if (token.GetName().Contains("."))
-						ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat32()));
-					else
-						ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt32()));
-				}
-				break;
+				case Token::Types::ConstantBool:
+					ADD_TO_RESULT(token.GetName());
+					break;
+
+				case Token::Types::ConstantInt32:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt32()));
+					break;
+
+				case Token::Types::ConstantInt64:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt64()));
+					break;
+
+				case Token::Types::ConstantFloat32:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat32()));
+					break;
+
+				case Token::Types::ConstantFloat64:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat64()));
+					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+					break;
 				}
 			}
 

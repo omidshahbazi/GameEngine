@@ -31,151 +31,16 @@ namespace Engine
 					return false;
 				}
 
-				Token.SetStartIndex(GetPrevIndex());
-				Token.SetLineIndex(GetPrevLineIndex());
-
-				String name = Token.GetName();
+				FillDebugInfo(Token);
 
 				if (CharacterUtility::IsAlphabetic(c))
-				{
-					do
-					{
-						name += c;
-						c = GetChar();
-					} while (CharacterUtility::IsAlphanumeric(c));
-
-					UngetChar();
-
-					Token.SetIdentifier(name);
-
-					if (!NoConst)
-					{
-						if (Token.Matches("true"))
-						{
-							Token.SetConstantBool(true);
-							return true;
-						}
-						else if (Token.Matches("false"))
-						{
-							Token.SetConstantBool(false);
-							return true;
-						}
-					}
-
-					return true;
-				}
+					return FillIdentifier(c, NoConst, Token);
 				else if (CharacterUtility::IsDigit(c) || ((c == PLUS || c == MINES) && CharacterUtility::IsDigit(p)))
-				{
-					bool isFloat = false;
-					bool isHex = false;
-
-					do
-					{
-						if (c == DOT)
-							isFloat = true;
-
-						if (c == UPPER_X || c == LOWER_X)
-							isHex = true;
-
-						name += c;
-
-						c = CharacterUtility::ToUpper(GetChar());
-
-					} while (CharacterUtility::IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
-
-					if (isFloat || c != UPPER_F)
-						UngetChar();
-
-					if (NoConst)
-						Token.SetIdentifier(name);
-					else
-					{
-						if (isFloat)
-							Token.SetConstantFloat32(StringUtility::ToFloat32(name));
-						else if (isHex)
-							Token.SetConstantInt32(StringUtility::ToInt32(name));
-						else
-							Token.SetConstantInt32(StringUtility::ToInt32(name));
-					}
-
-					return true;
-				}
+					return FillIntegralConstant(c, NoConst, Token);
 				else if (c == DOUBLE_QUOTATION)
-				{
-					c = GetChar(true);
-					while (c != DOUBLE_QUOTATION && !CharacterUtility::IsEOL(c))
-					{
-						if (c == BACK_SLASH)
-						{
-							c = GetChar(true);
-
-							if (CharacterUtility::IsEOL(c))
-								break;
-							else if (c == 'n')
-								c = '\n';
-						}
-
-						name += c;
-
-						c = GetChar(true);
-					}
-
-					if (NoConst)
-						Token.SetIdentifier(name);
-					else
-						Token.SetConstantString(name);
-
-					return true;
-				}
+					return FillStringConstant(c, NoConst, Token);
 				else
-				{
-					name += c;
-
-#define PAIR(cc, dd) (c == cc && d == dd)
-
-					char8 d = GetChar();
-
-					if (PAIR('<', '<') ||
-						(PAIR('>', '>') && ParseTemplateCloseBracket != SymbolParseOptions::CloseTemplateBracket) ||
-						PAIR('=', '=') ||
-						PAIR('!', '=') ||
-						PAIR('<', '=') ||
-						PAIR('>', '=') ||
-						PAIR('+', '+') ||
-						PAIR('-', '-') ||
-						PAIR('|', '|') ||
-						PAIR('^', '^') ||
-						PAIR('&', '&') ||
-						PAIR('+', '=') ||
-						PAIR('-', '=') ||
-						PAIR('*', '=') ||
-						PAIR('/', '=') ||
-						PAIR('~', '=') ||
-						PAIR(':', ':') ||
-						PAIR('*', '*'))
-					{
-						name += d;
-
-						if (c == '>' && d == '>')
-						{
-							if (GetChar() == '>')
-								name += '>';
-							else
-								UngetChar();
-						}
-					}
-					else
-						UngetChar();
-
-#undef PAIR
-
-					if (NoConst)
-						Token.SetIdentifier(name);
-					else
-						Token.SetSymbol(name);
-
-					return true;
-				}
+					return FillSymbol(c, NoConst, ParseTemplateCloseBracket == SymbolParseOptions::CloseTemplateBracket, Token);
 			}
 
 			void CodePageParser::RequireToken(Token& Token, const String& Tag, bool NoConst)

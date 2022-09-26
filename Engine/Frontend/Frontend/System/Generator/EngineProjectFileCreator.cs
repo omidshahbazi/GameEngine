@@ -42,6 +42,13 @@ namespace Engine.Frontend.System.Generator
 						profile.NMakeReBuildCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.RebuildEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
 						profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
 
+						profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
+						profile.AddPreprocessorDefinition(configuration.GetPreprocessor());
+						profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+						profile.AddPreprocessorDefinition(architecture.GetPreprocessor());
+						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
+						profile.AddPreprocessorDefinition(BuildSystemHelper.IconIDDefinition);
+
 						ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(configuration, architecture);
 						foreach (ModuleRules module in modules)
 						{
@@ -61,12 +68,6 @@ namespace Engine.Frontend.System.Generator
 							foreach (string pd in module.PreprocessorDefinitions)
 								profile.AddPreprocessorDefinition(pd);
 						}
-
-						profile.AddPreprocessorDefinition(configuration.GetPreprocessor());
-						profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
-						profile.AddPreprocessorDefinition(architecture.GetPreprocessor());
-						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
-						profile.AddPreprocessorDefinition(BuildSystemHelper.IconIDDefinition);
 					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileSearchPattern);

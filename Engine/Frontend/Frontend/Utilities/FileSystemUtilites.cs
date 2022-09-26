@@ -7,18 +7,18 @@ namespace Engine.Frontend.Utilities
 {
 	static class FileSystemUtilites
 	{
-		public static string[] GetAllFiles(string DirectoryAddress, params string[] SearchPatterns)
+		public static string[] GetAllFiles(string RootDirectory, params string[] SearchPatterns)
 		{
 			List<string> files = new List<string>();
 
-			if (!Directory.Exists(DirectoryAddress))
+			if (!Directory.Exists(RootDirectory))
 				return files.ToArray();
 
 			if (SearchPatterns.Length == 0)
-				return Directory.GetFiles(DirectoryAddress, "*.*", SearchOption.AllDirectories);
+				return Directory.GetFiles(RootDirectory, "*.*", SearchOption.AllDirectories);
 
 			foreach (string pattern in SearchPatterns)
-				files.AddRange(Directory.GetFiles(DirectoryAddress, pattern, SearchOption.AllDirectories));
+				files.AddRange(Directory.GetFiles(RootDirectory, pattern, SearchOption.AllDirectories));
 
 			return files.ToArray();
 		}
@@ -52,6 +52,20 @@ namespace Engine.Frontend.Utilities
 				Directory = Directory.Substring(0, Directory.Length - 1);
 
 			return Path.GetDirectoryName(Directory);
+		}
+
+		public static void DeleteAllSubs(string RootDirectory)
+		{
+			if (!Directory.Exists(RootDirectory))
+				return;
+
+			string[] files = Directory.GetFiles(RootDirectory, "*.*", SearchOption.AllDirectories);
+			foreach (string file in files)
+				File.Delete(file);
+
+			string[] directories = Directory.GetDirectories(RootDirectory);
+			foreach (string directory in directories)
+				Directory.Delete(directory, true);
 		}
 	}
 }

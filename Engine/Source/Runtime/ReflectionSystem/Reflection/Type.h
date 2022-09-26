@@ -30,12 +30,12 @@ namespace Engine
 				return m_Name;
 			}
 
-			virtual String GetFullQualifiedName(void) const;
-
 			INLINE ObjectType* GetTopNest(void) const
 			{
 				return m_TopNest;
 			}
+
+			virtual String GetFullQualifiedName(void) const;
 
 		protected:
 			uint32 m_TypeID;

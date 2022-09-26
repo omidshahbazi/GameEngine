@@ -217,6 +217,12 @@ namespace Engine
 
 				Content += "			" + IMPLEMENT_POINTER_NAME + " = " + REFLECTION_ALLOCATORS_ALLOCATE + "<" + IMPLEMENT_NAME + ">();";
 				ADD_NEW_LINE();
+			}
+
+			for (auto& type : types)
+			{
+				const String IMPLEMENT_POINTER_NAME = GetImplementTypePointerName(type);
+
 				Content += "			Construct(" + IMPLEMENT_POINTER_NAME + ");";
 				ADD_NEW_LINE();
 			}

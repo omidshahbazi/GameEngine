@@ -235,21 +235,21 @@ namespace Engine
 
 			INLINE int16 GetAsInt16(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::Int16, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::Int16 || m_ValueType == ValueTypes::Int8, "Value type is different");
 
 				return m_Data.Int16;
 			}
 
 			INLINE int32 GetAsInt32(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::Int32, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::Int32 || m_ValueType == ValueTypes::Int16 || m_ValueType == ValueTypes::Int8, "Value type is different");
 
 				return m_Data.Int32;
 			}
 
 			INLINE int64 GetAsInt64(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::Int64, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::Int64 || m_ValueType == ValueTypes::Int32 || m_ValueType == ValueTypes::Int16 || m_ValueType == ValueTypes::Int8, "Value type is different");
 
 				return m_Data.Int64;
 			}
@@ -263,21 +263,21 @@ namespace Engine
 
 			INLINE uint16 GetAsUInt16(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::UInt16, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::UInt16 || m_ValueType == ValueTypes::UInt8, "Value type is different");
 
 				return m_Data.UInt16;
 			}
 
 			INLINE uint32 GetAsUInt32(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::UInt32, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::UInt32 || m_ValueType == ValueTypes::UInt16 || m_ValueType == ValueTypes::UInt8, "Value type is different");
 
 				return m_Data.UInt32;
 			}
 
 			INLINE uint64 GetAsUInt64(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::UInt64, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::UInt64 || m_ValueType == ValueTypes::UInt32 || m_ValueType == ValueTypes::UInt16 || m_ValueType == ValueTypes::UInt8, "Value type is different");
 
 				return m_Data.UInt64;
 			}
@@ -291,7 +291,7 @@ namespace Engine
 
 			INLINE float64 GetAsFloat64(void) const
 			{
-				HardAssert(m_ValueType == ValueTypes::Float64, "Value type is different");
+				HardAssert(m_ValueType == ValueTypes::Float64 || m_ValueType == ValueTypes::Float32, "Value type is different");
 
 				return m_Data.Float64;
 			}

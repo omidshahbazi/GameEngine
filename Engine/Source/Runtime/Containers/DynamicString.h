@@ -540,6 +540,12 @@ namespace Engine
 
 			INLINE void Move(DynamicString<T>& Value)
 			{
+				if (m_Allocator != Value.m_Allocator)
+				{
+					SetValue(Value.m_String, Value.m_Length);
+					return;
+				}
+
 				if (m_String != nullptr)
 					DeallocateMemory(GET_ALLOCATOR(), m_String);
 

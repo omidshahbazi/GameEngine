@@ -744,6 +744,14 @@ namespace Engine
 						Content += "			THROW_IF_EXCEPTION(Categories::Reflection, TargetObject == nullptr, \"TargetObject cannot be null\");";
 					ADD_NEW_LINE();
 
+					Content += "			typedef decltype(";
+					if (Type->GetIsStatic())
+						Content += Type->GetTopNest()->GetFullQualifiedName() + "::";
+					else
+						Content += "ReinterpretCast(" + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->";
+					Content += Type->GetName() + ") ValueType;";
+					ADD_NEW_LINE();
+
 					Content += "			";
 
 					if (Type->GetIsStatic())
@@ -758,14 +766,7 @@ namespace Engine
 					else
 						Content += "Value.Get<";
 
-					Content += "decltype(";
-
-					if (Type->GetIsStatic())
-						Content += Type->GetTopNest()->GetFullQualifiedName() + "::";
-					else
-						Content += "ReinterpretCast(" + Type->GetTopNest()->GetFullQualifiedName() + "*, TargetObject)->";
-
-					Content += Type->GetName() + ")";
+					Content += "ValueType";
 
 					if (Type->GetDataType().GetValueType() == ValueTypes::None)
 						Content += ", Value.Get<" + String(STRINGIZE(int32)) + ">())";

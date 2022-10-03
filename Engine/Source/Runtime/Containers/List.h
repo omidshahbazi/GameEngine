@@ -595,6 +595,12 @@ namespace Engine
 				if (m_FirstNode != nullptr && m_FirstNode == Other.m_FirstNode)
 					return *this;
 
+				if (m_Allocator != Other.m_Allocator)
+				{
+					Copy(Other);
+					return *this;
+				}
+
 				Deallocate();
 
 				m_Capacity = Other.m_Capacity;

@@ -113,7 +113,11 @@ namespace Engine
 		void Logger::InsertLog(Levels Level, Categories CategoryFlags, cstr File, uint32 LineNumber, cstr Function, cstr Content, va_list Args)
 		{
 			char8 content[2048];
-			StringUtility::Format(content, Content, Args);
+
+			if (Content == nullptr)
+				content[0] = '\0';
+			else
+				StringUtility::Format(content, Content, Args);
 
 			InsertLog(Level, CategoryFlags, File, LineNumber, Function, content);
 		}

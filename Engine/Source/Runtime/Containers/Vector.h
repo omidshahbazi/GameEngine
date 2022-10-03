@@ -458,6 +458,12 @@ namespace Engine
 				if (m_Items != nullptr && m_Items == Other.m_Items)
 					return *this;
 
+				if (m_Allocator != Other.m_Allocator)
+				{
+					Copy(Other);
+					return *this;
+				}
+
 				Deallocate();
 
 				m_Capacity = Other.m_Capacity;

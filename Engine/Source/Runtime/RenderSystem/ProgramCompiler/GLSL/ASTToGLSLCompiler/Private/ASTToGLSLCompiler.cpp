@@ -21,20 +21,12 @@ namespace Engine
 
 			VertexLayouts GetLayout(const String& Name)
 			{
-				static bool initialized = false;
-				static Map<String, VertexLayouts> registers;
-
-				if (!initialized)
-				{
-					initialized = true;
-
-					registers["POSITION"] = VertexLayouts::Position;
-					registers["NORMAL"] = VertexLayouts::Normal;
-					registers["TEXCOORD"] = VertexLayouts::TexCoord;
-				}
-
-				if (registers.Contains(Name))
-					return registers[Name];
+				if (Name == "POSITION")
+					return VertexLayouts::Position;
+				if (Name == "NORMAL")
+					return VertexLayouts::Normal;
+				if (Name == "TEXCOORD")
+					return VertexLayouts::TexCoord;
 
 				THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", Name);
 			}

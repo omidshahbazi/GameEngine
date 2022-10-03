@@ -937,14 +937,24 @@ namespace Engine
 		{
 			ConstantStatement* stm = Allocate<ConstantStatement>();
 
-			if (DeclarationToken.GetName() == "true")
-				stm->SetBool(true);
-			else if (DeclarationToken.GetName() == "false")
-				stm->SetBool(false);
-			else if (DeclarationToken.GetName().Contains("."))
-				stm->SetFloat32(DeclarationToken.GetConstantFloat32());
-			else
+			switch (DeclarationToken.GetType())
+			{
+			case Token::Types::ConstantBool:
+				stm->SetBool(DeclarationToken.GetConstantBool());
+				break;
+
+			case Token::Types::ConstantInt32:
 				stm->SetFloat32(DeclarationToken.GetConstantInt32());
+				break;
+				break;
+
+			case Token::Types::ConstantFloat32:
+				stm->SetFloat32(DeclarationToken.GetConstantFloat32());
+				break;
+
+			default:
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
 
 			return stm;
 		}

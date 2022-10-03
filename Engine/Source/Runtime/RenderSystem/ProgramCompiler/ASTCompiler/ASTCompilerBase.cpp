@@ -359,11 +359,25 @@ namespace Engine
 		{
 			Shader += "(";
 
-			Shader += UnaryOperatorStatement::GetPrefixOperatorSymbol(Statement->GetOperator());
+			switch (Statement->GetOperator())
+			{
+			case UnaryOperatorStatement::Operators::Exlamation:
+			case UnaryOperatorStatement::Operators::Minus:
+			case UnaryOperatorStatement::Operators::PrefixIncrement:
+			case UnaryOperatorStatement::Operators::PrefixDecrement:
+				Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+				break;
+			}
 
 			BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
 
-			Shader += UnaryOperatorStatement::GetPostfixOperatorSymbol(Statement->GetOperator());
+			switch (Statement->GetOperator())
+			{
+			case UnaryOperatorStatement::Operators::PostfixIncrement:
+			case UnaryOperatorStatement::Operators::PostfixDecrement:
+				Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+				break;
+			}
 
 			Shader += ")";
 		}
@@ -633,7 +647,7 @@ namespace Engine
 		{
 			if (Stage != Stages::Fragment)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
-			
+
 			Shader += "discard;";
 			ADD_NEW_LINE();
 		}

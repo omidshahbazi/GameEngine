@@ -44,7 +44,8 @@ namespace Engine
 
 			ASTToGLSLCompiler::ASTToGLSLCompiler() :
 				m_AdditionalLayoutCount(0),
-				m_BindingCount(0)
+				m_BindingCount(0),
+				m_MemberAccessLevel(0)
 			{
 			}
 
@@ -58,6 +59,7 @@ namespace Engine
 				m_Outputs = OutputMap(Allocator);
 				m_AdditionalLayoutCount = 0;
 				m_BindingCount = 0;
+				m_MemberAccessLevel = 0;
 				m_Parameters = ParameterList(Allocator);
 
 				try

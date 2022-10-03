@@ -5,7 +5,6 @@
 
 #include <Containers\Strings.h>
 #include <Containers\GUID.h>
-#include <Common\Definitions.h>
 #include <Platform\PlatformFile.h>
 #include <Reflection\PropertyType.h>
 #include <JSON\JSONObject.h>
@@ -19,20 +18,20 @@ namespace Engine
 
 	namespace ResourceImportExport
 	{
-		REFLECTION_OBJECT()
-			class RESOURCEIMPORTEXPORT_API ImporterExporter
+		REFLECTION_OBJECT(REFLECTION_ABSTRACT);
+		class RESOURCEIMPORTEXPORT_API ImporterExporter
 		{
-			IMPORTEREXPORTER_OBJECT()
+			IMPORTEREXPORTER_OBJECT();
 
 		public:
 			static cwstr META_EXTENSION;
 			static const int8 META_FILE_FORMAT_VERSION;
 
 		public:
-			REFLECTION_STRUCT()
-				struct RESOURCEIMPORTEXPORT_API Settings
+			REFLECTION_OBJECT(REFLECTION_ABSTRACT);
+			struct RESOURCEIMPORTEXPORT_API Settings
 			{
-				SETTINGS_OBJECT()
+				SETTINGS_OBJECT();
 
 			public:
 				Settings(void) :
@@ -41,17 +40,17 @@ namespace Engine
 				}
 
 			public:
-				REFLECTION_PROPERTY()
-					String ID;
+				REFLECTION_PROPERTY();
+				String ID;
 
-				REFLECTION_PROPERTY()
-					int8 FileFormatVersion;
+				REFLECTION_PROPERTY();
+				int8 FileFormatVersion;
 			};
 
-			REFLECTION_STRUCT()
-				struct RESOURCEIMPORTEXPORT_API TextSettings : public Settings
+			REFLECTION_OBJECT();
+			struct RESOURCEIMPORTEXPORT_API TextSettings : public Settings
 			{
-				TEXTSETTINGS_OBJECT()
+				TEXTSETTINGS_OBJECT();
 
 			public:
 				TextSettings(void)
@@ -59,27 +58,27 @@ namespace Engine
 				}
 			};
 
-			REFLECTION_STRUCT()
-				struct RESOURCEIMPORTEXPORT_API TextureSettings : public Settings
+			REFLECTION_OBJECT();
+			struct RESOURCEIMPORTEXPORT_API TextureSettings : public Settings
 			{
-				TEXTURESETTINGS_OBJECT()
+				TEXTURESETTINGS_OBJECT();
 
 			public:
-				REFLECTION_ENUM()
-					enum class Types
+				REFLECTION_ENUM();
+				enum class Types
 				{
 					TwoD = 0
 				};
 
-				REFLECTION_ENUM()
-					enum class UseTypes
+				REFLECTION_ENUM();
+				enum class UseTypes
 				{
 					Texture = 0,
 					Sprite
 				};
 
-				REFLECTION_ENUM()
-					enum class Formats
+				REFLECTION_ENUM();
+				enum class Formats
 				{
 					Automatic = 0,
 					R8,
@@ -107,35 +106,35 @@ namespace Engine
 				}
 
 			public:
-				REFLECTION_PROPERTY()
-					Types Type;
+				REFLECTION_PROPERTY();
+				Types Type;
 
-				REFLECTION_PROPERTY()
-					UseTypes UseType;
+				REFLECTION_PROPERTY();
+				UseTypes UseType;
 
-				REFLECTION_PROPERTY()
-					Formats Format;
+				REFLECTION_PROPERTY();
+				Formats Format;
 
-				REFLECTION_PROPERTY()
-					int32 Size;
+				REFLECTION_PROPERTY();
+				int32 Size;
 
-				REFLECTION_PROPERTY()
-					int32 BorderRight;
+				REFLECTION_PROPERTY();
+				int32 BorderRight;
 
-				REFLECTION_PROPERTY()
-					int32 BorderLeft;
+				REFLECTION_PROPERTY();
+				int32 BorderLeft;
 
-				REFLECTION_PROPERTY()
-					int32 BorderTop;
+				REFLECTION_PROPERTY();
+				int32 BorderTop;
 
-				REFLECTION_PROPERTY()
-					int32 BorderBottom;
+				REFLECTION_PROPERTY();
+				int32 BorderBottom;
 			};
 
-			REFLECTION_STRUCT()
-				struct RESOURCEIMPORTEXPORT_API ProgramSettings : public Settings
+			REFLECTION_OBJECT();
+			struct RESOURCEIMPORTEXPORT_API ProgramSettings : public Settings
 			{
-				PROGRAMSETTINGS_OBJECT()
+				PROGRAMSETTINGS_OBJECT();
 
 			public:
 				ProgramSettings(void)
@@ -143,17 +142,17 @@ namespace Engine
 				}
 
 			public:
-				//REFLECTION_PROPERTY()
-					Vector<String> Defines;
+				//REFLECTION_PROPERTY();
+				Vector<String> Defines;
 
-				REFLECTION_PROPERTY()
-					bool DebugMode;
+				REFLECTION_PROPERTY();
+				bool DebugMode;
 			};
 
-			REFLECTION_STRUCT()
-				struct RESOURCEIMPORTEXPORT_API MeshSettings : public Settings
+			REFLECTION_OBJECT();
+			struct RESOURCEIMPORTEXPORT_API MeshSettings : public Settings
 			{
-				MESHSETTINGS_OBJECT()
+				MESHSETTINGS_OBJECT();
 
 			public:
 				MeshSettings(void)
@@ -161,14 +160,14 @@ namespace Engine
 				}
 			};
 
-			REFLECTION_STRUCT()
-				struct RESOURCEIMPORTEXPORT_API FontSettings : public Settings
+			REFLECTION_OBJECT();
+			struct RESOURCEIMPORTEXPORT_API FontSettings : public Settings
 			{
-				FONTSETTINGS_OBJECT()
+				FONTSETTINGS_OBJECT();
 
 			public:
-				REFLECTION_ENUM()
-					enum class RenderTypes
+				REFLECTION_ENUM();
+				enum class RenderTypes
 				{
 					Mesh = 0,
 					Texture
@@ -181,8 +180,8 @@ namespace Engine
 				}
 
 			public:
-				REFLECTION_PROPERTY()
-					RenderTypes RenderType;
+				REFLECTION_PROPERTY();
+				RenderTypes RenderType;
 			};
 
 		public:
@@ -198,7 +197,7 @@ namespace Engine
 				if (!PlatformFile::Exists(metaFilePath.GetValue()))
 					return false;
 
-				Reflection::TypeList properties;
+				Reflection::PropertyTypeList properties;
 				GetProperties(T::GetType(), properties);
 
 				ReadMetaFile(metaFilePath, properties, Settings);
@@ -214,7 +213,7 @@ namespace Engine
 
 				Settings->FileFormatVersion = META_FILE_FORMAT_VERSION;
 
-				Reflection::TypeList properties;
+				Reflection::PropertyTypeList properties;
 				GetProperties(T::GetType(), properties);
 
 				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings, Overwrite);
@@ -227,10 +226,10 @@ namespace Engine
 		private:
 			static WString GetMetaFilePath(const WString& FilePath);
 
-			static void GetProperties(const Reflection::DataStructureType& Type, Reflection::TypeList& Properties);
+			static void GetProperties(const Reflection::ObjectType& Type, Reflection::PropertyTypeList& Properties);
 			static bool ParseMetaFile(AllocatorBase* Allocator, const WString& FilePath, JSONObject& Object);
-			static bool ReadMetaFile(const WString& FilePath, Reflection::TypeList& Properties, void* SettingObject);
-			static bool WriteMetaFile(const WString& FilePath, Reflection::TypeList& Properties, const void* SettingObject, bool Overwrite);
+			static bool ReadMetaFile(const WString& FilePath, Reflection::PropertyTypeList& Properties, void* SettingObject);
+			static bool WriteMetaFile(const WString& FilePath, Reflection::PropertyTypeList& Properties, const void* SettingObject, bool Overwrite);
 		};
 	}
 }

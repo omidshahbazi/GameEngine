@@ -13,8 +13,8 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public InputSystemModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public InputSystemModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Debugging");
 			PrivateDependencyModuleNames.Add("MathContainers");

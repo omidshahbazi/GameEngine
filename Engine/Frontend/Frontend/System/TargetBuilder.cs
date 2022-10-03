@@ -34,7 +34,7 @@ namespace Engine.Frontend.System
 			this.Configuration = Configuration;
 			this.Architecture = Architecture;
 
-			RulesLibrary.Instance.Build(true);
+			RulesLibrary.Instance.Build(true, Configuration, Architecture, EnvironmentHelper.DebugModeProjectPreprocessor);
 
 			targetRules = RulesLibrary.Instance.GetTargetRules(Target, Configuration, Architecture);
 

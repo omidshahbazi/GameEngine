@@ -13,8 +13,8 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public FontAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public FontAssetParserModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("MeshAssetParser");
 			PrivateDependencyModuleNames.Add("TextureAssetParser");

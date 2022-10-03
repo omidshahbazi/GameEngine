@@ -40,7 +40,7 @@ namespace Engine
 
 		void PreprocessorParser::Process(Parameters& Parameters)
 		{
-			Tokenizer::Parse();
+			Tokenizer::Reset();
 
 			Process(Parameters, EndConditions::None);
 		}
@@ -85,27 +85,40 @@ namespace Engine
 				if (ParsePreprocessor(token, Parameters))
 					continue;
 
-				switch (token.GetTokenType())
+				switch (token.GetType())
 				{
 				case Token::Types::Identifier:
 				case Token::Types::Symbol:
-					ADD_TO_RESULT(token.GetIdentifier());
+					ADD_TO_RESULT(token.GetName());
 					break;
 
-				case Token::Types::Constant:
-				{
-					if (token.GetConstantString() != String::Empty)
-						ADD_TO_RESULT("\"" + token.GetConstantString() + "\"");
-					else if (token.GetIdentifier() == "true")
-						ADD_TO_RESULT(token.GetIdentifier());
-					else if (token.GetIdentifier() == "false")
-						ADD_TO_RESULT(token.GetIdentifier());
-					else if (token.GetIdentifier().Contains("."))
-						ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat32()));
-					else
-						ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt32()));
-				}
-				break;
+				case Token::Types::ConstantBool:
+					ADD_TO_RESULT(token.GetName());
+					break;
+
+				case Token::Types::ConstantInt32:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt32()));
+					break;
+
+				case Token::Types::ConstantInt64:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantInt64()));
+					break;
+
+				case Token::Types::ConstantFloat32:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat32()));
+					break;
+
+				case Token::Types::ConstantFloat64:
+					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat64()));
+					break;
+
+				case Token::Types::ConstantFloat64:
+					ADD_TO_RESULT("\"" + token.GetConstantString() + "\"");
+					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+					break;
 				}
 			}
 
@@ -126,12 +139,12 @@ namespace Engine
 				while (true)
 				{
 					Token token;
-					RequireToken(token);
+					RequireToken(token, "parse preprocessor include");
 
 					if (token.Matches(CLOSE_ANGLE_BRACKET, Token::SearchCases::CaseSensitive))
 						break;
 
-					fileName += token.GetIdentifier();
+					fileName += token.GetName();
 				}
 
 				String source;
@@ -147,18 +160,18 @@ namespace Engine
 			if (MatchIdentifier(PREPROCESSOR_DEFINE))
 			{
 				Token nameToken;
-				RequireToken(nameToken);
+				RequireToken(nameToken, "parse preprocessor definition");
 
 				bool isDuplicate = false;
 				for (const auto& define : Parameters.Defines)
-					if (define == nameToken.GetIdentifier())
+					if (define == nameToken.GetName())
 					{
 						isDuplicate = true;
 						break;
 					}
 
 				if (!isDuplicate)
-					Parameters.Defines.Add({ nameToken.GetIdentifier() });
+					Parameters.Defines.Add({ nameToken.GetName() });
 
 				return true;
 			}
@@ -166,10 +179,10 @@ namespace Engine
 			if (MatchIdentifier(PREPROCESSOR_UNDEF))
 			{
 				Token nameToken;
-				RequireToken(nameToken);
+				RequireToken(nameToken, "parse preprocessor undef");
 
 				for (uint32 i = 0; i < Parameters.Defines.GetSize(); ++i)
-					if (Parameters.Defines[i] == nameToken.GetIdentifier())
+					if (Parameters.Defines[i] == nameToken.GetName())
 						Parameters.Defines.RemoveAt(i--);
 
 				return true;
@@ -179,17 +192,17 @@ namespace Engine
 			if (MatchIdentifier(PREPROCESSOR_IFDEF) || (isNotDef = MatchIdentifier(PREPROCESSOR_IFNDEF)))
 			{
 				Token nameToken;
-				RequireToken(nameToken);
+				RequireToken(nameToken, "parse preprocessor ifdef/ifndef directive");
 
-				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetIdentifier()) == isNotDef);
+				bool shouldRemoveBlock = (IsDefined(Parameters.Defines, nameToken.GetName()) == isNotDef);
 
 				ParsePreprocessorBlock(Parameters, shouldRemoveBlock);
 
 				Token sharpToken;
-				RequireSymbol(SHARP, "Preprocess ifdef/ifndef directive");
+				RequireSymbol(SHARP, "parse preprocess ifdef/ifndef directive");
 
 				Token preprocessorToken;
-				RequireToken(preprocessorToken);
+				RequireToken(preprocessorToken, "parse preprocess ifdef/ifndef directive");
 
 				if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 					ParsePreprocessorBlock(Parameters, !shouldRemoveBlock);
@@ -210,7 +223,7 @@ namespace Engine
 				while (true)
 				{
 					Token token;
-					RequireToken(token);
+					RequireToken(token, "parse preprocess block");
 
 					if (token.Matches(PREPROCESSOR_IFDEF, Token::SearchCases::CaseSensitive) || token.Matches(PREPROCESSOR_IFNDEF, Token::SearchCases::CaseSensitive))
 					{
@@ -238,10 +251,10 @@ namespace Engine
 			Process(Parameters, EndConditions::PreprocessorElse | EndConditions::PreprocessorEndIf);
 
 			Token sharpToken;
-			RequireToken(sharpToken);
+			RequireToken(sharpToken, "parse preprocess block");
 
 			Token preprocessorToken;
-			RequireToken(preprocessorToken);
+			RequireToken(preprocessorToken, "parse preprocess block");
 
 			if (preprocessorToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive))
 			{

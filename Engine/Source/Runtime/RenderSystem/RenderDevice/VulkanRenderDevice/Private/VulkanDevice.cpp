@@ -1,10 +1,14 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <VulkanRenderDevice\Private\VulkanDevice.h>
 
+#include <Containers\Exception.h>
+using namespace Engine::Containers;
+
 namespace Engine
 {
 	using namespace Common;
 	using namespace Platform;
+
 
 	namespace VulkanRenderDevice
 	{
@@ -12,6 +16,7 @@ namespace Engine
 		{
 			VulkanDevice::VulkanDevice(void)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::RenderSystem);
 			}
 			VulkanDevice::~VulkanDevice(void)
 			{

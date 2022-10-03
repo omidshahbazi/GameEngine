@@ -13,8 +13,8 @@ namespace Engine.Test
 			get { return UseTypes.Executable; }
 		}
 
-		public TestLauncherModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public TestLauncherModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("CoreSystem");
 			PrivateDependencyModuleNames.Add("GameObjectSystem");

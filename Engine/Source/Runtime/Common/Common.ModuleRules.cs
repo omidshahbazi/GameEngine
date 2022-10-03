@@ -13,8 +13,8 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public CommonModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public CommonModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 		}
 	}

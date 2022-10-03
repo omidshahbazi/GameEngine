@@ -13,8 +13,8 @@ namespace Engine.Runtime.ProgramCompiler
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ProgramCompilerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ProgramCompilerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("ProgramParser");
 			PrivateDependencyModuleNames.Add("DynamicModuleSystem");

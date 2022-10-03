@@ -23,8 +23,7 @@ namespace Engine
 			ProgramCompiler = (RenderSystem << 1),
 			ResourceSystem = (ProgramCompiler << 1),
 			Reflection = (ResourceSystem << 1),
-			ReflectionTool = (Reflection << 1),
-			Utilities = (ReflectionTool << 1),
+			Utilities = (Reflection << 1),
 			All = 0xFFFFFFF
 		};
 	}

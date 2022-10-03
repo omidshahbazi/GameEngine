@@ -14,9 +14,9 @@ namespace Engine.Frontend.System.Generator
 			get { return EnvironmentHelper.EngineDirectory + "Engine.vcxproj"; }
 		}
 
-		public static bool Generate()
+		public static bool Generate(bool DebugModeProject)
 		{
-			RulesLibrary.Instance.Build(false);
+			RulesLibrary.Instance.Build(false, (DebugModeProject ? EnvironmentHelper.DebugModeProjectPreprocessor : ""));
 
 			TargetRules[] targets = RulesLibrary.Instance.GetTargetRules(ProjectBase.ProfileBase.BuildConfigurations.Debug, ProjectBase.ProfileBase.PlatformArchitectures.x64);
 
@@ -43,6 +43,11 @@ namespace Engine.Frontend.System.Generator
 						profile.NMakeCleanCommandLine = $"\"{EnvironmentHelper.FrontenddToolPath}\" -Action {EntryPoint.Actions.CleanEngine} -Target {targetModule.Name} -Architecture {architecture} -Configuration {configuration}";
 
 						profile.AddPreprocessorDefinition(BuildSystemHelper.ExportAPIPreprocessor);
+						profile.AddPreprocessorDefinition(configuration.GetPreprocessor());
+						profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+						profile.AddPreprocessorDefinition(architecture.GetPreprocessor());
+						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
+						profile.AddPreprocessorDefinition(BuildSystemHelper.IconIDDefinition);
 
 						ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(configuration, architecture);
 						foreach (ModuleRules module in modules)
@@ -63,12 +68,6 @@ namespace Engine.Frontend.System.Generator
 							foreach (string pd in module.PreprocessorDefinitions)
 								profile.AddPreprocessorDefinition(pd);
 						}
-
-						profile.AddPreprocessorDefinition(configuration.GetPreprocessor());
-						profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
-						profile.AddPreprocessorDefinition(architecture.GetPreprocessor());
-						profile.AddPreprocessorDefinition(BuildSystemHelper.EmptyModuleNamePreprocessor);
-						profile.AddPreprocessorDefinition(BuildSystemHelper.IconIDDefinition);
 					}
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CSharpFileSearchPattern);
@@ -86,6 +85,17 @@ namespace Engine.Frontend.System.Generator
 			files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, EnvironmentHelper.CompileFileSearchPattern);
 			foreach (string file in files)
 				projectFile.AddCompileFile(file);
+
+			if (DebugModeProject)
+			{
+				files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.IntermediateDirectory, EnvironmentHelper.HeaderFileSearchPattern);
+				foreach (string file in files)
+					projectFile.AddIncludeFile(file.Replace(EnvironmentHelper.EngineDirectory, ""));
+
+				files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.IntermediateDirectory, EnvironmentHelper.CompileFileSearchPattern);
+				foreach (string file in files)
+					projectFile.AddCompileFile(file.Replace(EnvironmentHelper.EngineDirectory, ""));
+			}
 
 			MicrosoftVCProjectGenerator generator = new MicrosoftVCProjectGenerator();
 			generator.ToolsVersion = MSBuildProcess.Info.ToolsVersion;

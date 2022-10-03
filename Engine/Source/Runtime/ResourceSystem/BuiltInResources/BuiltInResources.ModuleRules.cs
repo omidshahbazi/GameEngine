@@ -13,8 +13,8 @@ namespace Engine.Runtime.ResourceSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public BuiltInResourcesModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public BuiltInResourcesModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("RenderSystem");
 			PrivateDependencyModuleNames.Add("FileUtility");

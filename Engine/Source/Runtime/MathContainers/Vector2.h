@@ -3,14 +3,11 @@
 #ifndef VECTOR_2_H
 #define VECTOR_2_H
 
-#include <Common\Definitions.h>
-
 namespace Engine
 {
 	namespace MathContainers
 	{
-		WRAPPER_DATA_STRUCTURE()
-			template<typename T>
+		template<typename T>
 		class Vector2
 		{
 		public:
@@ -104,7 +101,7 @@ namespace Engine
 
 			INLINE bool operator<(const Vector2& Other) const
 			{
-				return (X < Other.X && Y < Other.Y);
+				return (X < Other.X&& Y < Other.Y);
 			}
 
 			INLINE bool operator>=(const Vector2& Other) const

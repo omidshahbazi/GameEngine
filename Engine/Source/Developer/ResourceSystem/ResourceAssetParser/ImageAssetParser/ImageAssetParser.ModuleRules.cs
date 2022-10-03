@@ -13,8 +13,8 @@ namespace Engine.Developer.ResourceSystem.ResourceAssetParser
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ImageAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ImageAssetParserModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("STB");
 			PrivateDependencyModuleNames.Add("RenderCommon");

@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.Utilities;
+using System;
 using System.IO;
 
 namespace Engine.Frontend.System.Compile
@@ -21,16 +22,17 @@ namespace Engine.Frontend.System.Compile
 
 			string error = "";
 
-			//while (!Output.EndOfStream)
-			//	error += Output.ReadLine() + Environment.NewLine;
 			Wait();
+
+			while (!Output.EndOfStream)
+				error += Output.ReadLine() + Environment.NewLine;
 
 			if (ExitCode == 0)
 				return true;
 			else if (ExitCode == 1)
 				return false;
 
-			throw new FrontendException($"Parsing {FilePath}  for reflection has error(s): {error}");
+			throw new FrontendException($"Parsing {FilePath} for reflection has error(s): {error}");
 		}
 	}
 }

@@ -13,17 +13,18 @@ namespace Engine.Programs
 			get { return UseTypes.Executable; }
 		}
 
-		public ReflectionToolModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ReflectionToolModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
-			PrivateDependencyModuleNames.Add("Debugging");
+			PrivateDependencyModuleNames.Add("Allocators");
 			PrivateDependencyModuleNames.Add("Containers");
 			PrivateDependencyModuleNames.Add("Reflection");
 			PrivateDependencyModuleNames.Add("FileUtility");
 			PrivateDependencyModuleNames.Add("Lexer");
 			PrivateDependencyModuleNames.Add("EntryPointUtility");
 			PrivateDependencyModuleNames.Add("MemoryManagement");
+			PrivateDependencyModuleNames.Add("ReflectionGenerator");
 
 			IconPath = "Engine/Contents/Icon.png";
 		}

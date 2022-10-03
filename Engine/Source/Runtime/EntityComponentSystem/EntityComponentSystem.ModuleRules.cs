@@ -13,8 +13,8 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public EntityComponentSystemModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public EntityComponentSystemModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Common");
 			PublicDependencyModuleNames.Add("Containers");

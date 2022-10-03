@@ -45,7 +45,7 @@ namespace Engine.Frontend
 					break;
 
 				case Actions.GenerateProjectFile:
-					GenerateProjectFile();
+					GenerateProjectFile(Arguments);
 					break;
 
 				case Actions.GenerateDependencyGraph:
@@ -72,9 +72,13 @@ namespace Engine.Frontend
 			CreateTargetBuilder(Arguments).Clean();
 		}
 
-		private static void GenerateProjectFile()
+		private static void GenerateProjectFile(ArgumentParser Arguments)
 		{
-			EngineProjectFileCreator.Generate();
+			bool debugModeProject = false;
+			if (Arguments.Contains("DebugModeProject"))
+				debugModeProject = Arguments.Get<bool>("DebugModeProject");
+
+			EngineProjectFileCreator.Generate(debugModeProject);
 
 			EngineSolutionFileGenerator.Generate();
 		}

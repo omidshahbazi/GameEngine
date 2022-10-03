@@ -13,8 +13,8 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ContainersModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ContainersModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Common");
 			PublicDependencyModuleNames.Add("MemoryManagement");

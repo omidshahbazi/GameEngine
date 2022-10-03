@@ -21,7 +21,7 @@ namespace Engine
 			{
 				const AnyDataType& any = Data->GetAny();
 
-				if (any.GetValueType() == ValueTypes::VoidPointer)
+				if (any.GetValueType() == ValueTypes::Void)
 					value = "null";
 				if (any.GetValueType() == ValueTypes::Bool)
 					value = (any.GetAsBool() ? "true" : "false");

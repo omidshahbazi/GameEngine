@@ -13,8 +13,8 @@ namespace Engine.Runtime.ResourceSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ResourceImportExportModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ResourceImportExportModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("JSON");
 			PrivateDependencyModuleNames.Add("Allocators");

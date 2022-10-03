@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public GLSLIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public GLSLIntrinsicModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("APIIntrinsic");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");

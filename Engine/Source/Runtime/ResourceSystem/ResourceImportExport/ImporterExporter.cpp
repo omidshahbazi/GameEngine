@@ -48,15 +48,15 @@ namespace Engine
 			return MetaFilePath.SubString(0, MetaFilePath.GetLength() - EXT_LENGTH);
 		}
 
-		void ImporterExporter::GetProperties(const DataStructureType& Type, TypeList& Properties)
+		void ImporterExporter::GetProperties(const ObjectType& Type, PropertyTypeList& Properties)
 		{
 			Type.GetProperties(AccessSpecifiers::Public | AccessSpecifiers::Protected | AccessSpecifiers::Private, Properties);
 
-			TypeList list;
+			ObjectTypeList list;
 			Type.GetParents(AccessSpecifiers::Private | AccessSpecifiers::Protected | AccessSpecifiers::Public, list);
 
 			for (const auto parentType : list)
-				GetProperties(*ReinterpretCast(DataStructureType*, parentType), Properties);
+				GetProperties(*parentType, Properties);
 		}
 
 		bool ImporterExporter::ParseMetaFile(AllocatorBase* Allocator, const WString& FilePath, JSONObject& Object)
@@ -76,17 +76,15 @@ namespace Engine
 			return true;
 		}
 
-		bool ImporterExporter::ReadMetaFile(const WString& FilePath, TypeList& Properties, void* SettingObject)
+		bool ImporterExporter::ReadMetaFile(const WString& FilePath, PropertyTypeList& Properties, void* SettingObject)
 		{
 			FrameAllocator allocator("MetaFile parser allocator", RootAllocator::GetInstance(), MegaByte);
 			JSONObject obj(&allocator);
 			if (!ParseMetaFile(&allocator, FilePath, obj))
 				return false;
 
-			for (auto& type : Properties)
+			for (auto& prop : Properties)
 			{
-				PropertyType* prop = ReinterpretCast(PropertyType*, type);
-
 				if (!obj.Contains(prop->GetName()))
 					continue;
 
@@ -98,7 +96,7 @@ namespace Engine
 			return true;
 		}
 
-		bool ImporterExporter::WriteMetaFile(const WString& FilePath, TypeList& Properties, const void* SettingObject, bool Overwrite)
+		bool ImporterExporter::WriteMetaFile(const WString& FilePath, PropertyTypeList& Properties, const void* SettingObject, bool Overwrite)
 		{
 			FrameAllocator allocator("MetaFile writer allocator", RootAllocator::GetInstance(), MegaByte);
 			JSONObject obj(&allocator);
@@ -106,12 +104,8 @@ namespace Engine
 			if (!Overwrite && !ParseMetaFile(&allocator, FilePath, obj))
 				return false;
 
-			for (auto type : Properties)
-			{
-				PropertyType* prop = ReinterpretCast(PropertyType*, type);
-
+			for (auto prop : Properties)
 				obj[prop->GetName()] = prop->GetValue(SettingObject);
-			}
 
 			auto handle = PlatformFile::Open(FilePath.GetValue(), PlatformFile::OpenModes::Output);
 			if (handle == 0)

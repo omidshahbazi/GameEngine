@@ -13,8 +13,8 @@ namespace Engine.Runtime.Utility
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public EntryPointUtilityModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public EntryPointUtilityModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Containers");
 

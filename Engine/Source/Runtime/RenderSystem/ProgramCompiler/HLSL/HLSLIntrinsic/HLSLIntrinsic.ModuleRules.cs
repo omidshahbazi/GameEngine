@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public HLSLIntrinsicModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public HLSLIntrinsicModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("APIIntrinsic");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");

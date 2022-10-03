@@ -13,8 +13,8 @@ namespace Engine.Runtime.Utility
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public LexerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public LexerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Containers");

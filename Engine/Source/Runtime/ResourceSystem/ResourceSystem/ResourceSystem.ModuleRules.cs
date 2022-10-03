@@ -13,8 +13,8 @@ namespace Engine.Runtime.ResourceSystem
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ResourceSystemModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ResourceSystemModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("MemoryManagement");
 			PrivateDependencyModuleNames.Add("Platform");

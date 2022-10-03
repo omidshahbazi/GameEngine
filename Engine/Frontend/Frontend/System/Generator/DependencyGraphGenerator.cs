@@ -1,4 +1,5 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
+using Engine.Frontend.Project;
 using Engine.Frontend.Utilities;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,9 @@ namespace Engine.Frontend.System.Generator
 {
 	static class DependencyGraphGenerator
 	{
+		private const ProjectBase.ProfileBase.BuildConfigurations Configuration = ProjectBase.ProfileBase.BuildConfigurations.Debug;
+		private const ProjectBase.ProfileBase.PlatformArchitectures Platform = ProjectBase.ProfileBase.PlatformArchitectures.x86;
+
 		private static string FilePath
 		{
 			get { return EnvironmentHelper.EngineDirectory + "DependencyGraph.dgml"; }
@@ -16,9 +20,9 @@ namespace Engine.Frontend.System.Generator
 
 		public static bool Generate()
 		{
-			RulesLibrary.Instance.Build(false);
+			RulesLibrary.Instance.Build(false, Configuration, Platform);
 
-			ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(Project.ProjectBase.ProfileBase.BuildConfigurations.Debug, Project.ProjectBase.ProfileBase.PlatformArchitectures.x86);
+			ModuleRules[] modules = RulesLibrary.Instance.GetModuleRules(Configuration, Platform);
 
 			List<string> namespaces = new List<string>();
 			foreach (ModuleRules module in modules)

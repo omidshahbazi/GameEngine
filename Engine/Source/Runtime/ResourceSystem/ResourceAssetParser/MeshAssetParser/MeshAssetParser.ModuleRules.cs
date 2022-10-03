@@ -13,8 +13,8 @@ namespace Engine.Runtime.ResourceSystem.ResourceAssetParser
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public MeshAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public MeshAssetParserModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Containers");
 			PublicDependencyModuleNames.Add("RenderDevice");

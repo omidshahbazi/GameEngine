@@ -250,6 +250,17 @@ namespace Engine
 				return (Find(Key) != -1);
 			}
 
+			template<typename U>
+			INLINE Map<K, V> Cast(void)
+			{
+				Map<K, V> temp(GetAllocator(), m_Size);
+
+				for (uint32 i = 0; i < m_Size; ++i)
+					temp.Add(m_Items[i].GetFirst(), m_Items[i].GetSecond());
+
+				return temp;
+			}
+
 			INLINE V& operator[](const K& Key)
 			{
 				int32 index = Find(Key);
@@ -283,6 +294,12 @@ namespace Engine
 			{
 				if (m_Items != nullptr && m_Items == Other.m_Items)
 					return *this;
+
+				if (m_Allocator != Other.m_Allocator)
+				{
+					Copy(Other);
+					return *this;
+				}
 
 				Deallocate();
 

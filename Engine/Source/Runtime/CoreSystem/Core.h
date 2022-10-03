@@ -3,7 +3,6 @@
 #ifndef CORE_H
 #define CORE_H
 
-#include <Common\Definitions.h>
 #include <MemoryManagement\Singleton.h>
 #include <WindowUtility\Window.h>
 #include <TimeUtility\Timer.h>

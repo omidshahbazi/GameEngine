@@ -11,6 +11,9 @@ namespace Engine.Frontend.System.Build
 {
 	class ModuleBuilder : BaseBuilder
 	{
+		private const string KEY_FRONTENT_HASH = "FH";
+		private const string KEY_REFLECTION_TOOL_HASH = "RTH";
+
 		private TargetBuilder targetBuilder = null;
 		private string sourceCodeRootPath = "";
 
@@ -99,6 +102,8 @@ namespace Engine.Frontend.System.Build
 				}
 				else
 				{
+					FileSystemUtilites.DeleteAllSubs(IntermediateGeneratedDirectory);
+
 					CPPProject cppProject = GenerateProject();
 
 					Compile(cppProject.Profiles[0]);
@@ -113,6 +118,12 @@ namespace Engine.Frontend.System.Build
 					if (Module.GenerateRenderDocSettings)
 						GenerateRenderDocSettings();
 				}
+			}
+			catch (FrontendException ex)
+			{
+				ConsoleHelper.WriteError($"Building {Module.Name} has failed details: ({ex.Message})");
+
+				State = States.Failed;
 			}
 			catch
 			{
@@ -159,7 +170,11 @@ namespace Engine.Frontend.System.Build
 
 			ISerializeObject hashesData = Creator.Create<ISerializeObject>(File.ReadAllText(HashesFilePath));
 
-			bool result = false;
+			if (hashesData.Get<uint>(KEY_FRONTENT_HASH) != EnvironmentHelper.FrontenddToolHash)
+				return true;
+
+			if (Module.GenerateReflection && hashesData.Get<uint>(KEY_REFLECTION_TOOL_HASH) != EnvironmentHelper.GetReflectionToolHash(Configuration, Architecture))
+				return true;
 
 			List<string> extensions = new List<string>();
 			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
@@ -174,10 +189,10 @@ namespace Engine.Frontend.System.Build
 				if (hashesData.Contains(filePathHash) && hashesData.Get<int>(filePathHash) == contentHash)
 					continue;
 
-				result = true;
+				return true;
 			}
 
-			return result;
+			return false;
 		}
 
 		private void GenerateHashes(bool Failed)
@@ -186,6 +201,11 @@ namespace Engine.Frontend.System.Build
 
 			if (!Failed)
 			{
+				hashesData[KEY_FRONTENT_HASH] = EnvironmentHelper.FrontenddToolHash;
+
+				if (Module.GenerateReflection)
+					hashesData[KEY_REFLECTION_TOOL_HASH] = EnvironmentHelper.GetReflectionToolHash(Configuration, Architecture);
+
 				List<string> extensions = new List<string>();
 				extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
 				extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
@@ -299,10 +319,10 @@ namespace Engine.Frontend.System.Build
 
 			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.HeaderFileSearchPattern);
 			foreach (string file in files)
-			{
 				cppProj.AddIncludeFile(file);
 
-				if (Module.GenerateReflection)
+			if (Module.GenerateReflection)
+				foreach (string file in files)
 				{
 					string outputBaseFileName = IntermediateGeneratedDirectory + Path.GetFileNameWithoutExtension(file) + ".Reflection";
 					if (ParseForReflection(file, outputBaseFileName))
@@ -311,7 +331,6 @@ namespace Engine.Frontend.System.Build
 						cppProj.AddCompileFile(outputBaseFileName + EnvironmentHelper.CompileFileExtension);
 					}
 				}
-			}
 
 			files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern);
 			foreach (string file in files)

@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ASTToGLSLCompilerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ASTToGLSLCompilerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("ASTCompiler");
 			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");

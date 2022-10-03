@@ -99,83 +99,32 @@ namespace Engine.Frontend.System
 			targetRules = new RulesRepository<TargetRules>();
 		}
 
-		public void Build(bool ForceToRebuild)
+		public void Build(bool ForceToRebuild, params string[] AdditionalPreprocessors)
 		{
-			builder.Build(ForceToRebuild);
+			if (!BuildInternal(ForceToRebuild, AdditionalPreprocessors))
+				return;
 
-			moduleRules.Clear();
-			targetRules.Clear();
-
-			TargetRules.OperatingSystems operatingSystem;
-			switch (EnvironmentHelper.OperatingSystem)
-			{
-				case EnvironmentHelper.OperatingSystems.Windows:
-					operatingSystem = TargetRules.OperatingSystems.Windows;
-					break;
-				case EnvironmentHelper.OperatingSystems.Linux:
-					operatingSystem = TargetRules.OperatingSystems.Linux;
-					break;
-				default:
-					throw new NotImplementedException($"Handler for {EnvironmentHelper.OperatingSystem} has not implemented");
-			}
-
-			foreach (ProjectBase.ProfileBase.BuildConfigurations buildConfiguration in BuildSystemHelper.BuildConfigurations)
+			foreach (ProjectBase.ProfileBase.BuildConfigurations configuration in BuildSystemHelper.BuildConfigurations)
 				foreach (ProjectBase.ProfileBase.PlatformArchitectures architecture in BuildSystemHelper.PlatformTypes)
 				{
-					BaseRules.Configurations configuration;
-					switch (buildConfiguration)
-					{
-						case ProjectBase.ProfileBase.BuildConfigurations.Debug:
-							configuration = BaseRules.Configurations.Debug;
-							break;
-						case ProjectBase.ProfileBase.BuildConfigurations.Release:
-							configuration = BaseRules.Configurations.Release;
-							break;
-						default:
-							throw new NotImplementedException($"Handler for {buildConfiguration} has not implemented");
-					}
+					LoadModules(configuration, architecture);
 
-					BaseRules.Platforms platform;
-					switch (architecture)
-					{
-						case ProjectBase.ProfileBase.PlatformArchitectures.x86:
-							platform = BaseRules.Platforms.x86;
-							break;
-						case ProjectBase.ProfileBase.PlatformArchitectures.x64:
-							platform = BaseRules.Platforms.x64;
-							break;
-						default:
-							throw new NotImplementedException($"Handler for {architecture} has not implemented");
-					}
+					CheckCircularDependencies(configuration, architecture);
 
-					List<int> nameHashes = new List<int>();
-					foreach (Type moduleType in builder.ModuleTupes)
-					{
-						ModuleRules module = (ModuleRules)Activator.CreateInstance(moduleType, configuration, platform);
-
-						if (nameHashes.Find((int item) => item == module.Name.GetHashCode()) != 0)
-							throw new FrontendException($"A module with same name of {module.Name} already exists");
-
-						nameHashes.Add(module.Name.GetHashCode());
-
-						moduleRules.Add(buildConfiguration, architecture, module);
-					}
-
-					CheckCircularDependencies(buildConfiguration, architecture);
-
-					nameHashes.Clear();
-					foreach (Type targetType in builder.TargetTypes)
-					{
-						TargetRules target = (TargetRules)Activator.CreateInstance(targetType, operatingSystem, configuration, platform);
-
-						if (nameHashes.Find((int item) => item == target.ModuleName.GetHashCode()) != 0)
-							throw new FrontendException($"A target with same name of {target.ModuleName} already exists");
-
-						nameHashes.Add(target.ModuleName.GetHashCode());
-
-						targetRules.Add(buildConfiguration, architecture, (TargetRules)Activator.CreateInstance(targetType, operatingSystem, configuration, platform));
-					}
+					LoadTargets(configuration, architecture);
 				}
+		}
+
+		public void Build(bool ForceToRebuild, ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture, params string[] AdditionalPreprocessors)
+		{
+			if (!BuildInternal(ForceToRebuild, AdditionalPreprocessors))
+				return;
+
+			LoadModules(Configuration, Architecture);
+
+			CheckCircularDependencies(Configuration, Architecture);
+
+			LoadTargets(Configuration, Architecture);
 		}
 
 		public ModuleRules[] GetModuleRules(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
@@ -206,6 +155,42 @@ namespace Engine.Frontend.System
 			throw new FrontendException($"Couldn't find {Name} target rules");
 		}
 
+		private bool BuildInternal(bool ForceToRebuild, params string[] AdditionalPreprocessors)
+		{
+			bool built = builder.Built && !ForceToRebuild;
+
+			builder.Build(ForceToRebuild, AdditionalPreprocessors);
+
+			if (built)
+				return false;
+
+			moduleRules.Clear();
+			targetRules.Clear();
+
+			return true;
+		}
+
+		private void LoadModules(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			ConsoleHelper.WriteInfo($"Loading Modules for {Configuration} {Architecture}");
+
+			BaseRules.OperatingSystems operatingSystem = GetOperatingSystem();
+			BaseRules.Configurations configuration = GetConfiguration(Configuration);
+			BaseRules.Platforms platform = GetPlatform(Architecture);
+
+			List<int> nameHashes = new List<int>();
+			foreach (Type moduleType in builder.ModuleTupes)
+			{
+				ModuleRules module = (ModuleRules)Activator.CreateInstance(moduleType, operatingSystem, configuration, platform);
+
+				if (nameHashes.Find((int item) => item == module.Name.GetHashCode()) != 0)
+					throw new FrontendException($"A module with same name of {module.Name} already exists");
+
+				nameHashes.Add(module.Name.GetHashCode());
+				moduleRules.Add(Configuration, Architecture, module);
+			}
+		}
+
 		private void CheckCircularDependencies(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
 			ConsoleHelper.WriteInfo($"Check for Circular Dependencies {Configuration} {Architecture}");
@@ -216,6 +201,28 @@ namespace Engine.Frontend.System
 			{
 				Stack<string> stack = new Stack<string>();
 				CheckCircularDependencies(builder, Configuration, Architecture, stack);
+			}
+		}
+
+		private void LoadTargets(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			ConsoleHelper.WriteInfo($"Loading Targets for {Configuration} {Architecture}");
+
+			BaseRules.OperatingSystems operatingSystem = GetOperatingSystem();
+			BaseRules.Configurations configuration = GetConfiguration(Configuration);
+			BaseRules.Platforms platform = GetPlatform(Architecture);
+
+			List<int> nameHashes = new List<int>();
+			foreach (Type targetType in builder.TargetTypes)
+			{
+				TargetRules target = (TargetRules)Activator.CreateInstance(targetType, operatingSystem, configuration, platform);
+
+				if (nameHashes.Find((int item) => item == target.ModuleName.GetHashCode()) != 0)
+					throw new FrontendException($"A target with same name of {target.ModuleName} already exists");
+
+				nameHashes.Add(target.ModuleName.GetHashCode());
+
+				targetRules.Add(Configuration, Architecture, (TargetRules)Activator.CreateInstance(targetType, operatingSystem, configuration, platform));
 			}
 		}
 
@@ -233,6 +240,51 @@ namespace Engine.Frontend.System
 			}
 
 			ModuleNameStack.Pop();
+		}
+
+		private static BaseRules.OperatingSystems GetOperatingSystem()
+		{
+			switch (EnvironmentHelper.OperatingSystem)
+			{
+				case EnvironmentHelper.OperatingSystems.Windows:
+					return BaseRules.OperatingSystems.Windows;
+
+				case EnvironmentHelper.OperatingSystems.Linux:
+					return BaseRules.OperatingSystems.Linux;
+
+				default:
+					throw new NotImplementedException($"Handler for {EnvironmentHelper.OperatingSystem} has not implemented");
+			}
+		}
+
+		private static BaseRules.Platforms GetPlatform(ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			switch (Architecture)
+			{
+				case ProjectBase.ProfileBase.PlatformArchitectures.x86:
+					return BaseRules.Platforms.x86;
+
+				case ProjectBase.ProfileBase.PlatformArchitectures.x64:
+					return BaseRules.Platforms.x64;
+
+				default:
+					throw new NotImplementedException($"Handler for {Architecture} has not implemented");
+			}
+		}
+
+		private static BaseRules.Configurations GetConfiguration(ProjectBase.ProfileBase.BuildConfigurations BuildConfiguration)
+		{
+			switch (BuildConfiguration)
+			{
+				case ProjectBase.ProfileBase.BuildConfigurations.Debug:
+					return BaseRules.Configurations.Debug;
+
+				case ProjectBase.ProfileBase.BuildConfigurations.Release:
+					return BaseRules.Configurations.Release;
+
+				default:
+					throw new NotImplementedException($"Handler for {BuildConfiguration} has not implemented");
+			}
 		}
 	}
 }

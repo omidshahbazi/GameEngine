@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef REFLECTION_TYPE_H
-#define REFLECTION_TYPE_H
+#ifndef AST_TYPE_H
+#define AST_TYPE_H
 
 #include <Containers\Strings.h>
 

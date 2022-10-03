@@ -27,14 +27,14 @@ namespace Engine
 			return (PlatformOS::Handle)GetModuleHandleW(ModuleName);
 		}
 
-		void* PlatformOS::GetProcedureAddress(Handle Handle, cstr Name)
-		{
-			return GetProcAddress((HMODULE)Handle, Name);
-		}
-
 		PlatformOS::Handle PlatformOS::GetExecutingModuleInstance(void)
 		{
 			return GetModuleInstance(nullptr);
+		}
+
+		void* PlatformOS::GetProcedureAddress(Handle Handle, cstr Name)
+		{
+			return GetProcAddress((HMODULE)Handle, Name);
 		}
 
 		void PlatformOS::GetExecutablePath(wstr Path)

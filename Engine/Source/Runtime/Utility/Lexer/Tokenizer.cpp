@@ -12,24 +12,24 @@ namespace Engine
 	namespace Lexer
 	{
 		Tokenizer::Tokenizer(const String& Text) :
-			m_CurrentIndex(0),
+			m_Text(Text),
 			m_PrevIndex(0),
-			m_CurrentLineIndex(0),
+			m_CurrentIndex(0),
 			m_PrevLineIndex(0),
-			m_CurrentColumnIndex(0),
+			m_CurrentLineIndex(0),
 			m_PrevColumnIndex(0),
-			m_Text(Text)
+			m_CurrentColumnIndex(0)
 		{
 		}
 
-		void Tokenizer::Parse(void)
+		void Tokenizer::Reset(void)
 		{
-			m_CurrentIndex = 0;
 			m_PrevIndex = 0;
-			m_CurrentLineIndex = 0;
+			m_CurrentIndex = 0;
 			m_PrevLineIndex = 0;
-			m_CurrentColumnIndex = 0;
+			m_CurrentLineIndex = 0;
 			m_PrevColumnIndex = 0;
+			m_CurrentColumnIndex = 0;
 		}
 
 		bool Tokenizer::GetToken(Token& Token)
@@ -43,140 +43,16 @@ namespace Engine
 				return false;
 			}
 
-			Token.SetStartIndex(m_PrevIndex);
-			Token.SetLineIndex(m_PrevLineIndex);
-			Token.SetColumnIndex(m_PrevColumnIndex);
-			Token.SetIdentifier("");
+			FillDebugInfo(Token);
 
-			if (IsAlphabetic(c))
-			{
-				do
-				{
-					Token.GetIdentifier() += c;
-					c = GetChar();
-				} while (IsAlphanumeric(c));
-
-				UngetChar();
-
-				Token.SetType(Token::Types::Identifier);
-				//Token.SetName(Token.GetName());
-
-				if (Token.Matches("true", Token::SearchCases::CaseSensitive))
-				{
-					Token.SetConstantBool(true);
-					return true;
-				}
-				else if (Token.Matches("false", Token::SearchCases::CaseSensitive))
-				{
-					Token.SetConstantBool(false);
-					return true;
-				}
-
-				return true;
-			}
-			else if (IsDigit(c) || ((c == PLUS || c == MINES) && IsDigit(p)))
-			{
-				bool isFloat = false;
-				bool isHex = false;
-
-				do
-				{
-					if (c == DOT)
-						isFloat = true;
-
-					if (c == UPPER_X || c == LOWER_X)
-						isHex = true;
-
-					Token.GetIdentifier() += c;
-
-					c = CharacterUtility::ToUpper(GetChar());
-
-				} while (IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
-
-				if (isFloat || c != UPPER_F)
-					UngetChar();
-
-				if (isFloat)
-					Token.SetConstantFloat32(StringUtility::ToFloat32(Token.GetIdentifier()));
-				else if (isHex)
-					Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
-				else
-					Token.SetConstantInt32(StringUtility::ToInt32(Token.GetIdentifier()));
-
-				return true;
-			}
+			if (CharacterUtility::IsAlphabetic(c))
+				return FillIdentifier(c, false, Token);
+			else if (CharacterUtility::IsDigit(c) || ((c == PLUS || c == MINES) && CharacterUtility::IsDigit(p)))
+				return FillIntegralConstant(c, false, Token);
 			else if (c == DOUBLE_QUOTATION)
-			{
-				String temp;
-				c = GetChar(true);
-				while (c != DOUBLE_QUOTATION && !IsEOL(c))
-				{
-					if (c == BACK_SLASH)
-					{
-						c = GetChar(true);
-
-						if (IsEOL(c))
-							break;
-						else if (c == 'n')
-							c = '\n';
-					}
-
-					temp += c;
-
-					c = GetChar(true);
-				}
-
-				Token.SetConstantString(temp);
-
-				return true;
-			}
+				return FillStringConstant(c, false, Token);
 			else
-			{
-				Token.GetIdentifier() += c;
-
-#define PAIR(cc, dd) (c == cc && d == dd)
-
-				char8 d = GetChar();
-
-				if (PAIR('<', '<') ||
-					PAIR('>', '>') ||
-					PAIR('=', '=') ||
-					PAIR('!', '=') ||
-					PAIR('<', '=') ||
-					PAIR('>', '=') ||
-					PAIR('+', '+') ||
-					PAIR('-', '-') ||
-					PAIR('|', '|') ||
-					PAIR('^', '^') ||
-					PAIR('&', '&') ||
-					PAIR('+', '=') ||
-					PAIR('-', '=') ||
-					PAIR('*', '=') ||
-					PAIR('/', '=') ||
-					PAIR('~', '=') ||
-					PAIR(':', ':') ||
-					PAIR('*', '*'))
-				{
-					Token.GetIdentifier() += d;
-
-					if (c == '>' && d == '>')
-					{
-						if (GetChar() == '>')
-							Token.GetIdentifier() += '>';
-						else
-							UngetChar();
-					}
-				}
-				else
-					UngetChar();
-
-#undef PAIR
-
-				Token.SetType(Token::Types::Symbol);
-				Token.SetName(Token.GetIdentifier());
-
-				return true;
-			}
+				return FillSymbol(c, false, false, Token);
 		}
 
 		void Tokenizer::UngetToken(const Token& Token)
@@ -184,6 +60,172 @@ namespace Engine
 			m_CurrentIndex = Token.GetStartIndex();
 			m_CurrentLineIndex = Token.GetLineIndex();
 			m_CurrentColumnIndex = Token.GetColumnIndex();
+		}
+
+		void Tokenizer::FillDebugInfo(Token& Token)
+		{
+			Token.SetStartIndex(m_PrevIndex);
+			Token.SetLineIndex(m_PrevLineIndex);
+			Token.SetColumnIndex(m_PrevColumnIndex);
+		}
+
+		bool Tokenizer::FillIdentifier(char8 c, bool NoConst, Token& Token)
+		{
+			String name = Token.GetName();
+
+			do
+			{
+				name += c;
+				c = GetChar();
+			} while (CharacterUtility::IsAlphanumeric(c));
+
+			UngetChar();
+
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+			{
+				if (name == "true")
+					Token.SetConstantBool(true);
+				else if (name == "false")
+					Token.SetConstantBool(false);
+				else
+					Token.SetIdentifier(name);
+			}
+
+			return true;
+		}
+
+		bool Tokenizer::FillIntegralConstant(char8 c, bool NoConst, Token& Token)
+		{
+			String name = Token.GetName();
+
+			bool isFloat = false;
+			bool isHex = false;
+
+			do
+			{
+				if (c == DOT)
+					isFloat = true;
+
+				if (c == UPPER_X || c == LOWER_X)
+					isHex = true;
+
+				name += c;
+
+				c = CharacterUtility::ToUpper(GetChar());
+
+			} while (CharacterUtility::IsDigit(c) || (!isFloat && c == DOT) || (!isHex && c == UPPER_X) || (isHex && c >= UPPER_A && c <= UPPER_F));
+
+			if (isFloat || c != UPPER_F)
+				UngetChar();
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+			{
+				if (isFloat)
+				{
+					float64 value = StringUtility::ToFloat64(name);
+					if (value > 0x7FFFFFFF)
+						Token.SetConstantFloat64(value);
+					else
+						Token.SetConstantFloat32(value);
+				}
+				else
+				{
+					int64 value = StringUtility::ToInt64(name);
+					if (value > 0x7FFFFFFF)
+						Token.SetConstantInt64(value);
+					else
+						Token.SetConstantInt32(value);
+				}
+			}
+
+			return true;
+		}
+
+		bool Tokenizer::FillStringConstant(char8 c, bool NoConst, Token& Token)
+		{
+			String name = Token.GetName();
+
+			c = GetChar(true);
+			while (c != DOUBLE_QUOTATION && !CharacterUtility::IsEOL(c))
+			{
+				if (c == BACK_SLASH)
+				{
+					c = GetChar(true);
+
+					if (CharacterUtility::IsEOL(c))
+						break;
+					else if (c == 'n')
+						c = '\n';
+				}
+
+				name += c;
+
+				c = GetChar(true);
+			}
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+				Token.SetConstantString(name);
+
+			return true;
+		}
+
+		bool Tokenizer::FillSymbol(char8 c, bool NoConst, bool DetectCloseTemplateBracket, Token& Token)
+		{
+			String name = Token.GetName();
+
+			name += c;
+
+#define PAIR(cc, dd) (c == cc && d == dd)
+
+			char8 d = GetChar();
+
+			if (PAIR('<', '<') ||
+				(PAIR('>', '>') && !DetectCloseTemplateBracket) ||
+				PAIR('=', '=') ||
+				PAIR('!', '=') ||
+				PAIR('<', '=') ||
+				PAIR('>', '=') ||
+				PAIR('+', '+') ||
+				PAIR('-', '-') ||
+				PAIR('|', '|') ||
+				PAIR('^', '^') ||
+				PAIR('&', '&') ||
+				PAIR('+', '=') ||
+				PAIR('-', '=') ||
+				PAIR('*', '=') ||
+				PAIR('/', '=') ||
+				PAIR('~', '=') ||
+				PAIR(':', ':') ||
+				PAIR('*', '*'))
+			{
+				name += d;
+
+				if (c == '>' && d == '>')
+				{
+					if (GetChar() == '>')
+						name += '>';
+					else
+						UngetChar();
+				}
+			}
+			else
+				UngetChar();
+
+#undef PAIR
+
+			if (NoConst)
+				Token.SetIdentifier(name);
+			else
+				Token.SetSymbol(name);
+
+			return true;
 		}
 
 		char8 Tokenizer::GetChar(bool Literal)
@@ -242,7 +284,7 @@ namespace Engine
 					if (c == trailingCommentNewline)
 						multipleNewline = true;
 
-				} while (IsWhitespace(c));
+				} while (CharacterUtility::IsWhitespace(c));
 
 				if (!(c == SLASH && PeekChar() == SLASH))
 					return c;
@@ -259,7 +301,7 @@ namespace Engine
 					if (c == '\0')
 						return c;
 
-				} while (!IsEOL(c));
+				} while (!CharacterUtility::IsEOL(c));
 
 				trailingCommentNewline = c;
 
@@ -270,7 +312,7 @@ namespace Engine
 					if (c == '\0')
 						return c;
 
-					if (c == trailingCommentNewline || !IsEOL(c))
+					if (c == trailingCommentNewline || !CharacterUtility::IsEOL(c))
 					{
 						UngetChar();
 						break;
@@ -281,48 +323,66 @@ namespace Engine
 			return '\0';
 		}
 
-		void Tokenizer::RequireToken(Token& Token)
+		void Tokenizer::RequireToken(Token& Token, const String& Tag)
 		{
 			if (GetToken(Token))
 				return;
 
-			THROW_LEXER_EXCEPTION("Token required");
-		}
-
-		void Tokenizer::RequireIdentifierToken(Token& Token)
-		{
-			if (MatchIdentifierToken(Token))
-				return;
-
-			THROW_LEXER_EXCEPTION("Missing an identifier");
-		}
-
-		void Tokenizer::RequireConstantToken(Token& Token)
-		{
-			if (MatchConstantToken(Token))
-				return;
-
-			THROW_LEXER_EXCEPTION("Missing an constant");
+			ThrowRequiredException(Tag);
 		}
 
 		bool Tokenizer::MatchIdentifierToken(Token& Token)
 		{
-			RequireToken(Token);
+			RequireToken(Token, "identifier token parsing");
 
-			if (Token.GetTokenType() != Token::Types::Identifier)
+			if (Token.GetType() != Token::Types::Identifier)
 			{
 				UngetToken(Token);
 				return false;
 			}
 
 			return true;
+		}
+
+		void Tokenizer::RequireIdentifierToken(Token& Token, const String& Tag)
+		{
+			if (MatchIdentifierToken(Token))
+				return;
+
+			ThrowRequiredException(Tag);
+		}
+
+		bool Tokenizer::MatchSymbolToken(Token& Token)
+		{
+			RequireToken(Token, "identifier token parsing");
+
+			if (Token.GetType() != Token::Types::Symbol)
+			{
+				UngetToken(Token);
+				return false;
+			}
+
+			return true;
+		}
+
+		void Tokenizer::RequireSymbolToken(Token& Token, const String& Tag)
+		{
+			if (MatchSymbolToken(Token))
+				return;
+
+			ThrowRequiredException(Tag);
 		}
 
 		bool Tokenizer::MatchConstantToken(Token& Token)
 		{
-			RequireToken(Token);
+			RequireToken(Token, "identifier token parsing");
 
-			if (Token.GetTokenType() != Token::Types::Constant)
+			if (Token.GetType() != Token::Types::ConstantBool &&
+				Token.GetType() != Token::Types::ConstantInt32 &&
+				Token.GetType() != Token::Types::ConstantInt64 &&
+				Token.GetType() != Token::Types::ConstantFloat32 &&
+				Token.GetType() != Token::Types::ConstantFloat64 &&
+				Token.GetType() != Token::Types::ConstantString)
 			{
 				UngetToken(Token);
 				return false;
@@ -331,21 +391,21 @@ namespace Engine
 			return true;
 		}
 
-		void Tokenizer::RequireSymbol(const String& Match, const String& Tag)
+		void Tokenizer::RequireConstantToken(Token& Token, const String& Tag)
 		{
-			if (MatchSymbol(Match))
+			if (MatchConstantToken(Token))
 				return;
 
-			THROW_LEXER_EXCEPTION("Missing symbol '" + Match + "' in " + Tag);
+			ThrowRequiredException(Tag);
 		}
 
-		bool Tokenizer::MatchSymbol(const String& Match)
+		bool Tokenizer::MatchIdentifier(const String& Match)
 		{
 			Token token;
 			if (!GetToken(token))
 				return false;
 
-			if (token.GetTokenType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
+			if (token.GetType() == Token::Types::Identifier && token.Matches(Match, Token::SearchCases::IgnoreCase))
 				return true;
 
 			UngetToken(token);
@@ -358,21 +418,47 @@ namespace Engine
 			if (MatchIdentifier(Match))
 				return;
 
-			THROW_LEXER_EXCEPTION("Missing identifier '" + Match + "' in " + Tag);
+			ThrowMissingException(Match, Tag);
 		}
 
-		bool Tokenizer::MatchIdentifier(const String& Match)
+		bool Tokenizer::MatchSymbol(const String& Match)
 		{
 			Token token;
 			if (!GetToken(token))
 				return false;
 
-			if (token.GetTokenType() == Token::Types::Identifier && token.Matches(Match, Token::SearchCases::IgnoreCase))
+			if (token.GetType() == Token::Types::Symbol && token.Matches(Match, Token::SearchCases::CaseSensitive))
 				return true;
 
 			UngetToken(token);
 
 			return false;
+		}
+
+		void Tokenizer::RequireSymbol(const String& Match, const String& Tag)
+		{
+			if (MatchSymbol(Match))
+				return;
+
+			ThrowMissingException(Match, Tag);
+		}
+
+		void Tokenizer::ThrowRequiredException(const String& Tag)
+		{
+			Token token;
+			if (GetToken(token))
+				THROW_LEXER_EXCEPTION("Missing token before '" + token.GetName() + "' " + Tag);
+			else
+				THROW_LEXER_EXCEPTION("Missing token " + Tag);
+		}
+
+		void Tokenizer::ThrowMissingException(const String& Match, const String& Tag)
+		{
+			Token token;
+			if (GetToken(token))
+				THROW_LEXER_EXCEPTION("Missing '" + Match + "' before '" + token.GetName() + "' " + Tag);
+			else
+				THROW_LEXER_EXCEPTION("Missing '" + Match + "' " + Tag);
 		}
 	}
 }

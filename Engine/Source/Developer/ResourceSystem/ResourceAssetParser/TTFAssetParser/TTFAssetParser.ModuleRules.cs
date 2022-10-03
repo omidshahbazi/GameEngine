@@ -13,8 +13,8 @@ namespace Engine.Developer.ResourceSystem.ResourceAssetParser
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public TTFAssetParserModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public TTFAssetParserModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("FreeType");
 

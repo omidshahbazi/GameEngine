@@ -16,8 +16,6 @@ namespace Engine.Frontend.System.Build
 		{
 		}
 
-		private bool alreadyBuilt = false;
-
 		private TypeList moduleTypes = null;
 		private TypeList targetTypes = null;
 
@@ -36,6 +34,12 @@ namespace Engine.Frontend.System.Build
 			get { return targetTypes.ToArray(); }
 		}
 
+		public bool Built
+		{
+			get;
+			private set;
+		}
+
 		public RulesLibraryBuilder(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture) :
 			base(Configuration, Architecture)
 		{
@@ -45,17 +49,17 @@ namespace Engine.Frontend.System.Build
 			Initialize();
 		}
 
-		public override void Build(bool ForceToRebuild)
+		public void Build(bool ForceToRebuild, params string[] AdditionalPreprocessors)
 		{
 			if (ForceToRebuild)
 			{
-				alreadyBuilt = false;
+				Built = false;
 
 				moduleTypes.Clear();
 				targetTypes.Clear();
 			}
 
-			if (alreadyBuilt)
+			if (Built)
 				return;
 
 			CSProject csproj = new CSProject();
@@ -66,9 +70,13 @@ namespace Engine.Frontend.System.Build
 			profile.OutputPath = IntermediateOutputPath;
 			profile.IntermediateDirectory = ModuleName.GetIntermediateDirectory();
 			profile.OutputType = ProjectBase.ProfileBase.OutputTypes.DynamicLinkLibrary;
+
 			profile.AddPreprocessorDefinition(Configuration.GetPreprocessor());
 			profile.AddPreprocessorDefinition(Architecture.GetPreprocessor());
 			profile.AddPreprocessorDefinition(EnvironmentHelper.OperatingSystem.GetPreprocessor());
+			foreach (string preprocessor in AdditionalPreprocessors)
+				profile.AddPreprocessorDefinition(preprocessor);
+
 			csproj.AddReferenceBinaryFile(EnvironmentHelper.FrontenddToolPath);
 
 			string[] files = FileSystemUtilites.GetAllFiles(EnvironmentHelper.SourceDirectory, $"*{ModuleRules.FilePostfix}", $"*{TargetRules.FilePostfix}");
@@ -99,7 +107,12 @@ namespace Engine.Frontend.System.Build
 
 			ConsoleHelper.WriteInfo($"Building rules took {(DateTime.Now - startTime).ToHHMMSS()}");
 
-			alreadyBuilt = true;
+			Built = true;
+		}
+
+		public override void Build(bool ForceToRebuild)
+		{
+			Build(ForceToRebuild);
 		}
 
 		protected override void CreateDirectories()

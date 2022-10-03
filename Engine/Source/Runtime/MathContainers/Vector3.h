@@ -4,7 +4,6 @@
 #define VECTOR_3_H
 
 #include <Mathematics\Math.h>
-#include <Common\Definitions.h>
 
 namespace Engine
 {
@@ -12,8 +11,7 @@ namespace Engine
 
 	namespace MathContainers
 	{
-		WRAPPER_DATA_STRUCTURE()
-			template<typename T>
+		template<typename T>
 		class Vector3
 		{
 		public:

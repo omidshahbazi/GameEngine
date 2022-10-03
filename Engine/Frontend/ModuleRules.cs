@@ -91,7 +91,7 @@ namespace Engine
 			set;
 		}
 
-		public ModuleRules(Configurations Configuration, Platforms Platform)
+		public ModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform)
 		{
 			TargetName = Name;
 

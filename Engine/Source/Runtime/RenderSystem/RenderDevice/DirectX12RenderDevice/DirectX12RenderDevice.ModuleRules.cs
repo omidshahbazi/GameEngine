@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.RenderDevice
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public DirectX12RenderDeviceModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public DirectX12RenderDeviceModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Containers");

@@ -13,8 +13,8 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ProgramCompilerCommonModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ProgramCompilerCommonModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Common");
 		}

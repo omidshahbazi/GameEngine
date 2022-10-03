@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef PARAMETER_TYPE_H
-#define PARAMETER_TYPE_H
+#ifndef AST_PARAMETER_TYPE_H
+#define AST_PARAMETER_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\VariableType.h>
 

@@ -4,9 +4,12 @@
 #define UNARY_OPERATOR_STATEMENT_H
 
 #include <ProgramParser\AbstractSyntaxTree\Statement.h>
+#include <Containers\Exception.h>
 
 namespace Engine
 {
+	using namespace Containers;
+
 	namespace ProgramParser
 	{
 		namespace AbstractSyntaxTree
@@ -61,44 +64,50 @@ namespace Engine
 				{
 					String result;
 
-					result += GetPrefixOperatorSymbol(m_Operator);
+					switch (m_Operator)
+					{
+					case Operators::Exlamation:
+					case Operators::Minus:
+					case Operators::PrefixIncrement:
+					case Operators::PrefixDecrement:
+						result += GetOperatorSymbol(m_Operator);
+						break;
+					}
 
 					result += m_Statement->ToString();
 
-					result += GetPostfixOperatorSymbol(m_Operator);
+					switch (m_Operator)
+					{
+					case Operators::PostfixIncrement:
+					case Operators::PostfixDecrement:
+						result += GetOperatorSymbol(m_Operator);
+						break;
+					}
 
 					return result;
 				}
 
 			public:
-				static String GetPrefixOperatorSymbol(Operators Operator)
+				static String GetOperatorSymbol(Operators Operator)
 				{
 					switch (Operator)
 					{
 					case Operators::Exlamation:
-						return "!";
+						return STRINGIZE(!);
+
 					case Operators::Minus:
-						return "-";
+						return STRINGIZE(-);
+
 					case Operators::PrefixIncrement:
-						return "++";
-					case Operators::PrefixDecrement:
-						return "--";
-					}
-
-					return "";
-				}
-
-				static String GetPostfixOperatorSymbol(Operators Operator)
-				{
-					switch (Operator)
-					{
 					case Operators::PostfixIncrement:
-						return "++";
+						return STRINGIZE(++);
+
+					case Operators::PrefixDecrement:
 					case Operators::PostfixDecrement:
-						return "--";
+						return STRINGIZE(--);
 					}
 
-					return "";
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 			private:

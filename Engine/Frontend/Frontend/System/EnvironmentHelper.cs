@@ -2,9 +2,11 @@
 using Engine.Frontend.Project;
 using Engine.Frontend.Utilities;
 using GameFramework.ASCIISerializer;
+using GameFramework.Common.Utilities;
 using System;
 using System.IO;
 using System.Reflection;
+using Version = System.Version;
 
 namespace Engine.Frontend.System
 {
@@ -31,13 +33,15 @@ namespace Engine.Frontend.System
 
 		private static Type monoRuntime = Type.GetType("Mono.Runtime");
 
-		public static readonly string HeaderFileExtension = ".h";
-		public static readonly string CompileFileExtension = ".cpp";
+		public const string HeaderFileExtension = ".h";
+		public const string CompileFileExtension = ".cpp";
 
 		public static readonly string[] HeaderFileSearchPattern = new string[] { "*.h", "*.hpp" };
 		public static readonly string[] CompileFileSearchPattern = new string[] { "*.cpp", "*.c", "*.cxx" };
 		public static readonly string[] CSharpFileSearchPattern = new string[] { "*.cs" };
 		public static readonly string[] DebugVisualizerFileSearchPattern = new string[] { "*.natvis" };
+
+		public const string DebugModeProjectPreprocessor = "DEBUG_MODE_PROJECT";
 
 		private static string FrontenddToolDirectory
 		{
@@ -96,6 +100,12 @@ namespace Engine.Frontend.System
 			get { return Assembly.GetExecutingAssembly().Location; }
 		}
 
+		public static uint FrontenddToolHash
+		{
+			get;
+			private set;
+		}
+
 		public static string BinariesDirectory
 		{
 			get { return Path.GetFullPath($"{FrontenddToolDirectory}..{PathSeparator}..{PathSeparator}{BinariesPathName}{PathSeparator}"); }
@@ -141,11 +151,18 @@ namespace Engine.Frontend.System
 
 			Version = new Version(obj.Get<string>("Version", "0.0.0.0"));
 			Copyright = obj.Get<string>("Copyright");
+
+			FrontenddToolHash = FileHelper.GetHash(FrontenddToolPath);
 		}
 
 		public static string GetReflectionToolPath(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
 		{
 			return GetOutputDirectory(Configuration, Architecture) + ReflectionToolFileName + ExecutableExtensions;
+		}
+
+		public static uint GetReflectionToolHash(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)
+		{
+			return FileHelper.GetHash(GetReflectionToolPath(Configuration, Architecture));
 		}
 
 		public static string GetOutputPathName(ProjectBase.ProfileBase.BuildConfigurations Configuration, ProjectBase.ProfileBase.PlatformArchitectures Architecture)

@@ -13,8 +13,8 @@ namespace Engine.Runtime
 			get { return UseTypes.DynamicLibrary; }
 		}
 
-		public ProfilerModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public ProfilerModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("Common");
 			PrivateDependencyModuleNames.Add("Containers");

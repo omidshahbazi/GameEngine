@@ -13,8 +13,8 @@ namespace Engine.Test
 			get { return UseTypes.Executable; }
 		}
 
-		public TestDockableModuleRules(Configurations Configuration, Platforms Platform) :
-			base(Configuration, Platform)
+		public TestDockableModuleRules(OperatingSystems OperatingSystem, Configurations Configuration, Platforms Platform) :
+			base(OperatingSystem, Configuration, Platform)
 		{
 			PrivateDependencyModuleNames.Add("FileUtility");
 			PrivateDependencyModuleNames.Add("RenderSystem");

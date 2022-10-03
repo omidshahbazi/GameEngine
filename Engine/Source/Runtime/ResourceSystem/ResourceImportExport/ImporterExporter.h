@@ -19,7 +19,7 @@ namespace Engine
 
 	namespace ResourceImportExport
 	{
-		REFLECTION_STRUCT()
+		REFLECTION_OBJECT()
 			class RESOURCEIMPORTEXPORT_API ImporterExporter
 		{
 			IMPORTEREXPORTER_OBJECT()

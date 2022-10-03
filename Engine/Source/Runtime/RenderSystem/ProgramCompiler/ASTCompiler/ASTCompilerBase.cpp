@@ -172,7 +172,10 @@ namespace Engine
 				for (auto parameter : function->GetParameters())
 					m_Variables[parameter->GetName()] = parameter->GetDataType();
 
-				BuildFunction(function, Stage, Shader);
+				if (function->IsEntrypoint())
+					BuildEntrypointFunction(function, Stage, Shader);
+				else
+					BuildFunction(function, Stage, Shader);
 
 				while (m_OpenScopeCount > 0)
 				{
@@ -183,6 +186,33 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 			}
+		}
+
+		void ASTCompilerBase::BuildEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader)
+		{
+			if (Stage == Stages::Hull)
+			{
+				const ConstantEntrypointAttributeType* constantEntryPoint = Function->GetAttribute<ConstantEntrypointAttributeType>();
+
+				const StructType* structType = FindStructType(Function->GetReturnDataType()->GetUserDefined());
+				if (structType == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find %S struct type", Function->GetReturnDataType()->GetUserDefined());
+
+				StructVariableType::Registers requiredRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
+				uint8 requiredRegisterCount = 2;
+
+				for (uint8 i = 0; i < requiredRegisterCount; ++i)
+				{
+					StructVariableType::Registers reg = requiredRegisters[i];
+
+					if (structType->GetItems().ContainsIf([reg](auto item) { return item->GetRegister() == reg; }))
+						continue;
+
+					THROW_PROGRAM_COMPILER_EXCEPTION(StringUtility::Format<char8>("A variable with %S is required inside %S", StructVariableType::GetRegisterName(reg), structType->GetName()), Function->GetName());
+				}
+			}
+
+			BuildFunction(Function, Stage, Shader);
 		}
 
 		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader)

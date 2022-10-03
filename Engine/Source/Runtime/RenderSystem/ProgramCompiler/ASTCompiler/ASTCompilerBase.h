@@ -98,6 +98,8 @@ namespace Engine
 
 			virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) = 0;
 
+			virtual void BuildEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader);
+
 			virtual void BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildAttribute(BaseAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader);

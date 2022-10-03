@@ -8,12 +8,10 @@ namespace Engine
 
 	namespace Allocators
 	{
-		const uint64 RESERVE_SIZE = 16 * GigaByte;
-
 		SINGLETON_DEFINITION(RootAllocator);
 
-		RootAllocator::RootAllocator(void) :
-			DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance(), RESERVE_SIZE)
+		RootAllocator::RootAllocator(uint64 ReserveSize) :
+			DynamicSizeAllocator("Root Allocator", DefaultAllocator::GetInstance(), ReserveSize)
 		{
 		}
 	}

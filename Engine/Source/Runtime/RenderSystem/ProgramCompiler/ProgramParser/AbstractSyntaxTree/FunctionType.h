@@ -57,6 +57,16 @@ namespace Engine
 					return m_Attributes;
 				}
 
+				template<typename T>
+				const T* GetAttribute(void) const
+				{
+					int32 index = m_Attributes.FindIf([](auto attributeType) { return attributeType->GetType() == TypeOf(T); });
+					if (index == -1)
+						return nullptr;
+
+					return ReinterpretCast(const T*, m_Attributes[index]);
+				}
+
 				void SetReturnDataType(DataTypeStatement* Type)
 				{
 					m_ReturnType = Type;

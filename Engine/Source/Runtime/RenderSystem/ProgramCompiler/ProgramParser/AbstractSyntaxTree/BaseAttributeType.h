@@ -4,6 +4,7 @@
 #define BASE_ATTRIBUTE_TYPE_H
 
 #include <Containers\Strings.h>
+#include <BaseAttributeType.Reflection.h>
 
 namespace Engine
 {
@@ -13,8 +14,11 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
+			REFLECTION_OBJECT()
 			class PROGRAMPARSER_API BaseAttributeType
 			{
+				BASEATTRIBUTETYPE_OBJECT()
+
 			public:
 				BaseAttributeType(void)
 				{

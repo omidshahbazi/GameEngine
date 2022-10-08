@@ -112,7 +112,7 @@ namespace Engine
 					ADD_TO_RESULT(StringUtility::ToString<char8>(token.GetConstantFloat64()));
 					break;
 
-				case Token::Types::ConstantFloat64:
+				case Token::Types::ConstantString:
 					ADD_TO_RESULT("\"" + token.GetConstantString() + "\"");
 					break;
 

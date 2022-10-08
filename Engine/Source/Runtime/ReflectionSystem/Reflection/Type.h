@@ -37,6 +37,16 @@ namespace Engine
 
 			virtual String GetFullQualifiedName(void) const;
 
+			bool operator==(const Type& Other) const
+			{
+				return (m_TypeID == Other.m_TypeID);
+			}
+
+			bool operator!=(const Type& Other) const
+			{
+				return (m_TypeID != Other.m_TypeID);
+			}
+
 		protected:
 			uint32 m_TypeID;
 			String m_Name;

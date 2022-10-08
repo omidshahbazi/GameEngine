@@ -289,16 +289,21 @@ namespace Engine
 			void HeaderParser::PushNamespace(void)
 			{
 				Token nameToken;
-
 				while (!MatchSymbol(OPEN_BRACKET))
 					RequireToken(nameToken, "reading namespace");
 
-				m_Namespaces.Push(nameToken.GetName());
+				m_Namespaces.Push({ m_BlockLevel, nameToken.GetName() });
+
+				IncreaseBlockLevel();
 			}
 
 			void HeaderParser::PopNamespace(void)
 			{
-				m_Namespaces.Pop();
+				NamespaceInfo info;
+				m_Namespaces.Peek(&info);
+
+				if (info.GetFirst() == m_BlockLevel)
+					m_Namespaces.Pop();
 			}
 
 			String HeaderParser::GetFullNamespace(void) const
@@ -306,13 +311,13 @@ namespace Engine
 				String str;
 
 				bool isFirst = true;
-				for (auto& name : m_Namespaces)
+				for (auto& pair : m_Namespaces)
 				{
 					if (!isFirst)
 						str = "::" + str;
 					isFirst = false;
 
-					str = name + str;
+					str = pair.GetSecond() + str;
 				}
 
 				return str;

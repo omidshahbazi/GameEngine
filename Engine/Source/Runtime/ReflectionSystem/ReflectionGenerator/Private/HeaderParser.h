@@ -17,7 +17,8 @@ namespace Engine
 			class REFLECTIONGENERATOR_API HeaderParser : public CodePageParser
 			{
 			private:
-				typedef Stack<String> NamespaceStack;
+				typedef Pair<uint16, String> NamespaceInfo;
+				typedef Stack<NamespaceInfo> NamespaceStack;
 
 			public:
 				HeaderParser(AllocatorBase* Allocator, const String& Text) :

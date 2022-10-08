@@ -14,10 +14,10 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			REFLECTION_OBJECT()
+			REFLECTION_OBJECT(REFLECTION_ABSTRACT);
 			class PROGRAMPARSER_API BaseAttributeType
 			{
-				BASEATTRIBUTETYPE_OBJECT()
+				BASEATTRIBUTETYPE_OBJECT();
 
 			public:
 				BaseAttributeType(void)

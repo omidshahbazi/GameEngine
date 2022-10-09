@@ -257,6 +257,11 @@ namespace Engine
 			{
 				if (Function->GetAttribute<MaxVertexCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find MaxVertexCount attribute", Function->GetName());
+				if (Function->GetAttribute<PrimitiveTypeAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find PrimitiveType attribute", Function->GetName());
+
+				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Geometry program must not return any value", Function->GetName());
 			}
 			else if (Stage == Stages::Compute)
 			{
@@ -315,6 +320,12 @@ namespace Engine
 
 				BuildMaxVertexCountAttributeType(stm, Type, Stage, Shader);
 			}
+			else if (IsAssignableFrom(Attribute, PrimitiveTypeAttributeType))
+			{
+				PrimitiveTypeAttributeType* stm = ReinterpretCast(PrimitiveTypeAttributeType*, Attribute);
+
+				BuildPrimitiveTypeAttributeType(stm, Type, Stage, Shader);
+			}
 			else if (IsAssignableFrom(Attribute, ThreadCountAttributeType))
 			{
 				ThreadCountAttributeType* stm = ReinterpretCast(ThreadCountAttributeType*, Attribute);
@@ -341,6 +352,13 @@ namespace Engine
 			BuildDataTypeStatement(Parameter->GetDataType(), Shader);
 			Shader += " ";
 			Shader += Parameter->GetName();
+
+			if (Parameter->GetDataType()->GetPostElementCount() != nullptr)
+			{
+				Shader += "[";
+				BuildStatement(Parameter->GetDataType()->GetPostElementCount(), FunctionType::Types::None, Stage, Shader);
+				Shader += "]";
+			}
 		}
 
 		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)

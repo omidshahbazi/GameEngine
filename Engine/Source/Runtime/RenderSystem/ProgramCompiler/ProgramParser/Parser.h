@@ -95,11 +95,13 @@ namespace Engine
 			BaseAttributeType* ParseControlPointsAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseConstantEntrypointAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseMaxVertexCountAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParsePrimitiveTypeAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseThreadCountAttributeType(const Token& DeclarationToken);
 
 			DataTypeStatement* ParseDataType(const Token& DeclarationToken);
 			void ParsePostArrayDataType(DataTypeStatement* DataType);
 			Statement* ParseArrayElementCountStatement(void);
+			void ValidateDataType(DataTypeStatement* DataType);
 
 			Statement* ParseIfStatement(const Token& DeclarationToken);
 			Statement* ParseElseStatement(const Token& DeclarationToken);
@@ -129,7 +131,7 @@ namespace Engine
 			Statement* ParseVariableAccessStatement(const Token& DeclarationToken);
 			Statement* ParseVariableAccessStatementBase(const Token& DeclarationToken);
 			Statement* ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement);
-			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, StructType* ParentType);
+			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, const DataTypeStatement* ParentDataType);
 			Statement* ParseFunctionCallStatement(const Token& DeclarationToken);
 
 			bool IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask);

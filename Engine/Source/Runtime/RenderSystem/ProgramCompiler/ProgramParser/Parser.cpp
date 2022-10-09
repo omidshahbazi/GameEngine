@@ -11,6 +11,7 @@
 #include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\MaxVertexCountAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\PrimitiveTypeAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
@@ -203,6 +204,7 @@ namespace Engine
 			m_AttributeParsers["ControlPoints"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseControlPointsAttributeType(DeclarationToken); });
 			m_AttributeParsers["ConstantEntrypoint"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseConstantEntrypointAttributeType(DeclarationToken); });
 			m_AttributeParsers["MaxVertexCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseMaxVertexCountAttributeType(DeclarationToken); });
+			m_AttributeParsers["PrimitiveType"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParsePrimitiveTypeAttributeType(DeclarationToken); });
 			m_AttributeParsers["ThreadCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseThreadCountAttributeType(DeclarationToken); });
 		}
 
@@ -298,6 +300,7 @@ namespace Engine
 				return false;
 
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+			ValidateDataType(dataType);
 			VariableType->SetDataType(dataType);
 
 			Token nameToken;
@@ -388,9 +391,9 @@ namespace Engine
 			if (DeclarationToken.GetType() != Token::Types::Identifier)
 				return false;
 
-			GlobalVariableType* variableType = Allocate<GlobalVariableType>(m_Allocator);
-
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+
+			GlobalVariableType* variableType = Allocate<GlobalVariableType>(m_Allocator);
 			variableType->SetDataType(dataType);
 
 			Token nameToken;
@@ -407,6 +410,8 @@ namespace Engine
 
 				return false;
 			}
+
+			ValidateDataType(dataType);
 
 			variableType->SetName(nameToken.GetName());
 
@@ -526,6 +531,7 @@ namespace Engine
 		bool Parser::ParseParameter(const Token& DeclarationToken, ParameterType* ParameterType)
 		{
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+			ValidateDataType(dataType);
 
 			ParameterType->SetDataType(dataType);
 
@@ -533,6 +539,8 @@ namespace Engine
 			RequireIdentifierToken(nameToken, "function parameter");
 
 			ParameterType->SetName(nameToken.GetName());
+
+			ParsePostArrayDataType(dataType);
 
 			if (MatchSymbol(COLON))
 			{
@@ -667,6 +675,35 @@ namespace Engine
 			return attr;
 		}
 
+		BaseAttributeType* Parser::ParsePrimitiveTypeAttributeType(const Token& DeclarationToken)
+		{
+			RequireSymbol(OPEN_BRACE, "primitive type attribute");
+
+			Token typeToken;
+			RequireIdentifierToken(typeToken, "primitive type attribute");
+
+			PrimitiveTypeAttributeType::Types type;
+			if (typeToken.Matches("Point", Token::SearchCases::CaseSensitive))
+				type = PrimitiveTypeAttributeType::Types::Point;
+			else if (typeToken.Matches("Line", Token::SearchCases::CaseSensitive))
+				type = PrimitiveTypeAttributeType::Types::Line;
+			else if (typeToken.Matches("Triangle", Token::SearchCases::CaseSensitive))
+				type = PrimitiveTypeAttributeType::Types::Triangle;
+			else if (typeToken.Matches("LineAdjacency", Token::SearchCases::CaseSensitive))
+				type = PrimitiveTypeAttributeType::Types::LineAdjacency;
+			else if (typeToken.Matches("TriangleAdjacency", Token::SearchCases::CaseSensitive))
+				type = PrimitiveTypeAttributeType::Types::TriangleAdjacency;
+			else
+				THROW_PROGRAM_PARSER_EXCEPTION("Invalid Primitive type", typeToken);
+
+			RequireSymbol(CLOSE_BRACE, "primitive type attribute");
+
+			PrimitiveTypeAttributeType* attr = Allocate<PrimitiveTypeAttributeType>();
+			attr->SetType(type);
+
+			return attr;
+		}
+
 		BaseAttributeType* Parser::ParseThreadCountAttributeType(const Token& DeclarationToken)
 		{
 			RequireSymbol(OPEN_BRACE, "thread count attribute");
@@ -701,8 +738,6 @@ namespace Engine
 				THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", DeclarationToken);
 
 			ProgramDataTypes primitiveType = GetPrimitiveDataType(identifier);
-			if (primitiveType == ProgramDataTypes::Void)
-				THROW_PROGRAM_PARSER_EXCEPTION("Expected a valid data type", DeclarationToken);
 
 			String userDefinedType;
 			if (primitiveType == ProgramDataTypes::Unknown)
@@ -741,6 +776,12 @@ namespace Engine
 			RequireSymbol(CLOSE_SQUARE_BRACKET, "data type definition");
 
 			return stm;
+		}
+
+		void Parser::ValidateDataType(DataTypeStatement* DataType)
+		{
+			if (DataType->GetType() == ProgramDataTypes::Void)
+				THROW_EXCEPTION(Categories::ProgramCompiler, "Expected a valid data type");
 		}
 
 		Statement* Parser::ParseIfStatement(const Token& DeclarationToken)
@@ -1010,8 +1051,11 @@ namespace Engine
 			if (!MatchIdentifierToken(nameToken))
 				return nullptr;
 
+			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
+			ValidateDataType(dataType);
+
 			VariableStatement* stm = Allocate<VariableStatement>(m_Allocator);
-			stm->SetDataType(ParseDataType(DeclarationToken));
+			stm->SetDataType(dataType);
 			stm->SetName(nameToken.GetName());
 
 			if (MatchSymbol(EQUAL))
@@ -1047,6 +1091,7 @@ namespace Engine
 
 			Token token;
 			RequireToken(token, "unary expression");
+
 			if (token.Matches(INCREMENT, Token::SearchCases::CaseSensitive) ||
 				token.Matches(DECREMENT, Token::SearchCases::CaseSensitive))
 			{
@@ -1104,21 +1149,30 @@ namespace Engine
 
 				stm = ParseVariableAccessStatement(DeclarationToken);
 
-				while (true)
+				if (MatchSymbol(OPEN_SQUARE_BRACKET))
 				{
-					if (MatchSymbol(OPEN_SQUARE_BRACKET))
-					{
-						Token elementToekn;
-						RequireToken(elementToekn, "unary expression");
+					Token elementToekn;
+					RequireToken(elementToekn, "unary expression");
 
-						Statement* arrayAccessStm = ParseArrayElementAccessStatement(elementToekn, stm);
+					Statement* arrayAccessStm = ParseArrayElementAccessStatement(elementToekn, stm);
 
-						if (arrayAccessStm != nullptr)
-							stm = arrayAccessStm;
-					}
-					else
-						break;
+					if (arrayAccessStm != nullptr)
+						stm = arrayAccessStm;
 				}
+
+				Token memberAccessToken;
+				RequireToken(memberAccessToken, "unary expression");
+
+				DataTypeStatement* parentDataType = nullptr;
+				VariableType* varType = FindVariableType(DeclarationToken.GetName());
+				if (varType != nullptr)
+					parentDataType = varType->GetDataType();
+
+				Statement* memberAccessStm = ParseMemberAccessStatement(memberAccessToken, stm, parentDataType);
+				if (memberAccessStm != stm)
+					return memberAccessStm;
+
+				UngetToken(memberAccessToken);
 
 				return stm;
 			}
@@ -1269,12 +1323,12 @@ namespace Engine
 			Token token;
 			RequireToken(token, "variable access statement");
 
-			StructType* parentStructType = nullptr;
+			DataTypeStatement* parentDataType = nullptr;
 			VariableType* varType = FindVariableType(stm->GetName());
-			if (varType != nullptr && !varType->GetDataType()->IsBuiltIn())
-				parentStructType = FindStructType(varType->GetDataType()->GetUserDefined());
+			if (varType != nullptr)
+				parentDataType = varType->GetDataType();
 
-			return ParseMemberAccessStatement(token, stm, parentStructType);
+			return ParseMemberAccessStatement(token, stm, parentDataType);
 		}
 
 		Statement* Parser::ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement)
@@ -1289,8 +1343,12 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, StructType* ParentType)
+		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, const DataTypeStatement* ParentDataType)
 		{
+			StructType* parentStructType = nullptr;
+			if (ParentDataType != nullptr && !ParentDataType->IsBuiltIn())
+				parentStructType = FindStructType(ParentDataType->GetUserDefined());
+
 			if (DeclarationToken.Matches(DOT, Token::SearchCases::CaseSensitive))
 			{
 				MemberAccessStatement* stm = Allocate<MemberAccessStatement>();
@@ -1300,8 +1358,8 @@ namespace Engine
 				Token memberToken;
 				RequireIdentifierToken(memberToken, "member access statement");
 
-				if (ParentType != nullptr)
-					RequiredVarialbe(ReinterpretCast(const VariableList&, ParentType->GetItems()), memberToken);
+				if (parentStructType != nullptr)
+					RequiredVarialbe(ReinterpretCast(const VariableList&, parentStructType->GetItems()), memberToken);
 
 				stm->SetRight(ParseVariableAccessStatementBase(memberToken));
 
@@ -1339,12 +1397,12 @@ namespace Engine
 			Token token;
 			RequireToken(token, "function call statement");
 
-			StructType* parentStructType = nullptr;
+			DataTypeStatement* parentDataType = nullptr;
 			FunctionType* funcType = FindFunctionType(stm->GetFunctionName());
-			if (funcType != nullptr && !funcType->GetReturnDataType()->IsBuiltIn())
-				parentStructType = FindStructType(funcType->GetReturnDataType()->GetUserDefined());
+			if (funcType != nullptr)
+				parentDataType = funcType->GetReturnDataType();
 
-			return ParseMemberAccessStatement(token, stm, parentStructType);
+			return ParseMemberAccessStatement(token, stm, parentDataType);
 		}
 
 		bool Parser::IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask)

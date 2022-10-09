@@ -285,6 +285,10 @@ namespace Engine
 			{
 			}
 
+			void ASTToGLSLCompiler::BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
 			void ASTToGLSLCompiler::BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 			}

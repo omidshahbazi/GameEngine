@@ -15,6 +15,7 @@
 #include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\MaxVertexCountAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\PrimitiveTypeAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
@@ -116,6 +117,8 @@ namespace Engine
 			virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 			virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 			virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 

@@ -242,10 +242,7 @@ namespace Engine
 		bool Parser::ParseStruct(const Token& DeclarationToken)
 		{
 			if (DeclarationToken.GetType() != Token::Types::Identifier)
-			{
-				UngetToken(DeclarationToken);
 				return false;
-			}
 
 			if (!DeclarationToken.Matches(STRUCT, Token::SearchCases::CaseSensitive))
 				return false;
@@ -449,6 +446,9 @@ namespace Engine
 
 			Token token;
 			RequireToken(token, "parse attribute");
+
+			if (!m_AttributeParsers.Contains(token.GetName()))
+				ThrowMissingException("valid attribute", "parse attributes");
 
 			m_AttributesList.Add((*m_AttributeParsers[token.GetName()])(token));
 

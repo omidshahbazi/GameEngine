@@ -5,6 +5,7 @@
 
 #include <ProgramParser\AbstractSyntaxTree\BaseAttributeType.h>
 #include <Containers\StringUtility.h>
+#include <ConstantEntrypointAttributeType.Reflection.h>
 
 namespace Engine
 {
@@ -14,8 +15,11 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
+			REFLECTION_OBJECT(REFLECTION_ABSTRACT);
 			class PROGRAMPARSER_API ConstantEntrypointAttributeType : public BaseAttributeType
 			{
+				CONSTANTENTRYPOINTATTRIBUTETYPE_OBJECT();
+
 			public:
 				void SetEntrypoint(const String& Value)
 				{

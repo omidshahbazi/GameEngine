@@ -133,8 +133,18 @@ namespace Engine
 
 			Content += "public: \\";
 			ADD_NEW_LINE();
-			Content += "		static const " + OBJECT_TYPE + "& GetType(void);";
+
+#define IMPLEMENT_GET_FUNCTION(Name) \
+			Content += "const " + OBJECT_TYPE + "& " + Name + "(void); \\"; \
 			ADD_NEW_LINE();
+
+			Content += "		virtual ";
+			IMPLEMENT_GET_FUNCTION(GET_MEMBER_FUNCTION_NAME);
+
+			Content += "		static ";
+			IMPLEMENT_GET_FUNCTION(GET_STATIC_FUNCTION_NAME);
+
+#undef IMPLEMENT_GET_FUNCTION
 
 			ADD_NEW_LINE();
 

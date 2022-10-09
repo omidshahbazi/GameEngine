@@ -431,18 +431,24 @@ namespace Engine
 				ADD_NEW_LINE();
 
 				{
-					Content += "	const ";
-					Content += OBJECT_TYPE;
-					Content += "& " + Type->GetFullQualifiedName() + "::GetType(void)";
+#define IMPLEMENT_GET_FUNCTION(Name) \
+					Content += "	const "; \
+					Content += OBJECT_TYPE; \
+					Content += "& " + Type->GetFullQualifiedName() + "::" + Name + "(void)"; \
+					ADD_NEW_LINE(); \
+					Content += "	{"; \
+					ADD_NEW_LINE(); \
+					Content += "		" + RUNTIME_IMPLEMENTATION_INITIALIZE_META + "();"; \
+					ADD_NEW_LINE(); \
+					Content += "		return *" + IMPLEMENT_POINTER_NAME + ";"; \
+					ADD_NEW_LINE(); \
+					Content += "	}"; \
 					ADD_NEW_LINE();
-					Content += "	{";
-					ADD_NEW_LINE();
-					Content += "		" + RUNTIME_IMPLEMENTATION_INITIALIZE_META + "();";
-					ADD_NEW_LINE();
-					Content += "		return *" + IMPLEMENT_POINTER_NAME + ";";
-					ADD_NEW_LINE();
-					Content += "	}";
-					ADD_NEW_LINE();
+
+					IMPLEMENT_GET_FUNCTION(GET_MEMBER_FUNCTION_NAME);
+					IMPLEMENT_GET_FUNCTION(GET_STATIC_FUNCTION_NAME);
+
+#undef IMPLEMENT_GET_FUNCTION
 
 					ADD_NEW_LINE();
 				}

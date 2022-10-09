@@ -193,17 +193,17 @@ namespace Engine
 			if (Stage == Stages::Hull)
 			{
 				const ConstantEntrypointAttributeType* constantEntryPoint = Function->GetAttribute<ConstantEntrypointAttributeType>();
+				if (constantEntryPoint == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint attribute", Function->GetName());
 
 				const StructType* structType = FindStructType(Function->GetReturnDataType()->GetUserDefined());
 				if (structType == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find %S struct type", Function->GetReturnDataType()->GetUserDefined());
 
-				StructVariableType::Registers requiredRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
-				uint8 requiredRegisterCount = 2;
-
-				for (uint8 i = 0; i < requiredRegisterCount; ++i)
+				const StructVariableType::Registers RequiredRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
+				for (uint8 i = 0; i < _countof(RequiredRegisters); ++i)
 				{
-					StructVariableType::Registers reg = requiredRegisters[i];
+					StructVariableType::Registers reg = RequiredRegisters[i];
 
 					if (structType->GetItems().ContainsIf([reg](auto item) { return item->GetRegister() == reg; }))
 						continue;

@@ -23,6 +23,8 @@ namespace Engine
 		{
 		protected:
 			static const cstr FILE_HEADER;
+			static const cstr GET_MEMBER_FUNCTION_NAME;
+			static const cstr GET_STATIC_FUNCTION_NAME;
 
 		protected:
 			static void GenerateDataType(const DataType& Type, const String& VariableName, String& Content);

@@ -10,6 +10,7 @@
 #include <ProgramParser\AbstractSyntaxTree\TopologyAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\MaxVertexCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
@@ -201,6 +202,7 @@ namespace Engine
 			m_AttributeParsers["Topology"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseTopologyAttributeType(DeclarationToken); });
 			m_AttributeParsers["ControlPoints"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseControlPointsAttributeType(DeclarationToken); });
 			m_AttributeParsers["ConstantEntrypoint"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseConstantEntrypointAttributeType(DeclarationToken); });
+			m_AttributeParsers["MaxVertexCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseMaxVertexCountAttributeType(DeclarationToken); });
 			m_AttributeParsers["ThreadCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseThreadCountAttributeType(DeclarationToken); });
 		}
 
@@ -646,6 +648,21 @@ namespace Engine
 
 			ConstantEntrypointAttributeType* attr = Allocate<ConstantEntrypointAttributeType>();
 			attr->SetEntrypoint(entrypointToken.GetName());
+
+			return attr;
+		}
+
+		BaseAttributeType* Parser::ParseMaxVertexCountAttributeType(const Token& DeclarationToken)
+		{
+			RequireSymbol(OPEN_BRACE, "max vertex count attribute");
+
+			Token numberToken;
+			RequireConstantToken(numberToken, "max vertex count attribute");
+
+			RequireSymbol(CLOSE_BRACE, "max vertex count attribute");
+
+			MaxVertexCountAttributeType* attr = Allocate<MaxVertexCountAttributeType>();
+			attr->SetCount(numberToken.GetConstantInt32());
 
 			return attr;
 		}

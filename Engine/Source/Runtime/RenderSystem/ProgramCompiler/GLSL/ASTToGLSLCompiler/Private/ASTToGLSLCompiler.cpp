@@ -281,6 +281,10 @@ namespace Engine
 			{
 			}
 
+			void ASTToGLSLCompiler::BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
 			void ASTToGLSLCompiler::BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 			}

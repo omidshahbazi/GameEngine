@@ -407,6 +407,15 @@ namespace Engine
 				Shader += ")]";
 			}
 
+			void ASTToHLSLCompiler::BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+				Shader += "[maxvertexcount(";
+
+				Shader += StringUtility::ToString<char8>(Attribute->GetCount());
+
+				Shader += ")]";
+			}
+
 			void ASTToHLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 				Shader += "[patchconstantfunc(\"";

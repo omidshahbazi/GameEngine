@@ -23,8 +23,6 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			PublicDependencyModuleNames.Add("ProgramCompilerCommon");
 			PublicDependencyModuleNames.Add("RenderCommon");
 			PublicDependencyModuleNames.Add("MemoryManagement");
-
-			GenerateReflection = true;
 		}
 	}
 }

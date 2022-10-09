@@ -1,7 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #pragma once
-#ifndef CONTROL_POINTS_ATTRIBUTE_TYPE_H
-#define CONTROL_POINTS_ATTRIBUTE_TYPE_H
+#ifndef MAX_VERTEX_COUNT_ATTRIBUTE_TYPE_H
+#define MAX_VERTEX_COUNT_ATTRIBUTE_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\BaseAttributeType.h>
 #include <Containers\StringUtility.h>
@@ -14,26 +14,26 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
-			class PROGRAMPARSER_API ControlPointsAttributeType : public BaseAttributeType
+			class PROGRAMPARSER_API MaxVertexCountAttributeType : public BaseAttributeType
 			{
 			public:
-				void SetNumber(uint16 Value)
+				void SetCount(uint16 Value)
 				{
-					m_Number = Value;
+					m_Count = Value;
 				}
 
-				uint16 GetNumber(void) const
+				uint16 GetCount(void) const
 				{
-					return m_Number;
+					return m_Count;
 				}
 
 				virtual String ToString(void) const override
 				{
-					String result = "[ControlPoints";
+					String result = "[MaxVertexCount";
 
 					result += "(";
 
-					result += StringUtility::ToString<char8>(m_Number);
+					result += StringUtility::ToString<char8>(m_Count);
 
 					result += ")]";
 
@@ -41,7 +41,7 @@ namespace Engine
 				}
 
 			private:
-				uint16 m_Number;
+				uint16 m_Count;
 			};
 		}
 	}

@@ -30,7 +30,7 @@ namespace Engine
 					m_Type = Type;
 				}
 
-				Types GetType(void)
+				Types GetType(void) const
 				{
 					return m_Type;
 				}

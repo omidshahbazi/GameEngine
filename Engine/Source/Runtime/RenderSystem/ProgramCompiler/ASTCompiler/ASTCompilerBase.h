@@ -14,6 +14,7 @@
 #include <ProgramParser\AbstractSyntaxTree\TopologyAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ControlPointsAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\MaxVertexCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
@@ -114,6 +115,8 @@ namespace Engine
 
 			virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
+			virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
 			virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 			virtual void BuildParameters(const ParameterList& Parameters, FunctionType::Types Type, Stages Stage, String& Shader);
@@ -179,6 +182,7 @@ namespace Engine
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
 
+			const FunctionType* FindFunctionType(const String& Name) const;
 			const StructType* FindStructType(const String& Name) const;
 			const VariableType* FindVariableType(const StructType* StructType, const String& Name) const;
 

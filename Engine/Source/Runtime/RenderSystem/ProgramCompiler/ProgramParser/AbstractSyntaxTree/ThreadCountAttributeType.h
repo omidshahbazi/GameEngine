@@ -23,7 +23,7 @@ namespace Engine
 					m_XCount = Value;
 				}
 
-				uint16 GetXCount(void)
+				uint16 GetXCount(void) const
 				{
 					return m_XCount;
 				}
@@ -33,7 +33,7 @@ namespace Engine
 					m_YCount = Value;
 				}
 
-				uint16 GetYCount(void)
+				uint16 GetYCount(void) const
 				{
 					return m_YCount;
 				}
@@ -43,7 +43,7 @@ namespace Engine
 					m_ZCount = Value;
 				}
 
-				uint16 GetZCount(void)
+				uint16 GetZCount(void) const
 				{
 					return m_ZCount;
 				}

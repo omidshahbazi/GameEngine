@@ -190,18 +190,13 @@ namespace Engine
 
 		void ASTCompilerBase::BuildEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader)
 		{
-			if (Stage == Stages::Hull)
+			auto checkRequiredRegisters = [&](const String& StructName, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
-				const ConstantEntrypointAttributeType* constantEntryPoint = Function->GetAttribute<ConstantEntrypointAttributeType>();
-				if (constantEntryPoint == nullptr)
-					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint attribute", Function->GetName());
-
-				const StructType* structType = FindStructType(Function->GetReturnDataType()->GetUserDefined());
+				const StructType* structType = FindStructType(StructName);
 				if (structType == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find %S struct type", Function->GetReturnDataType()->GetUserDefined());
 
-				const StructVariableType::Registers RequiredRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
-				for (uint8 i = 0; i < _countof(RequiredRegisters); ++i)
+				for (uint8 i = 0; i < RequiredRegisterCount; ++i)
 				{
 					StructVariableType::Registers reg = RequiredRegisters[i];
 
@@ -210,6 +205,63 @@ namespace Engine
 
 					THROW_PROGRAM_COMPILER_EXCEPTION(StringUtility::Format<char8>("A variable with %S is required inside %S", StructVariableType::GetRegisterName(reg), structType->GetName()), Function->GetName());
 				}
+			};
+
+			auto checkRequiredOutputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
+			{
+				checkRequiredRegisters(Function->GetReturnDataType()->GetUserDefined(), RequiredRegisters, RequiredRegisterCount);
+			};
+
+			auto checkRequiredInputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
+			{
+				for (auto& param : Function->GetParameters())
+				{
+					auto& structName = param->GetDataType()->GetUserDefined();
+					if (structName == String::Empty)
+						continue;
+
+					checkRequiredRegisters(structName, RequiredRegisters, RequiredRegisterCount);
+				}
+			};
+
+			const StructVariableType::Registers RequiredTessFactorsRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
+
+			if (Stage == Stages::Hull)
+			{
+				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
+				if (Function->GetAttribute<PartitioningAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Partitioning attribute", Function->GetName());
+				if (Function->GetAttribute<TopologyAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Topology attribute", Function->GetName());
+				if (Function->GetAttribute<ControlPointsAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ControlPoints attribute", Function->GetName());
+				const ConstantEntrypointAttributeType* constantEntryPoint = Function->GetAttribute<ConstantEntrypointAttributeType>();
+				if (constantEntryPoint == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint attribute", Function->GetName());
+
+				const FunctionType* constantEntryPointFunc = FindFunctionType(constantEntryPoint->GetEntrypoint());
+				if (constantEntryPointFunc == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint function", Function->GetName());
+
+				checkRequiredOutputRegisters(constantEntryPointFunc, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
+			}
+			else if (Stage == Stages::Domain)
+			{
+				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
+
+				checkRequiredInputRegisters(Function, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
+			}
+			else if (Stage == Stages::Geometry)
+			{
+				if (Function->GetAttribute<MaxVertexCountAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find MaxVertexCount attribute", Function->GetName());
+			}
+			else if (Stage == Stages::Compute)
+			{
+				if (Function->GetAttribute<ThreadCountAttributeType>() == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ThreadCount attribute", Function->GetName());
 			}
 
 			BuildFunction(Function, Stage, Shader);
@@ -256,6 +308,12 @@ namespace Engine
 				ConstantEntrypointAttributeType* stm = ReinterpretCast(ConstantEntrypointAttributeType*, Attribute);
 
 				BuildConstantEntrypointAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, MaxVertexCountAttributeType))
+			{
+				MaxVertexCountAttributeType* stm = ReinterpretCast(MaxVertexCountAttributeType*, Attribute);
+
+				BuildMaxVertexCountAttributeType(stm, Type, Stage, Shader);
 			}
 			else if (IsAssignableFrom(Attribute, ThreadCountAttributeType))
 			{
@@ -522,7 +580,7 @@ namespace Engine
 		{
 			auto& funcName = Statement->GetFunctionName();
 
-			if (m_Functions.ContainsIf([funcName](auto item) { return item->GetName() == funcName; }))
+			if (FindFunctionType(funcName) != nullptr)
 			{
 				Shader += funcName;
 
@@ -1030,6 +1088,15 @@ namespace Engine
 			}
 
 			return ProgramDataTypes::Unknown;
+		}
+
+		const FunctionType* ASTCompilerBase::FindFunctionType(const String& Name) const
+		{
+			int32 index = m_Functions.FindIf([&Name](auto structType) { return structType->GetName() == Name; });
+			if (index == -1)
+				return nullptr;
+
+			return m_Functions[index];
 		}
 
 		const StructType* ASTCompilerBase::FindStructType(const String& Name) const

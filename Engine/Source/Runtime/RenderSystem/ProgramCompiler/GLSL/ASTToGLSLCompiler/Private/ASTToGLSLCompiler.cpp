@@ -202,7 +202,7 @@ namespace Engine
 			{
 				FunctionType::Types funcType = Function->GetType();
 
-				ASTCompilerBase::BuildAttributes(Function->GetAttributes(), funcType, Stage, Shader);
+				BuildAttributes(Function->GetAttributes(), funcType, Stage, Shader);
 
 				if (funcType == FunctionType::Types::FragmentMain)
 				{
@@ -286,6 +286,10 @@ namespace Engine
 			}
 
 			void ASTToGLSLCompiler::BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+			}
+
+			void ASTToGLSLCompiler::BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 			}
 

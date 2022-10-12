@@ -52,6 +52,10 @@ namespace Engine
 				{
 				}
 
+				virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				{
+				}
+
 				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)  override;
 
 				virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)  override;
@@ -68,6 +72,7 @@ namespace Engine
 
 			public:
 				static String GetSamplerVariableName(const String& TextureVariableName);
+				static String GetGeometryOutputStreamParameterName(void);
 
 			private:
 				FunctionList m_Functions;

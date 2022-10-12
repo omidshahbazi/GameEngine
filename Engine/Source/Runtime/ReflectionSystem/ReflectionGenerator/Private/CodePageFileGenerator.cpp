@@ -264,13 +264,13 @@ namespace Engine
 
 		String CodePageFileGenerator::GetUniqueName(Type* Type)
 		{
-			if (IsTypeOf(Type, MetaObject))
+			if (IsAssignableFrom(Type, MetaObject))
 				return GetUniqueName(ReinterpretCast(MetaObject*, Type));
-			else if (IsTypeOf(Type, MetaEnum))
+			else if (IsAssignableFrom(Type, MetaEnum))
 				return  GetUniqueName(ReinterpretCast(MetaEnum*, Type));
-			else if (IsTypeOf(Type, MetaFunction))
+			else if (IsAssignableFrom(Type, MetaFunction))
 				return GetUniqueName(ReinterpretCast(MetaFunction*, Type));
-			else if (IsTypeOf(Type, MetaProperty))
+			else if (IsAssignableFrom(Type, MetaProperty))
 				return  GetUniqueName(ReinterpretCast(MetaProperty*, Type));
 
 			CoreDebugAssert(Categories::Reflection, false, "Unhandled type");
@@ -280,13 +280,13 @@ namespace Engine
 		{
 			String uniqueName = GetUniqueName(Type);
 
-			if (IsTypeOf(Type, MetaObject))
+			if (IsAssignableFrom(Type, MetaObject))
 				return uniqueName + "_" + STRINGIZE(ImplementObjectType);
-			else if (IsTypeOf(Type, MetaEnum))
+			else if (IsAssignableFrom(Type, MetaEnum))
 				return uniqueName + "_" + STRINGIZE(ImplementEnumType);
-			else if (IsTypeOf(Type, MetaFunction))
+			else if (IsAssignableFrom(Type, MetaFunction))
 				return uniqueName + "_" + STRINGIZE(ImplementFunctionType);
-			else if (IsTypeOf(Type, MetaProperty))
+			else if (IsAssignableFrom(Type, MetaProperty))
 				return uniqueName + "_" + STRINGIZE(ImplementPropertyType);
 
 			return "";

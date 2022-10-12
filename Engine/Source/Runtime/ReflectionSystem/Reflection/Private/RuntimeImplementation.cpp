@@ -106,7 +106,7 @@ namespace Engine
 				INITIALIZE_MAP(m_ObjectTypes);
 				INITIALIZE_MAP(m_EnumTypes);
 
-				if (IsTypeOf(Type, ObjectType))
+				if (IsAssignableFrom(Type, ObjectType))
 				{
 					String scopedName = Type->GetFullQualifiedName();
 
@@ -114,7 +114,7 @@ namespace Engine
 
 					m_ObjectTypes->Add(scopedName, Type);
 				}
-				else if (IsTypeOf(Type, EnumType))
+				else if (IsAssignableFrom(Type, EnumType))
 				{
 					const String& name = Type->GetFullQualifiedName();
 
@@ -131,9 +131,9 @@ namespace Engine
 				INITIALIZE_MAP(m_ObjectTypes);
 				INITIALIZE_MAP(m_EnumTypes);
 
-				if (IsTypeOf(Type, ObjectType))
+				if (IsAssignableFrom(Type, ObjectType))
 					m_ObjectTypes->Remove(Type->GetFullQualifiedName());
-				else if (IsTypeOf(Type, EnumType))
+				else if (IsAssignableFrom(Type, EnumType))
 					m_EnumTypes->Remove(Type->GetFullQualifiedName());
 				else
 					CoreDebugAssert(Categories::Reflection, false, "Unhandled type");

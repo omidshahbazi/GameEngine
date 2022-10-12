@@ -47,7 +47,7 @@ namespace Engine
 
 		void HeaderFileGenerator::GenerateTypeCode(Type* Type, String& Content)
 		{
-			if (IsTypeOf(Type, ObjectType))
+			if (IsAssignableFrom(Type, ObjectType))
 				GenerateObjectCode(ReinterpretCast(MetaObject*, Type), Content);
 		}
 
@@ -80,7 +80,7 @@ namespace Engine
 					Content += "	friend class " + IMPLEMENT_NESTED_TYPE + "; \\";
 					ADD_NEW_LINE();
 
-					if (IsTypeOf(item, MetaObject))
+					if (IsAssignableFrom(item, MetaObject))
 						generateFriendClassForNesteds(ReinterpretCast(MetaObject*, item), AccessLevel);
 				}
 			};
@@ -102,7 +102,7 @@ namespace Engine
 				Type->GetNestedTypes(AccessLevel, nestedTypes);
 
 				for (auto& item : nestedTypes)
-					if (IsTypeOf(item, MetaObject))
+					if (IsAssignableFrom(item, MetaObject))
 						generateFriendClassForFunctions(ReinterpretCast(MetaObject*, item), AccessLevel);
 			};
 
@@ -123,7 +123,7 @@ namespace Engine
 				Type->GetNestedTypes(AccessLevel, nestedTypes);
 
 				for (auto& item : nestedTypes)
-					if (IsTypeOf(item, MetaObject))
+					if (IsAssignableFrom(item, MetaObject))
 						generateFriendClassForNProperties(ReinterpretCast(MetaObject*, item), AccessLevel);
 			};
 

@@ -82,7 +82,6 @@ namespace Engine
 #define DynamicCast(Type, Value) dynamic_cast<Type>(Value)
 #define ConstCast(Type, Value) const_cast<Type>(Value)
 #define IsAssignableFrom(Value, BaseType) (DynamicCast(BaseType*, Value) != nullptr)
-#define IsTypeOf(Value, Type) (IsAssignableFrom(Value, Type))
 
 #define HardAssert(Condition, Message) _STL_ASSERT(Condition, Message)
 

@@ -173,9 +173,9 @@ namespace Engine
 					m_Variables[parameter->GetName()] = parameter->GetDataType();
 
 				if (function->IsEntrypoint())
-					BuildEntrypointFunction(function, Stage, Shader);
-				else
-					BuildFunction(function, Stage, Shader);
+					ValidateEntrypointFunction(function, Stage, Shader);
+
+				BuildFunction(function, Stage, Shader);
 
 				while (m_OpenScopeCount > 0)
 				{
@@ -188,7 +188,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader)
+		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader)
 		{
 			auto checkRequiredRegisters = [&](const String& StructName, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
@@ -226,6 +226,9 @@ namespace Engine
 
 			const StructVariableType::Registers RequiredTessFactorsRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
 
+			if (Function->GetParameters().GetSize() > 1)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Entrypoints cannot have more than one parameter", Function->GetName());
+
 			if (Stage == Stages::Hull)
 			{
 				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
@@ -257,8 +260,22 @@ namespace Engine
 			{
 				if (Function->GetAttribute<MaxVertexCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find MaxVertexCount attribute", Function->GetName());
-				if (Function->GetAttribute<PrimitiveTypeAttributeType>() == nullptr)
+				const PrimitiveTypeAttributeType* primitiveType = Function->GetAttribute<PrimitiveTypeAttributeType>();
+				if (primitiveType == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find PrimitiveType attribute", Function->GetName());
+				const OutputStreamTypeAttributeType* outputStreamType = Function->GetAttribute<OutputStreamTypeAttributeType>();
+				if (outputStreamType == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find OutputStreamType attribute", Function->GetName());
+
+				if (!Function->GetParameters()[0]->GetDataType()->IsArray())
+					THROW_PROGRAM_COMPILER_EXCEPTION("Parameter of a Geometry entry point must be an array", Function->GetName());
+
+				const uint8 ELEMENT_COUNT[]{ 1, 2, 3, 4, 6 };
+				if (ELEMENT_COUNT[(uint32)primitiveType->GetType()] != StringUtility::ToUInt8(Function->GetParameters()[0]->GetDataType()->GetPostElementCount()->ToString()))
+					THROW_PROGRAM_COMPILER_EXCEPTION("Element count of the Geometry entrypoint is not compatible with its primitive type", Function->GetName());
+
+				if (FindStructType(outputStreamType->GetDataType()) == nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find the DataType specified in the OutputStream attribute", Function->GetName());
 
 				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Geometry program must not return any value", Function->GetName());
@@ -268,8 +285,6 @@ namespace Engine
 				if (Function->GetAttribute<ThreadCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ThreadCount attribute", Function->GetName());
 			}
-
-			BuildFunction(Function, Stage, Shader);
 		}
 
 		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -325,6 +340,12 @@ namespace Engine
 				PrimitiveTypeAttributeType* stm = ReinterpretCast(PrimitiveTypeAttributeType*, Attribute);
 
 				BuildPrimitiveTypeAttributeType(stm, Type, Stage, Shader);
+			}
+			else if (IsAssignableFrom(Attribute, OutputStreamTypeAttributeType))
+			{
+				OutputStreamTypeAttributeType* stm = ReinterpretCast(OutputStreamTypeAttributeType*, Attribute);
+
+				BuildOutputStreamTypeAttributeType(stm, Type, Stage, Shader);
 			}
 			else if (IsAssignableFrom(Attribute, ThreadCountAttributeType))
 			{

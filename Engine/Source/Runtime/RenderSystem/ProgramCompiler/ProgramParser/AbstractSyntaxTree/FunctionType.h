@@ -60,7 +60,7 @@ namespace Engine
 				template<typename T>
 				const T* GetAttribute(void) const
 				{
-					int32 index = m_Attributes.FindIf([](auto attributeType) { return IsTypeOf(attributeType, T); });
+					int32 index = m_Attributes.FindIf([](auto attributeType) { return IsAssignableFrom(attributeType, T); });
 					if (index == -1)
 						return nullptr;
 

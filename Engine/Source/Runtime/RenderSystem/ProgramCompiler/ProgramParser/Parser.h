@@ -96,6 +96,7 @@ namespace Engine
 			BaseAttributeType* ParseConstantEntrypointAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseMaxVertexCountAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParsePrimitiveTypeAttributeType(const Token& DeclarationToken);
+			BaseAttributeType* ParseOutputStreamTypeAttributeType(const Token& DeclarationToken);
 			BaseAttributeType* ParseThreadCountAttributeType(const Token& DeclarationToken);
 
 			DataTypeStatement* ParseDataType(const Token& DeclarationToken);

@@ -131,6 +131,46 @@ namespace Engine
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
+			String GetPrimitiveType(PrimitiveTypeAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case PrimitiveTypeAttributeType::Types::Point:
+					return "point";
+
+				case PrimitiveTypeAttributeType::Types::Line:
+					return "line";
+
+				case PrimitiveTypeAttributeType::Types::Triangle:
+					return "triangle";
+
+				case PrimitiveTypeAttributeType::Types::LineAdjacency:
+					return "lineadj";
+
+				case PrimitiveTypeAttributeType::Types::TriangleAdjacency:
+					return "triangleadj";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
+			String GetOutputStreamType(OutputStreamTypeAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case OutputStreamTypeAttributeType::Types::Point:
+					return "PointStream";
+
+				case OutputStreamTypeAttributeType::Types::Line:
+					return "LineStream";
+
+				case OutputStreamTypeAttributeType::Types::Triangle:
+					return "TriangleStream";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
 			ASTToHLSLCompiler::ASTToHLSLCompiler(void) :
 				m_ConstantBufferBindingCount(0),
 				m_TextureBindingCount(0)
@@ -341,7 +381,7 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 
-				ASTCompilerBase::BuildAttributes(Function->GetAttributes(), funcType, Stage, Shader);
+				BuildAttributes(Function->GetAttributes(), funcType, Stage, Shader);
 
 				BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
 
@@ -353,6 +393,25 @@ namespace Engine
 					Shader += Function->GetName();
 
 				Shader += "(";
+
+				if (funcType == FunctionType::Types::GeometryMain)
+				{
+					const auto* outputType = Function->GetAttribute<OutputStreamTypeAttributeType>();
+
+					Shader += "inout ";
+					Shader += GetOutputStreamType(outputType->GetType());
+					Shader += "<";
+					Shader += outputType->GetDataType();
+					Shader += "> ";
+					Shader += GetGeometryOutputStreamParameterName();
+
+					Shader += ", ";
+
+					const auto* primitiveTypeAttr = Function->GetAttribute<PrimitiveTypeAttributeType>();
+
+					Shader += GetPrimitiveType(primitiveTypeAttr->GetType());
+					Shader += " ";
+				}
 
 				BuildParameters(Function->GetParameters(), funcType, Stage, Shader);
 
@@ -535,6 +594,10 @@ namespace Engine
 			String ASTToHLSLCompiler::GetSamplerVariableName(const String& TextureVariableName)
 			{
 				return TextureVariableName + "Sampler";
+			}
+			String ASTToHLSLCompiler::GetGeometryOutputStreamParameterName(void)
+			{
+				return "outputStream";
 			}
 		};
 

@@ -104,7 +104,7 @@ namespace Engine
 
 				ADD_NEW_LINE();
 
-				if (IsTypeOf(type, MetaObject))
+				if (IsAssignableFrom(type, MetaObject))
 				{
 					MetaObject* metaObject = ReinterpretCast(MetaObject*, type);
 
@@ -127,13 +127,13 @@ namespace Engine
 
 		void CompileFileGenerator::GenerateTypeCode(Type* Type, String& Content)
 		{
-			if (IsTypeOf(Type, MetaObject))
+			if (IsAssignableFrom(Type, MetaObject))
 				GenerateObjectCode(ReinterpretCast(MetaObject*, Type), Content);
-			else if (IsTypeOf(Type, MetaEnum))
+			else if (IsAssignableFrom(Type, MetaEnum))
 				GenerateEnumCode(ReinterpretCast(MetaEnum*, Type), Content);
-			else if (IsTypeOf(Type, MetaFunction))
+			else if (IsAssignableFrom(Type, MetaFunction))
 				GenerateFunctionCode(ReinterpretCast(MetaFunction*, Type), Content);
-			else if (IsTypeOf(Type, MetaProperty))
+			else if (IsAssignableFrom(Type, MetaProperty))
 				GeneratePropertyCode(ReinterpretCast(MetaProperty*, Type), Content);
 		}
 
@@ -151,7 +151,7 @@ namespace Engine
 			const String IMPLEMENT_TOP_NEST_POINTER_NAME = GetImplementTypePointerName(Type);
 
 			TypeList types;
-			if (IsTypeOf(Type, MetaObject))
+			if (IsAssignableFrom(Type, MetaObject))
 			{
 				MetaObject* metaObject = ReinterpretCast(MetaObject*, Type);
 
@@ -796,14 +796,14 @@ namespace Engine
 		void CompileFileGenerator::GenerateNamespaceHeader(Type* Type, String& Content)
 		{
 			String ns = String::Empty;
-			if (IsTypeOf(Type, MetaObject))
+			if (IsAssignableFrom(Type, MetaObject))
 			{
 				if (Type->GetTopNest() != nullptr)
 					return;
 
 				ns = ReinterpretCast(MetaObject*, Type)->GetNamespace();
 			}
-			else if (IsTypeOf(Type, EnumType))
+			else if (IsAssignableFrom(Type, EnumType))
 			{
 				if (Type->GetTopNest() != nullptr)
 					return;
@@ -826,14 +826,14 @@ namespace Engine
 		{
 			bool shouldProceed = false;
 
-			if (IsTypeOf(Type, MetaObject))
+			if (IsAssignableFrom(Type, MetaObject))
 			{
 				if (Type->GetTopNest() != nullptr)
 					return;
 
 				shouldProceed = true;
 			}
-			else if (IsTypeOf(Type, EnumType))
+			else if (IsAssignableFrom(Type, EnumType))
 			{
 				if (Type->GetTopNest() != nullptr)
 					return;

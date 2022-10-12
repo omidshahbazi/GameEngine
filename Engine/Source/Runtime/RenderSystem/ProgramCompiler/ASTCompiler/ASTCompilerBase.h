@@ -16,6 +16,7 @@
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\MaxVertexCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\PrimitiveTypeAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\OutputStreamTypeAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ElseStatement.h>
@@ -100,7 +101,7 @@ namespace Engine
 
 			virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) = 0;
 
-			virtual void BuildEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader);
+			virtual void ValidateEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader);
 
 			virtual void BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader);
 
@@ -119,6 +120,8 @@ namespace Engine
 			virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 			virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+
+			virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 
 			virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 

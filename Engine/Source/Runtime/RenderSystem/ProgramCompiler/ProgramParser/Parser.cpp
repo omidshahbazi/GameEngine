@@ -12,6 +12,7 @@
 #include <ProgramParser\AbstractSyntaxTree\ConstantEntrypointAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\MaxVertexCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\PrimitiveTypeAttributeType.h>
+#include <ProgramParser\AbstractSyntaxTree\OutputStreamTypeAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\ThreadCountAttributeType.h>
 #include <ProgramParser\AbstractSyntaxTree\DataTypeStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\IfStatement.h>
@@ -205,6 +206,7 @@ namespace Engine
 			m_AttributeParsers["ConstantEntrypoint"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseConstantEntrypointAttributeType(DeclarationToken); });
 			m_AttributeParsers["MaxVertexCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseMaxVertexCountAttributeType(DeclarationToken); });
 			m_AttributeParsers["PrimitiveType"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParsePrimitiveTypeAttributeType(DeclarationToken); });
+			m_AttributeParsers["OutputStreamType"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseOutputStreamTypeAttributeType(DeclarationToken); });
 			m_AttributeParsers["ThreadCount"] = std::make_shared<AttributeParseFunction>([&](const Token& DeclarationToken) { return ParseThreadCountAttributeType(DeclarationToken); });
 		}
 
@@ -542,12 +544,6 @@ namespace Engine
 
 			ParsePostArrayDataType(dataType);
 
-			if (MatchSymbol(COLON))
-			{
-				Token registerToken;
-				RequireIdentifierToken(registerToken, "function parameter");
-			}
-
 			return true;
 		}
 
@@ -700,6 +696,37 @@ namespace Engine
 
 			PrimitiveTypeAttributeType* attr = Allocate<PrimitiveTypeAttributeType>();
 			attr->SetType(type);
+
+			return attr;
+		}
+
+		BaseAttributeType* Parser::ParseOutputStreamTypeAttributeType(const Token& DeclarationToken)
+		{
+			RequireSymbol(OPEN_BRACE, "output stream type attribute");
+
+			Token typeToken;
+			RequireIdentifierToken(typeToken, "output stream type attribute");
+
+			OutputStreamTypeAttributeType::Types type;
+			if (typeToken.Matches("Point", Token::SearchCases::CaseSensitive))
+				type = OutputStreamTypeAttributeType::Types::Point;
+			else if (typeToken.Matches("Line", Token::SearchCases::CaseSensitive))
+				type = OutputStreamTypeAttributeType::Types::Line;
+			else if (typeToken.Matches("Triangle", Token::SearchCases::CaseSensitive))
+				type = OutputStreamTypeAttributeType::Types::Triangle;
+			else
+				THROW_PROGRAM_PARSER_EXCEPTION("Invalid OuputStream type", typeToken);
+
+			RequireSymbol(COMMA, "output stream type attribute");
+
+			Token dataTypeToken;
+			RequireIdentifierToken(dataTypeToken, "output stream type attribute");
+
+			RequireSymbol(CLOSE_BRACE, "output stream type attribute");
+
+			OutputStreamTypeAttributeType* attr = Allocate<OutputStreamTypeAttributeType>();
+			attr->SetType(type);
+			attr->SetDataType(dataTypeToken.GetName());
 
 			return attr;
 		}

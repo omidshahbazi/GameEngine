@@ -101,10 +101,14 @@ namespace Engine
 
 			auto& overrides = functions[Name];
 			int32 index = overrides.FindIf([hash](auto item) { return item.Hash == hash; });
-			if (index == -1)
-				return nullptr;
+			if (index != -1)
+				return &overrides[index];
 
-			return &overrides[index];
+			index = overrides.FindIf([hash](auto item) { return item.IsTemplate; });
+			if (index != -1)
+				return &overrides[index];
+
+			return nullptr;
 		}
 
 		uint32 IntrinsicsBuilder::CalculateFunctionSignatureHash(const String& Name, const ProgramDataTypes* ParameterTypes, uint8 ParameterTypeCount)

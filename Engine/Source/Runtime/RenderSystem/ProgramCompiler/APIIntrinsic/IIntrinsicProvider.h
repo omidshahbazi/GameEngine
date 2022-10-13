@@ -55,6 +55,9 @@ namespace Engine
 
 			public:
 				ProgramDataTypes ReturnType;
+
+				bool IsTemplate;
+
 				uint32 Hash;
 
 				String NativeFunctionName;
@@ -90,6 +93,9 @@ namespace Engine
 				function.ReturnType = ReturnDataType; \
 				ProgramDataTypes parameterTypes[MAX_PARAMETER_COUNT]; \
 				uint8 parameterTypeCount = 0;
+
+#define MARK_AS_TEMPLATE() \
+				function.IsTemplate = true;
 
 #define ADD_PARAMETER(DataType) \
 				parameterTypes[parameterTypeCount++] = DataType;

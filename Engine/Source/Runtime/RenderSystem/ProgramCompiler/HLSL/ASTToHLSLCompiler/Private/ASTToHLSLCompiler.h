@@ -30,6 +30,8 @@ namespace Engine
 			private:
 				virtual void ResetPerStageValues(Stages Stage) override;
 
+				virtual void BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader) override;
+
 				virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override;
 
 				virtual void BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader) override;
@@ -67,6 +69,8 @@ namespace Engine
 				virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
+
+				virtual void BuildRootSignature(const GlobalVariableList& Variables, String& Shader);
 
 				static cstr GetRootSignatureDefineName(void);
 

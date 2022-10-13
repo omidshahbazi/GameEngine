@@ -35,27 +35,27 @@ namespace Engine
 			m_Structs = Structs;
 			m_Functions = Functions;
 
-			auto ContainsType = [&Functions](FunctionType::Types Type)
+			auto containsEntrypoint = [&Functions](FunctionType::Types Type)
 			{
 				return Functions.ContainsIf([Type](auto functionType) {return functionType->GetType() == Type; });
 			};
 
-			if (ContainsType(FunctionType::Types::VertexMain))
+			if (containsEntrypoint(FunctionType::Types::VertexMain))
 				BuildVertexShader(Structs, Variables, Functions, Output.VertexShader);
 
-			if (ContainsType(FunctionType::Types::HullMain))
+			if (containsEntrypoint(FunctionType::Types::HullMain))
 				BuildHullShader(Structs, Variables, Functions, Output.HullShader);
 
-			if (ContainsType(FunctionType::Types::DomainMain))
+			if (containsEntrypoint(FunctionType::Types::DomainMain))
 				BuildDomainShader(Structs, Variables, Functions, Output.DomainShader);
 
-			if (ContainsType(FunctionType::Types::GeometryMain))
+			if (containsEntrypoint(FunctionType::Types::GeometryMain))
 				BuildGeometryShader(Structs, Variables, Functions, Output.GeometryShader);
 
-			if (ContainsType(FunctionType::Types::FragmentMain))
+			if (containsEntrypoint(FunctionType::Types::FragmentMain))
 				BuildFragmentShader(Structs, Variables, Functions, Output.FragmentShader);
 
-			if (ContainsType(FunctionType::Types::ComputeMain))
+			if (containsEntrypoint(FunctionType::Types::ComputeMain))
 				BuildComputeShader(Structs, Variables, Functions, Output.ComputeShader);
 
 			m_Variables.Clear();
@@ -284,6 +284,9 @@ namespace Engine
 			{
 				if (Function->GetAttribute<ThreadCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ThreadCount attribute", Function->GetName());
+
+				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Compute program must not return any value", Function->GetName());
 			}
 		}
 

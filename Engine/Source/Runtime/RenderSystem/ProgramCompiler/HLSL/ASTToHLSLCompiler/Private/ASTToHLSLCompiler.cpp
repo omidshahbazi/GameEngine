@@ -190,43 +190,7 @@ namespace Engine
 
 				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
 
-				String rootSignature = "#define ";
-				rootSignature += GetRootSignatureDefineName();
-				rootSignature += " \"";
 
-				rootSignature += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
-
-				uint8 cbvIndex = 0;
-				uint8 textureIndex = 0;
-				for (auto variableType : Variables)
-				{
-					const DataTypeStatement* dataType = variableType->GetDataType();
-
-					rootSignature += ",";
-
-					if (dataType->GetType() == ProgramDataTypes::Unknown)
-					{
-						rootSignature += "CBV(b";
-
-						rootSignature += StringUtility::ToString<char8>(cbvIndex++);
-					}
-					else if (dataType->GetType() == ProgramDataTypes::Texture2D)
-					{
-						rootSignature += "DescriptorTable(SRV(t";
-						rootSignature += StringUtility::ToString<char8>(textureIndex);
-						rootSignature += ")),DescriptorTable(Sampler(s";
-						rootSignature += StringUtility::ToString<char8>(textureIndex);
-						rootSignature += ")";
-
-						++textureIndex;
-					}
-
-					rootSignature += ")";
-				}
-
-				rootSignature += "\"\n";
-
-				Output.VertexShader = rootSignature + Output.VertexShader;
 			}
 
 			void ASTToHLSLCompiler::ResetPerStageValues(Stages Stage)
@@ -235,6 +199,20 @@ namespace Engine
 
 				m_ConstantBufferBindingCount = 0;
 				m_TextureBindingCount = 0;
+			}
+
+			void ASTToHLSLCompiler::BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
+			{
+				ASTCompilerBase::BuildStageShader(Stage, Structs, Variables, Functions, Shader);
+
+				if (Stage != Stages::Vertex &&
+					Stage != Stages::Compute)
+					return;
+
+				String rootSignature;
+				BuildRootSignature(Variables, rootSignature);
+
+				Shader = rootSignature + Shader;
 			}
 
 			void ASTToHLSLCompiler::BuildStruct(StructType* Struct, Stages Stage, String& Shader)
@@ -490,9 +468,9 @@ namespace Engine
 
 				Shader += StringUtility::ToString<char8>(Attribute->GetXCount());
 				Shader += ", ";
-				Shader += StringUtility::ToString<char8>(Attribute->GetXCount());
+				Shader += StringUtility::ToString<char8>(Attribute->GetYCount());
 				Shader += ", ";
-				Shader += StringUtility::ToString<char8>(Attribute->GetXCount());
+				Shader += StringUtility::ToString<char8>(Attribute->GetZCount());
 
 				Shader += ")]";
 			}
@@ -582,6 +560,45 @@ namespace Engine
 					Shader += "Texture2D";
 					break;
 				}
+			}
+
+			void ASTToHLSLCompiler::BuildRootSignature(const GlobalVariableList& Variables, String& Shader)
+			{
+				Shader += "#define ";
+				Shader += GetRootSignatureDefineName();
+				Shader += " \"";
+
+				Shader += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
+
+				uint8 cbvIndex = 0;
+				uint8 textureIndex = 0;
+				for (auto variableType : Variables)
+				{
+					const DataTypeStatement* dataType = variableType->GetDataType();
+
+					Shader += ",";
+
+					if (dataType->GetType() == ProgramDataTypes::Unknown)
+					{
+						Shader += "CBV(b";
+
+						Shader += StringUtility::ToString<char8>(cbvIndex++);
+					}
+					else if (dataType->GetType() == ProgramDataTypes::Texture2D)
+					{
+						Shader += "DescriptorTable(SRV(t";
+						Shader += StringUtility::ToString<char8>(textureIndex);
+						Shader += ")),DescriptorTable(Sampler(s";
+						Shader += StringUtility::ToString<char8>(textureIndex);
+						Shader += ")";
+
+						++textureIndex;
+					}
+
+					Shader += ")";
+				}
+
+				Shader += "\"\n";
 			}
 
 			cstr ASTToHLSLCompiler::GetRootSignatureDefineName(void)

@@ -17,21 +17,25 @@ namespace Engine
 
 	namespace MathContainers
 	{
+		typedef Vector2<int32> Vector2I;
+		typedef Vector2<uint32> Vector2U;
 		typedef Vector2<float32> Vector2F;
 		typedef Vector2<float64> Vector2D;
-		typedef Vector2<int32> Vector2I;
 
+		typedef Vector3<int32> Vector3I;
+		typedef Vector3<uint32> Vector3U;
 		typedef Vector3<float32> Vector3F;
 		typedef Vector3<float64> Vector3D;
-		typedef Vector3<int32> Vector3I;
+
+		typedef Vector4<int32> Vector4I;
+		typedef Vector4<uint32> Vector4U;
+		typedef Vector4<float32> Vector4F;
+		typedef Vector4<float64> Vector4D;
 
 		typedef Quaternion<float32> QuaternionF;
 
-		typedef Vector4<float32> Vector4F;
-		typedef Vector4<float64> Vector4D;
-		typedef Vector4<int32> Vector4I;
-
 		typedef Matrix4<float32> Matrix4F;
+		typedef Matrix4<float64> Matrix4D;
 
 		typedef Rect<int32> RectI;
 	}

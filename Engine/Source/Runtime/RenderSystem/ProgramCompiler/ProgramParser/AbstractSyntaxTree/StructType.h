@@ -81,6 +81,16 @@ namespace Engine
 						alignment = GPUAlignedFloat64::Alignment;
 						break;
 
+					case ProgramDataTypes::Integer2:
+						Size = GPUAlignedVector2I::Size;
+						alignment = GPUAlignedVector2I::Alignment;
+						break;
+
+					case ProgramDataTypes::UnsignedInteger2:
+						Size = GPUAlignedVector2U::Size;
+						alignment = GPUAlignedVector2U::Alignment;
+						break;
+
 					case ProgramDataTypes::Float2:
 						Size = GPUAlignedVector2F::Size;
 						alignment = GPUAlignedVector2F::Alignment;
@@ -89,6 +99,16 @@ namespace Engine
 					case ProgramDataTypes::Double2:
 						Size = GPUAlignedVector2D::Size;
 						alignment = GPUAlignedVector2D::Alignment;
+						break;
+
+					case ProgramDataTypes::Integer3:
+						Size = GPUAlignedVector3I::Size;
+						alignment = GPUAlignedVector3I::Alignment;
+						break;
+
+					case ProgramDataTypes::UnsignedInteger3:
+						Size = GPUAlignedVector3U::Size;
+						alignment = GPUAlignedVector3U::Alignment;
 						break;
 
 					case ProgramDataTypes::Float3:
@@ -101,6 +121,16 @@ namespace Engine
 						alignment = GPUAlignedVector3D::Alignment;
 						break;
 
+					case ProgramDataTypes::Integer4:
+						Size = GPUAlignedVector4I::Size;
+						alignment = GPUAlignedVector4I::Alignment;
+						break;
+
+					case ProgramDataTypes::UnsignedInteger4:
+						Size = GPUAlignedVector4U::Size;
+						alignment = GPUAlignedVector4U::Alignment;
+						break;
+
 					case ProgramDataTypes::Float4:
 						Size = GPUAlignedVector4F::Size;
 						alignment = GPUAlignedVector4F::Alignment;
@@ -111,9 +141,14 @@ namespace Engine
 						alignment = GPUAlignedVector4D::Alignment;
 						break;
 
-					case ProgramDataTypes::Matrix4:
+					case ProgramDataTypes::Matrix4F:
 						Size = GPUAlignedMatrix4F::Size;
 						alignment = GPUAlignedMatrix4F::Alignment;
+						break;
+
+					case ProgramDataTypes::Matrix4D:
+						Size = GPUAlignedMatrix4D::Size;
+						alignment = GPUAlignedMatrix4D::Alignment;
 						break;
 
 					default:

@@ -529,12 +529,28 @@ namespace Engine
 					Shader += "double";
 					break;
 
+				case ProgramDataTypes::Integer2:
+					Shader += "ivec2";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger2:
+					Shader += "uvec2";
+					break;
+
 				case ProgramDataTypes::Float2:
 					Shader += "vec2";
 					break;
 
 				case ProgramDataTypes::Double2:
 					Shader += "dvec2";
+					break;
+
+				case ProgramDataTypes::Integer3:
+					Shader += "ivec3";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger3:
+					Shader += "uvec3";
 					break;
 
 				case ProgramDataTypes::Float3:
@@ -545,6 +561,14 @@ namespace Engine
 					Shader += "dvec3";
 					break;
 
+				case ProgramDataTypes::Integer4:
+					Shader += "ivec4";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger4:
+					Shader += "uvec4";
+					break;
+
 				case ProgramDataTypes::Float4:
 					Shader += "vec4";
 					break;
@@ -553,7 +577,8 @@ namespace Engine
 					Shader += "dvec4";
 					break;
 
-				case ProgramDataTypes::Matrix4:
+				case ProgramDataTypes::Matrix4F:
+				case ProgramDataTypes::Matrix4D:
 					Shader += "mat4";
 					break;
 

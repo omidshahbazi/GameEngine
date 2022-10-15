@@ -528,12 +528,28 @@ namespace Engine
 					Shader += "double";
 					break;
 
+				case ProgramDataTypes::Integer2:
+					Shader += "int2";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger2:
+					Shader += "uint2";
+					break;
+
 				case ProgramDataTypes::Float2:
 					Shader += "float2";
 					break;
 
 				case ProgramDataTypes::Double2:
 					Shader += "double2";
+					break;
+
+				case ProgramDataTypes::Integer3:
+					Shader += "int3";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger3:
+					Shader += "uint3";
 					break;
 
 				case ProgramDataTypes::Float3:
@@ -544,6 +560,14 @@ namespace Engine
 					Shader += "double3";
 					break;
 
+				case ProgramDataTypes::Integer4:
+					Shader += "int4";
+					break;
+
+				case ProgramDataTypes::UnsignedInteger4:
+					Shader += "uint4";
+					break;
+
 				case ProgramDataTypes::Float4:
 					Shader += "float4";
 					break;
@@ -552,8 +576,12 @@ namespace Engine
 					Shader += "double4";
 					break;
 
-				case ProgramDataTypes::Matrix4:
+				case ProgramDataTypes::Matrix4F:
 					Shader += "float4x4";
+					break;
+
+				case ProgramDataTypes::Matrix4D:
+					Shader += "double4x4";
 					break;
 
 				case ProgramDataTypes::Texture2D:

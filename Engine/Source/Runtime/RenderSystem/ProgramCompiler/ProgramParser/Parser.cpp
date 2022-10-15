@@ -375,6 +375,17 @@ namespace Engine
 				else
 					THROW_PROGRAM_PARSER_EXCEPTION("Couldn't recognize a register", registerToken);
 
+				if (reg == StructVariableType::Registers::PrimitiveID ||
+					reg == StructVariableType::Registers::InstanceID ||
+					reg == StructVariableType::Registers::DispatchThreadID ||
+					reg == StructVariableType::Registers::GroupID ||
+					reg == StructVariableType::Registers::GroupIndex ||
+					reg == StructVariableType::Registers::GroupThreadID)
+				{
+					if (!dataType->IsIntegral())
+						THROW_PROGRAM_PARSER_EXCEPTION("Data type must be integral", registerToken);
+				}
+
 				VariableType->SetRegister(reg);
 
 				if (indexStartIndex != identifier.GetLength())
@@ -1545,13 +1556,20 @@ namespace Engine
 				dataTypesName["uint"] = ProgramDataTypes::UnsignedInteger;
 				dataTypesName["float"] = ProgramDataTypes::Float;
 				dataTypesName["double"] = ProgramDataTypes::Double;
+				dataTypesName["int2"] = ProgramDataTypes::Integer2;
+				dataTypesName["uint2"] = ProgramDataTypes::UnsignedInteger2;
 				dataTypesName["float2"] = ProgramDataTypes::Float2;
 				dataTypesName["double2"] = ProgramDataTypes::Double2;
+				dataTypesName["int3"] = ProgramDataTypes::Integer3;
+				dataTypesName["uint3"] = ProgramDataTypes::UnsignedInteger3;
 				dataTypesName["float3"] = ProgramDataTypes::Float3;
 				dataTypesName["double3"] = ProgramDataTypes::Double3;
+				dataTypesName["int4"] = ProgramDataTypes::Integer4;
+				dataTypesName["uint4"] = ProgramDataTypes::UnsignedInteger4;
 				dataTypesName["float4"] = ProgramDataTypes::Float4;
 				dataTypesName["double4"] = ProgramDataTypes::Double4;
-				dataTypesName["matrix4"] = ProgramDataTypes::Matrix4;
+				dataTypesName["matrix4d"] = ProgramDataTypes::Matrix4F;
+				dataTypesName["matrix4f"] = ProgramDataTypes::Matrix4D;
 				dataTypesName["texture2D"] = ProgramDataTypes::Texture2D;
 			}
 

@@ -10,8 +10,148 @@ namespace Engine
 		{
 			void HLSLIntrinsicProvider::Initialize(IInitializeHelper* Helper)
 			{
-				BEGIN_FUNCTION("float2", 2);
+				BEGIN_FUNCTION("int2", 6);
 				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("uint2", 6);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("uint2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("uint2");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("float2", 11);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("float2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("float2");
+					}
+					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
@@ -26,45 +166,352 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("float2");
 					}
 					END_OVERRIDE();
-				}
-				END_FUNCTION();
 
-				BEGIN_FUNCTION("double2", 4);
-				{
-					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 					{
-						ADD_PARAMETER(ProgramDataTypes::Float);
-						SET_NATIVE_DESCRIPTION("double2");
-					}
-					END_OVERRIDE();
-
-					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
-					{
-						ADD_PARAMETER(ProgramDataTypes::Float);
-						ADD_PARAMETER(ProgramDataTypes::Float);
-						SET_NATIVE_DESCRIPTION("double2");
-					}
-					END_OVERRIDE();
-
-					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
-					{
-						ADD_PARAMETER(ProgramDataTypes::Double);
-						SET_NATIVE_DESCRIPTION("double2");
-					}
-					END_OVERRIDE();
-
-					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
-					{
-						ADD_PARAMETER(ProgramDataTypes::Double);
-						ADD_PARAMETER(ProgramDataTypes::Double);
-						SET_NATIVE_DESCRIPTION("double2");
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						SET_NATIVE_DESCRIPTION("float2");
 					}
 					END_OVERRIDE();
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("float3", 5);
+				BEGIN_FUNCTION("double2", 12);
 				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double2);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Double2);
+						SET_NATIVE_DESCRIPTION("double2");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("int3", 10);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("int3");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("uint3", 10);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("uint3");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("float3", 15);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("float3");
+					}
+					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
@@ -106,8 +553,86 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("double3", 7);
+				BEGIN_FUNCTION("double3", 22);
 				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
@@ -121,6 +646,29 @@ namespace Engine
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						SET_NATIVE_DESCRIPTION("double3");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double3);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float3);
+						SET_NATIVE_DESCRIPTION("float3");
 					}
 					END_OVERRIDE();
 
@@ -165,8 +713,418 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("float4", 8);
+				BEGIN_FUNCTION("int4", 16);
 				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger4);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Integer4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer4);
+						SET_NATIVE_DESCRIPTION("int4");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("uint4", 16);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer4);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::UnsignedInteger4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger4);
+						SET_NATIVE_DESCRIPTION("uint4");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("float4", 24);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer4);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger4);
+						SET_NATIVE_DESCRIPTION("float4");
+					}
+					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
@@ -236,8 +1194,143 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("double4", 10);
+				BEGIN_FUNCTION("double4", 34);
 				{
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer2);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer);
+						ADD_PARAMETER(ProgramDataTypes::Integer3);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Integer4);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger2);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger);
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger3);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::UnsignedInteger4);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
@@ -251,6 +1344,56 @@ namespace Engine
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float2);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float3);
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float);
+						ADD_PARAMETER(ProgramDataTypes::Float3);
+						SET_NATIVE_DESCRIPTION("double4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Float4);
 						SET_NATIVE_DESCRIPTION("double4");
 					}
 					END_OVERRIDE();
@@ -324,16 +1467,16 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("matrix4", 2);
+				BEGIN_FUNCTION("matrix4f", 2);
 				{
-					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4);
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4F);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						SET_NATIVE_DESCRIPTION("float4x4");
 					}
 					END_OVERRIDE();
 
-					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4);
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4F);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						ADD_PARAMETER(ProgramDataTypes::Float);
@@ -352,6 +1495,39 @@ namespace Engine
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						ADD_PARAMETER(ProgramDataTypes::Float);
 						SET_NATIVE_DESCRIPTION("float4x4");
+					}
+					END_OVERRIDE();
+				}
+				END_FUNCTION();
+
+				BEGIN_FUNCTION("matrix4D", 2);
+				{
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4D);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						SET_NATIVE_DESCRIPTION("double4x4");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4D);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						ADD_PARAMETER(ProgramDataTypes::Double);
+						SET_NATIVE_DESCRIPTION("double4x4");
 					}
 					END_OVERRIDE();
 				}
@@ -388,12 +1564,14 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("normalize");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
 						SET_NATIVE_DESCRIPTION("normalize");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -412,6 +1590,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("min");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float2);
@@ -419,6 +1598,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("min");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -426,6 +1606,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("min");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -445,6 +1626,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("max");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float2);
@@ -452,6 +1634,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("max");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -459,6 +1642,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("max");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -469,19 +1653,68 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Multiply", 2);
+				BEGIN_FUNCTION("Multiply", 8);
 				{
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
-						ADD_PARAMETER(ProgramDataTypes::Matrix4);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
 						ADD_PARAMETER(ProgramDataTypes::Float4);
 						SET_NATIVE_DESCRIPTION("mul");
 					}
 					END_OVERRIDE();
-					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4);
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
-						ADD_PARAMETER(ProgramDataTypes::Matrix4);
-						ADD_PARAMETER(ProgramDataTypes::Matrix4);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
+						ADD_PARAMETER(ProgramDataTypes::Float4);
+						SET_NATIVE_DESCRIPTION("mul");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
+						ADD_PARAMETER(ProgramDataTypes::Double4);
+						SET_NATIVE_DESCRIPTION("mul");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Double4);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
+						ADD_PARAMETER(ProgramDataTypes::Double4);
+						SET_NATIVE_DESCRIPTION("mul");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4F);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
+						SET_NATIVE_DESCRIPTION("mul");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4D);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
+						SET_NATIVE_DESCRIPTION("mul");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4D);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
+						SET_NATIVE_DESCRIPTION("mul");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4D);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
 						SET_NATIVE_DESCRIPTION("mul");
 					}
 					END_OVERRIDE();
@@ -509,6 +1742,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("dot");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -516,6 +1750,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("dot");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -535,6 +1770,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("reflect");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -542,6 +1778,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("reflect");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -562,6 +1799,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("refract");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -570,6 +1808,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("refract");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -589,12 +1828,14 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("length");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
 						SET_NATIVE_DESCRIPTION("length");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -613,6 +1854,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("distance");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -620,6 +1862,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("distance");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -630,11 +1873,18 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Transpose", 1);
+				BEGIN_FUNCTION("Transpose", 2);
 				{
-					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4);
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4F);
 					{
-						ADD_PARAMETER(ProgramDataTypes::Matrix4);
+						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
+						SET_NATIVE_DESCRIPTION("transpose");
+					}
+					END_OVERRIDE();
+
+					BEGIN_OVERRIDE(ProgramDataTypes::Matrix4D);
+					{
+						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
 						SET_NATIVE_DESCRIPTION("transpose");
 					}
 					END_OVERRIDE();
@@ -705,6 +1955,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("pow");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float2);
@@ -712,6 +1963,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("pow");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -719,6 +1971,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("pow");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);
@@ -739,6 +1992,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("clamp");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float2);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float2);
@@ -747,6 +2001,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("clamp");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float3);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float3);
@@ -755,6 +2010,7 @@ namespace Engine
 						SET_NATIVE_DESCRIPTION("clamp");
 					}
 					END_OVERRIDE();
+
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
 						ADD_PARAMETER(ProgramDataTypes::Float4);

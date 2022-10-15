@@ -77,6 +77,19 @@ namespace Engine
 					return !(m_ElementCount == nullptr && m_PostElementCount == nullptr);
 				}
 
+				bool IsIntegral(void) const
+				{
+					return (
+						m_Type == ProgramDataTypes::Integer ||
+						m_Type == ProgramDataTypes::UnsignedInteger ||
+						m_Type == ProgramDataTypes::Integer2 ||
+						m_Type == ProgramDataTypes::UnsignedInteger2 ||
+						m_Type == ProgramDataTypes::Integer3 ||
+						m_Type == ProgramDataTypes::UnsignedInteger3 ||
+						m_Type == ProgramDataTypes::Integer4 ||
+						m_Type == ProgramDataTypes::UnsignedInteger4);
+				}
+
 				String ToString(void) const
 				{
 					String result = "";
@@ -107,6 +120,14 @@ namespace Engine
 						result = "double";
 						break;
 
+					case ProgramDataTypes::Integer2:
+						result = "int2";
+						break;
+
+					case ProgramDataTypes::UnsignedInteger2:
+						result = "uint2";
+						break;
+
 					case ProgramDataTypes::Float2:
 						result = "float2";
 						break;
@@ -119,6 +140,14 @@ namespace Engine
 						result = "float3";
 						break;
 
+					case ProgramDataTypes::Integer3:
+						result = "int3";
+						break;
+
+					case ProgramDataTypes::UnsignedInteger3:
+						result = "uint3";
+						break;
+
 					case ProgramDataTypes::Double3:
 						result = "double3";
 						break;
@@ -127,12 +156,24 @@ namespace Engine
 						result = "float4";
 						break;
 
+					case ProgramDataTypes::Integer4:
+						result = "int4";
+						break;
+
+					case ProgramDataTypes::UnsignedInteger4:
+						result = "uint4";
+						break;
+
 					case ProgramDataTypes::Double4:
 						result = "double4";
 						break;
 
-					case ProgramDataTypes::Matrix4:
-						result = "matrix4";
+					case ProgramDataTypes::Matrix4F:
+						result = "matrix4f";
+						break;
+
+					case ProgramDataTypes::Matrix4D:
+						result = "matrix4d";
 						break;
 
 					default:

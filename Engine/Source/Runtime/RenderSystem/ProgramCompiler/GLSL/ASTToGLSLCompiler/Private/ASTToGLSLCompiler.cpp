@@ -263,38 +263,47 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildDomainAttributeType(DomainAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildTopologyAttributeType(TopologyAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			void ASTToGLSLCompiler::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -336,11 +345,6 @@ namespace Engine
 					ASTCompilerBase::BuildMemberAccessStatement(Statement, Type, Stage, Shader);
 				else
 					BuildStatement(Statement->GetRight(), Type, Stage, Shader);
-			}
-
-			void ASTToGLSLCompiler::BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-			{
-				ASTCompilerBase::BuildIfStatement(Statement, Type, Stage, Shader);
 			}
 
 			void ASTToGLSLCompiler::BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)

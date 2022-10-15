@@ -118,20 +118,6 @@ namespace Engine
 
 				compiler->Compile(&compilerAllocator, parameters.Structs, parameters.Variables, parameters.Functions, output);
 
-				String vs = output.VertexShader;
-				String hs = output.HullShader;
-				String ds = output.DomainShader;
-				String gs = output.GeometryShader;
-				String fs = output.FragmentShader;
-				String cs = output.ComputeShader;
-
-				FileSystem::WriteAllText("D:/vs.hlsl", vs);
-				FileSystem::WriteAllText("D:/hs.hlsl", hs);
-				FileSystem::WriteAllText("D:/ds.hlsl", ds);
-				FileSystem::WriteAllText("D:/gs.hlsl", gs);
-				FileSystem::WriteAllText("D:/fs.hlsl", fs);
-				FileSystem::WriteAllText("D:/cs.hlsl", cs);
-
 				for (auto& structType : parameters.Structs)
 				{
 					auto variables = structType->GetItems();

@@ -268,7 +268,7 @@ namespace Engine
 				if (MatchSymbol(CLOSE_BRACKET))
 					break;
 
-				StructVariableType* variableType = Allocate<StructVariableType>(m_Allocator);
+				StructVariableType* variableType = Allocate<StructVariableType>(structType, m_Allocator);
 				structType->AddItem(variableType);
 
 				Token variableToken;
@@ -523,7 +523,7 @@ namespace Engine
 				if (MatchSymbol(COMMA))
 					continue;
 
-				ParameterType* parameterType = Allocate<ParameterType>(m_Allocator);
+				ParameterType* parameterType = Allocate<ParameterType>(functionType, m_Allocator);
 				functionType->AddParamaeter(parameterType);
 
 				Token parameterToken;
@@ -1092,7 +1092,7 @@ namespace Engine
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
 			ValidateDataType(dataType);
 
-			VariableStatement* stm = Allocate<VariableStatement>(m_Allocator);
+			VariableStatement* stm = Allocate<VariableStatement>(m_Parameters->Functions[m_Parameters->Functions.GetSize() - 1], m_Allocator);
 			stm->SetDataType(dataType);
 			stm->SetName(nameToken.GetName());
 

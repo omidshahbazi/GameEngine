@@ -4,6 +4,7 @@
 #define STRUCT_VARIABLE_TYPE_H
 
 #include <ProgramParser\AbstractSyntaxTree\VariableType.h>
+#include <ProgramParser\AbstractSyntaxTree\StructType.h>
 
 namespace Engine
 {
@@ -11,6 +12,8 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
+			class StructType;
+
 			class PROGRAMPARSER_API StructVariableType : public VariableType
 			{
 			public:
@@ -35,11 +38,17 @@ namespace Engine
 				};
 
 			public:
-				StructVariableType(AllocatorBase* Allocator) :
+				StructVariableType(StructType* Parent, AllocatorBase* Allocator) :
 					VariableType(Allocator),
+					m_Parent(Parent),
 					m_Register(Registers::None),
 					m_RegisterIndex(0)
 				{
+				}
+
+				const StructType* GetParent(void) const
+				{
+					return m_Parent;
 				}
 
 				Registers GetRegister(void) const
@@ -137,6 +146,7 @@ namespace Engine
 				}
 
 			private:
+				StructType* m_Parent;
 				Registers m_Register;
 				uint8 m_RegisterIndex;
 			};

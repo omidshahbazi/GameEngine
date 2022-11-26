@@ -83,8 +83,6 @@ namespace Engine
 
 			virtual void ResetPerStageValues(Stages Stage);
 
-			virtual void BuildHeader(String& Shader);
-
 			virtual void BuildStructs(const StructList& Structs, Stages Stage, String& Shader);
 
 			virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) = 0;
@@ -179,7 +177,7 @@ namespace Engine
 
 			virtual uint8 BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
-			virtual void BuildDataTypeStatement(DataTypeStatement* Statement, String& Shader);
+			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, String& Shader);
 
 			virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 
@@ -190,7 +188,8 @@ namespace Engine
 
 			const FunctionType* FindFunctionType(const String& Name) const;
 			const StructType* FindStructType(const String& Name) const;
-			const VariableType* FindVariableType(const StructType* StructType, const String& Name) const;
+			const StructVariableType* FindVariableType(const StructType* StructType, const String& Name) const;
+			const StructVariableType* FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 
 			static cstr GetStageResultArrayVariableName(void);
 

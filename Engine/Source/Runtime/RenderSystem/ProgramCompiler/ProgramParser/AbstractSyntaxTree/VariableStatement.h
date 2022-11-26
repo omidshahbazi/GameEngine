@@ -13,11 +13,14 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
+			class FunctionType;
+
 			class PROGRAMPARSER_API VariableStatement : public Statement, public VariableType
 			{
 			public:
-				VariableStatement(AllocatorBase* Allocator) :
+				VariableStatement(FunctionType* Parent, AllocatorBase* Allocator) :
 					VariableType(Allocator),
+					m_Parent(Parent),
 					m_InitialStatement(nullptr)
 				{
 				}
@@ -26,6 +29,11 @@ namespace Engine
 				{
 					if (m_InitialStatement != nullptr)
 						Destruct(m_InitialStatement);
+				}
+
+				const FunctionType* GetParent(void) const
+				{
+					return m_Parent;
 				}
 
 				Statement* GetInitialStatement(void) const
@@ -58,6 +66,7 @@ namespace Engine
 				}
 
 			private:
+				FunctionType* m_Parent;
 				Statement* m_InitialStatement;
 			};
 		}

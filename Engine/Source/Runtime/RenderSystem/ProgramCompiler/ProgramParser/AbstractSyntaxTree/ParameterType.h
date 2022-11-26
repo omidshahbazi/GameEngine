@@ -13,12 +13,20 @@ namespace Engine
 	{
 		namespace AbstractSyntaxTree
 		{
+			class FunctionType;
+
 			class PROGRAMPARSER_API ParameterType : public VariableType
 			{
 			public:
-				ParameterType(AllocatorBase* Allocator) :
-					VariableType(Allocator)
+				ParameterType(FunctionType* Parent, AllocatorBase* Allocator) :
+					VariableType(Allocator),
+					m_Parent(Parent)
 				{
+				}
+
+				const FunctionType* GetParent(void) const
+				{
+					return m_Parent;
 				}
 
 				virtual String ToString(void) const override
@@ -29,6 +37,9 @@ namespace Engine
 
 					return result;
 				}
+
+			private:
+				FunctionType* m_Parent;
 			};
 
 			typedef Vector<ParameterType*> ParameterList;

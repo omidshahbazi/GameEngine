@@ -189,8 +189,6 @@ namespace Engine
 				m_TextureBindingCount = 0;
 
 				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
-
-
 			}
 
 			void ASTToHLSLCompiler::ResetPerStageValues(Stages Stage)

@@ -1647,7 +1647,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
 						ADD_PARAMETER(ProgramDataTypes::Float4);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1655,7 +1662,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
 						ADD_PARAMETER(ProgramDataTypes::Float4);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1663,7 +1677,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
 						ADD_PARAMETER(ProgramDataTypes::Double4);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1671,7 +1692,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
 						ADD_PARAMETER(ProgramDataTypes::Double4);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1679,7 +1707,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
 						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1687,7 +1722,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
 						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1695,7 +1737,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
 						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 
@@ -1703,7 +1752,14 @@ namespace Engine
 					{
 						ADD_PARAMETER(ProgramDataTypes::Matrix4F);
 						ADD_PARAMETER(ProgramDataTypes::Matrix4D);
-						SET_NATIVE_DESCRIPTION("mul");
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								Shader += '(';
+								Compiler->BuildStatement(Arguments[0], Type, Stage, Shader);
+								Shader += '*';
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 				}
@@ -2007,7 +2063,7 @@ namespace Engine
 								//Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetGeometryOutputStreamParameterName();
 								//Shader += ".Append(";
 								//Shader += argument;
-								//Shader += ");\n";
+								Shader += "EmitVertex();\n";
 							});
 					}
 					END_OVERRIDE();
@@ -2022,7 +2078,7 @@ namespace Engine
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
 								//Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetGeometryOutputStreamParameterName();
-								//Shader += ".RestartStrip();\n";
+								Shader += "EndPrimitive();\n";
 							});
 					}
 					END_OVERRIDE();

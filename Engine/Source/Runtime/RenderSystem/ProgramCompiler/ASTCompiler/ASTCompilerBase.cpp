@@ -68,8 +68,6 @@ namespace Engine
 
 			ResetPerStageValues(Stage);
 
-			BuildHeader(Shader);
-
 			BuildStructs(Structs, Stage, Shader);
 
 			BuildGlobalVariables(Variables, Stage, Shader);
@@ -110,10 +108,6 @@ namespace Engine
 		void ASTCompilerBase::ResetPerStageValues(Stages Stage)
 		{
 			m_Variables.Clear();
-		}
-
-		void ASTCompilerBase::BuildHeader(String& Shader)
-		{
 		}
 
 		void ASTCompilerBase::BuildStructs(const StructList& Structs, Stages Stage, String& Shader)
@@ -432,6 +426,8 @@ namespace Engine
 			{
 				VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
 
+				m_Variables[stm->GetName()] = stm->GetDataType();
+
 				BuildVariableStatement(stm, Type, Stage, Shader);
 			}
 			else if (IsAssignableFrom(Statement, VariableAccessStatement))
@@ -654,8 +650,6 @@ namespace Engine
 
 		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			m_Variables[Statement->GetName()] = Statement->GetDataType();
-
 			BuildDataTypeStatement(Statement->GetDataType(), Shader);
 
 			Shader += " ";
@@ -921,7 +915,7 @@ namespace Engine
 			return elementCount;
 		}
 
-		void ASTCompilerBase::BuildDataTypeStatement(DataTypeStatement* Statement, String& Shader)
+		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, String& Shader)
 		{
 			if (Statement->IsBuiltIn())
 				BuildType(Statement->GetType(), Shader);
@@ -1164,9 +1158,14 @@ namespace Engine
 			return m_Structs[index];
 		}
 
-		const VariableType* ASTCompilerBase::FindVariableType(const StructType* StructType, const String& Name) const
+		const StructVariableType* ASTCompilerBase::FindVariableType(const StructType* StructType, const String& Name) const
 		{
-			int32 index = StructType->GetItems().FindIf([&Name](auto variableType) { return variableType->GetName() == Name; });
+			return FindVariableType(StructType, [&Name](auto variableType) { return variableType->GetName() == Name; });
+		}
+
+		const StructVariableType* ASTCompilerBase::FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const
+		{
+			int32 index = StructType->GetItems().FindIf(Condition);
 			if (index == -1)
 				return nullptr;
 

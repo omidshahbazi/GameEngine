@@ -72,6 +72,22 @@ BEGIN_ENTRY_POINT
 
 	EditorGUIManager::Create(RootAllocator::GetInstance());
 
+
+	ProgramInfo info;
+	info.DebugMode = true;
+	FileSystem::ReadAllText("D:/Projects/GameEngine/Engine/Binaries/Debug Win64/Assets/TessTest.program", &info.Source);
+
+	device->CreateProgram(&info);
+
+
+	ResourceManager::GetInstance()->GetCompiler()->CompileResources();
+	Material mat(ResourceManager::GetInstance()->Load<Program>("TessTest.program"));
+
+	auto quad = ResourceManager::GetInstance()->GetPrimitiveMesh(ResourceManager::PrimitiveMeshTypes::Quad);
+
+	CommandBuffer buffer;
+	buffer.Draw(**quad, Matrix4F::Identity, &mat);
+
 	{
 		PhysicalWindow physWindow(device);
 		physWindow.SetSize({ 1080, 920 });
@@ -81,17 +97,19 @@ BEGIN_ENTRY_POINT
 
 		while (!physWindow.IsClosed())
 		{
-			//_sleep(16);
+			_sleep(16);
 
 			physWindow.UpdateAll();
 
 			device->BeginFrame(physWindow.GetContext());
 
-			cmd.Clear();
+			//cmd.Clear();
 
-			physWindow.RenderAll(&cmd);
+			//physWindow.RenderAll(&cmd);
 
-			device->SubmitCommandBuffer(&cmd);
+			//device->SubmitCommandBuffer(&cmd);
+
+			device->SubmitCommandBuffer(&buffer);
 
 			device->EndFrame();
 

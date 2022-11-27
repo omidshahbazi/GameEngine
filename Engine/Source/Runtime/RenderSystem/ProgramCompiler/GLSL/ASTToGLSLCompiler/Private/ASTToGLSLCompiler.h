@@ -107,7 +107,8 @@ namespace Engine
 				void BuildFlattenParameterName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, Stages Stage, String& Shader);
 				void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, String& Shader);
 
-				const VariableType* FindVariableType(const String& Name);
+				const VariableType* FindVariableTypeInBlocks(const String& Name);
+
 				void IncreaseBlockIndex(void);
 				void DecreaseBlockIndex(void);
 				void PushVariable(VariableType* Variable);

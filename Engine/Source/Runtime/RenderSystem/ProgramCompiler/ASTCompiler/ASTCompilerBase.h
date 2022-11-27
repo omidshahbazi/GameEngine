@@ -187,9 +187,16 @@ namespace Engine
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
 
 			const FunctionType* FindFunctionType(const String& Name) const;
+			const FunctionType* GetFunctionType(const String& Name) const;
+
 			const StructType* FindStructType(const String& Name) const;
+			const StructType* GetStructType(const String& Name) const;
+
 			const StructVariableType* FindVariableType(const StructType* StructType, const String& Name) const;
+			const StructVariableType* GetVariableType(const StructType* StructType, const String& Name) const;
+
 			const StructVariableType* FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
+			const StructVariableType* GetVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 
 			static cstr GetStageResultArrayVariableName(void);
 

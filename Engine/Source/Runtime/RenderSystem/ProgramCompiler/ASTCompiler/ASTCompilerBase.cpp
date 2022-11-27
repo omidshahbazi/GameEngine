@@ -186,9 +186,7 @@ namespace Engine
 		{
 			auto checkRequiredRegisters = [&](const String& StructName, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
-				const StructType* structType = FindStructType(StructName);
-				if (structType == nullptr)
-					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find %S struct type", Function->GetReturnDataType()->GetUserDefined());
+				const StructType* structType = GetStructType(StructName);
 
 				for (uint8 i = 0; i < RequiredRegisterCount; ++i)
 				{
@@ -268,7 +266,7 @@ namespace Engine
 				if (ELEMENT_COUNT[(uint32)primitiveType->GetType()] != StringUtility::ToUInt8(Function->GetParameters()[0]->GetDataType()->GetPostElementCount()->ToString()))
 					THROW_PROGRAM_COMPILER_EXCEPTION("Element count of the Geometry entrypoint is not compatible with its primitive type", Function->GetName());
 
-				if (FindStructType(outputStreamType->GetDataType()) == nullptr)
+				if (GetStructType(outputStreamType->GetDataType()) == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find the DataType specified in the OutputStream attribute", Function->GetName());
 
 				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
@@ -1149,6 +1147,15 @@ namespace Engine
 			return m_Functions[index];
 		}
 
+		const FunctionType* ASTCompilerBase::GetFunctionType(const String& Name) const
+		{
+			const FunctionType* type = FindFunctionType(Name);
+			if (type == nullptr)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find function", Name);
+
+			return type;
+		}
+
 		const StructType* ASTCompilerBase::FindStructType(const String& Name) const
 		{
 			int32 index = m_Structs.FindIf([&Name](auto structType) { return structType->GetName() == Name; });
@@ -1158,9 +1165,27 @@ namespace Engine
 			return m_Structs[index];
 		}
 
+		const StructType* ASTCompilerBase::GetStructType(const String& Name) const
+		{
+			const StructType* type = FindStructType(Name);
+			if (type == nullptr)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find struct", Name);
+
+			return type;
+		}
+
 		const StructVariableType* ASTCompilerBase::FindVariableType(const StructType* StructType, const String& Name) const
 		{
 			return FindVariableType(StructType, [&Name](auto variableType) { return variableType->GetName() == Name; });
+		}
+
+		const StructVariableType* ASTCompilerBase::GetVariableType(const StructType* StructType, const String& Name) const
+		{
+			const StructVariableType* type = FindVariableType(StructType, Name);
+			if (type == nullptr)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find the variable", StructType->GetName() + "::" + Name);
+
+			return type;
 		}
 
 		const StructVariableType* ASTCompilerBase::FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const
@@ -1170,6 +1195,15 @@ namespace Engine
 				return nullptr;
 
 			return StructType->GetItems()[index];
+		}
+
+		const StructVariableType* ASTCompilerBase::GetVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const
+		{
+			const StructVariableType* type = FindVariableType(StructType, Condition);
+			if (type == nullptr)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find the variable", StructType->GetName());
+
+			return type;
 		}
 
 		cstr ASTCompilerBase::GetStageResultArrayVariableName(void)

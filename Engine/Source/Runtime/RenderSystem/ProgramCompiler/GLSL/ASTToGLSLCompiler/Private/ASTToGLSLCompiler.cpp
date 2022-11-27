@@ -126,15 +126,13 @@ namespace Engine
 				const String& name = Variable->GetName();
 				DataTypeStatement* dataType = Variable->GetDataType();
 
-				if (dataType->GetUserDefined() != String::Empty)
+				if (!dataType->IsBuiltIn())
 				{
-					const StructType* structType = FindStructType(dataType->GetUserDefined());
-					if (structType)
-					{
-						BuildUniformBlock(structType, name, Stages::Vertex, Shader);
+					const StructType* structType = GetStructType(dataType->GetUserDefined());
 
-						return;
-					}
+					BuildUniformBlock(structType, name, Stages::Vertex, Shader);
+
+					return;
 				}
 
 				for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
@@ -285,10 +283,26 @@ namespace Engine
 			{
 				PushVariable(Statement);
 
-				if (!Statement->GetDataType()->IsBuiltIn())
-					return;
+				if (Statement->GetDataType()->IsBuiltIn())
+				{
+					ASTCompilerBase::BuildVariableStatement(Statement, Type, Stage, Shader);
 
-				ASTCompilerBase::BuildVariableStatement(Statement, Type, Stage, Shader);
+					return;
+				}
+
+				const StructType* structType = GetStructType(Statement->GetDataType()->GetUserDefined());
+				for (const auto& variable : structType->GetItems())
+				{
+					BuildDataTypeStatement(variable->GetDataType(), Shader);
+
+					Shader += ' ';
+
+					BuildFlattenStructMemberVariableName(structType, variable, Statement->GetName(), true, Shader);
+
+					Shader += ';';
+
+					ADD_NEW_LINE();
+				}
 			}
 
 			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -309,7 +323,7 @@ namespace Engine
 				String leftStm;
 				BuildStatement(Statement->GetLeft(), Type, Stage, leftStm);
 
-				const VariableType* leftVariable = FindVariableType(leftStm);
+				const VariableType* leftVariable = FindVariableTypeInBlocks(leftStm);
 				if (leftVariable != nullptr)
 				{
 					bool isParameter = IsAssignableFrom(leftVariable, const ParameterType);
@@ -321,7 +335,7 @@ namespace Engine
 
 					if (isParameter || isOutputVariable)
 					{
-						const StructType* structType = FindStructType(leftVariable->GetDataType()->GetUserDefined());
+						const StructType* structType = GetStructType(leftVariable->GetDataType()->GetUserDefined());
 
 						bool isMemberAccess = IsAssignableFrom(Statement->GetRight(), MemberAccessStatement);
 						auto* rightStatement = (isMemberAccess ? ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetLeft() : Statement->GetRight());
@@ -330,9 +344,7 @@ namespace Engine
 						BuildStatement(rightStatement, Type, Stage, rightStm);
 						rightStm = rightStm.Split('.')[0];
 
-						const StructVariableType* rightVariable = ASTCompilerBase::FindVariableType(structType, rightStm);
-						if (rightVariable == nullptr)
-							THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find the struct member", rightStm);
+						const StructVariableType* rightVariable = GetVariableType(structType, rightStm);
 
 						BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Shader);
 
@@ -443,25 +455,28 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
+				if (Type == FunctionType::Types::None)
+					return;
+
 				Shader += String(GetReturnBoolName()) + " = true;";
 
 				ADD_NEW_LINE();
 
+				const String& returnDataType = m_CurrentBuildingFunction->GetReturnDataType()->GetUserDefined();
+				const StructType* structType = GetStructType(returnDataType);
+				const StructVariableType* variableType = nullptr;
+
 				if (Type == FunctionType::Types::VertexMain)
 				{
-					const StructType* structType = FindStructType(m_CurrentBuildingFunction->GetReturnDataType()->GetUserDefined());
-					const StructVariableType* variableType = ASTCompilerBase::FindVariableType(structType, [](const StructVariableType* item) { return item->GetRegister() == StructVariableType::Registers::Position; });
-					if (variableType == nullptr)
-						return;
-
 					Shader += "gl_Position = ";
 
-					BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Shader);
+					variableType = FindVariableType(structType, [](const StructVariableType* item) { return item->GetRegister() == StructVariableType::Registers::Position; });
 				}
 				else if (Type == FunctionType::Types::FragmentMain)
 				{
-					uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Type, Stage, Shader);
+					variableType = FindVariableType(structType, [](const StructVariableType* item) { return item->GetRegister() == StructVariableType::Registers::Color; });
 
+					uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Type, Stage, Shader);
 					for (uint8 i = 0; i < elementCount; ++i)
 					{
 						Shader += GetFragmentVariableName(i) + " = ";
@@ -480,12 +495,15 @@ namespace Engine
 						ADD_NEW_LINE();
 					}
 				}
-				else
-				{
-					Shader += "return ";
 
-					BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
-				}
+				if (variableType == nullptr)
+					return;
+
+				BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Shader);
+
+				//Shader += "return ";
+
+				//BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
 
 				Shader += ";";
 
@@ -606,13 +624,11 @@ namespace Engine
 			{
 				CoreDebugAssert(Categories::ProgramCompiler, !DataType->IsBuiltIn(), "DataType must be user-defined");
 
-				const StructType* structType = FindStructType(DataType->GetUserDefined());
-				CoreDebugAssert(Categories::ProgramCompiler, structType != nullptr, "Couldn't find struct %S", DataType->GetUserDefined());
-
+				const StructType* structType = GetStructType(DataType->GetUserDefined());
 				const auto& variables = structType->GetItems();
 
 				if (variables.ContainsIf([](auto item) { return item->GetRegister() == StructVariableType::Registers::None; }))
-					CoreDebugAssert(Categories::ProgramCompiler, false, "Struct %S cannot have variables without register specified", structType->GetName());
+					THROW_PROGRAM_COMPILER_EXCEPTION("Struct cannot have variables without register specified", structType->GetName());
 
 				for (auto& variable : variables)
 				{
@@ -641,7 +657,7 @@ namespace Engine
 			{
 				auto variables = Struct->GetItems();
 
-				if (variables.ContainsIf([](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }))
+				if (FindVariableType(Struct, [](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }) != nullptr)
 					CoreDebugAssert(Categories::ProgramCompiler, false, "Struct %S cannot have variables with register specified", Struct->GetName());
 
 				Shader += "layout(std140, binding=";
@@ -699,7 +715,7 @@ namespace Engine
 				}
 				else
 				{
-					const StructType* structType = FindStructType(DataType->GetUserDefined());
+					const StructType* structType = GetStructType(DataType->GetUserDefined());
 					for (auto& variable : structType->GetItems())
 					{
 						if (!IsFirst)
@@ -739,7 +755,7 @@ namespace Engine
 				Shader += Variable->GetName();
 			}
 
-			const VariableType* ASTToGLSLCompiler::FindVariableType(const String& Name)
+			const VariableType* ASTToGLSLCompiler::FindVariableTypeInBlocks(const String& Name)
 			{
 				for (int8 i = m_BlockVariables.GetSize() - 1; i >= 0; --i)
 				{

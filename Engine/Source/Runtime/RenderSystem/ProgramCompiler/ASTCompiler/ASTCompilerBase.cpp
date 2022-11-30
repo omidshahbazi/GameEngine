@@ -16,8 +16,8 @@ namespace Engine
 
 		ASTCompilerBase::ASTCompilerBase(void) :
 			m_Allocator(nullptr),
-			m_OpenScopeCount(0),
-			m_LastFunction(0)
+			m_BlockIndex(-1),
+			m_LastFunction(nullptr)
 		{
 		}
 
@@ -28,12 +28,10 @@ namespace Engine
 
 		void ASTCompilerBase::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 		{
-			m_OpenScopeCount = 0;
-			m_LastFunction = 0;
+			m_BlockIndex = -1;
+			m_LastFunction = nullptr;
 			m_Allocator = Allocator;
-
-			m_Structs = Structs;
-			m_Functions = Functions;
+			m_BlockVariables = BlockVariablesList(Allocator);
 
 			auto containsEntrypoint = [&Functions](FunctionType::Types Type)
 			{
@@ -58,14 +56,13 @@ namespace Engine
 			if (containsEntrypoint(FunctionType::Types::ComputeMain))
 				BuildComputeShader(Structs, Variables, Functions, Output.ComputeShader);
 
-			m_Variables.Clear();
+			m_Structs.Clear();
+			m_Functions.Clear();
+			m_BlockVariables.Clear();
 		}
 
 		void ASTCompilerBase::BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
 		{
-			m_LastFunction = nullptr;
-			m_ReturnValueAlreadyBuilt = false;
-
 			ResetPerStageValues(Stage);
 
 			BuildStructs(Structs, Stage, Shader);
@@ -107,13 +104,24 @@ namespace Engine
 
 		void ASTCompilerBase::ResetPerStageValues(Stages Stage)
 		{
-			m_Variables.Clear();
+			m_Structs.Clear();
+			m_Functions.Clear();
+			m_BlockVariables.Clear();
+			m_BlockIndex = -1;
+			m_LastFunction = nullptr;
+			m_ReturnValueAlreadyBuilt = false;
+
+			IncreaseBlockIndex();
 		}
 
 		void ASTCompilerBase::BuildStructs(const StructList& Structs, Stages Stage, String& Shader)
 		{
 			for (auto structType : Structs)
+			{
+				m_Structs.Add(structType);
+
 				BuildStruct(structType, Stage, Shader);
+			}
 		}
 
 		void ASTCompilerBase::BuildStructVariables(const StructVariableList& Variables, Stages Stage, String& Shader)
@@ -126,7 +134,7 @@ namespace Engine
 		{
 			for (auto variable : Variables)
 			{
-				m_Variables[variable->GetName()] = variable->GetDataType();
+				PushVariable(variable);
 
 				BuildGlobalVariable(variable, Stage, Shader);
 			}
@@ -159,26 +167,16 @@ namespace Engine
 						continue;
 				}
 
-				m_OpenScopeCount = 0;
-
+				m_Functions.Add(function);
 				m_LastFunction = function;
 
 				for (auto parameter : function->GetParameters())
-					m_Variables[parameter->GetName()] = parameter->GetDataType();
+					PushVariable(parameter);
 
 				if (function->IsEntrypoint())
 					ValidateEntrypointFunction(function, Stage, Shader);
 
 				BuildFunction(function, Stage, Shader);
-
-				while (m_OpenScopeCount > 0)
-				{
-					--m_OpenScopeCount;
-
-					Shader += "}";
-
-					ADD_NEW_LINE();
-				}
 			}
 		}
 
@@ -355,6 +353,8 @@ namespace Engine
 			bool isFirst = true;
 			for (auto parameter : Parameters)
 			{
+				PushVariable(parameter);
+
 				if (!isFirst)
 					Shader += ", ";
 				isFirst = false;
@@ -379,6 +379,8 @@ namespace Engine
 
 		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
+			IncreaseBlockIndex();
+
 			for (auto statement : Holder->GetItems())
 			{
 				BuildStatement(statement, Type, Stage, Shader);
@@ -392,6 +394,8 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 			}
+
+			DecreaseBlockIndex();
 		}
 
 		void ASTCompilerBase::BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -424,7 +428,7 @@ namespace Engine
 			{
 				VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
 
-				m_Variables[stm->GetName()] = stm->GetDataType();
+				PushVariable(stm);
 
 				BuildVariableStatement(stm, Type, Stage, Shader);
 			}
@@ -547,7 +551,7 @@ namespace Engine
 				{
 					BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
 
-					Shader += '=';
+					Shader += " = ";
 
 					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
 
@@ -573,7 +577,11 @@ namespace Engine
 
 			BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
 
+			Shader += ' ';
+
 			Shader += OperatorStatement::GetOperatorSymbol(op);
+
+			Shader += ' ';
 
 			BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
@@ -638,7 +646,20 @@ namespace Engine
 			if (IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Type, Stage, Shader))
 				return;
 
-			THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable", funcName);
+			THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable or function", funcName);
+		}
+
+		void ASTCompilerBase::BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			bool isFirst = true;
+			for (auto argument : Statements)
+			{
+				if (!isFirst)
+					Shader += ", ";
+				isFirst = false;
+
+				BuildStatement(argument, Type, Stage, Shader);
+			}
 		}
 
 		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -655,7 +676,7 @@ namespace Engine
 
 			if (Statement->GetInitialStatement() != nullptr)
 			{
-				Shader += "=";
+				Shader += " = ";
 				BuildStatement(Statement->GetInitialStatement(), Type, Stage, Shader);
 			}
 		}
@@ -723,7 +744,7 @@ namespace Engine
 
 		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			Shader += "switch(";
+			Shader += "switch (";
 
 			BuildStatement(Statement->GetSelector(), Type, Stage, Shader);
 
@@ -902,7 +923,7 @@ namespace Engine
 				Shader += ']';
 			}
 
-			Shader += '=';
+			Shader += " = ";
 
 			BuildStatement(Statement, Type, Stage, Shader);
 
@@ -926,24 +947,6 @@ namespace Engine
 				BuildStatement(Statement->GetElementCount(), FunctionType::Types::None, Stages::Vertex, Shader);
 				Shader += "]";
 			}
-		}
-
-		bool ASTCompilerBase::ContainsReturnStatement(StatementItemHolder* Statement)
-		{
-			const auto& statements = Statement->GetItems();
-			for (auto statement : statements)
-			{
-				if (IsAssignableFrom(statement, ReturnStatement))
-					return true;
-
-				if (!IsAssignableFrom(statement, StatementItemHolder))
-					continue;
-
-				if (ContainsReturnStatement(DynamicCast(StatementItemHolder*, statement)))
-					return true;
-			}
-
-			return false;
 		}
 
 		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
@@ -1063,8 +1066,9 @@ namespace Engine
 
 				const String& variableName = stm->GetName();
 
-				if (m_Variables.Contains(variableName))
-					return *m_Variables[stm->GetName()];
+				const VariableType* variableType = FindVariableType(stm->GetName());
+				if (variableType != nullptr)
+					return *variableType->GetDataType();
 
 				if (TopStatement != nullptr)
 				{
@@ -1136,6 +1140,48 @@ namespace Engine
 			}
 
 			return ProgramDataTypes::Unknown;
+		}
+
+		ProgramDataTypes ASTCompilerBase::EvaluateProgramDataType(Statement* Statement) const
+		{
+			return EvaluateDataType(Statement).GetType();
+		}
+
+		const VariableType* ASTCompilerBase::FindVariableType(const String& Name) const
+		{
+			for (int8 i = m_BlockVariables.GetSize() - 1; i >= 0; --i)
+			{
+				const auto& variables = m_BlockVariables[i];
+
+				int32 index = variables.FindIf([&Name](auto item) { return item->GetName() == Name; });
+				if (index == -1)
+					continue;
+
+				return variables[index];
+			}
+
+			return nullptr;
+		}
+
+		void ASTCompilerBase::IncreaseBlockIndex(void)
+		{
+			CoreDebugAssert(Categories::ProgramCompiler, m_BlockIndex + 1 == m_BlockVariables.GetSize(), "Mismatch detected");
+
+			++m_BlockIndex;
+
+			m_BlockVariables.Add(VariableList(m_BlockVariables.GetAllocator()));
+		}
+
+		void ASTCompilerBase::DecreaseBlockIndex(void)
+		{
+			CoreDebugAssert(Categories::ProgramCompiler, m_BlockIndex + 1 == m_BlockVariables.GetSize(), "Mismatch detected");
+
+			m_BlockVariables.RemoveAt(m_BlockIndex--);
+		}
+
+		void ASTCompilerBase::PushVariable(VariableType* Variable)
+		{
+			m_BlockVariables[m_BlockIndex].Add(Variable);
 		}
 
 		const FunctionType* ASTCompilerBase::FindFunctionType(const String& Name) const
@@ -1211,24 +1257,6 @@ namespace Engine
 			static cstr name = "__result_value__";
 
 			return name;
-		}
-
-		ProgramDataTypes ASTCompilerBase::EvaluateProgramDataType(Statement* Statement) const
-		{
-			return EvaluateDataType(Statement).GetType();
-		}
-
-		void ASTCompilerBase::BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
-		{
-			bool isFirst = true;
-			for (auto argument : Statements)
-			{
-				if (!isFirst)
-					Shader += ",";
-				isFirst = false;
-
-				BuildStatement(argument, Type, Stage, Shader);
-			}
 		}
 
 #undef ADD_NEW_LINE

@@ -17,24 +17,15 @@ namespace Engine
 		{
 			class ASTToGLSLCompiler : public ASTCompilerBase
 			{
-			private:
-				typedef Vector<VariableList> BlockVariablesList;
-
 			public:
 				ASTToGLSLCompiler(void);
-
-				virtual void Initialize(DeviceTypes DeviceType) override;
-
-				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
 
 			private:
 				virtual void ResetPerStageValues(Stages Stage) override;
 
 				virtual void BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader) override;
 
-				virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override
-				{
-				}
+				virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override;
 
 				virtual void BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader) override
 				{
@@ -78,12 +69,6 @@ namespace Engine
 				{
 				}
 
-				virtual void BuildParameters(const ParameterList& Parameters, FunctionType::Types Type, Stages Stage, String& Shader);
-
-				virtual void BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
-				virtual void BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
 				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
 				virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
@@ -102,26 +87,11 @@ namespace Engine
 
 				void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader);
 
-				void BuildFlattenParameters(const DataTypeStatement* DataType, const String& Name, bool IsFirst, bool IsInput, Stages Stage, String& Shader);
-				void BuildFlattenParameter(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, Stages Stage, String& Shader);
-				void BuildFlattenParameterName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, Stages Stage, String& Shader);
 				void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, String& Shader);
-
-				const VariableType* FindVariableTypeInBlocks(const String& Name);
-
-				void IncreaseBlockIndex(void);
-				void DecreaseBlockIndex(void);
-				void PushVariable(VariableType* Variable);
 
 			private:
 				uint8 m_AdditionalLayoutCount;
 				uint8 m_BindingCount;
-				//ParameterList m_Parameters;
-
-				BlockVariablesList m_BlockVariables;
-				int8 m_BlockIndex;
-
-				FunctionType* m_CurrentBuildingFunction;
 			};
 		}
 	}

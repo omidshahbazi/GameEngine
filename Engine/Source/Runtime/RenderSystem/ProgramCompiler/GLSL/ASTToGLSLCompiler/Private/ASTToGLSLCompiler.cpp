@@ -57,44 +57,10 @@ namespace Engine
 				return String(Constants::FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
 			}
 
-			cstr GetReturnBoolName(void)
-			{
-				static cstr name = "_MustReturn";
-				return name;
-			}
-
 			ASTToGLSLCompiler::ASTToGLSLCompiler() :
 				m_AdditionalLayoutCount(0),
-				m_BindingCount(0),
-				m_BlockIndex(0),
-				m_CurrentBuildingFunction(nullptr)
+				m_BindingCount(0)
 			{
-			}
-
-			void ASTToGLSLCompiler::Initialize(DeviceTypes DeviceType)
-			{
-				ASTCompilerBase::Initialize(DeviceType);
-			}
-
-			void ASTToGLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
-			{
-				//m_Outputs = OutputMap(Allocator);
-				m_AdditionalLayoutCount = 0;
-				m_BindingCount = 0;
-				m_BlockVariables = BlockVariablesList(Allocator);
-
-				try
-				{
-					ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
-				}
-				catch (...)
-				{
-					m_BlockVariables = BlockVariablesList();
-
-					throw;
-				}
-
-				m_BlockVariables = BlockVariablesList();
 			}
 
 			void ASTToGLSLCompiler::ResetPerStageValues(Stages Stage)
@@ -103,13 +69,6 @@ namespace Engine
 
 				m_AdditionalLayoutCount = SubMeshInfo::GetLayoutCount();
 				m_BindingCount = 0;
-
-				m_BlockVariables.Clear();
-				m_BlockIndex = -1;
-
-				m_CurrentBuildingFunction = nullptr;
-
-				IncreaseBlockIndex();
 			}
 
 			void ASTToGLSLCompiler::BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
@@ -119,10 +78,36 @@ namespace Engine
 				Shader = "#version 460 core\n" + Shader;
 			}
 
+			void ASTToGLSLCompiler::BuildStruct(StructType* Struct, Stages Stage, String& Shader)
+			{
+				Shader += "struct ";
+				Shader += Struct->GetName();
+				ADD_NEW_LINE();
+
+				Shader += '{';
+				ADD_NEW_LINE();
+
+				for (auto& variable : Struct->GetItems())
+				{
+					BuildDataTypeStatement(variable->GetDataType(), Shader);
+
+					Shader += ' ';
+
+					Shader += variable->GetName();
+
+					BuildPostDataType(variable->GetDataType(), Stage, Shader);
+
+					Shader += ';';
+
+					ADD_NEW_LINE();
+				}
+
+				Shader += "};";
+				ADD_NEW_LINE();
+			}
+
 			void ASTToGLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, Stages Stage, String& Shader)
 			{
-				PushVariable(Variable);
-
 				const String& name = Variable->GetName();
 				DataTypeStatement* dataType = Variable->GetDataType();
 
@@ -165,8 +150,6 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, Stages Stage, String& Shader)
 			{
-				m_CurrentBuildingFunction = Function;
-
 				FunctionType::Types funcType = Function->GetType();
 
 				if (funcType == FunctionType::Types::VertexMain ||
@@ -185,7 +168,7 @@ namespace Engine
 
 					for (uint8 i = 0; i < elementCount; ++i)
 					{
-						Shader += "layout(location=";
+						Shader += "layout(location = ";
 						Shader += StringUtility::ToString<char8>(i);
 						Shader += ") out ";
 						BuildType(ProgramDataTypes::Float4, Shader);
@@ -197,7 +180,10 @@ namespace Engine
 					}
 				}
 
-				BuildType(ProgramDataTypes::Void, Shader);
+				if (Function->IsEntrypoint())
+					BuildType(ProgramDataTypes::Void, Shader);
+				else
+					BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
 
 				Shader += " ";
 
@@ -205,6 +191,8 @@ namespace Engine
 					Shader += Constants::ENTRY_POINT_NAME;
 				else
 					Shader += Function->GetName();
+
+				IncreaseBlockIndex();
 
 				Shader += "(";
 
@@ -214,95 +202,25 @@ namespace Engine
 						PushVariable(parameter);
 				}
 				else
-				{
 					BuildParameters(Function->GetParameters(), funcType, Stage, Shader);
 
-					BuildFlattenParameters(Function->GetReturnDataType(), String::Empty, Function->GetParameters().GetSize() == 0, false, Stage, Shader);
-				}
-
 				Shader += ")";
-
 				ADD_NEW_LINE();
 
 				Shader += "{";
-
-				ADD_NEW_LINE();
-
-				BuildType(ProgramDataTypes::Bool, Shader);
-				Shader += String(" ") + GetReturnBoolName() + " = false;";
-
 				ADD_NEW_LINE();
 
 				BuildStatementHolder(Function, funcType, Stage, Shader);
 
 				Shader += "}";
-
 				ADD_NEW_LINE();
+
+				DecreaseBlockIndex();
 			}
 
 			void ASTToGLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 				//THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-			}
-
-			void ASTToGLSLCompiler::BuildParameters(const ParameterList& Parameters, FunctionType::Types Type, Stages Stage, String& Shader)
-			{
-				int32 i = 0;
-				for (auto& parameter : Parameters)
-				{
-					if (i != 0)
-						Shader += ", ";
-
-					PushVariable(parameter);
-
-					BuildFlattenParameters(parameter->GetDataType(), parameter->GetName(), i++ == 0, true, Stage, Shader);
-				}
-			}
-
-			void ASTToGLSLCompiler::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
-			{
-				IncreaseBlockIndex();
-
-				ASTCompilerBase::BuildStatementHolder(Holder, Type, Stage, Shader);
-
-				if (Type != FunctionType::Types::None && ContainsReturnStatement(Holder))
-				{
-					Shader += String("if (!") + GetReturnBoolName() + ")";
-
-					ADD_NEW_LINE();
-
-					Shader += "{";
-
-					IncreamentOpenScopeCount();
-				}
-
-				DecreaseBlockIndex();
-			}
-
-			void ASTToGLSLCompiler::BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-			{
-				PushVariable(Statement);
-
-				if (Statement->GetDataType()->IsBuiltIn())
-				{
-					ASTCompilerBase::BuildVariableStatement(Statement, Type, Stage, Shader);
-
-					return;
-				}
-
-				const StructType* structType = GetStructType(Statement->GetDataType()->GetUserDefined());
-				for (const auto& variable : structType->GetItems())
-				{
-					BuildDataTypeStatement(variable->GetDataType(), Shader);
-
-					Shader += ' ';
-
-					BuildFlattenStructMemberVariableName(structType, variable, Statement->GetName(), true, Shader);
-
-					Shader += ';';
-
-					ADD_NEW_LINE();
-				}
 			}
 
 			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
@@ -320,42 +238,45 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
-				String leftStm;
-				BuildStatement(Statement->GetLeft(), Type, Stage, leftStm);
-
-				const VariableType* leftVariable = FindVariableTypeInBlocks(leftStm);
-				if (leftVariable != nullptr)
+				if (Type != FunctionType::Types::None)
 				{
-					bool isParameter = IsAssignableFrom(leftVariable, const ParameterType);
-					bool isOutputVariable = (IsAssignableFrom(leftVariable, const VariableStatement) && leftVariable->GetDataType()->GetUserDefined() == m_CurrentBuildingFunction->GetReturnDataType()->GetUserDefined());
+					String leftStm;
+					BuildStatement(Statement->GetLeft(), Type, Stage, leftStm);
 
-					String name = String::Empty;
-					if (isParameter)
-						name = ReinterpretCast(const ParameterType*, leftVariable)->GetName();
-
-					if (isParameter || isOutputVariable)
+					const VariableType* leftVariable = FindVariableType(leftStm);
+					if (leftVariable != nullptr)
 					{
-						const StructType* structType = GetStructType(leftVariable->GetDataType()->GetUserDefined());
+						bool isParameter = IsAssignableFrom(leftVariable, const ParameterType);
+						bool isOutputVariable = (IsAssignableFrom(leftVariable, const VariableStatement) && leftVariable->GetDataType()->GetUserDefined() == GetLastFunction()->GetReturnDataType()->GetUserDefined());
 
-						bool isMemberAccess = IsAssignableFrom(Statement->GetRight(), MemberAccessStatement);
-						auto* rightStatement = (isMemberAccess ? ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetLeft() : Statement->GetRight());
+						String name = String::Empty;
+						if (isParameter)
+							name = ReinterpretCast(const ParameterType*, leftVariable)->GetName();
 
-						String rightStm;
-						BuildStatement(rightStatement, Type, Stage, rightStm);
-						rightStm = rightStm.Split('.')[0];
-
-						const StructVariableType* rightVariable = GetVariableType(structType, rightStm);
-
-						BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Shader);
-
-						if (isMemberAccess)
+						if (isParameter || isOutputVariable)
 						{
-							Shader += '.';
+							const StructType* structType = GetStructType(leftVariable->GetDataType()->GetUserDefined());
 
-							BuildStatement(ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetRight(), Type, Stage, Shader);
+							bool isMemberAccess = IsAssignableFrom(Statement->GetRight(), MemberAccessStatement);
+							auto* rightStatement = (isMemberAccess ? ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetLeft() : Statement->GetRight());
+
+							String rightStm;
+							BuildStatement(rightStatement, Type, Stage, rightStm);
+							rightStm = rightStm.Split('.')[0];
+
+							const StructVariableType* rightVariable = GetVariableType(structType, rightStm);
+
+							BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Shader);
+
+							if (isMemberAccess)
+							{
+								Shader += '.';
+
+								BuildStatement(ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetRight(), Type, Stage, Shader);
+							}
+
+							return;
 						}
-
-						return;
 					}
 				}
 
@@ -378,11 +299,11 @@ namespace Engine
 						{
 							if (isFirstOne)
 							{
-								Shader += "if";
+								Shader += "if ";
 								isFirstOne = false;
 							}
 							else
-								Shader += "else if";
+								Shader += "else if ";
 
 							Shader += "(";
 						}
@@ -419,11 +340,11 @@ namespace Engine
 						{
 							if (isFirstOne)
 							{
-								Shader += "if";
+								Shader += "if ";
 								isFirstOne = false;
 							}
 							else
-								Shader += "else if";
+								Shader += "else if ";
 
 							Shader += "(";
 						}
@@ -456,13 +377,18 @@ namespace Engine
 			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 				if (Type == FunctionType::Types::None)
+				{
+					Shader += "return ";
+
+					BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+
+					Shader += ';';
+					ADD_NEW_LINE();
+
 					return;
+				}
 
-				Shader += String(GetReturnBoolName()) + " = true;";
-
-				ADD_NEW_LINE();
-
-				const String& returnDataType = m_CurrentBuildingFunction->GetReturnDataType()->GetUserDefined();
+				const String& returnDataType = GetLastFunction()->GetReturnDataType()->GetUserDefined();
 				const StructType* structType = GetStructType(returnDataType);
 				const StructVariableType* variableType = nullptr;
 
@@ -490,8 +416,7 @@ namespace Engine
 							Shader += "]";
 						}
 
-						Shader += ";";
-
+						Shader += ';';
 						ADD_NEW_LINE();
 					}
 				}
@@ -501,12 +426,10 @@ namespace Engine
 
 				BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Shader);
 
-				//Shader += "return ";
+				Shader += ';';
+				ADD_NEW_LINE();
 
-				//BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
-
-				Shader += ";";
-
+				Shader += "return;";
 				ADD_NEW_LINE();
 			}
 
@@ -638,7 +561,7 @@ namespace Engine
 					else
 						location = SubMeshInfo::GetLayoutIndex(GetLayout(variable->GetRegister()));
 
-					Shader += "layout(location=";
+					Shader += "layout(location = ";
 					Shader += StringUtility::ToString<char8>(location);
 					Shader += ") ";
 					Shader += (IsInput ? "in " : "out ");
@@ -660,7 +583,7 @@ namespace Engine
 				if (FindVariableType(Struct, [](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }) != nullptr)
 					CoreDebugAssert(Categories::ProgramCompiler, false, "Struct %S cannot have variables with register specified", Struct->GetName());
 
-				Shader += "layout(std140, binding=";
+				Shader += "layout(std140, binding = ";
 				Shader += StringUtility::ToString<char8>(m_BindingCount++);
 				Shader += ") uniform " + Struct->GetName();
 				Shader += "_";
@@ -677,7 +600,7 @@ namespace Engine
 					uint8 size = 0;
 					StructType::GetAlignedOffset(dataType, offset, size);
 
-					Shader += "layout(offset=";
+					Shader += "layout(offset = ";
 					Shader += StringUtility::ToString<char8>(offset);
 					Shader += ") ";
 
@@ -701,49 +624,6 @@ namespace Engine
 				ADD_NEW_LINE();
 			}
 
-			void ASTToGLSLCompiler::BuildFlattenParameters(const DataTypeStatement* DataType, const String& Name, bool IsFirst, bool IsInput, Stages Stage, String& Shader)
-			{
-				if (DataType->IsBuiltIn())
-				{
-					BuildDataTypeStatement(DataType, Shader);
-
-					Shader += ' ';
-
-					Shader += Name;
-
-					BuildPostDataType(DataType, Stage, Shader);
-				}
-				else
-				{
-					const StructType* structType = GetStructType(DataType->GetUserDefined());
-					for (auto& variable : structType->GetItems())
-					{
-						if (!IsFirst)
-							Shader += ", ";
-
-						BuildFlattenParameter(structType, variable, Name, IsInput, Stage, Shader);
-					}
-				}
-			}
-
-			void ASTToGLSLCompiler::BuildFlattenParameter(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, Stages Stage, String& Shader)
-			{
-				Shader += (IsInput ? "in " : "out ");
-
-				BuildDataTypeStatement(Variable->GetDataType(), Shader);
-
-				Shader += ' ';
-
-				BuildFlattenParameterName(Parent, Variable, Name, IsInput, Stage, Shader);
-			}
-
-			void ASTToGLSLCompiler::BuildFlattenParameterName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, Stages Stage, String& Shader)
-			{
-				BuildFlattenStructMemberVariableName(Parent, Variable, Name, IsInput, Shader);
-
-				BuildPostDataType(Variable->GetDataType(), Stage, Shader);
-			}
-
 			void ASTToGLSLCompiler::BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, String& Shader)
 			{
 				Shader += Name;
@@ -753,45 +633,6 @@ namespace Engine
 				Shader += Parent->GetName();
 				Shader += '_';
 				Shader += Variable->GetName();
-			}
-
-			const VariableType* ASTToGLSLCompiler::FindVariableTypeInBlocks(const String& Name)
-			{
-				for (int8 i = m_BlockVariables.GetSize() - 1; i >= 0; --i)
-				{
-					const auto& variables = m_BlockVariables[i];
-
-					int32 index = variables.FindIf([&Name](auto item) { return item->GetName() == Name; });
-					if (index == -1)
-						continue;
-
-					return variables[index];
-				}
-
-				return nullptr;
-			}
-
-			void ASTToGLSLCompiler::IncreaseBlockIndex(void)
-			{
-				CoreDebugAssert(Categories::ProgramCompiler, m_BlockIndex + 1 == m_BlockVariables.GetSize(), "Mismatch detected");
-
-				++m_BlockIndex;
-
-				m_BlockVariables.Add(VariableList(m_BlockVariables.GetAllocator()));
-			}
-
-			void ASTToGLSLCompiler::DecreaseBlockIndex(void)
-			{
-				CoreDebugAssert(Categories::ProgramCompiler, m_BlockIndex + 1 == m_BlockVariables.GetSize(), "Mismatch detected");
-
-				--m_BlockIndex;
-
-				m_BlockVariables.RemoveAt(m_BlockIndex);
-			}
-
-			void ASTToGLSLCompiler::PushVariable(VariableType* Variable)
-			{
-				m_BlockVariables[m_BlockIndex].Add(Variable);
 			}
 
 #undef ADD_NEW_LINE

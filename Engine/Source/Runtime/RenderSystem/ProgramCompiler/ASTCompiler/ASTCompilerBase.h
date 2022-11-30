@@ -55,6 +55,8 @@ namespace Engine
 		protected:
 			typedef Map<String, String> OutputMap;
 			typedef Map<String, DataTypeStatement*> VariableTypeMap;
+			typedef Vector<VariableList> BlockVariablesList;
+
 
 		public:
 			ASTCompilerBase(void);
@@ -139,6 +141,8 @@ namespace Engine
 
 			virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
+			virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader);
+
 			virtual void BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
@@ -181,10 +185,14 @@ namespace Engine
 
 			virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 
-			bool ContainsReturnStatement(StatementItemHolder* Statement);
-
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
+			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
+
+			const VariableType* FindVariableType(const String& Name) const;
+			void IncreaseBlockIndex(void);
+			void DecreaseBlockIndex(void);
+			void PushVariable(VariableType* Variable);
 
 			const FunctionType* FindFunctionType(const String& Name) const;
 			const FunctionType* GetFunctionType(const String& Name) const;
@@ -200,33 +208,24 @@ namespace Engine
 
 			static cstr GetStageResultArrayVariableName(void);
 
-			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
-
-			void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
 			AllocatorBase* GetAllocator(void) const
 			{
 				return m_Allocator;
 			}
 
-			void IncreamentOpenScopeCount(void)
+			const FunctionType* GetLastFunction(void) const
 			{
-				++m_OpenScopeCount;
-			}
-
-			const StructList& GetStructs(void) const
-			{
-				return m_Structs;
+				return m_LastFunction;
 			}
 
 		private:
 			AllocatorBase* m_Allocator;
 
-			int8 m_OpenScopeCount;
-
 			StructList m_Structs;
 			FunctionList m_Functions;
-			VariableTypeMap m_Variables;
+
+			BlockVariablesList m_BlockVariables;
+			int8 m_BlockIndex;
 
 			FunctionType* m_LastFunction;
 

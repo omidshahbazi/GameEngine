@@ -181,13 +181,21 @@ namespace Engine
 
 			virtual uint8 BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
 
-			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, String& Shader);
+			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader);
+
+			virtual void BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, FunctionType::Types Type, Stages Stage, String& Shader);
+			virtual void BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, FunctionType::Types Type, Stages Stage, String& Shader);
 
 			virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
 			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
+
+			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right);
+			//void CheckDataTypes(Statement* Left, Statement* Right);
+			//void CheckDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right);
+			//void ExpectProgramDataType(Statement* Statement, ProgramDataTypes Expected);
 
 			const VariableType* FindVariableType(const String& Name) const;
 			void IncreaseBlockIndex(void);

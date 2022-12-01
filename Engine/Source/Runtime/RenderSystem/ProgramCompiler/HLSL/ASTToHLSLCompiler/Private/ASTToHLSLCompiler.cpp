@@ -259,7 +259,7 @@ namespace Engine
 
 			void ASTToHLSLCompiler::BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader)
 			{
-				BuildDataTypeStatement(Variable->GetDataType(), Shader);
+				BuildDataTypeStatement(Variable->GetDataType(), FunctionType::Types::None, Stage, Shader);
 
 				Shader += " ";
 				Shader += Variable->GetName();
@@ -302,7 +302,7 @@ namespace Engine
 					Shader += "ConstantBuffer<";
 				}
 
-				BuildDataTypeStatement(dataType, Shader);
+				BuildDataTypeStatement(dataType, FunctionType::Types::None, Stage, Shader);
 
 				if (!dataType->IsBuiltIn())
 					Shader += ">";
@@ -359,7 +359,7 @@ namespace Engine
 
 				BuildAttributes(Function->GetAttributes(), funcType, Stage, Shader);
 
-				BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
+				BuildDataTypeStatement(Function->GetReturnDataType(), funcType, Stage, Shader);
 
 				Shader += " ";
 

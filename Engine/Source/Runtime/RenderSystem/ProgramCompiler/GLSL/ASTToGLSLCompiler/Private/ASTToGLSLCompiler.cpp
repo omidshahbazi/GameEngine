@@ -89,7 +89,7 @@ namespace Engine
 
 				for (auto& variable : Struct->GetItems())
 				{
-					BuildDataTypeStatement(variable->GetDataType(), Shader);
+					BuildDataTypeStatement(variable->GetDataType(), FunctionType::Types::None, Stage, Shader);
 
 					Shader += ' ';
 
@@ -140,7 +140,7 @@ namespace Engine
 					break;
 				}
 
-				BuildDataTypeStatement(dataType, Shader);
+				BuildDataTypeStatement(dataType, FunctionType::Types::None, Stage, Shader);
 				Shader += " ";
 				Shader += name;
 				Shader += ";";
@@ -158,8 +158,8 @@ namespace Engine
 					funcType == FunctionType::Types::FragmentMain)
 				{
 					const auto* parameter = Function->GetParameters()[0];
-					BuildInOutStruct(parameter->GetDataType(), parameter->GetName(), true, Shader);
-					BuildInOutStruct(Function->GetReturnDataType(), String::Empty, false, Shader);
+					BuildInOutStruct(parameter->GetDataType(), parameter->GetName(), true, funcType, Stage, Shader);
+					BuildInOutStruct(Function->GetReturnDataType(), String::Empty, false, funcType, Stage, Shader);
 				}
 
 				if (funcType == FunctionType::Types::FragmentMain)
@@ -183,7 +183,7 @@ namespace Engine
 				if (Function->IsEntrypoint())
 					BuildType(ProgramDataTypes::Void, Shader);
 				else
-					BuildDataTypeStatement(Function->GetReturnDataType(), Shader);
+					BuildDataTypeStatement(Function->GetReturnDataType(), funcType, Stage, Shader);
 
 				Shader += " ";
 
@@ -446,6 +446,23 @@ namespace Engine
 				Shader += ')';
 			}
 
+			void ASTToGLSLCompiler::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, FunctionType::Types Type, Stages Stage, String& Shader)
+			{
+				bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
+
+				if (needsCasting)
+				{
+					BuildDataTypeStatement(DataType, Type, Stage, Shader);
+
+					Shader += '(';
+				}
+
+				BuildStatement(Statement, Type, Stage, Shader);
+
+				if (needsCasting)
+					Shader += ')';
+			}
+
 			void ASTToGLSLCompiler::BuildType(ProgramDataTypes Type, String& Shader)
 			{
 				switch (Type)
@@ -543,7 +560,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, String& Shader)
+			void ASTToGLSLCompiler::BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 				CoreDebugAssert(Categories::ProgramCompiler, !DataType->IsBuiltIn(), "DataType must be user-defined");
 
@@ -566,7 +583,7 @@ namespace Engine
 					Shader += ") ";
 					Shader += (IsInput ? "in " : "out ");
 
-					BuildDataTypeStatement(variable->GetDataType(), Shader);
+					BuildDataTypeStatement(variable->GetDataType(), Type, Stage, Shader);
 					Shader += ' ';
 
 					BuildFlattenStructMemberVariableName(structType, variable, Name, IsInput, Shader);
@@ -604,7 +621,7 @@ namespace Engine
 					Shader += StringUtility::ToString<char8>(offset);
 					Shader += ") ";
 
-					BuildDataTypeStatement(variable->GetDataType(), Shader);
+					BuildDataTypeStatement(variable->GetDataType(), FunctionType::Types::None, Stage, Shader);
 
 					Shader += " ";
 					Shader += variable->GetName();

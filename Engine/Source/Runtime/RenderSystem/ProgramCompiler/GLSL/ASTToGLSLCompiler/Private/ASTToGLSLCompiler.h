@@ -79,11 +79,13 @@ namespace Engine
 
 				virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
 
+				virtual void BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, FunctionType::Types Type, Stages Stage, String& Shader) override;
+
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
 
 				virtual void BuildPostDataType(const DataTypeStatement* Type, Stages Stage, String& Shader);
 
-				void BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, String& Shader);
+				void BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, FunctionType::Types Type, Stages Stage, String& Shader);
 
 				void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader);
 

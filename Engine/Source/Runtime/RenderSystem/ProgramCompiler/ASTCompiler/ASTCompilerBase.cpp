@@ -365,7 +365,7 @@ namespace Engine
 
 		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			BuildDataTypeStatement(Parameter->GetDataType(), Shader);
+			BuildDataTypeStatement(Parameter->GetDataType(), Type, Stage, Shader);
 			Shader += " ";
 			Shader += Parameter->GetName();
 
@@ -583,7 +583,13 @@ namespace Engine
 
 			Shader += ' ';
 
-			BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+			if (isAssignment)
+			{
+				DataTypeStatement leftDataType = EvaluateDataType(Statement->GetLeft());
+				BuildExplicitCast(Statement->GetRight(), &leftDataType, Type, Stage, Shader);
+			}
+			else
+				BuildStatement(Statement->GetRight(), Type, Stage, Shader);
 
 			if (!isAssignment)
 				Shader += ")";
@@ -669,7 +675,7 @@ namespace Engine
 
 		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
-			BuildDataTypeStatement(Statement->GetDataType(), Shader);
+			BuildDataTypeStatement(Statement->GetDataType(), Type, Stage, Shader);
 
 			Shader += " ";
 			Shader += Statement->GetName();
@@ -705,7 +711,7 @@ namespace Engine
 		{
 			Shader += "if (";
 
-			BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Type, Stage, Shader);
 
 			Shader += ")";
 
@@ -807,7 +813,7 @@ namespace Engine
 			Shader += ";";
 
 			if (Statement->GetCondition() != nullptr)
-				BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+				BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Type, Stage, Shader);
 
 			Shader += ";";
 
@@ -853,7 +859,7 @@ namespace Engine
 		{
 			Shader += "while (";
 
-			BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Type, Stage, Shader);
 
 			Shader += ")";
 
@@ -934,7 +940,7 @@ namespace Engine
 			return elementCount;
 		}
 
-		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, String& Shader)
+		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
 			if (Statement->IsBuiltIn())
 				BuildType(Statement->GetType(), Shader);
@@ -944,9 +950,35 @@ namespace Engine
 			if (Statement->GetElementCount() != nullptr)
 			{
 				Shader += "[";
-				BuildStatement(Statement->GetElementCount(), FunctionType::Types::None, Stages::Vertex, Shader);
+				BuildStatement(Statement->GetElementCount(), Type, Stage, Shader);
 				Shader += "]";
 			}
+		}
+
+		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
+
+			if (needsCasting)
+			{
+				Shader += '(';
+
+				BuildDataTypeStatement(DataType, Type, Stage, Shader);
+
+				Shader += ")(";
+			}
+
+			BuildStatement(Statement, Type, Stage, Shader);
+
+			if (needsCasting)
+				Shader += ')';
+		}
+
+		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, FunctionType::Types Type, Stages Stage, String& Shader)
+		{
+			DataTypeStatement dataType = DataType;
+
+			BuildExplicitCast(Statement, &dataType, Type, Stage, Shader);
 		}
 
 		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
@@ -1003,24 +1035,34 @@ namespace Engine
 
 				OperatorStatement::Operators op = stm->GetOperator();
 
-				if (op == OperatorStatement::Operators::Multiplication ||
-					op == OperatorStatement::Operators::Division)
+				switch (op)
+				{
+				case OperatorStatement::Operators::Multiplication:
+				case OperatorStatement::Operators::Division:
 					return MULTIPLY_RESULT[(uint8)leftType.GetType()][(uint8)rightType.GetType()];
 
-				if (op == OperatorStatement::Operators::Remainder ||
-					op == OperatorStatement::Operators::Addition ||
-					op == OperatorStatement::Operators::Subtraction)
+				case OperatorStatement::Operators::Remainder:
+				case OperatorStatement::Operators::Addition:
+				case OperatorStatement::Operators::Subtraction:
 					return leftType;
 
-				if (op == OperatorStatement::Operators::EqualCheck ||
-					op == OperatorStatement::Operators::NotEqualCheck ||
-					op == OperatorStatement::Operators::LessCheck ||
-					op == OperatorStatement::Operators::LessEqualCheck ||
-					op == OperatorStatement::Operators::GreaterCheck ||
-					op == OperatorStatement::Operators::GreaterEqualCheck ||
-					op == OperatorStatement::Operators::LogicalAnd ||
-					op == OperatorStatement::Operators::LogicalOr)
+				case OperatorStatement::Operators::EqualCheck:
+				case OperatorStatement::Operators::NotEqualCheck:
+				case OperatorStatement::Operators::LessCheck:
+				case OperatorStatement::Operators::LessEqualCheck:
+				case OperatorStatement::Operators::GreaterCheck:
+				case OperatorStatement::Operators::GreaterEqualCheck:
+				case OperatorStatement::Operators::LogicalAnd:
+				case OperatorStatement::Operators::LogicalOr:
 					return ProgramDataTypes::Bool;
+
+				case OperatorStatement::Operators::Assignment:
+				case OperatorStatement::Operators::AdditionAssignment:
+				case OperatorStatement::Operators::SubtractionAssignment:
+				case OperatorStatement::Operators::MultiplicationAssignment:
+				case OperatorStatement::Operators::DivisionAssignment:
+					return leftType;
+				}
 			}
 			else if (IsAssignableFrom(CurrentStatement, UnaryOperatorStatement))
 			{
@@ -1146,6 +1188,54 @@ namespace Engine
 		{
 			return EvaluateDataType(Statement).GetType();
 		}
+
+		bool ASTCompilerBase::CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right)
+		{
+			if (Left.IsBuiltIn() != Right.IsBuiltIn())
+				return false;
+
+			if (Left.IsArray() != Right.IsArray())
+				return false;
+
+			if (Left.IsArray() && (Right.GetElementCount() != Right.GetElementCount()))
+				return false;
+
+			if (Left.IsArray() && (Right.GetPostElementCount() != Right.GetPostElementCount()))
+				return false;
+
+			if (Left.GetUserDefined() != Right.GetUserDefined())
+				return false;
+
+			if (Left.GetType() != Right.GetType())
+				return false;
+
+			return true;
+		}
+
+		//void ASTCompilerBase::CheckDataTypes(Statement* Left, Statement* Right)
+		//{
+		//	CoreDebugAssert(Categories::ProgramCompiler, Left != nullptr, "Left cannot be null");
+		//	CoreDebugAssert(Categories::ProgramCompiler, Right != nullptr, "Right cannot be null");
+
+		//	CheckDataTypes(EvaluateDataType(Left), EvaluateDataType(Right));
+		//}
+
+		//void ASTCompilerBase::CheckDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right)
+		//{
+		//	if (CompareDataTypes(Left, Right))
+		//		return;
+
+		//	if (Left.GetType() != Right.GetType())
+		//		return;
+
+		//ThrowException:
+		//	THROW_PROGRAM_COMPILER_EXCEPTION(Right.ToString() + " is not compatible", Left.ToString());
+		//}
+
+		//void ASTCompilerBase::ExpectProgramDataType(Statement* Statement, ProgramDataTypes Expected)
+		//{
+		//	CheckDataTypes(EvaluateDataType(Statement), Expected);
+		//}
 
 		const VariableType* ASTCompilerBase::FindVariableType(const String& Name) const
 		{

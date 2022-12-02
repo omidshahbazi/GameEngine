@@ -447,7 +447,7 @@ namespace Engine
 					}
 
 					if (!allowed)
-						THROW_PROGRAM_PARSER_EXCEPTION("Cannot declared in global context", DeclarationToken);
+						THROW_PROGRAM_PARSER_EXCEPTION("Cannot be declared in global context", DeclarationToken);
 				}
 
 				m_Parameters->Variables.Add(variableType);
@@ -968,7 +968,7 @@ namespace Engine
 			RequireToken(token, "do statement");
 
 			if (!token.Matches(WHILE, Token::SearchCases::CaseSensitive))
-				THROW_PROGRAM_PARSER_EXCEPTION("expected while after do", token);
+				THROW_PROGRAM_PARSER_EXCEPTION("Expected while after do", token);
 
 			stm->SetWhile(ParseWhileStatement(token));
 
@@ -1233,7 +1233,7 @@ namespace Engine
 
 			UnaryOperatorStatement::Operators op = GetUnaryOperator(DeclarationToken.GetName(), false);
 			if (op == UnaryOperatorStatement::Operators::Unknown)
-				THROW_PROGRAM_PARSER_EXCEPTION("Unrecognized operator", DeclarationToken);
+				THROW_PROGRAM_PARSER_EXCEPTION("Unrecognized token", DeclarationToken);
 
 			UnaryOperatorStatement* stm = Allocate<UnaryOperatorStatement>();
 			stm->SetOperator(op);
@@ -1484,29 +1484,6 @@ namespace Engine
 			list.Add(Variable);
 
 			m_VariablesStack.Push(list);
-		}
-
-		void Parser::RequiredVarialbe(const Token& Token)
-		{
-			const String& name = Token.GetName();
-
-			for (const auto& list : m_VariablesStack)
-			{
-				if (list.ContainsIf([&name](auto& variable) { return variable->GetName() == name; }))
-					return;
-			}
-
-			THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find variable", Token);
-		}
-
-		void Parser::RequiredVarialbe(const VariableList& List, const Token& Token)
-		{
-			const String& name = Token.GetName();
-
-			if (List.ContainsIf([&name](auto& variable) { return variable->GetName() == name; }))
-				return;
-
-			THROW_PROGRAM_PARSER_EXCEPTION("Couldn't find variable", Token);
 		}
 
 		StructType* Parser::FindStructType(const String& Name)

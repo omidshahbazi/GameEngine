@@ -140,8 +140,6 @@ namespace Engine
 			void PushAVariableList(void);
 			void PopAVariableList(void);
 			void AddVariableToStack(VariableType* Variable);
-			void RequiredVarialbe(const Token& Name);
-			void RequiredVarialbe(const VariableList& List, const Token& Token);
 
 			StructType* FindStructType(const String& Name);
 			VariableType* FindVariableType(const String& Name);

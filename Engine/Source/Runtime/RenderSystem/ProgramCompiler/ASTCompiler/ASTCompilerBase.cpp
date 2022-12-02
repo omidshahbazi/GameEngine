@@ -428,8 +428,6 @@ namespace Engine
 			{
 				VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
 
-				PushVariable(stm);
-
 				BuildVariableStatement(stm, Type, Stage, Shader);
 			}
 			else if (IsAssignableFrom(Statement, VariableAccessStatement))
@@ -636,13 +634,21 @@ namespace Engine
 		{
 			auto& funcName = Statement->GetFunctionName();
 
-			if (FindFunctionType(funcName) != nullptr)
+			const FunctionType* functionType = FindMatchingFunction(funcName, Statement->GetArguments());
+			if (functionType != nullptr)
 			{
 				Shader += funcName;
 
 				Shader += "(";
 
-				BuildArguments(Statement->GetArguments(), Type, Stage, Shader);
+				uint8 i = 0;
+				for (auto argument : Statement->GetArguments()->GetItems())
+				{
+					if (i != 0)
+						Shader += ", ";
+
+					BuildExplicitCast(argument, functionType->GetParameters()[i++]->GetDataType(), Type, Stage, Shader);
+				}
 
 				Shader += ")";
 
@@ -675,6 +681,11 @@ namespace Engine
 
 		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
+			if (FindVariableType(Statement->GetName(), true))
+				THROW_PROGRAM_COMPILER_EXCEPTION("Variable redifinition", Statement->GetName());
+
+			PushVariable(Statement);
+
 			BuildDataTypeStatement(Statement->GetDataType(), Type, Stage, Shader);
 
 			Shader += " ";
@@ -1080,21 +1091,9 @@ namespace Engine
 			{
 				FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, CurrentStatement);
 
-				uint32 hash = IntrinsicsBuilder::CalculateFunctionSignatureHash(stm->GetFunctionName(), stm->GetArguments()->GetItems());
-
-				int32 index = m_Functions.FindIf([hash](auto item)
-					{
-						ProgramDataTypes parameterTypes[16];
-						uint8 parameterTypeCount = 0;
-						const auto& parameters = item->GetParameters();
-						for (auto& parameter : parameters)
-							parameterTypes[parameterTypeCount++] = parameter->GetDataType()->GetType();
-
-						return (hash == IntrinsicsBuilder::CalculateFunctionSignatureHash(item->GetName(), parameterTypes, parameterTypeCount));
-					});
-
-				if (index != -1)
-					return *m_Functions[index]->GetReturnDataType();
+				const FunctionType* functionType = FindMatchingFunction(stm->GetFunctionName(), stm->GetArguments());
+				if (functionType != nullptr)
+					return *(functionType->GetReturnDataType());
 
 				ProgramDataTypes dataType = IntrinsicsBuilder::EvaluateFunctionReturnValue(stm);
 				if (dataType == ProgramDataTypes::Unknown)
@@ -1189,7 +1188,7 @@ namespace Engine
 			return EvaluateDataType(Statement).GetType();
 		}
 
-		bool ASTCompilerBase::CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right)
+		bool ASTCompilerBase::CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const
 		{
 			if (Left.IsBuiltIn() != Right.IsBuiltIn())
 				return false;
@@ -1212,32 +1211,7 @@ namespace Engine
 			return true;
 		}
 
-		//void ASTCompilerBase::CheckDataTypes(Statement* Left, Statement* Right)
-		//{
-		//	CoreDebugAssert(Categories::ProgramCompiler, Left != nullptr, "Left cannot be null");
-		//	CoreDebugAssert(Categories::ProgramCompiler, Right != nullptr, "Right cannot be null");
-
-		//	CheckDataTypes(EvaluateDataType(Left), EvaluateDataType(Right));
-		//}
-
-		//void ASTCompilerBase::CheckDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right)
-		//{
-		//	if (CompareDataTypes(Left, Right))
-		//		return;
-
-		//	if (Left.GetType() != Right.GetType())
-		//		return;
-
-		//ThrowException:
-		//	THROW_PROGRAM_COMPILER_EXCEPTION(Right.ToString() + " is not compatible", Left.ToString());
-		//}
-
-		//void ASTCompilerBase::ExpectProgramDataType(Statement* Statement, ProgramDataTypes Expected)
-		//{
-		//	CheckDataTypes(EvaluateDataType(Statement), Expected);
-		//}
-
-		const VariableType* ASTCompilerBase::FindVariableType(const String& Name) const
+		const VariableType* ASTCompilerBase::FindVariableType(const String& Name, bool LatestBlockOnly) const
 		{
 			for (int8 i = m_BlockVariables.GetSize() - 1; i >= 0; --i)
 			{
@@ -1245,7 +1219,12 @@ namespace Engine
 
 				int32 index = variables.FindIf([&Name](auto item) { return item->GetName() == Name; });
 				if (index == -1)
+				{
+					if (LatestBlockOnly)
+						break;
+
 					continue;
+				}
 
 				return variables[index];
 			}
@@ -1279,6 +1258,42 @@ namespace Engine
 			int32 index = m_Functions.FindIf([&Name](auto structType) { return structType->GetName() == Name; });
 			if (index == -1)
 				return nullptr;
+
+			return m_Functions[index];
+		}
+
+		const FunctionType* ASTCompilerBase::FindMatchingFunction(const String& Name, const StatementItemHolder* Arguments) const
+		{
+			int32 index = m_Functions.FindIf([&](auto item)
+				{
+					const auto& parameters = item->GetParameters();
+
+					if (parameters.GetSize() != Arguments->GetItems().GetSize())
+						return false;
+
+					for (uint8 i = 0; i < parameters.GetSize(); ++i)
+					{
+						const auto& parameter = parameters[i];
+						const auto& argument = Arguments->GetItems()[i];
+
+						const DataTypeStatement argumentDataType = EvaluateDataType(argument);
+						if (!CompareDataTypes(*parameter->GetDataType(), argumentDataType))
+						{
+							if (parameter->GetDataType()->IsNumeric() != argumentDataType.IsNumeric())
+								return false;
+						}
+
+						return true;
+					}
+				});
+
+			if (index == -1)
+			{
+				if (FindFunctionType(Name) != nullptr)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find a matching version of function with the parameters", Name);
+
+				return nullptr;
+			}
 
 			return m_Functions[index];
 		}

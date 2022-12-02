@@ -90,6 +90,24 @@ namespace Engine
 						m_Type == ProgramDataTypes::UnsignedInteger4);
 				}
 
+				bool IsFloating(void) const
+				{
+					return (
+						m_Type == ProgramDataTypes::Float ||
+						m_Type == ProgramDataTypes::Float2 ||
+						m_Type == ProgramDataTypes::Float3 ||
+						m_Type == ProgramDataTypes::Float4 ||
+						m_Type == ProgramDataTypes::Double ||
+						m_Type == ProgramDataTypes::Double2 ||
+						m_Type == ProgramDataTypes::Double3 ||
+						m_Type == ProgramDataTypes::Double4);
+				}
+
+				bool IsNumeric(void) const
+				{
+					return IsIntegral() || IsFloating();
+				}
+
 				String ToString(void) const
 				{
 					String result = "";

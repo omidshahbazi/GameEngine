@@ -192,17 +192,15 @@ namespace Engine
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
 			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
 
-			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right);
-			//void CheckDataTypes(Statement* Left, Statement* Right);
-			//void CheckDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right);
-			//void ExpectProgramDataType(Statement* Statement, ProgramDataTypes Expected);
+			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const;
 
-			const VariableType* FindVariableType(const String& Name) const;
+			const VariableType* FindVariableType(const String& Name, bool LatestBlockOnly = false) const;
 			void IncreaseBlockIndex(void);
 			void DecreaseBlockIndex(void);
 			void PushVariable(VariableType* Variable);
 
 			const FunctionType* FindFunctionType(const String& Name) const;
+			const FunctionType* FindMatchingFunction(const String& Name, const StatementItemHolder* Arguments) const;
 			const FunctionType* GetFunctionType(const String& Name) const;
 
 			const StructType* FindStructType(const String& Name) const;

@@ -137,10 +137,12 @@ namespace Engine
 				for (auto parameter : function->GetParameters())
 					PushVariable(parameter);
 
-				if (function->IsEntrypoint())
-					ValidateEntrypointFunction(function, { funcType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, Data.Shader });
+				StageData data = { funcType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, Data.Shader };
 
-				BuildFunction(function, Data);
+				if (function->IsEntrypoint())
+					ValidateEntrypointFunction(function, data);
+
+				BuildFunction(function, data);
 			}
 		}
 

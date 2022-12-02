@@ -44,7 +44,6 @@ namespace Engine
 			public:
 				virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
-				virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 				virtual ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const = 0;
 			};
 

@@ -9,7 +9,7 @@ namespace Engine
 	namespace ASTCompiler
 	{
 #ifdef DEBUG_MODE
-#define ADD_NEW_LINE() Shader += "\n"
+#define ADD_NEW_LINE() Data.Shader += "\n"
 #else
 #define ADD_NEW_LINE()
 #endif
@@ -39,70 +39,40 @@ namespace Engine
 			};
 
 			if (containsEntrypoint(FunctionType::Types::VertexMain))
-				BuildVertexShader(Structs, Variables, Functions, Output.VertexShader);
+				BuildStageShader({ FunctionType::Types::None, Stages::Vertex, Structs, Variables, Functions, Output.VertexShader });
 
 			if (containsEntrypoint(FunctionType::Types::HullMain))
-				BuildHullShader(Structs, Variables, Functions, Output.HullShader);
+				BuildStageShader({ FunctionType::Types::None, Stages::Hull, Structs, Variables, Functions, Output.HullShader });
 
 			if (containsEntrypoint(FunctionType::Types::DomainMain))
-				BuildDomainShader(Structs, Variables, Functions, Output.DomainShader);
+				BuildStageShader({ FunctionType::Types::None, Stages::Domain, Structs, Variables, Functions, Output.DomainShader });
 
 			if (containsEntrypoint(FunctionType::Types::GeometryMain))
-				BuildGeometryShader(Structs, Variables, Functions, Output.GeometryShader);
+				BuildStageShader({ FunctionType::Types::None, Stages::Geometry, Structs, Variables, Functions, Output.GeometryShader });
 
 			if (containsEntrypoint(FunctionType::Types::FragmentMain))
-				BuildFragmentShader(Structs, Variables, Functions, Output.FragmentShader);
+				BuildStageShader({ FunctionType::Types::None, Stages::Fragment, Structs, Variables, Functions, Output.FragmentShader });
 
 			if (containsEntrypoint(FunctionType::Types::ComputeMain))
-				BuildComputeShader(Structs, Variables, Functions, Output.ComputeShader);
+				BuildStageShader({ FunctionType::Types::None, Stages::Compute, Structs, Variables, Functions, Output.ComputeShader });
 
 			m_Structs.Clear();
 			m_Functions.Clear();
 			m_BlockVariables.Clear();
 		}
 
-		void ASTCompilerBase::BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
+		void ASTCompilerBase::BuildStageShader(const StageData& Data)
 		{
-			ResetPerStageValues(Stage);
+			ResetPerStageValues(Data);
 
-			BuildStructs(Structs, Stage, Shader);
+			BuildStructs(Data);
 
-			BuildGlobalVariables(Variables, Stage, Shader);
+			BuildGlobalVariables(Data);
 
-			BuildFunctions(Functions, Stage, Shader);
+			BuildFunctions(Data);
 		}
 
-		void ASTCompilerBase::BuildVertexShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
-		{
-			BuildStageShader(Stages::Vertex, Structs, Variables, Functions, Shader);
-		}
-
-		void ASTCompilerBase::BuildHullShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
-		{
-			BuildStageShader(Stages::Hull, Structs, Variables, Functions, Shader);
-		}
-
-		void ASTCompilerBase::BuildDomainShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
-		{
-			BuildStageShader(Stages::Domain, Structs, Variables, Functions, Shader);
-		}
-
-		void ASTCompilerBase::BuildGeometryShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
-		{
-			BuildStageShader(Stages::Geometry, Structs, Variables, Functions, Shader);
-		}
-
-		void ASTCompilerBase::BuildFragmentShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
-		{
-			BuildStageShader(Stages::Fragment, Structs, Variables, Functions, Shader);
-		}
-
-		void ASTCompilerBase::BuildComputeShader(const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader)
-		{
-			BuildStageShader(Stages::Compute, Structs, Variables, Functions, Shader);
-		}
-
-		void ASTCompilerBase::ResetPerStageValues(Stages Stage)
+		void ASTCompilerBase::ResetPerStageValues(const StageData& Data)
 		{
 			m_Structs.Clear();
 			m_Functions.Clear();
@@ -114,56 +84,50 @@ namespace Engine
 			IncreaseBlockIndex();
 		}
 
-		void ASTCompilerBase::BuildStructs(const StructList& Structs, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildStructs(const StageData& Data)
 		{
-			for (auto structType : Structs)
+			for (auto structType : Data.Structs)
 			{
 				m_Structs.Add(structType);
 
-				BuildStruct(structType, Stage, Shader);
+				BuildStruct(structType, Data);
 			}
 		}
 
-		void ASTCompilerBase::BuildStructVariables(const StructVariableList& Variables, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildGlobalVariables(const StageData& Data)
 		{
-			for (auto variable : Variables)
-				BuildStructVariable(variable, Stage, Shader);
-		}
-
-		void ASTCompilerBase::BuildGlobalVariables(const GlobalVariableList& Variables, Stages Stage, String& Shader)
-		{
-			for (auto variable : Variables)
+			for (auto variable : Data.Variables)
 			{
 				PushVariable(variable);
 
-				BuildGlobalVariable(variable, Stage, Shader);
+				BuildGlobalVariable(variable, Data);
 			}
 		}
 
-		void ASTCompilerBase::BuildFunctions(const FunctionList& Functions, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildFunctions(const StageData& Data)
 		{
-			for (auto function : Functions)
+			for (auto function : Data.Functions)
 			{
+				FunctionType::Types funcType = function->GetType();
+
 				if (function->IsEntrypoint())
 				{
-					FunctionType::Types funcType = function->GetType();
-
-					if (funcType == FunctionType::Types::VertexMain && Stage != Stages::Vertex)
+					if (funcType == FunctionType::Types::VertexMain && Data.Stage != Stages::Vertex)
 						continue;
 
-					if (funcType == FunctionType::Types::HullMain && Stage != Stages::Hull)
+					if (funcType == FunctionType::Types::HullMain && Data.Stage != Stages::Hull)
 						continue;
 
-					if (funcType == FunctionType::Types::DomainMain && Stage != Stages::Domain)
+					if (funcType == FunctionType::Types::DomainMain && Data.Stage != Stages::Domain)
 						continue;
 
-					if (funcType == FunctionType::Types::GeometryMain && Stage != Stages::Geometry)
+					if (funcType == FunctionType::Types::GeometryMain && Data.Stage != Stages::Geometry)
 						continue;
 
-					if (funcType == FunctionType::Types::FragmentMain && Stage != Stages::Fragment)
+					if (funcType == FunctionType::Types::FragmentMain && Data.Stage != Stages::Fragment)
 						continue;
 
-					if (funcType == FunctionType::Types::ComputeMain && Stage != Stages::Compute)
+					if (funcType == FunctionType::Types::ComputeMain && Data.Stage != Stages::Compute)
 						continue;
 				}
 
@@ -174,13 +138,13 @@ namespace Engine
 					PushVariable(parameter);
 
 				if (function->IsEntrypoint())
-					ValidateEntrypointFunction(function, Stage, Shader);
+					ValidateEntrypointFunction(function, { funcType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, Data.Shader });
 
-				BuildFunction(function, Stage, Shader);
+				BuildFunction(function, Data);
 			}
 		}
 
-		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, Stages Stage, String& Shader)
+		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, const StageData& Data)
 		{
 			auto checkRequiredRegisters = [&](const String& StructName, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
@@ -219,7 +183,7 @@ namespace Engine
 			if (Function->GetParameters().GetSize() > 1)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Entrypoints cannot have more than one parameter", Function->GetName());
 
-			if (Stage == Stages::Hull)
+			if (Data.Stage == Stages::Hull)
 			{
 				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
@@ -239,14 +203,14 @@ namespace Engine
 
 				checkRequiredOutputRegisters(constantEntryPointFunc, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
 			}
-			else if (Stage == Stages::Domain)
+			else if (Data.Stage == Stages::Domain)
 			{
 				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
 
 				checkRequiredInputRegisters(Function, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
 			}
-			else if (Stage == Stages::Geometry)
+			else if (Data.Stage == Stages::Geometry)
 			{
 				if (Function->GetAttribute<MaxVertexCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find MaxVertexCount attribute", Function->GetName());
@@ -270,7 +234,7 @@ namespace Engine
 				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Geometry program must not return any value", Function->GetName());
 			}
-			else if (Stage == Stages::Compute)
+			else if (Data.Stage == Stages::Compute)
 			{
 				if (Function->GetAttribute<ThreadCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ThreadCount attribute", Function->GetName());
@@ -280,75 +244,75 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, const StageData& Data)
 		{
 			for (auto attribute : Attributes)
 			{
-				BuildAttribute(attribute, Type, Stage, Shader);
+				BuildAttribute(attribute, Data);
 
 				ADD_NEW_LINE();
 			}
 		}
 
-		void ASTCompilerBase::BuildAttribute(BaseAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildAttribute(BaseAttributeType* Attribute, const StageData& Data)
 		{
 			if (IsAssignableFrom(Attribute, DomainAttributeType))
 			{
 				DomainAttributeType* stm = ReinterpretCast(DomainAttributeType*, Attribute);
 
-				BuildDomainAttributeType(stm, Type, Stage, Shader);
+				BuildDomainAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, PartitioningAttributeType))
 			{
 				PartitioningAttributeType* stm = ReinterpretCast(PartitioningAttributeType*, Attribute);
 
-				BuildPartitioningAttributeType(stm, Type, Stage, Shader);
+				BuildPartitioningAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, TopologyAttributeType))
 			{
 				TopologyAttributeType* stm = ReinterpretCast(TopologyAttributeType*, Attribute);
 
-				BuildTopologyAttributeType(stm, Type, Stage, Shader);
+				BuildTopologyAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, ControlPointsAttributeType))
 			{
 				ControlPointsAttributeType* stm = ReinterpretCast(ControlPointsAttributeType*, Attribute);
 
-				BuildControlPointsAttributeType(stm, Type, Stage, Shader);
+				BuildControlPointsAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, ConstantEntrypointAttributeType))
 			{
 				ConstantEntrypointAttributeType* stm = ReinterpretCast(ConstantEntrypointAttributeType*, Attribute);
 
-				BuildConstantEntrypointAttributeType(stm, Type, Stage, Shader);
+				BuildConstantEntrypointAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, MaxVertexCountAttributeType))
 			{
 				MaxVertexCountAttributeType* stm = ReinterpretCast(MaxVertexCountAttributeType*, Attribute);
 
-				BuildMaxVertexCountAttributeType(stm, Type, Stage, Shader);
+				BuildMaxVertexCountAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, PrimitiveTypeAttributeType))
 			{
 				PrimitiveTypeAttributeType* stm = ReinterpretCast(PrimitiveTypeAttributeType*, Attribute);
 
-				BuildPrimitiveTypeAttributeType(stm, Type, Stage, Shader);
+				BuildPrimitiveTypeAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, OutputStreamTypeAttributeType))
 			{
 				OutputStreamTypeAttributeType* stm = ReinterpretCast(OutputStreamTypeAttributeType*, Attribute);
 
-				BuildOutputStreamTypeAttributeType(stm, Type, Stage, Shader);
+				BuildOutputStreamTypeAttributeType(stm, Data);
 			}
 			else if (IsAssignableFrom(Attribute, ThreadCountAttributeType))
 			{
 				ThreadCountAttributeType* stm = ReinterpretCast(ThreadCountAttributeType*, Attribute);
 
-				BuildThreadCountAttributeType(stm, Type, Stage, Shader);
+				BuildThreadCountAttributeType(stm, Data);
 			}
 		}
 
-		void ASTCompilerBase::BuildParameters(const ParameterList& Parameters, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildParameters(const ParameterList& Parameters, const StageData& Data)
 		{
 			bool isFirst = true;
 			for (auto parameter : Parameters)
@@ -356,40 +320,40 @@ namespace Engine
 				PushVariable(parameter);
 
 				if (!isFirst)
-					Shader += ", ";
+					Data.Shader += ", ";
 				isFirst = false;
 
-				BuildParameter(parameter, Type, Stage, Shader);
+				BuildParameter(parameter, Data);
 			}
 		}
 
-		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, const StageData& Data)
 		{
-			BuildDataTypeStatement(Parameter->GetDataType(), Type, Stage, Shader);
-			Shader += " ";
-			Shader += Parameter->GetName();
+			BuildDataTypeStatement(Parameter->GetDataType(), Data);
+			Data.Shader += " ";
+			Data.Shader += Parameter->GetName();
 
 			if (Parameter->GetDataType()->GetPostElementCount() != nullptr)
 			{
-				Shader += "[";
-				BuildStatement(Parameter->GetDataType()->GetPostElementCount(), FunctionType::Types::None, Stage, Shader);
-				Shader += "]";
+				Data.Shader += "[";
+				BuildStatement(Parameter->GetDataType()->GetPostElementCount(), Data);
+				Data.Shader += "]";
 			}
 		}
 
-		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, const StageData& Data)
 		{
 			IncreaseBlockIndex();
 
 			for (auto statement : Holder->GetItems())
 			{
-				BuildStatement(statement, Type, Stage, Shader);
+				BuildStatement(statement, Data);
 
 				if (IsAssignableFrom(statement, VariableStatement) ||
 					IsAssignableFrom(statement, OperatorStatement) ||
 					IsAssignableFrom(statement, UnaryOperatorStatement))
 				{
-					Shader += ";";
+					Data.Shader += ";";
 
 					ADD_NEW_LINE();
 				}
@@ -398,133 +362,133 @@ namespace Engine
 			DecreaseBlockIndex();
 		}
 
-		void ASTCompilerBase::BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildStatement(Statement* Statement, const StageData& Data)
 		{
 			if (IsAssignableFrom(Statement, OperatorStatement))
 			{
 				OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
 
-				BuildOperatorStatement(stm, Type, Stage, Shader);
+				BuildOperatorStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
 			{
 				UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
 
-				BuildUnaryOperatorStatement(stm, Type, Stage, Shader);
+				BuildUnaryOperatorStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, ConstantStatement))
 			{
 				ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
 
-				BuildConstantStatement(stm, Type, Stage, Shader);
+				BuildConstantStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, FunctionCallStatement))
 			{
 				FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
 
-				BuildFunctionCallStatement(stm, Type, Stage, Shader);
+				BuildFunctionCallStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, VariableStatement))
 			{
 				VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
 
-				BuildVariableStatement(stm, Type, Stage, Shader);
+				BuildVariableStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, VariableAccessStatement))
 			{
 				VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
 
-				BuildVariableAccessStatement(stm, Type, Stage, Shader);
+				BuildVariableAccessStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
 			{
 				ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
 
-				BuildArrayElementAccessStatement(stm, Type, Stage, Shader);
+				BuildArrayElementAccessStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, MemberAccessStatement))
 			{
 				MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
 
-				BuildMemberAccessStatement(stm, Type, Stage, Shader);
+				BuildMemberAccessStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, IfStatement))
 			{
 				IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
 
-				BuildIfStatement(stm, Type, Stage, Shader);
+				BuildIfStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, ElseStatement))
 			{
 				ElseStatement* stm = ReinterpretCast(ElseStatement*, Statement);
 
-				BuildElseStatement(stm, Type, Stage, Shader);
+				BuildElseStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, SwitchStatement))
 			{
 				SwitchStatement* stm = ReinterpretCast(SwitchStatement*, Statement);
 
-				BuildSwitchStatement(stm, Type, Stage, Shader);
+				BuildSwitchStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, CaseStatement))
 			{
 				CaseStatement* stm = ReinterpretCast(CaseStatement*, Statement);
 
-				BuildCaseStatement(stm, Type, Stage, Shader);
+				BuildCaseStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, DefaultStatement))
 			{
 				DefaultStatement* stm = ReinterpretCast(DefaultStatement*, Statement);
 
-				BuildDefaultStatement(stm, Type, Stage, Shader);
+				BuildDefaultStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, ForStatement))
 			{
 				ForStatement* stm = ReinterpretCast(ForStatement*, Statement);
 
-				BuildForStatement(stm, Type, Stage, Shader);
+				BuildForStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, DoStatement))
 			{
 				DoStatement* stm = ReinterpretCast(DoStatement*, Statement);
 
-				BuildDoStatement(stm, Type, Stage, Shader);
+				BuildDoStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, WhileStatement))
 			{
 				WhileStatement* stm = ReinterpretCast(WhileStatement*, Statement);
 
-				BuildWhileStatement(stm, Type, Stage, Shader);
+				BuildWhileStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, BreakStatement))
 			{
 				BreakStatement* stm = ReinterpretCast(BreakStatement*, Statement);
 
-				BuildBreakStatement(stm, Type, Stage, Shader);
+				BuildBreakStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, ReturnStatement))
 			{
 				ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
 
-				BuildReturnStatement(stm, Type, Stage, Shader);
+				BuildReturnStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, ArrayStatement))
 			{
 				ArrayStatement* stm = ReinterpretCast(ArrayStatement*, Statement);
 
-				BuildArrayStatement(stm, Type, Stage, Shader);
+				BuildArrayStatement(stm, Data);
 			}
 			else if (IsAssignableFrom(Statement, DiscardStatement))
 			{
 				DiscardStatement* stm = ReinterpretCast(DiscardStatement*, Statement);
 
-				BuildDiscardStatement(stm, Type, Stage, Shader);
+				BuildDiscardStatement(stm, Data);
 			}
 			else
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 		}
 
-		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, const StageData& Data)
 		{
 			OperatorStatement::Operators op = Statement->GetOperator();
 
@@ -535,7 +499,7 @@ namespace Engine
 				if (dataType == ProgramDataTypes::Matrix4F ||
 					dataType == ProgramDataTypes::Matrix4D)
 				{
-					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
+					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
 
 					return;
 				}
@@ -547,18 +511,18 @@ namespace Engine
 				if (dataType == ProgramDataTypes::Matrix4F ||
 					dataType == ProgramDataTypes::Matrix4D)
 				{
-					BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+					BuildStatement(Statement->GetLeft(), Data);
 
-					Shader += " = ";
+					Data.Shader += " = ";
 
-					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
+					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
 
 					return;
 				}
 			}
 			else if (op == OperatorStatement::Operators::Remainder)
 			{
-				IntrinsicsBuilder::BuildFunctionCallStatement("Reminder", { Statement->GetLeft(), Statement->GetRight() }, Type, Stage, Shader);
+				IntrinsicsBuilder::BuildFunctionCallStatement("Reminder", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
 
 				return;
 			}
@@ -571,31 +535,31 @@ namespace Engine
 				op == OperatorStatement::Operators::SubtractionAssignment;
 
 			if (!isAssignment)
-				Shader += "(";
+				Data.Shader += "(";
 
-			BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+			BuildStatement(Statement->GetLeft(), Data);
 
-			Shader += ' ';
+			Data.Shader += ' ';
 
-			Shader += OperatorStatement::GetOperatorSymbol(op);
+			Data.Shader += OperatorStatement::GetOperatorSymbol(op);
 
-			Shader += ' ';
+			Data.Shader += ' ';
 
 			if (isAssignment)
 			{
 				DataTypeStatement leftDataType = EvaluateDataType(Statement->GetLeft());
-				BuildExplicitCast(Statement->GetRight(), &leftDataType, Type, Stage, Shader);
+				BuildExplicitCast(Statement->GetRight(), &leftDataType, Data);
 			}
 			else
-				BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+				BuildStatement(Statement->GetRight(), Data);
 
 			if (!isAssignment)
-				Shader += ")";
+				Data.Shader += ")";
 		}
 
-		void ASTCompilerBase::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, const StageData& Data)
 		{
-			Shader += "(";
+			Data.Shader += "(";
 
 			switch (Statement->GetOperator())
 			{
@@ -603,239 +567,239 @@ namespace Engine
 			case UnaryOperatorStatement::Operators::Minus:
 			case UnaryOperatorStatement::Operators::PrefixIncrement:
 			case UnaryOperatorStatement::Operators::PrefixDecrement:
-				Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+				Data.Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
 				break;
 			}
 
-			BuildStatement(Statement->GetStatement(), Type, Stage, Shader);
+			BuildStatement(Statement->GetStatement(), Data);
 
 			switch (Statement->GetOperator())
 			{
 			case UnaryOperatorStatement::Operators::PostfixIncrement:
 			case UnaryOperatorStatement::Operators::PostfixDecrement:
-				Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+				Data.Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
 				break;
 			}
 
-			Shader += ")";
+			Data.Shader += ")";
 		}
 
-		void ASTCompilerBase::BuildConstantStatement(ConstantStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildConstantStatement(ConstantStatement* Statement, const StageData& Data)
 		{
 			if (Statement->GetType() == ProgramDataTypes::Bool)
-				Shader += StringUtility::ToString<char8>(Statement->GetBool());
+				Data.Shader += StringUtility::ToString<char8>(Statement->GetBool());
 			else if (Statement->GetFloat32() == 0 || Statement->GetFloat32() / (int32)Statement->GetFloat32() == 1)
-				Shader += StringUtility::ToString<char8>((int32)Statement->GetFloat32());
+				Data.Shader += StringUtility::ToString<char8>((int32)Statement->GetFloat32());
 			else
-				Shader += StringUtility::ToString<char8>(Statement->GetFloat32());
+				Data.Shader += StringUtility::ToString<char8>(Statement->GetFloat32());
 		}
 
-		void ASTCompilerBase::BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildFunctionCallStatement(FunctionCallStatement* Statement, const StageData& Data)
 		{
 			auto& funcName = Statement->GetFunctionName();
 
 			const FunctionType* functionType = FindMatchingFunction(funcName, Statement->GetArguments());
 			if (functionType != nullptr)
 			{
-				Shader += funcName;
+				Data.Shader += funcName;
 
-				Shader += "(";
+				Data.Shader += "(";
 
 				uint8 i = 0;
 				for (auto argument : Statement->GetArguments()->GetItems())
 				{
 					if (i != 0)
-						Shader += ", ";
+						Data.Shader += ", ";
 
-					BuildExplicitCast(argument, functionType->GetParameters()[i++]->GetDataType(), Type, Stage, Shader);
+					BuildExplicitCast(argument, functionType->GetParameters()[i++]->GetDataType(), Data);
 				}
 
-				Shader += ")";
+				Data.Shader += ")";
 
 				return;
 			}
 
-			if (IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Type, Stage, Shader))
+			if (IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Data.FunctionType, Data.Stage, Data.Shader))
 				return;
 
 			THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable or function", funcName);
 		}
 
-		void ASTCompilerBase::BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildArguments(const Vector<Statement*>& Statements, const StageData& Data)
 		{
 			bool isFirst = true;
 			for (auto argument : Statements)
 			{
 				if (!isFirst)
-					Shader += ", ";
+					Data.Shader += ", ";
 				isFirst = false;
 
-				BuildStatement(argument, Type, Stage, Shader);
+				BuildStatement(argument, Data);
 			}
 		}
 
-		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, const StageData& Data)
 		{
-			BuildArguments(Statements->GetItems(), Type, Stage, Shader);
+			BuildArguments(Statements->GetItems(), Data);
 		}
 
-		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, const StageData& Data)
 		{
 			if (FindVariableType(Statement->GetName(), true))
 				THROW_PROGRAM_COMPILER_EXCEPTION("Variable redifinition", Statement->GetName());
 
 			PushVariable(Statement);
 
-			BuildDataTypeStatement(Statement->GetDataType(), Type, Stage, Shader);
+			BuildDataTypeStatement(Statement->GetDataType(), Data);
 
-			Shader += " ";
-			Shader += Statement->GetName();
+			Data.Shader += " ";
+			Data.Shader += Statement->GetName();
 
 			if (Statement->GetInitialStatement() != nullptr)
 			{
-				Shader += " = ";
-				BuildStatement(Statement->GetInitialStatement(), Type, Stage, Shader);
+				Data.Shader += " = ";
+				BuildStatement(Statement->GetInitialStatement(), Data);
 			}
 		}
 
-		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, const StageData& Data)
 		{
-			BuildStatement(Statement->GetArrayStatement(), Type, Stage, Shader);
+			BuildStatement(Statement->GetArrayStatement(), Data);
 
-			Shader += "[";
+			Data.Shader += "[";
 
-			BuildStatement(Statement->GetElementStatement(), Type, Stage, Shader);
+			BuildStatement(Statement->GetElementStatement(), Data);
 
-			Shader += "]";
+			Data.Shader += "]";
 		}
 
-		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data)
 		{
-			BuildStatement(Statement->GetLeft(), Type, Stage, Shader);
+			BuildStatement(Statement->GetLeft(), Data);
 
-			Shader += ".";
+			Data.Shader += ".";
 
-			BuildStatement(Statement->GetRight(), Type, Stage, Shader);
+			BuildStatement(Statement->GetRight(), Data);
 		}
 
-		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, const StageData& Data)
 		{
-			Shader += "if (";
+			Data.Shader += "if (";
 
-			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Type, Stage, Shader);
+			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Data);
 
-			Shader += ")";
+			Data.Shader += ")";
 
 			ADD_NEW_LINE();
 
-			Shader += "{";
+			Data.Shader += "{";
 
 			ADD_NEW_LINE();
 
-			BuildStatementHolder(Statement, Type, Stage, Shader);
+			BuildStatementHolder(Statement, Data);
 
-			Shader += "}";
+			Data.Shader += "}";
 
 			ADD_NEW_LINE();
 
 			if (Statement->GetElse() != nullptr)
-				BuildStatement(Statement->GetElse(), Type, Stage, Shader);
+				BuildStatement(Statement->GetElse(), Data);
 		}
 
-		void ASTCompilerBase::BuildElseStatement(ElseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildElseStatement(ElseStatement* Statement, const StageData& Data)
 		{
-			Shader += "else";
+			Data.Shader += "else";
 
 			ADD_NEW_LINE();
 
-			Shader += "{";
+			Data.Shader += "{";
 
 			ADD_NEW_LINE();
 
-			BuildStatementHolder(Statement, Type, Stage, Shader);
+			BuildStatementHolder(Statement, Data);
 
-			Shader += "}";
+			Data.Shader += "}";
 
-			ADD_NEW_LINE();
-		}
-
-		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-		{
-			Shader += "switch (";
-
-			BuildStatement(Statement->GetSelector(), Type, Stage, Shader);
-
-			Shader += ")";
-			ADD_NEW_LINE();
-			Shader += "{";
-			ADD_NEW_LINE();
-
-			BuildStatementHolder(Statement, Type, Stage, Shader);
-
-			Shader += "}";
 			ADD_NEW_LINE();
 		}
 
-		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, const StageData& Data)
 		{
-			Shader += "case ";
+			Data.Shader += "switch (";
 
-			BuildStatement(Statement->GetCondition(), Type, Stage, Shader);
+			BuildStatement(Statement->GetSelector(), Data);
 
-			Shader += ":";
+			Data.Shader += ")";
+			ADD_NEW_LINE();
+			Data.Shader += "{";
+			ADD_NEW_LINE();
+
+			BuildStatementHolder(Statement, Data);
+
+			Data.Shader += "}";
+			ADD_NEW_LINE();
+		}
+
+		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, const StageData& Data)
+		{
+			Data.Shader += "case ";
+
+			BuildStatement(Statement->GetCondition(), Data);
+
+			Data.Shader += ":";
 			ADD_NEW_LINE();
 
 			if (Statement->GetItems().GetSize() != 0)
 			{
-				Shader += "{";
+				Data.Shader += "{";
 				ADD_NEW_LINE();
 
-				BuildStatementHolder(Statement, Type, Stage, Shader);
+				BuildStatementHolder(Statement, Data);
 
-				Shader += "}";
+				Data.Shader += "}";
 				ADD_NEW_LINE();
 			}
 		}
 
-		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, const StageData& Data)
 		{
-			Shader += "default:";
+			Data.Shader += "default:";
 			ADD_NEW_LINE();
 
 			if (Statement->GetItems().GetSize() != 0)
 			{
-				Shader += "{";
+				Data.Shader += "{";
 				ADD_NEW_LINE();
 
-				BuildStatementHolder(Statement, Type, Stage, Shader);
+				BuildStatementHolder(Statement, Data);
 
-				Shader += "}";
+				Data.Shader += "}";
 				ADD_NEW_LINE();
 			}
 		}
 
-		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, const StageData& Data)
 		{
-			Shader += "for (";
+			Data.Shader += "for (";
 
 			if (Statement->GetInitializer() != nullptr)
-				BuildStatement(Statement->GetInitializer(), Type, Stage, Shader);
+				BuildStatement(Statement->GetInitializer(), Data);
 
-			Shader += ";";
+			Data.Shader += ";";
 
 			if (Statement->GetCondition() != nullptr)
-				BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Type, Stage, Shader);
+				BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Data);
 
-			Shader += ";";
+			Data.Shader += ";";
 
 			if (Statement->GetStep() != nullptr)
-				BuildStatement(Statement->GetStep(), Type, Stage, Shader);
+				BuildStatement(Statement->GetStep(), Data);
 
-			Shader += ")";
+			Data.Shader += ")";
 
 			if (Statement->GetItems().GetSize() == 0)
 			{
-				Shader += ";";
+				Data.Shader += ";";
 				ADD_NEW_LINE();
 
 				return;
@@ -843,40 +807,40 @@ namespace Engine
 
 			ADD_NEW_LINE();
 
-			Shader += "{";
+			Data.Shader += "{";
 			ADD_NEW_LINE();
 
-			BuildStatementHolder(Statement, Type, Stage, Shader);
+			BuildStatementHolder(Statement, Data);
 
-			Shader += "}";
+			Data.Shader += "}";
 			ADD_NEW_LINE();
 		}
 
-		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, const StageData& Data)
 		{
-			Shader += "do";
+			Data.Shader += "do";
 
-			Shader += "{";
+			Data.Shader += "{";
 			ADD_NEW_LINE();
 
-			BuildStatementHolder(Statement, Type, Stage, Shader);
+			BuildStatementHolder(Statement, Data);
 
-			Shader += "}";
+			Data.Shader += "}";
 
-			BuildStatement(Statement->GetWhile(), Type, Stage, Shader);
+			BuildStatement(Statement->GetWhile(), Data);
 		}
 
-		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, const StageData& Data)
 		{
-			Shader += "while (";
+			Data.Shader += "while (";
 
-			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Type, Stage, Shader);
+			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Data);
 
-			Shader += ")";
+			Data.Shader += ")";
 
 			if (Statement->GetItems().GetSize() == 0)
 			{
-				Shader += ";";
+				Data.Shader += ";";
 				ADD_NEW_LINE();
 
 				return;
@@ -884,37 +848,37 @@ namespace Engine
 
 			ADD_NEW_LINE();
 
-			Shader += "{";
+			Data.Shader += "{";
 			ADD_NEW_LINE();
 
-			BuildStatementHolder(Statement, Type, Stage, Shader);
+			BuildStatementHolder(Statement, Data);
 
-			Shader += "}";
-			ADD_NEW_LINE();
-		}
-
-		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
-		{
-			Shader += "continue;";
+			Data.Shader += "}";
 			ADD_NEW_LINE();
 		}
 
-		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, const StageData& Data)
 		{
-			Shader += "break;";
+			Data.Shader += "continue;";
 			ADD_NEW_LINE();
 		}
 
-		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, const StageData& Data)
 		{
-			if (Stage != Stages::Fragment)
+			Data.Shader += "break;";
+			ADD_NEW_LINE();
+		}
+
+		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, const StageData& Data)
+		{
+			if (Data.Stage != Stages::Fragment)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
 
-			Shader += "discard;";
+			Data.Shader += "discard;";
 			ADD_NEW_LINE();
 		}
 
-		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, const StageData& Data)
 		{
 			uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
 
@@ -929,67 +893,67 @@ namespace Engine
 				return 0;
 			}
 
-			BuildType(m_LastFunction->GetReturnDataType()->GetType(), Shader);
-			Shader += " ";
-			Shader += GetStageResultArrayVariableName();
+			BuildType(m_LastFunction->GetReturnDataType()->GetType(), Data);
+			Data.Shader += " ";
+			Data.Shader += GetStageResultArrayVariableName();
 
 			if (isArray)
 			{
-				Shader += '[';
-				Shader += StringUtility::ToString<char8>(elementCount);
-				Shader += ']';
+				Data.Shader += '[';
+				Data.Shader += StringUtility::ToString<char8>(elementCount);
+				Data.Shader += ']';
 			}
 
-			Shader += " = ";
+			Data.Shader += " = ";
 
-			BuildStatement(Statement, Type, Stage, Shader);
+			BuildStatement(Statement, Data);
 
-			Shader += ";";
+			Data.Shader += ";";
 
 			ADD_NEW_LINE();
 
 			return elementCount;
 		}
 
-		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, const StageData& Data)
 		{
 			if (Statement->IsBuiltIn())
-				BuildType(Statement->GetType(), Shader);
+				BuildType(Statement->GetType(), Data);
 			else
-				Shader += Statement->GetUserDefined();
+				Data.Shader += Statement->GetUserDefined();
 
 			if (Statement->GetElementCount() != nullptr)
 			{
-				Shader += "[";
-				BuildStatement(Statement->GetElementCount(), Type, Stage, Shader);
-				Shader += "]";
+				Data.Shader += "[";
+				BuildStatement(Statement->GetElementCount(), Data);
+				Data.Shader += "]";
 			}
 		}
 
-		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, const StageData& Data)
 		{
 			bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
 
 			if (needsCasting)
 			{
-				Shader += '(';
+				Data.Shader += '(';
 
-				BuildDataTypeStatement(DataType, Type, Stage, Shader);
+				BuildDataTypeStatement(DataType, Data);
 
-				Shader += ")(";
+				Data.Shader += ")(";
 			}
 
-			BuildStatement(Statement, Type, Stage, Shader);
+			BuildStatement(Statement, Data);
 
 			if (needsCasting)
-				Shader += ')';
+				Data.Shader += ')';
 		}
 
-		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, FunctionType::Types Type, Stages Stage, String& Shader)
+		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, const StageData& Data)
 		{
 			DataTypeStatement dataType = DataType;
 
-			BuildExplicitCast(Statement, &dataType, Type, Stage, Shader);
+			BuildExplicitCast(Statement, &dataType, Data);
 		}
 
 		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
@@ -1002,7 +966,7 @@ namespace Engine
 			if (Statement->GetElementCount() != nullptr)
 			{
 				String elementCountString;
-				BuildStatement(Statement->GetElementCount(), FunctionType::Types::None, Stages::Vertex, elementCountString);
+				BuildStatement(Statement->GetElementCount(), { FunctionType::Types::None, Stages::Vertex, {}, {}, {} , elementCountString });
 
 				elementCount = StringUtility::ToInt8(elementCountString, 1);
 			}

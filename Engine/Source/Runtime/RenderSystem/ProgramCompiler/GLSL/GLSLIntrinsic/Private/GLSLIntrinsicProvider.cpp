@@ -2057,12 +2057,6 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
-								//String argument;
-								//Compiler->BuildStatement(Arguments[0], Type, Stage, argument);
-
-								//Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetGeometryOutputStreamParameterName();
-								//Shader += ".Append(";
-								//Shader += argument;
 								Shader += "EmitVertex();\n";
 							});
 					}
@@ -2077,7 +2071,6 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
-								//Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetGeometryOutputStreamParameterName();
 								Shader += "EndPrimitive();\n";
 							});
 					}

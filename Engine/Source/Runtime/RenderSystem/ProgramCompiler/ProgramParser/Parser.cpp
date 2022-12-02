@@ -1347,13 +1347,6 @@ namespace Engine
 
 		Statement* Parser::ParseVariableAccessStatement(const Token& DeclarationToken)
 		{
-			RequiredVarialbe(DeclarationToken);
-
-			return ParseVariableAccessStatementBase(DeclarationToken);
-		}
-
-		Statement* Parser::ParseVariableAccessStatementBase(const Token& DeclarationToken)
-		{
 			VariableAccessStatement* stm = Allocate<VariableAccessStatement>(m_Allocator);
 
 			stm->SetName(DeclarationToken.GetName());
@@ -1396,10 +1389,7 @@ namespace Engine
 				Token memberToken;
 				RequireIdentifierToken(memberToken, "member access statement");
 
-				if (parentStructType != nullptr)
-					RequiredVarialbe(ReinterpretCast(const VariableList&, parentStructType->GetItems()), memberToken);
-
-				stm->SetRight(ParseVariableAccessStatementBase(memberToken));
+				stm->SetRight(ParseVariableAccessStatement(memberToken));
 
 				return stm;
 			}

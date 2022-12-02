@@ -21,75 +21,71 @@ namespace Engine
 				ASTToGLSLCompiler(void);
 
 			private:
-				virtual void ResetPerStageValues(Stages Stage) override;
+				virtual void ResetPerStageValues(const StageData& Data) override;
 
-				virtual void BuildStageShader(Stages Stage, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, String& Shader) override;
+				virtual void BuildStageShader(const StageData& Data) override;
 
-				virtual void BuildStruct(StructType* Struct, Stages Stage, String& Shader) override;
+				virtual void BuildStruct(StructType* Struct, const StageData& Data) override;
 
-				virtual void BuildStructVariable(StructVariableType* Variable, Stages Stage, String& Shader) override
+				virtual void BuildGlobalVariable(GlobalVariableType* Variable, const StageData& Data) override;
+
+				virtual void BuildFunction(FunctionType* Function, const StageData& Data) override;
+
+				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildGlobalVariable(GlobalVariableType* Variable, Stages Stage, String& Shader) override;
-
-				virtual void BuildFunction(FunctionType* Function, Stages Stage, String& Shader) override;
-
-				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, const StageData& Data) override;
+
+				virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override;
-
-				virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
+				virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, const StageData& Data) override
 				{
 				}
 
-				virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, FunctionType::Types Type, Stages Stage, String& Shader) override
-				{
-				}
+				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, const StageData& Data) override;
 
-				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
+				virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data) override;
 
-				virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
+				virtual void BuildSwitchStatement(SwitchStatement* Statement, const StageData& Data) override;
 
-				virtual void BuildSwitchStatement(SwitchStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
+				virtual void BuildReturnStatement(ReturnStatement* Statement, const StageData& Data) override;
 
-				virtual void BuildReturnStatement(ReturnStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
+				virtual void BuildArrayStatement(ArrayStatement* Statement, const StageData& Data) override;
 
-				virtual void BuildArrayStatement(ArrayStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override;
+				virtual void BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, const StageData& Data) override;
 
-				virtual void BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, FunctionType::Types Type, Stages Stage, String& Shader) override;
+				virtual void BuildType(ProgramDataTypes Type, const StageData& Data) override;
 
-				virtual void BuildType(ProgramDataTypes Type, String& Shader) override;
+				virtual void BuildPostDataType(const DataTypeStatement* Type, const StageData& Data);
 
-				virtual void BuildPostDataType(const DataTypeStatement* Type, Stages Stage, String& Shader);
+				virtual void BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, const StageData& Data);
 
-				void BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, FunctionType::Types Type, Stages Stage, String& Shader);
+				virtual void BuildUniformBlock(const StructType* Struct, const String& Name, const StageData& Data);
 
-				void BuildUniformBlock(const StructType* Struct, const String& Name, Stages Stage, String& Shader);
-
-				void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, String& Shader);
+				virtual void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, const StageData& Data);
 
 			private:
 				uint8 m_AdditionalLayoutCount;

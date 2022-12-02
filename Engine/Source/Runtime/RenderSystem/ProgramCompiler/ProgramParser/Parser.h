@@ -130,7 +130,6 @@ namespace Engine
 
 			Statement* ParseConstantStatement(const Token& DeclarationToken);
 			Statement* ParseVariableAccessStatement(const Token& DeclarationToken);
-			Statement* ParseVariableAccessStatementBase(const Token& DeclarationToken);
 			Statement* ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement);
 			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, const DataTypeStatement* ParentDataType);
 			Statement* ParseFunctionCallStatement(const Token& DeclarationToken);

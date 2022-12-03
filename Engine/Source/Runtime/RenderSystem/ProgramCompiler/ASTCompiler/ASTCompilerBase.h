@@ -122,7 +122,7 @@ namespace Engine
 
 			virtual void BuildParameter(ParameterType* Parameter, const StageData& Data);
 
-			virtual void BuildStatementHolder(StatementItemHolder* Holder, const StageData& Data);
+			virtual void BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, const StageData& Data);
 
 			virtual void BuildStatement(Statement* Statement, const StageData& Data);
 

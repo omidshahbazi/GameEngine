@@ -365,7 +365,7 @@ namespace Engine
 
 				AddNewLine(Data);
 
-				BuildStatementHolder(Function, Data);
+				BuildStatementHolder(Function, false, Data);
 
 				AddCode('}', Data);
 

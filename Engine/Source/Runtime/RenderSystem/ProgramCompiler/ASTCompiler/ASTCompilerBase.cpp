@@ -337,9 +337,10 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, const StageData& Data)
+		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, const StageData& Data)
 		{
-			IncreaseBlockIndex();
+			if (IncreamentBlock)
+				IncreaseBlockIndex();
 
 			for (auto statement : Holder->GetItems())
 			{
@@ -355,7 +356,8 @@ namespace Engine
 				}
 			}
 
-			DecreaseBlockIndex();
+			if (IncreamentBlock)
+				DecreaseBlockIndex();
 		}
 
 		void ASTCompilerBase::BuildStatement(Statement* Statement, const StageData& Data)
@@ -692,7 +694,7 @@ namespace Engine
 
 			AddNewLine(Data);
 
-			BuildStatementHolder(Statement, Data);
+			BuildStatementHolder(Statement, true, Data);
 
 			AddCode('}', Data);
 
@@ -712,7 +714,7 @@ namespace Engine
 
 			AddNewLine(Data);
 
-			BuildStatementHolder(Statement, Data);
+			BuildStatementHolder(Statement, true, Data);
 
 			AddCode('}', Data);
 
@@ -730,7 +732,7 @@ namespace Engine
 			AddCode('{', Data);
 			AddNewLine(Data);
 
-			BuildStatementHolder(Statement, Data);
+			BuildStatementHolder(Statement, true, Data);
 
 			AddCode('}', Data);
 			AddNewLine(Data);
@@ -750,7 +752,7 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
-				BuildStatementHolder(Statement, Data);
+				BuildStatementHolder(Statement, false, Data);
 
 				AddCode('}', Data);
 				AddNewLine(Data);
@@ -767,7 +769,7 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
-				BuildStatementHolder(Statement, Data);
+				BuildStatementHolder(Statement, false, Data);
 
 				AddCode('}', Data);
 				AddNewLine(Data);
@@ -806,7 +808,7 @@ namespace Engine
 			AddCode('{', Data);
 			AddNewLine(Data);
 
-			BuildStatementHolder(Statement, Data);
+			BuildStatementHolder(Statement, true, Data);
 
 			AddCode('}', Data);
 			AddNewLine(Data);
@@ -815,13 +817,14 @@ namespace Engine
 		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, const StageData& Data)
 		{
 			AddCode("do", Data);
+			AddNewLine(Data);
 
 			AddCode('{', Data);
 			AddNewLine(Data);
 
-			BuildStatementHolder(Statement, Data);
+			BuildStatementHolder(Statement, true, Data);
 
-			AddCode('}', Data);
+			AddCode("} ", Data);
 
 			BuildStatement(Statement->GetWhile(), Data);
 		}
@@ -847,7 +850,7 @@ namespace Engine
 			AddCode('{', Data);
 			AddNewLine(Data);
 
-			BuildStatementHolder(Statement, Data);
+			BuildStatementHolder(Statement, true, Data);
 
 			AddCode('}', Data);
 			AddNewLine(Data);

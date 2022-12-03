@@ -81,6 +81,8 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
+				IncreaseBlockIndex();
+
 				for (auto& variable : Struct->GetItems())
 				{
 					BuildDataTypeStatement(variable->GetDataType(), Data);
@@ -95,6 +97,8 @@ namespace Engine
 
 					AddNewLine(Data);
 				}
+
+				DecreaseBlockIndex();
 
 				AddCode("};", Data);
 				AddNewLine(Data);
@@ -204,7 +208,7 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
-				BuildStatementHolder(Function, Data);
+				BuildStatementHolder(Function, false, Data);
 
 				AddCode('}', Data);
 				AddNewLine(Data);
@@ -315,10 +319,12 @@ namespace Engine
 						AddCode(')', Data);
 						AddNewLine(Data);
 						AddCode('{', Data);
+						AddNewLine(Data);
 
-						BuildStatementHolder(caseStatement, Data);
+						BuildStatementHolder(caseStatement, false, Data);
 
 						AddCode('}', Data);
+						AddNewLine(Data);
 					}
 					else if (IsAssignableFrom(statement, DefaultStatement))
 					{
@@ -352,10 +358,12 @@ namespace Engine
 						AddCode(')', Data);
 						AddNewLine(Data);
 						AddCode('{', Data);
+						AddNewLine(Data);
 
-						BuildStatementHolder(defaultStatement, Data);
+						BuildStatementHolder(defaultStatement, false, Data);
 
 						AddCode('}', Data);
+						AddNewLine(Data);
 					}
 				}
 			}
@@ -595,6 +603,8 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
+				IncreaseBlockIndex();
+
 				uint16 offset = 0;
 				for (auto variable : variables)
 				{
@@ -618,7 +628,9 @@ namespace Engine
 					offset += size;
 				}
 
-				AddCode('}', Data);
+				DecreaseBlockIndex();
+
+				AddCode("} ", Data);
 
 				AddCode(Name, Data);
 

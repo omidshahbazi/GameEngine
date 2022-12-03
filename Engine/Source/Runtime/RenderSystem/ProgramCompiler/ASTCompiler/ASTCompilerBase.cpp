@@ -8,12 +8,6 @@ namespace Engine
 
 	namespace ASTCompiler
 	{
-#ifdef DEBUG_MODE
-#define ADD_NEW_LINE() Data.Shader += "\n"
-#else
-#define ADD_NEW_LINE()
-#endif
-
 		ASTCompilerBase::ASTCompilerBase(void) :
 			m_Allocator(nullptr),
 			m_BlockIndex(-1),
@@ -252,7 +246,7 @@ namespace Engine
 			{
 				BuildAttribute(attribute, Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 			}
 		}
 
@@ -322,7 +316,7 @@ namespace Engine
 				PushVariable(parameter);
 
 				if (!isFirst)
-					Data.Shader += ", ";
+					AddCode(", ", Data);
 				isFirst = false;
 
 				BuildParameter(parameter, Data);
@@ -332,14 +326,14 @@ namespace Engine
 		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, const StageData& Data)
 		{
 			BuildDataTypeStatement(Parameter->GetDataType(), Data);
-			Data.Shader += " ";
-			Data.Shader += Parameter->GetName();
+			AddCode(' ', Data);
+			AddCode(Parameter->GetName(), Data);
 
 			if (Parameter->GetDataType()->GetPostElementCount() != nullptr)
 			{
-				Data.Shader += "[";
+				AddCode('[', Data);
 				BuildStatement(Parameter->GetDataType()->GetPostElementCount(), Data);
-				Data.Shader += "]";
+				AddCode(']', Data);
 			}
 		}
 
@@ -355,9 +349,9 @@ namespace Engine
 					IsAssignableFrom(statement, OperatorStatement) ||
 					IsAssignableFrom(statement, UnaryOperatorStatement))
 				{
-					Data.Shader += ";";
+					AddCode(';', Data);
 
-					ADD_NEW_LINE();
+					AddNewLine(Data);
 				}
 			}
 
@@ -515,7 +509,7 @@ namespace Engine
 				{
 					BuildStatement(Statement->GetLeft(), Data);
 
-					Data.Shader += " = ";
+					AddCode(" = ", Data);
 
 					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
 
@@ -537,15 +531,15 @@ namespace Engine
 				op == OperatorStatement::Operators::SubtractionAssignment;
 
 			if (!isAssignment)
-				Data.Shader += "(";
+				AddCode('(', Data);
 
 			BuildStatement(Statement->GetLeft(), Data);
 
-			Data.Shader += ' ';
+			AddCode(' ', Data);
 
-			Data.Shader += OperatorStatement::GetOperatorSymbol(op);
+			AddCode(OperatorStatement::GetOperatorSymbol(op), Data);
 
-			Data.Shader += ' ';
+			AddCode(' ', Data);
 
 			if (isAssignment)
 			{
@@ -556,12 +550,12 @@ namespace Engine
 				BuildStatement(Statement->GetRight(), Data);
 
 			if (!isAssignment)
-				Data.Shader += ")";
+				AddCode(')', Data);
 		}
 
 		void ASTCompilerBase::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "(";
+			AddCode('(', Data);
 
 			switch (Statement->GetOperator())
 			{
@@ -569,7 +563,7 @@ namespace Engine
 			case UnaryOperatorStatement::Operators::Minus:
 			case UnaryOperatorStatement::Operators::PrefixIncrement:
 			case UnaryOperatorStatement::Operators::PrefixDecrement:
-				Data.Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+				AddCode(UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator()), Data);
 				break;
 			}
 
@@ -579,21 +573,21 @@ namespace Engine
 			{
 			case UnaryOperatorStatement::Operators::PostfixIncrement:
 			case UnaryOperatorStatement::Operators::PostfixDecrement:
-				Data.Shader += UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator());
+				AddCode(UnaryOperatorStatement::GetOperatorSymbol(Statement->GetOperator()), Data);
 				break;
 			}
 
-			Data.Shader += ")";
+			AddCode(')', Data);
 		}
 
 		void ASTCompilerBase::BuildConstantStatement(ConstantStatement* Statement, const StageData& Data)
 		{
 			if (Statement->GetType() == ProgramDataTypes::Bool)
-				Data.Shader += StringUtility::ToString<char8>(Statement->GetBool());
+				AddCode(StringUtility::ToString<char8>(Statement->GetBool()), Data);
 			else if (Statement->GetFloat32() == 0 || Statement->GetFloat32() / (int32)Statement->GetFloat32() == 1)
-				Data.Shader += StringUtility::ToString<char8>((int32)Statement->GetFloat32());
+				AddCode(StringUtility::ToString<char8>((int32)Statement->GetFloat32()), Data);
 			else
-				Data.Shader += StringUtility::ToString<char8>(Statement->GetFloat32());
+				AddCode(StringUtility::ToString<char8>(Statement->GetFloat32()), Data);
 		}
 
 		void ASTCompilerBase::BuildFunctionCallStatement(FunctionCallStatement* Statement, const StageData& Data)
@@ -603,20 +597,20 @@ namespace Engine
 			const FunctionType* functionType = FindMatchingFunction(funcName, Statement->GetArguments());
 			if (functionType != nullptr)
 			{
-				Data.Shader += funcName;
+				AddCode(funcName, Data);
 
-				Data.Shader += "(";
+				AddCode('(', Data);
 
 				uint8 i = 0;
 				for (auto argument : Statement->GetArguments()->GetItems())
 				{
 					if (i != 0)
-						Data.Shader += ", ";
+						AddCode(", ", Data);
 
 					BuildExplicitCast(argument, functionType->GetParameters()[i++]->GetDataType(), Data);
 				}
 
-				Data.Shader += ")";
+				AddCode(')', Data);
 
 				return;
 			}
@@ -633,7 +627,7 @@ namespace Engine
 			for (auto argument : Statements)
 			{
 				if (!isFirst)
-					Data.Shader += ", ";
+					AddCode(", ", Data);
 				isFirst = false;
 
 				BuildStatement(argument, Data);
@@ -654,12 +648,12 @@ namespace Engine
 
 			BuildDataTypeStatement(Statement->GetDataType(), Data);
 
-			Data.Shader += " ";
-			Data.Shader += Statement->GetName();
+			AddCode(' ', Data);
+			AddCode(Statement->GetName(), Data);
 
 			if (Statement->GetInitialStatement() != nullptr)
 			{
-				Data.Shader += " = ";
+				AddCode(" = ", Data);
 				BuildStatement(Statement->GetInitialStatement(), Data);
 			}
 		}
@@ -668,41 +662,41 @@ namespace Engine
 		{
 			BuildStatement(Statement->GetArrayStatement(), Data);
 
-			Data.Shader += "[";
+			AddCode('[', Data);
 
 			BuildStatement(Statement->GetElementStatement(), Data);
 
-			Data.Shader += "]";
+			AddCode(']', Data);
 		}
 
 		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data)
 		{
 			BuildStatement(Statement->GetLeft(), Data);
 
-			Data.Shader += ".";
+			AddCode('.', Data);
 
 			BuildStatement(Statement->GetRight(), Data);
 		}
 
 		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "if (";
+			AddCode("if (", Data);
 
 			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Data);
 
-			Data.Shader += ")";
+			AddCode(')', Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
-			Data.Shader += "{";
+			AddCode('{', Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
 			BuildStatementHolder(Statement, Data);
 
-			Data.Shader += "}";
+			AddCode('}', Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
 			if (Statement->GetElse() != nullptr)
 				BuildStatement(Statement->GetElse(), Data);
@@ -710,165 +704,165 @@ namespace Engine
 
 		void ASTCompilerBase::BuildElseStatement(ElseStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "else";
+			AddCode("else", Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
-			Data.Shader += "{";
+			AddCode('{', Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
 			BuildStatementHolder(Statement, Data);
 
-			Data.Shader += "}";
+			AddCode('}', Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 		}
 
 		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "switch (";
+			AddCode("switch (", Data);
 
 			BuildStatement(Statement->GetSelector(), Data);
 
-			Data.Shader += ")";
-			ADD_NEW_LINE();
-			Data.Shader += "{";
-			ADD_NEW_LINE();
+			AddCode(')', Data);
+			AddNewLine(Data);
+			AddCode('{', Data);
+			AddNewLine(Data);
 
 			BuildStatementHolder(Statement, Data);
 
-			Data.Shader += "}";
-			ADD_NEW_LINE();
+			AddCode('}', Data);
+			AddNewLine(Data);
 		}
 
 		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "case ";
+			AddCode("case ", Data);
 
 			BuildStatement(Statement->GetCondition(), Data);
 
-			Data.Shader += ":";
-			ADD_NEW_LINE();
+			AddCode(':', Data);
+			AddNewLine(Data);
 
 			if (Statement->GetItems().GetSize() != 0)
 			{
-				Data.Shader += "{";
-				ADD_NEW_LINE();
+				AddCode('{', Data);
+				AddNewLine(Data);
 
 				BuildStatementHolder(Statement, Data);
 
-				Data.Shader += "}";
-				ADD_NEW_LINE();
+				AddCode('}', Data);
+				AddNewLine(Data);
 			}
 		}
 
 		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "default:";
-			ADD_NEW_LINE();
+			AddCode("default:", Data);
+			AddNewLine(Data);
 
 			if (Statement->GetItems().GetSize() != 0)
 			{
-				Data.Shader += "{";
-				ADD_NEW_LINE();
+				AddCode('{', Data);
+				AddNewLine(Data);
 
 				BuildStatementHolder(Statement, Data);
 
-				Data.Shader += "}";
-				ADD_NEW_LINE();
+				AddCode('}', Data);
+				AddNewLine(Data);
 			}
 		}
 
 		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "for (";
+			AddCode("for (", Data);
 
 			if (Statement->GetInitializer() != nullptr)
 				BuildStatement(Statement->GetInitializer(), Data);
 
-			Data.Shader += ";";
+			AddCode(';', Data);
 
 			if (Statement->GetCondition() != nullptr)
 				BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Data);
 
-			Data.Shader += ";";
+			AddCode(';', Data);
 
 			if (Statement->GetStep() != nullptr)
 				BuildStatement(Statement->GetStep(), Data);
 
-			Data.Shader += ")";
+			AddCode(')', Data);
 
 			if (Statement->GetItems().GetSize() == 0)
 			{
-				Data.Shader += ";";
-				ADD_NEW_LINE();
+				AddCode(';', Data);
+				AddNewLine(Data);
 
 				return;
 			}
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
-			Data.Shader += "{";
-			ADD_NEW_LINE();
+			AddCode('{', Data);
+			AddNewLine(Data);
 
 			BuildStatementHolder(Statement, Data);
 
-			Data.Shader += "}";
-			ADD_NEW_LINE();
+			AddCode('}', Data);
+			AddNewLine(Data);
 		}
 
 		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "do";
+			AddCode("do", Data);
 
-			Data.Shader += "{";
-			ADD_NEW_LINE();
+			AddCode('{', Data);
+			AddNewLine(Data);
 
 			BuildStatementHolder(Statement, Data);
 
-			Data.Shader += "}";
+			AddCode('}', Data);
 
 			BuildStatement(Statement->GetWhile(), Data);
 		}
 
 		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "while (";
+			AddCode("while (", Data);
 
 			BuildExplicitCast(Statement->GetCondition(), ProgramDataTypes::Bool, Data);
 
-			Data.Shader += ")";
+			AddCode(')', Data);
 
 			if (Statement->GetItems().GetSize() == 0)
 			{
-				Data.Shader += ";";
-				ADD_NEW_LINE();
+				AddCode(';', Data);
+				AddNewLine(Data);
 
 				return;
 			}
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
-			Data.Shader += "{";
-			ADD_NEW_LINE();
+			AddCode('{', Data);
+			AddNewLine(Data);
 
 			BuildStatementHolder(Statement, Data);
 
-			Data.Shader += "}";
-			ADD_NEW_LINE();
+			AddCode('}', Data);
+			AddNewLine(Data);
 		}
 
 		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "continue;";
-			ADD_NEW_LINE();
+			AddCode("continue;", Data);
+			AddNewLine(Data);
 		}
 
 		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, const StageData& Data)
 		{
-			Data.Shader += "break;";
-			ADD_NEW_LINE();
+			AddCode("break;", Data);
+			AddNewLine(Data);
 		}
 
 		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, const StageData& Data)
@@ -876,8 +870,8 @@ namespace Engine
 			if (Data.Stage != Stages::Fragment)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
 
-			Data.Shader += "discard;";
-			ADD_NEW_LINE();
+			AddCode("discard;", Data);
+			AddNewLine(Data);
 		}
 
 		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, const StageData& Data)
@@ -896,23 +890,23 @@ namespace Engine
 			}
 
 			BuildType(m_LastFunction->GetReturnDataType()->GetType(), Data);
-			Data.Shader += " ";
-			Data.Shader += GetStageResultArrayVariableName();
+			AddCode(' ', Data);
+			AddCode(GetStageResultArrayVariableName(), Data);
 
 			if (isArray)
 			{
-				Data.Shader += '[';
-				Data.Shader += StringUtility::ToString<char8>(elementCount);
-				Data.Shader += ']';
+				AddCode('[', Data);
+				AddCode(StringUtility::ToString<char8>(elementCount), Data);
+				AddCode(']', Data);
 			}
 
-			Data.Shader += " = ";
+			AddCode(" = ", Data);
 
 			BuildStatement(Statement, Data);
 
-			Data.Shader += ";";
+			AddCode(';', Data);
 
-			ADD_NEW_LINE();
+			AddNewLine(Data);
 
 			return elementCount;
 		}
@@ -922,13 +916,13 @@ namespace Engine
 			if (Statement->IsBuiltIn())
 				BuildType(Statement->GetType(), Data);
 			else
-				Data.Shader += Statement->GetUserDefined();
+				AddCode(Statement->GetUserDefined(), Data);
 
 			if (Statement->GetElementCount() != nullptr)
 			{
-				Data.Shader += "[";
+				AddCode('[', Data);
 				BuildStatement(Statement->GetElementCount(), Data);
-				Data.Shader += "]";
+				AddCode(']', Data);
 			}
 		}
 
@@ -938,17 +932,17 @@ namespace Engine
 
 			if (needsCasting)
 			{
-				Data.Shader += '(';
+				AddCode('(', Data);
 
 				BuildDataTypeStatement(DataType, Data);
 
-				Data.Shader += ")(";
+				AddCode(")(", Data);
 			}
 
 			BuildStatement(Statement, Data);
 
 			if (needsCasting)
-				Data.Shader += ')';
+				AddCode(')', Data);
 		}
 
 		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, const StageData& Data)
@@ -1323,13 +1317,29 @@ namespace Engine
 			return type;
 		}
 
+		void ASTCompilerBase::AddCode(const String& Value, const StageData& Data)
+		{
+#ifdef DEBUG_MODE
+			if (Data.Shader.EndsWith('\n'))
+				for (uint8 i = 0; i < m_BlockIndex; ++i)
+					Data.Shader += '\t';
+#endif
+
+			Data.Shader += Value;
+		}
+
+		void ASTCompilerBase::AddNewLine(const StageData& Data)
+		{
+#ifdef DEBUG_MODE
+			Data.Shader += '\n';
+#endif
+		}
+
 		cstr ASTCompilerBase::GetStageResultArrayVariableName(void)
 		{
 			static cstr name = "__result_value__";
 
 			return name;
 		}
-
-#undef ADD_NEW_LINE
 	}
 }

@@ -205,6 +205,9 @@ namespace Engine
 			const StructVariableType* FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 			const StructVariableType* GetVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 
+			void AddCode(const String& Value, const StageData& Data);
+			void AddNewLine(const StageData& Data);
+
 			void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 			{
 				BuildStatement(Statement, { Type, Stage, {}, {}, {}, Shader });

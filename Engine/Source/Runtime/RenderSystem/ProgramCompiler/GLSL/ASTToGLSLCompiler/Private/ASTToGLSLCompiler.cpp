@@ -13,12 +13,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-#ifdef DEBUG_MODE
-#define ADD_NEW_LINE() Data.Shader += "\n"
-#else
-#define ADD_NEW_LINE()
-#endif
-
 			VertexLayouts GetLayout(StructVariableType::Registers Register)
 			{
 				switch (Register)
@@ -80,30 +74,30 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildStruct(StructType* Struct, const StageData& Data)
 			{
-				Data.Shader += "struct ";
-				Data.Shader += Struct->GetName();
-				ADD_NEW_LINE();
+				AddCode("struct ", Data);
+				AddCode(Struct->GetName(), Data);
+				AddNewLine(Data);
 
-				Data.Shader += '{';
-				ADD_NEW_LINE();
+				AddCode('{', Data);
+				AddNewLine(Data);
 
 				for (auto& variable : Struct->GetItems())
 				{
 					BuildDataTypeStatement(variable->GetDataType(), Data);
 
-					Data.Shader += ' ';
+					AddCode(' ', Data);
 
-					Data.Shader += variable->GetName();
+					AddCode(variable->GetName(), Data);
 
 					BuildPostDataType(variable->GetDataType(), Data);
 
-					Data.Shader += ';';
+					AddCode(';', Data);
 
-					ADD_NEW_LINE();
+					AddNewLine(Data);
 				}
 
-				Data.Shader += "};";
-				ADD_NEW_LINE();
+				AddCode("};", Data);
+				AddNewLine(Data);
 			}
 
 			void ASTToGLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, const StageData& Data)
@@ -127,25 +121,25 @@ namespace Engine
 
 					if (allowedDataType == ProgramDataTypes::Texture2D)
 					{
-						Data.Shader += "layout(location = ";
-						Data.Shader += StringUtility::ToString<char8>(m_BindingCount);
-						Data.Shader += ", binding = ";
-						Data.Shader += StringUtility::ToString<char8>(m_BindingCount);
-						Data.Shader += ")";
+						AddCode("layout(location = ", Data);
+						AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
+						AddCode(", binding = ", Data);
+						AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
+						AddCode(')', Data);
 
 						++m_BindingCount;
 					}
 
-					Data.Shader += "uniform ";
+					AddCode("uniform ", Data);
 					break;
 				}
 
 				BuildDataTypeStatement(dataType, Data);
-				Data.Shader += " ";
-				Data.Shader += name;
-				Data.Shader += ";";
+				AddCode(' ', Data);
+				AddCode(name, Data);
+				AddCode(';', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 			}
 
 			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, const StageData& Data)
@@ -168,15 +162,15 @@ namespace Engine
 
 					for (uint8 i = 0; i < elementCount; ++i)
 					{
-						Data.Shader += "layout(location = ";
-						Data.Shader += StringUtility::ToString<char8>(i);
-						Data.Shader += ") out ";
+						AddCode("layout(location = ", Data);
+						AddCode(StringUtility::ToString<char8>(i), Data);
+						AddCode(") out ", Data);
 						BuildType(ProgramDataTypes::Float4, Data);
-						Data.Shader += " ";
-						Data.Shader += GetFragmentVariableName(i);
-						Data.Shader += ";";
+						AddCode(' ', Data);
+						AddCode(GetFragmentVariableName(i), Data);
+						AddCode(';', Data);
 
-						ADD_NEW_LINE();
+						AddNewLine(Data);
 					}
 				}
 
@@ -185,16 +179,16 @@ namespace Engine
 				else
 					BuildDataTypeStatement(Function->GetReturnDataType(), Data);
 
-				Data.Shader += " ";
+				AddCode(' ', Data);
 
 				if (Function->IsEntrypoint())
-					Data.Shader += Constants::ENTRY_POINT_NAME;
+					AddCode(Constants::ENTRY_POINT_NAME, Data);
 				else
-					Data.Shader += Function->GetName();
+					AddCode(Function->GetName(), Data);
 
 				IncreaseBlockIndex();
 
-				Data.Shader += "(";
+				AddCode('(', Data);
 
 				if (Function->IsEntrypoint())
 				{
@@ -204,16 +198,16 @@ namespace Engine
 				else
 					BuildParameters(Function->GetParameters(), Data);
 
-				Data.Shader += ")";
-				ADD_NEW_LINE();
+				AddCode(')', Data);
+				AddNewLine(Data);
 
-				Data.Shader += "{";
-				ADD_NEW_LINE();
+				AddCode('{', Data);
+				AddNewLine(Data);
 
 				BuildStatementHolder(Function, Data);
 
-				Data.Shader += "}";
-				ADD_NEW_LINE();
+				AddCode('}', Data);
+				AddNewLine(Data);
 
 				DecreaseBlockIndex();
 			}
@@ -225,7 +219,7 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, const StageData& Data)
 			{
-				Data.Shader += Statement->GetName();
+				AddCode(Statement->GetName(), Data);
 			}
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data)
@@ -262,7 +256,7 @@ namespace Engine
 
 							if (isMemberAccess)
 							{
-								Data.Shader += '.';
+								AddCode('.', Data);
 
 								BuildStatement(ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetRight(), Data);
 							}
@@ -291,20 +285,20 @@ namespace Engine
 						{
 							if (isFirstOne)
 							{
-								Data.Shader += "if ";
+								AddCode("if ", Data);
 								isFirstOne = false;
 							}
 							else
-								Data.Shader += "else if ";
+								AddCode("else if ", Data);
 
-							Data.Shader += "(";
+							AddCode('(', Data);
 						}
 
 						isCoupling = false;
 
 						BuildStatement(Statement->GetSelector(), Data);
 
-						Data.Shader += " == ";
+						AddCode(" == ", Data);
 
 						CaseStatement* caseStatement = ReinterpretCast(CaseStatement*, statement);
 
@@ -312,19 +306,19 @@ namespace Engine
 
 						if (caseStatement->GetItems().GetSize() == 0)
 						{
-							Data.Shader += " || ";
+							AddCode(" || ", Data);
 
 							isCoupling = true;
 							continue;
 						}
 
-						Data.Shader += ")";
-						ADD_NEW_LINE();
-						Data.Shader += "{";
+						AddCode(')', Data);
+						AddNewLine(Data);
+						AddCode('{', Data);
 
 						BuildStatementHolder(caseStatement, Data);
 
-						Data.Shader += "}";
+						AddCode('}', Data);
 					}
 					else if (IsAssignableFrom(statement, DefaultStatement))
 					{
@@ -332,36 +326,36 @@ namespace Engine
 						{
 							if (isFirstOne)
 							{
-								Data.Shader += "if ";
+								AddCode("if ", Data);
 								isFirstOne = false;
 							}
 							else
-								Data.Shader += "else if ";
+								AddCode("else if ", Data);
 
-							Data.Shader += "(";
+							AddCode('(', Data);
 						}
 
 						isCoupling = false;
 
-						Data.Shader += "true";
+						AddCode("true", Data);
 
 						DefaultStatement* defaultStatement = ReinterpretCast(DefaultStatement*, statement);
 
 						if (defaultStatement->GetItems().GetSize() == 0)
 						{
-							Data.Shader += " || ";
+							AddCode(" || ", Data);
 
 							isCoupling = true;
 							continue;
 						}
 
-						Data.Shader += ")";
-						ADD_NEW_LINE();
-						Data.Shader += "{";
+						AddCode(')', Data);
+						AddNewLine(Data);
+						AddCode('{', Data);
 
 						BuildStatementHolder(defaultStatement, Data);
 
-						Data.Shader += "}";
+						AddCode('}', Data);
 					}
 				}
 			}
@@ -370,12 +364,12 @@ namespace Engine
 			{
 				if (Data.FunctionType == FunctionType::Types::None)
 				{
-					Data.Shader += "return ";
+					AddCode("return ", Data);
 
 					BuildStatement(Statement->GetStatement(), Data);
 
-					Data.Shader += ';';
-					ADD_NEW_LINE();
+					AddCode(';', Data);
+					AddNewLine(Data);
 
 					return;
 				}
@@ -386,7 +380,7 @@ namespace Engine
 
 				if (Data.FunctionType == FunctionType::Types::VertexMain)
 				{
-					Data.Shader += "gl_Position = ";
+					AddCode("gl_Position = ", Data);
 
 					variableType = FindVariableType(structType, [](const StructVariableType* item) { return item->GetRegister() == StructVariableType::Registers::Position; });
 				}
@@ -397,19 +391,19 @@ namespace Engine
 					uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Data);
 					for (uint8 i = 0; i < elementCount; ++i)
 					{
-						Data.Shader += GetFragmentVariableName(i) + " = ";
+						AddCode(GetFragmentVariableName(i) + " = ", Data);
 
-						Data.Shader += GetStageResultArrayVariableName();
+						AddCode(GetStageResultArrayVariableName(), Data);
 
 						if (elementCount > 1)
 						{
-							Data.Shader += '[';
-							Data.Shader += StringUtility::ToString<char8>(i);
-							Data.Shader += "]";
+							AddCode('[', Data);
+							AddCode(StringUtility::ToString<char8>(i), Data);
+							AddCode(']', Data);
 						}
 
-						Data.Shader += ';';
-						ADD_NEW_LINE();
+						AddCode(';', Data);
+						AddNewLine(Data);
 					}
 				}
 
@@ -418,11 +412,11 @@ namespace Engine
 
 				BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Data);
 
-				Data.Shader += ';';
-				ADD_NEW_LINE();
+				AddCode(';', Data);
+				AddNewLine(Data);
 
-				Data.Shader += "return;";
-				ADD_NEW_LINE();
+				AddCode("return;", Data);
+				AddNewLine(Data);
 			}
 
 			void ASTToGLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, const StageData& Data)
@@ -431,11 +425,11 @@ namespace Engine
 
 				BuildType(dataType.GetType(), Data);
 
-				Data.Shader += "[](";
+				AddCode("[](", Data);
 
 				BuildArguments(Statement, Data);
 
-				Data.Shader += ')';
+				AddCode(')', Data);
 			}
 
 			void ASTToGLSLCompiler::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, const StageData& Data)
@@ -446,13 +440,13 @@ namespace Engine
 				{
 					BuildDataTypeStatement(DataType, Data);
 
-					Data.Shader += '(';
+					AddCode('(', Data);
 				}
 
 				BuildStatement(Statement, Data);
 
 				if (needsCasting)
-					Data.Shader += ')';
+					AddCode(')', Data);
 			}
 
 			void ASTToGLSLCompiler::BuildType(ProgramDataTypes Type, const StageData& Data)
@@ -460,84 +454,84 @@ namespace Engine
 				switch (Type)
 				{
 				case ProgramDataTypes::Void:
-					Data.Shader += "void";
+					AddCode("void", Data);
 					break;
 
 				case ProgramDataTypes::Bool:
-					Data.Shader += "bool";
+					AddCode("bool", Data);
 					break;
 
 				case ProgramDataTypes::Integer:
-					Data.Shader += "int";
+					AddCode("int", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger:
-					Data.Shader += "uint";
+					AddCode("uint", Data);
 					break;
 
 				case ProgramDataTypes::Float:
-					Data.Shader += "float";
+					AddCode("float", Data);
 					break;
 
 				case ProgramDataTypes::Double:
-					Data.Shader += "double";
+					AddCode("double", Data);
 					break;
 
 				case ProgramDataTypes::Integer2:
-					Data.Shader += "ivec2";
+					AddCode("ivec2", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger2:
-					Data.Shader += "uvec2";
+					AddCode("uvec2", Data);
 					break;
 
 				case ProgramDataTypes::Float2:
-					Data.Shader += "vec2";
+					AddCode("vec2", Data);
 					break;
 
 				case ProgramDataTypes::Double2:
-					Data.Shader += "dvec2";
+					AddCode("dvec2", Data);
 					break;
 
 				case ProgramDataTypes::Integer3:
-					Data.Shader += "ivec3";
+					AddCode("ivec3", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger3:
-					Data.Shader += "uvec3";
+					AddCode("uvec3", Data);
 					break;
 
 				case ProgramDataTypes::Float3:
-					Data.Shader += "vec3";
+					AddCode("vec3", Data);
 					break;
 
 				case ProgramDataTypes::Double3:
-					Data.Shader += "dvec3";
+					AddCode("dvec3", Data);
 					break;
 
 				case ProgramDataTypes::Integer4:
-					Data.Shader += "ivec4";
+					AddCode("ivec4", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger4:
-					Data.Shader += "uvec4";
+					AddCode("uvec4", Data);
 					break;
 
 				case ProgramDataTypes::Float4:
-					Data.Shader += "vec4";
+					AddCode("vec4", Data);
 					break;
 
 				case ProgramDataTypes::Double4:
-					Data.Shader += "dvec4";
+					AddCode("dvec4", Data);
 					break;
 
 				case ProgramDataTypes::Matrix4F:
 				case ProgramDataTypes::Matrix4D:
-					Data.Shader += "mat4";
+					AddCode("mat4", Data);
 					break;
 
 				case ProgramDataTypes::Texture2D:
-					Data.Shader += "sampler2D";
+					AddCode("sampler2D", Data);
 					break;
 				}
 			}
@@ -546,9 +540,9 @@ namespace Engine
 			{
 				if (Type->GetPostElementCount() != nullptr)
 				{
-					Data.Shader += "[";
+					AddCode('[', Data);
 					BuildStatement(Type->GetPostElementCount(), Data);
-					Data.Shader += "]";
+					AddCode(']', Data);
 				}
 			}
 
@@ -570,18 +564,18 @@ namespace Engine
 					else
 						location = SubMeshInfo::GetLayoutIndex(GetLayout(variable->GetRegister()));
 
-					Data.Shader += "layout(location = ";
-					Data.Shader += StringUtility::ToString<char8>(location);
-					Data.Shader += ") ";
-					Data.Shader += (IsInput ? "in " : "out ");
+					AddCode("layout(location = ", Data);
+					AddCode(StringUtility::ToString<char8>(location), Data);
+					AddCode(") ", Data);
+					AddCode((IsInput ? "in " : "out "), Data);
 
 					BuildDataTypeStatement(variable->GetDataType(), Data);
-					Data.Shader += ' ';
+					AddCode(' ', Data);
 
 					BuildFlattenStructMemberVariableName(structType, variable, Name, IsInput, Data);
-					Data.Shader += ';';
+					AddCode(';', Data);
 
-					ADD_NEW_LINE();
+					AddNewLine(Data);
 				}
 			}
 
@@ -592,14 +586,14 @@ namespace Engine
 				if (FindVariableType(Struct, [](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }) != nullptr)
 					CoreDebugAssert(Categories::ProgramCompiler, false, "Struct %S cannot have variables with register specified", Struct->GetName());
 
-				Data.Shader += "layout(std140, binding = ";
-				Data.Shader += StringUtility::ToString<char8>(m_BindingCount++);
-				Data.Shader += ") uniform " + Struct->GetName();
-				Data.Shader += "_";
-				Data.Shader += Name;
-				ADD_NEW_LINE();
-				Data.Shader += "{";
-				ADD_NEW_LINE();
+				AddCode("layout(std140, binding = ", Data);
+				AddCode(StringUtility::ToString<char8>(m_BindingCount++), Data);
+				AddCode(") uniform " + Struct->GetName(), Data);
+				AddCode('_', Data);
+				AddCode(Name, Data);
+				AddNewLine(Data);
+				AddCode('{', Data);
+				AddNewLine(Data);
 
 				uint16 offset = 0;
 				for (auto variable : variables)
@@ -609,42 +603,40 @@ namespace Engine
 					uint8 size = 0;
 					StructType::GetAlignedOffset(dataType, offset, size);
 
-					Data.Shader += "layout(offset = ";
-					Data.Shader += StringUtility::ToString<char8>(offset);
-					Data.Shader += ") ";
+					AddCode("layout(offset = ", Data);
+					AddCode(StringUtility::ToString<char8>(offset), Data);
+					AddCode(") ", Data);
 
 					BuildDataTypeStatement(variable->GetDataType(), Data);
 
-					Data.Shader += " ";
-					Data.Shader += variable->GetName();
-					Data.Shader += ";";
+					AddCode(' ', Data);
+					AddCode(variable->GetName(), Data);
+					AddCode(';', Data);
 
-					ADD_NEW_LINE();
+					AddNewLine(Data);
 
 					offset += size;
 				}
 
-				Data.Shader += "}";
+				AddCode('}', Data);
 
-				Data.Shader += Name;
+				AddCode(Name, Data);
 
-				Data.Shader += ";";
+				AddCode(';', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 			}
 
 			void ASTToGLSLCompiler::BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, const StageData& Data)
 			{
-				Data.Shader += Name;
-				Data.Shader += '_';
-				Data.Shader += (IsInput ? "In" : "Out");
-				Data.Shader += '_';
-				Data.Shader += Parent->GetName();
-				Data.Shader += '_';
-				Data.Shader += Variable->GetName();
+				AddCode(Name, Data);
+				AddCode('_', Data);
+				AddCode((IsInput ? "In" : "Out"), Data);
+				AddCode('_', Data);
+				AddCode(Parent->GetName(), Data);
+				AddCode('_', Data);
+				AddCode(Variable->GetName(), Data);
 			}
-
-#undef ADD_NEW_LINE
 		}
 	}
 }

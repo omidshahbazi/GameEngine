@@ -13,14 +13,6 @@ namespace Engine
 	{
 		namespace Private
 		{
-#ifdef DEBUG_MODE
-#define ADD_NEW_LINE() Data.Shader += "\n"
-#define ADD_NEW_LINE_EX(StringVariable) StringVariable += "\n"
-#else
-#define ADD_NEW_LINE()
-#define ADD_NEW_LINE_EX(StringVariable)
-#endif
-
 			String GetRegisterName(StructVariableType::Registers Register)
 			{
 				switch (Register)
@@ -215,15 +207,15 @@ namespace Engine
 
 			void ASTToHLSLCompiler::BuildStruct(StructType* Struct, const StageData& Data)
 			{
-				Data.Shader += "struct ";
+				AddCode("struct ", Data);
 
 				const String& name = Struct->GetName();
 
-				Data.Shader += name;
+				AddCode(name, Data);
 
-				ADD_NEW_LINE();
-				Data.Shader += "{";
-				ADD_NEW_LINE();
+				AddNewLine(Data);
+				AddCode('{', Data);
+				AddNewLine(Data);
 
 				auto variables = Struct->GetItems();
 				for (auto variable : variables)
@@ -241,20 +233,20 @@ namespace Engine
 						uint8 overflowByteCount = size % GPUAlignedVector4F::Alignment;
 						if (overflowByteCount != 0)
 						{
-							Data.Shader += "float";
-							Data.Shader += StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size);
-							Data.Shader += " ";
-							Data.Shader += name;
-							Data.Shader += "Padding";
-							Data.Shader += ";";
+							BuildType(ProgramDataTypes::Float, Data);
+							AddCode(StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size), Data);
+							AddCode(' ', Data);
+							AddCode(name, Data);
+							AddCode("Padding", Data);
+							AddCode(';', Data);
 
-							ADD_NEW_LINE();
+							AddNewLine(Data);
 						}
 					}
 				}
 
-				Data.Shader += "};";
-				ADD_NEW_LINE();
+				AddCode("};", Data);
+				AddNewLine(Data);
 			}
 
 			void ASTToHLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, const StageData& Data)
@@ -273,46 +265,46 @@ namespace Engine
 				}
 				else
 				{
-					Data.Shader += "ConstantBuffer<";
+					AddCode("ConstantBuffer<", Data);
 				}
 
 				BuildDataTypeStatement(dataType, Data);
 
 				if (!dataType->IsBuiltIn())
-					Data.Shader += ">";
+					AddCode('>', Data);
 
-				Data.Shader += " ";
-				Data.Shader += Variable->GetName();
+				AddCode(' ', Data);
+				AddCode(Variable->GetName(), Data);
 
 				if (dataType->IsBuiltIn())
 				{
 					if (dataType->GetType() == ProgramDataTypes::Texture2D)
 					{
-						Data.Shader += ":register(t";
-						Data.Shader += StringUtility::ToString<char8>(m_TextureBindingCount);
-						Data.Shader += ")";
+						AddCode(":register(t", Data);
+						AddCode(StringUtility::ToString<char8>(m_TextureBindingCount), Data);
+						AddCode(')', Data);
 					}
 				}
 				else
 				{
-					Data.Shader += ":register(b";
-					Data.Shader += StringUtility::ToString<char8>(m_ConstantBufferBindingCount++);
-					Data.Shader += ")";
+					AddCode(":register(b", Data);
+					AddCode(StringUtility::ToString<char8>(m_ConstantBufferBindingCount++), Data);
+					AddCode(')', Data);
 				}
 
-				Data.Shader += ";";
+				AddCode(';', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 
 				if (dataType->GetType() == ProgramDataTypes::Texture2D)
 				{
-					Data.Shader += "SamplerState ";
-					Data.Shader += GetSamplerVariableName(Variable->GetName());
-					Data.Shader += ":register(s";
-					Data.Shader += StringUtility::ToString<char8>(m_TextureBindingCount);
-					Data.Shader += ");";
+					AddCode("SamplerState ", Data);
+					AddCode(GetSamplerVariableName(Variable->GetName()), Data);
+					AddCode(":register(s", Data);
+					AddCode(StringUtility::ToString<char8>(m_TextureBindingCount), Data);
+					AddCode(");", Data);
 
-					ADD_NEW_LINE();
+					AddNewLine(Data);
 
 					++m_TextureBindingCount;
 				}
@@ -325,151 +317,151 @@ namespace Engine
 				if (funcType == FunctionType::Types::VertexMain ||
 					funcType == FunctionType::Types::ComputeMain)
 				{
-					Data.Shader += "[RootSignature(";
-					Data.Shader += GetRootSignatureDefineName();
-					Data.Shader += ")]";
-					ADD_NEW_LINE();
+					AddCode("[RootSignature(", Data);
+					AddCode(GetRootSignatureDefineName(), Data);
+					AddCode(")]", Data);
+					AddNewLine(Data);
 				}
 
 				BuildAttributes(Function->GetAttributes(), Data);
 
 				BuildDataTypeStatement(Function->GetReturnDataType(), Data);
 
-				Data.Shader += " ";
+				AddCode(' ', Data);
 
 				if (Function->IsEntrypoint())
-					Data.Shader += Constants::ENTRY_POINT_NAME;
+					AddCode(Constants::ENTRY_POINT_NAME, Data);
 				else
-					Data.Shader += Function->GetName();
+					AddCode(Function->GetName(), Data);
 
-				Data.Shader += "(";
+				AddCode('(', Data);
 
 				if (funcType == FunctionType::Types::GeometryMain)
 				{
 					const auto* outputType = Function->GetAttribute<OutputStreamTypeAttributeType>();
 
-					Data.Shader += "inout ";
-					Data.Shader += GetOutputStreamType(outputType->GetType());
-					Data.Shader += "<";
-					Data.Shader += outputType->GetDataType();
-					Data.Shader += "> ";
-					Data.Shader += GetGeometryOutputStreamParameterName();
+					AddCode("inout ", Data);
+					AddCode(GetOutputStreamType(outputType->GetType()), Data);
+					AddCode('<', Data);
+					AddCode(outputType->GetDataType(), Data);
+					AddCode("> ", Data);
+					AddCode(GetGeometryOutputStreamParameterName(), Data);
 
-					Data.Shader += ", ";
+					AddCode(", ", Data);
 
 					const auto* primitiveTypeAttr = Function->GetAttribute<PrimitiveTypeAttributeType>();
 
-					Data.Shader += GetPrimitiveType(primitiveTypeAttr->GetType());
-					Data.Shader += " ";
+					AddCode(GetPrimitiveType(primitiveTypeAttr->GetType()), Data);
+					AddCode(' ', Data);
 				}
 
 				BuildParameters(Function->GetParameters(), Data);
 
-				Data.Shader += ")";
+				AddCode(')', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 
-				Data.Shader += "{";
+				AddCode('{', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 
 				BuildStatementHolder(Function, Data);
 
-				Data.Shader += "}";
+				AddCode('}', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 			}
 
 			void ASTToHLSLCompiler::BuildDomainAttributeType(DomainAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[domain(\"";
+				AddCode("[domain(\"", Data);
 
-				Data.Shader += GetDomainType(Attribute->GetType());
+				AddCode(GetDomainType(Attribute->GetType()), Data);
 
-				Data.Shader += "\")]";
+				AddCode("\")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[partitioning(\"";
+				AddCode("[partitioning(\"", Data);
 
-				Data.Shader += GetPartitioningType(Attribute->GetType());
+				AddCode(GetPartitioningType(Attribute->GetType()), Data);
 
-				Data.Shader += "\")]";
+				AddCode("\")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildTopologyAttributeType(TopologyAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[outputtopology(\"";
+				AddCode("[outputtopology(\"", Data);
 
-				Data.Shader += GetTopologyType(Attribute->GetType());
+				AddCode(GetTopologyType(Attribute->GetType()), Data);
 
-				Data.Shader += "\")]";
+				AddCode("\")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[outputcontrolpoints(";
+				AddCode("[outputcontrolpoints(", Data);
 
-				Data.Shader += StringUtility::ToString<char8>(Attribute->GetNumber());
+				AddCode(StringUtility::ToString<char8>(Attribute->GetNumber()), Data);
 
-				Data.Shader += ")]";
+				AddCode(")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[maxvertexcount(";
+				AddCode("[maxvertexcount(", Data);
 
-				Data.Shader += StringUtility::ToString<char8>(Attribute->GetCount());
+				AddCode(StringUtility::ToString<char8>(Attribute->GetCount()), Data);
 
-				Data.Shader += ")]";
+				AddCode(")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[patchconstantfunc(\"";
+				AddCode("[patchconstantfunc(\"", Data);
 
-				Data.Shader += Attribute->GetEntrypoint();
+				AddCode(Attribute->GetEntrypoint(), Data);
 
-				Data.Shader += "\")]";
+				AddCode("\")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, const StageData& Data)
 			{
-				Data.Shader += "[numthreads(";
+				AddCode("[numthreads(", Data);
 
-				Data.Shader += StringUtility::ToString<char8>(Attribute->GetXCount());
-				Data.Shader += ", ";
-				Data.Shader += StringUtility::ToString<char8>(Attribute->GetYCount());
-				Data.Shader += ", ";
-				Data.Shader += StringUtility::ToString<char8>(Attribute->GetZCount());
+				AddCode(StringUtility::ToString<char8>(Attribute->GetXCount()), Data);
+				AddCode(", ", Data);
+				AddCode(StringUtility::ToString<char8>(Attribute->GetYCount()), Data);
+				AddCode(", ", Data);
+				AddCode(StringUtility::ToString<char8>(Attribute->GetZCount()), Data);
 
-				Data.Shader += ")]";
+				AddCode(")]", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, const StageData& Data)
 			{
-				Data.Shader += Statement->GetName();
+				AddCode(Statement->GetName(), Data);
 			}
 
 			void ASTToHLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, const StageData& Data)
 			{
-				Data.Shader += "return ";
+				AddCode("return ", Data);
 
 				BuildStatement(Statement->GetStatement(), Data);
 
-				Data.Shader += ";";
+				AddCode(';', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 			}
 
 			void ASTToHLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, const StageData& Data)
 			{
-				Data.Shader += '{';
+				AddCode('{', Data);
 
 				BuildArguments(Statement, Data);
 
-				Data.Shader += '}';
+				AddCode('}', Data);
 			}
 
 			void ASTToHLSLCompiler::BuildType(ProgramDataTypes Type, const StageData& Data)
@@ -477,98 +469,98 @@ namespace Engine
 				switch (Type)
 				{
 				case ProgramDataTypes::Void:
-					Data.Shader += "void";
+					AddCode("void", Data);
 					break;
 
 				case ProgramDataTypes::Bool:
-					Data.Shader += "bool";
+					AddCode("bool", Data);
 					break;
 
 				case ProgramDataTypes::Integer:
-					Data.Shader += "int";
+					AddCode("int", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger:
-					Data.Shader += "uint";
+					AddCode("uint", Data);
 					break;
 
 				case ProgramDataTypes::Float:
-					Data.Shader += "float";
+					AddCode("float", Data);
 					break;
 
 				case ProgramDataTypes::Double:
-					Data.Shader += "double";
+					AddCode("double", Data);
 					break;
 
 				case ProgramDataTypes::Integer2:
-					Data.Shader += "int2";
+					AddCode("int2", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger2:
-					Data.Shader += "uint2";
+					AddCode("uint2", Data);
 					break;
 
 				case ProgramDataTypes::Float2:
-					Data.Shader += "float2";
+					AddCode("float2", Data);
 					break;
 
 				case ProgramDataTypes::Double2:
-					Data.Shader += "double2";
+					AddCode("double2", Data);
 					break;
 
 				case ProgramDataTypes::Integer3:
-					Data.Shader += "int3";
+					AddCode("int3", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger3:
-					Data.Shader += "uint3";
+					AddCode("uint3", Data);
 					break;
 
 				case ProgramDataTypes::Float3:
-					Data.Shader += "float3";
+					AddCode("float3", Data);
 					break;
 
 				case ProgramDataTypes::Double3:
-					Data.Shader += "double3";
+					AddCode("double3", Data);
 					break;
 
 				case ProgramDataTypes::Integer4:
-					Data.Shader += "int4";
+					AddCode("int4", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger4:
-					Data.Shader += "uint4";
+					AddCode("uint4", Data);
 					break;
 
 				case ProgramDataTypes::Float4:
-					Data.Shader += "float4";
+					AddCode("float4", Data);
 					break;
 
 				case ProgramDataTypes::Double4:
-					Data.Shader += "double4";
+					AddCode("double4", Data);
 					break;
 
 				case ProgramDataTypes::Matrix4F:
-					Data.Shader += "float4x4";
+					AddCode("float4x4", Data);
 					break;
 
 				case ProgramDataTypes::Matrix4D:
-					Data.Shader += "double4x4";
+					AddCode("double4x4", Data);
 					break;
 
 				case ProgramDataTypes::Texture2D:
-					Data.Shader += "Texture2D";
+					AddCode("Texture2D", Data);
 					break;
 				}
 			}
 
 			void ASTToHLSLCompiler::BuildRootSignature(const StageData& Data)
 			{
-				Data.Shader += "#define ";
-				Data.Shader += GetRootSignatureDefineName();
-				Data.Shader += " \"";
+				AddCode("#define ", Data);
+				AddCode(GetRootSignatureDefineName(), Data);
+				AddCode(" \"", Data);
 
-				Data.Shader += "RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)";
+				AddCode("RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)", Data);
 
 				uint8 cbvIndex = 0;
 				uint8 textureIndex = 0;
@@ -576,55 +568,55 @@ namespace Engine
 				{
 					const DataTypeStatement* dataType = variableType->GetDataType();
 
-					Data.Shader += ",";
+					AddCode(',', Data);
 
 					if (dataType->GetType() == ProgramDataTypes::Unknown)
 					{
-						Data.Shader += "CBV(b";
+						AddCode("CBV(b", Data);
 
-						Data.Shader += StringUtility::ToString<char8>(cbvIndex++);
+						AddCode(StringUtility::ToString<char8>(cbvIndex++), Data);
 					}
 					else if (dataType->GetType() == ProgramDataTypes::Texture2D)
 					{
-						Data.Shader += "DescriptorTable(SRV(t";
-						Data.Shader += StringUtility::ToString<char8>(textureIndex);
-						Data.Shader += ")),DescriptorTable(Sampler(s";
-						Data.Shader += StringUtility::ToString<char8>(textureIndex);
-						Data.Shader += ")";
+						AddCode("DescriptorTable(SRV(t", Data);
+						AddCode(StringUtility::ToString<char8>(textureIndex), Data);
+						AddCode(")),DescriptorTable(Sampler(s", Data);
+						AddCode(StringUtility::ToString<char8>(textureIndex), Data);
+						AddCode(")", Data);
 
 						++textureIndex;
 					}
 
-					Data.Shader += ")";
+					AddCode(')', Data);
 				}
 
-				Data.Shader += "\"\n";
+				AddCode("\"\n", Data);
 			}
 
 			void ASTToHLSLCompiler::BuildStructVariable(StructVariableType* Variable, const StageData& Data)
 			{
 				BuildDataTypeStatement(Variable->GetDataType(), Data);
 
-				Data.Shader += " ";
-				Data.Shader += Variable->GetName();
+				AddCode(' ', Data);
+				AddCode(Variable->GetName(), Data);
 
 				if (Variable->GetDataType()->GetPostElementCount() != nullptr)
 				{
-					Data.Shader += "[";
+					AddCode('[', Data);
 					BuildStatement(Variable->GetDataType()->GetPostElementCount(), Data);
-					Data.Shader += "]";
+					AddCode(']', Data);
 				}
 
 				if (Variable->GetRegister() != StructVariableType::Registers::None)
 				{
-					Data.Shader += ":";
-					Data.Shader += GetRegisterName(Variable->GetRegister());
-					Data.Shader += StringUtility::ToString<char8>(Variable->GetRegisterIndex());
+					AddCode(" : ", Data);
+					AddCode(GetRegisterName(Variable->GetRegister()), Data);
+					AddCode(StringUtility::ToString<char8>(Variable->GetRegisterIndex()), Data);
 				}
 
-				Data.Shader += ";";
+				AddCode(';', Data);
 
-				ADD_NEW_LINE();
+				AddNewLine(Data);
 			}
 
 			cstr ASTToHLSLCompiler::GetRootSignatureDefineName(void)
@@ -643,7 +635,5 @@ namespace Engine
 				return "outputStream";
 			}
 		};
-
-#undef ADD_NEW_LINE
 	}
 }

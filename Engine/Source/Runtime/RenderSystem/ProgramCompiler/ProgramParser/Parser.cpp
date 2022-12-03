@@ -1066,14 +1066,14 @@ namespace Engine
 				else
 				{
 					bodyStm = ParseExpression(token, EndConditions::Semicolon);
+					if (bodyStm == nullptr)
+						UngetToken(token);
 
 					RequireSymbol(SEMICOLON, "expression");
 				}
 
-				if (bodyStm == nullptr)
-					THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", token);
-
-				StatementItemHolder->AddItem(bodyStm);
+				if (bodyStm != nullptr)
+					StatementItemHolder->AddItem(bodyStm);
 
 				if (ConditionMask == EndConditions::None && !hasOpenBracket)
 					break;

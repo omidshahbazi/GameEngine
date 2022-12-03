@@ -21,15 +21,15 @@ namespace Engine
 
 				virtual String ToString(void) const override
 				{
-					String result = "else\n{";
+					String result = "else\n{\n";
 
 					for (auto stm : GetItems())
 					{
 						result += stm->ToString();
-						result += "\n";
+						result += ";\n";
 					}
 
-					result += "}";
+					result += "}\n";
 
 					return result;
 				}

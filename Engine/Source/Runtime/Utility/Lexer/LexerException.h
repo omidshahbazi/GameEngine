@@ -33,7 +33,7 @@ namespace Engine
 			uint32 m_ColumnNumber;
 		};
 
-#define THROW_LEXER_EXCEPTION(What) throw LexerException(What, m_CurrentLineIndex, m_CurrentColumnIndex)
+#define THROW_LEXER_EXCEPTION(What) throw LexerException(What, m_CurrentLineIndex + 1, m_CurrentColumnIndex + 1)
 	}
 }
 #endif

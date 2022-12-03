@@ -61,6 +61,7 @@ namespace Engine
 				const GlobalVariableList& Variables;
 				const FunctionList& Functions;
 				String& Shader;
+				int8 IndentOffset;
 			};
 
 			typedef Map<String, String> OutputMap;

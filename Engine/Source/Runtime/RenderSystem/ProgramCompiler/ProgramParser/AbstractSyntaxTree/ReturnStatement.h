@@ -44,6 +44,8 @@ namespace Engine
 					if (m_Statement != nullptr)
 						result += m_Statement->ToString();
 
+					result += ";\n";
+
 					return result;
 				}
 

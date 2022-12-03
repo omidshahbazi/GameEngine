@@ -205,12 +205,18 @@ namespace Engine
 				AddCode(')', Data);
 				AddNewLine(Data);
 
+				--Data.IndentOffset;
 				AddCode('{', Data);
+				++Data.IndentOffset;
+
 				AddNewLine(Data);
 
 				BuildStatementHolder(Function, false, Data);
 
+				--Data.IndentOffset;
 				AddCode('}', Data);
+				++Data.IndentOffset;
+
 				AddNewLine(Data);
 
 				DecreaseBlockIndex();
@@ -321,7 +327,11 @@ namespace Engine
 						AddCode('{', Data);
 						AddNewLine(Data);
 
+						Data.IndentOffset++;
+
 						BuildStatementHolder(caseStatement, false, Data);
+
+						--Data.IndentOffset;
 
 						AddCode('}', Data);
 						AddNewLine(Data);

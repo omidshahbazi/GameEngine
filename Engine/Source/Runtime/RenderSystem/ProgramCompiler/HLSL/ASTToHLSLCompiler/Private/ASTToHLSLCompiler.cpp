@@ -361,13 +361,17 @@ namespace Engine
 
 				AddNewLine(Data);
 
+				--Data.IndentOffset;
 				AddCode('{', Data);
+				++Data.IndentOffset;
 
 				AddNewLine(Data);
 
 				BuildStatementHolder(Function, false, Data);
 
+				--Data.IndentOffset;
 				AddCode('}', Data);
+				++Data.IndentOffset;
 
 				AddNewLine(Data);
 			}

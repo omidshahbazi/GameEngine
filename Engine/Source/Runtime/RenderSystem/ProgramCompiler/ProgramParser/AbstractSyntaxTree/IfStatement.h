@@ -55,15 +55,15 @@ namespace Engine
 
 					result += m_Condition->ToString();
 
-					result += ")\n{";
+					result += ")\n{\n";
 
 					for (auto stm : GetItems())
 					{
 						result += stm->ToString();
-						result += "\n";
+						result += ";\n";
 					}
 
-					result += "}";
+					result += "}\n";
 
 					if (m_Else != nullptr)
 						result += m_Else->ToString();

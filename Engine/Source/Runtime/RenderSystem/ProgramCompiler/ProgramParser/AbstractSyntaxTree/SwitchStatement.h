@@ -41,7 +41,7 @@ namespace Engine
 
 					result += m_Selector->ToString();
 
-					result += ")\n{";
+					result += ")\n{\n";
 
 					for (auto stm : GetItems())
 					{
@@ -49,7 +49,7 @@ namespace Engine
 						result += "\n";
 					}
 
-					result += "}";
+					result += "}\n";
 
 					return result;
 				}

@@ -132,7 +132,7 @@ namespace Engine
 					for (auto stm : GetItems())
 					{
 						result += stm->ToString();
-						result += "\n";
+						result += ";\n";
 					}
 
 					result += "}";

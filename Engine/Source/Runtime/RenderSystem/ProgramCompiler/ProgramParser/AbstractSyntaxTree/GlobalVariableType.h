@@ -25,7 +25,7 @@ namespace Engine
 				{
 					String result;
 
-					result += GetDataType()->ToString() + " " + GetName();
+					result += GetDataType()->ToString() + " " + GetName() + ";";
 
 					return result;
 				}

@@ -16,7 +16,7 @@ namespace Engine
 			public:
 				virtual String ToString(void) const override
 				{
-					return "discard";
+					return "discard;\n";
 				}
 			};
 		}

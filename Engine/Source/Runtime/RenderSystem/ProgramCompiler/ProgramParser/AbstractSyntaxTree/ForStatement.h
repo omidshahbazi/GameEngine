@@ -85,15 +85,15 @@ namespace Engine
 
 					if (GetItems().GetSize() != 0)
 					{
-						result += "{";
+						result += "{\n";
 
 						for (auto stm : GetItems())
 						{
 							result += stm->ToString();
-							result += "\n";
+							result += ";\n";
 						}
 
-						result += "}";
+						result += "}\n";
 					}
 
 					return result;

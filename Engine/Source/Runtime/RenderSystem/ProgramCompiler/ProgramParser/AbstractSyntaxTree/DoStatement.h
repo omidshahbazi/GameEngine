@@ -38,17 +38,19 @@ namespace Engine
 
 				virtual String ToString(void) const override
 				{
-					String result = "do\n{";
+					String result = "do\n{\n";
 
 					for (auto stm : GetItems())
 					{
 						result += stm->ToString();
-						result += "\n";
+						result += ";\n";
 					}
 
-					result += "}";
+					result += "} ";
 
 					result += m_While->ToString();
+
+					result += ";\n";
 
 					return result;
 				}

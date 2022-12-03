@@ -20,7 +20,7 @@ namespace Engine
 
 				virtual String ToString(void) const override
 				{
-					return "continue;";
+					return "continue;\n";
 				}
 			};
 		}

@@ -11,7 +11,8 @@ namespace Engine
 		ASTCompilerBase::ASTCompilerBase(void) :
 			m_Allocator(nullptr),
 			m_BlockIndex(-1),
-			m_LastFunction(nullptr)
+			m_LastFunction(nullptr),
+			m_ReturnValueAlreadyBuilt(false)
 		{
 		}
 
@@ -1324,7 +1325,7 @@ namespace Engine
 		{
 #ifdef DEBUG_MODE
 			if (Data.Shader.EndsWith('\n'))
-				for (uint8 i = 0; i < m_BlockIndex; ++i)
+				for (uint8 i = 0; i < m_BlockIndex + Data.IndentOffset; ++i)
 					Data.Shader += '\t';
 #endif
 

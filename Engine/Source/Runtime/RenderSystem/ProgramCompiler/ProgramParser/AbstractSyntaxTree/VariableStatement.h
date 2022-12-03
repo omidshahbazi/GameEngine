@@ -52,13 +52,13 @@ namespace Engine
 
 					result += GetDataType()->ToString();
 
-					result += " ";
+					result += ' ';
 
 					result += GetName();
 
 					if (m_InitialStatement != nullptr)
 					{
-						result += "=";
+						result += '=';
 						result += m_InitialStatement->ToString();
 					}
 

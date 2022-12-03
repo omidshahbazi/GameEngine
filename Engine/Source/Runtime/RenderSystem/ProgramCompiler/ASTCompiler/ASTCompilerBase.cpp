@@ -771,7 +771,9 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
+				Data.IndentOffset++;
 				BuildStatementHolder(Statement, false, Data);
+				--Data.IndentOffset;
 
 				AddCode('}', Data);
 				AddNewLine(Data);
@@ -788,7 +790,9 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
+				Data.IndentOffset++;
 				BuildStatementHolder(Statement, false, Data);
+				--Data.IndentOffset;
 
 				AddCode('}', Data);
 				AddNewLine(Data);

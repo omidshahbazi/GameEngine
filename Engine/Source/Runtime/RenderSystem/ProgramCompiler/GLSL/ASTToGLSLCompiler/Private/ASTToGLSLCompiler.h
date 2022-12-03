@@ -69,8 +69,6 @@ namespace Engine
 
 				virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data) override;
 
-				virtual void BuildSwitchStatement(SwitchStatement* Statement, StageData& Data) override;
-
 				virtual void BuildReturnStatement(ReturnStatement* Statement, StageData& Data) override;
 
 				virtual void BuildArrayStatement(ArrayStatement* Statement, StageData& Data) override;

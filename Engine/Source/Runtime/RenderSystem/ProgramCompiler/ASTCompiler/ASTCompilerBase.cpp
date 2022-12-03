@@ -34,29 +34,47 @@ namespace Engine
 			};
 
 			if (containsEntrypoint(FunctionType::Types::VertexMain))
-				BuildStageShader({ FunctionType::Types::None, Stages::Vertex, Structs, Variables, Functions, Output.VertexShader });
+			{
+				StageData data = { FunctionType::Types::None, Stages::Vertex, Structs, Variables, Functions, Output.VertexShader, 0 };
+				BuildStageShader(data);
+			}
 
 			if (containsEntrypoint(FunctionType::Types::HullMain))
-				BuildStageShader({ FunctionType::Types::None, Stages::Hull, Structs, Variables, Functions, Output.HullShader });
+			{
+				StageData data = { FunctionType::Types::None, Stages::Hull, Structs, Variables, Functions, Output.HullShader, 0 };
+				BuildStageShader(data);
+			}
 
 			if (containsEntrypoint(FunctionType::Types::DomainMain))
-				BuildStageShader({ FunctionType::Types::None, Stages::Domain, Structs, Variables, Functions, Output.DomainShader });
+			{
+				StageData data = { FunctionType::Types::None, Stages::Domain, Structs, Variables, Functions, Output.DomainShader, 0 };
+				BuildStageShader(data);
+			}
 
 			if (containsEntrypoint(FunctionType::Types::GeometryMain))
-				BuildStageShader({ FunctionType::Types::None, Stages::Geometry, Structs, Variables, Functions, Output.GeometryShader });
+			{
+				StageData data = { FunctionType::Types::None, Stages::Geometry, Structs, Variables, Functions, Output.GeometryShader, 0 };
+				BuildStageShader(data);
+			}
 
 			if (containsEntrypoint(FunctionType::Types::FragmentMain))
-				BuildStageShader({ FunctionType::Types::None, Stages::Fragment, Structs, Variables, Functions, Output.FragmentShader });
+			{
+				StageData data = { FunctionType::Types::None, Stages::Fragment, Structs, Variables, Functions, Output.FragmentShader, 0 };
+				BuildStageShader(data);
+			}
 
 			if (containsEntrypoint(FunctionType::Types::ComputeMain))
-				BuildStageShader({ FunctionType::Types::None, Stages::Compute, Structs, Variables, Functions, Output.ComputeShader });
+			{
+				StageData data = { FunctionType::Types::None, Stages::Compute, Structs, Variables, Functions, Output.ComputeShader, 0 };
+				BuildStageShader(data);
+			}
 
 			m_Structs.Clear();
 			m_Functions.Clear();
 			m_BlockVariables.Clear();
 		}
 
-		void ASTCompilerBase::BuildStageShader(const StageData& Data)
+		void ASTCompilerBase::BuildStageShader(StageData& Data)
 		{
 			ResetPerStageValues(Data);
 
@@ -67,7 +85,7 @@ namespace Engine
 			BuildFunctions(Data);
 		}
 
-		void ASTCompilerBase::ResetPerStageValues(const StageData& Data)
+		void ASTCompilerBase::ResetPerStageValues(StageData& Data)
 		{
 			m_Structs.Clear();
 			m_Functions.Clear();
@@ -79,7 +97,7 @@ namespace Engine
 			IncreaseBlockIndex();
 		}
 
-		void ASTCompilerBase::BuildStructs(const StageData& Data)
+		void ASTCompilerBase::BuildStructs(StageData& Data)
 		{
 			for (auto structType : Data.Structs)
 			{
@@ -89,7 +107,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildGlobalVariables(const StageData& Data)
+		void ASTCompilerBase::BuildGlobalVariables(StageData& Data)
 		{
 			for (auto variable : Data.Variables)
 			{
@@ -99,7 +117,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildFunctions(const StageData& Data)
+		void ASTCompilerBase::BuildFunctions(StageData& Data)
 		{
 			for (auto function : Data.Functions)
 			{
@@ -141,7 +159,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, const StageData& Data)
+		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, StageData& Data)
 		{
 			auto checkRequiredRegisters = [&](const String& StructName, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
@@ -241,7 +259,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, const StageData& Data)
+		void ASTCompilerBase::BuildAttributes(const AttributeList& Attributes, StageData& Data)
 		{
 			for (auto attribute : Attributes)
 			{
@@ -251,7 +269,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildAttribute(BaseAttributeType* Attribute, const StageData& Data)
+		void ASTCompilerBase::BuildAttribute(BaseAttributeType* Attribute, StageData& Data)
 		{
 			if (IsAssignableFrom(Attribute, DomainAttributeType))
 			{
@@ -309,7 +327,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildParameters(const ParameterList& Parameters, const StageData& Data)
+		void ASTCompilerBase::BuildParameters(const ParameterList& Parameters, StageData& Data)
 		{
 			bool isFirst = true;
 			for (auto parameter : Parameters)
@@ -324,7 +342,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, const StageData& Data)
+		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, StageData& Data)
 		{
 			BuildDataTypeStatement(Parameter->GetDataType(), Data);
 			AddCode(' ', Data);
@@ -338,7 +356,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, const StageData& Data)
+		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, StageData& Data)
 		{
 			if (IncreamentBlock)
 				IncreaseBlockIndex();
@@ -361,7 +379,7 @@ namespace Engine
 				DecreaseBlockIndex();
 		}
 
-		void ASTCompilerBase::BuildStatement(Statement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildStatement(Statement* Statement, StageData& Data)
 		{
 			if (IsAssignableFrom(Statement, OperatorStatement))
 			{
@@ -487,7 +505,7 @@ namespace Engine
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 		}
 
-		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, StageData& Data)
 		{
 			OperatorStatement::Operators op = Statement->GetOperator();
 
@@ -556,7 +574,7 @@ namespace Engine
 				AddCode(')', Data);
 		}
 
-		void ASTCompilerBase::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, StageData& Data)
 		{
 			AddCode('(', Data);
 
@@ -583,7 +601,7 @@ namespace Engine
 			AddCode(')', Data);
 		}
 
-		void ASTCompilerBase::BuildConstantStatement(ConstantStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildConstantStatement(ConstantStatement* Statement, StageData& Data)
 		{
 			if (Statement->GetType() == ProgramDataTypes::Bool)
 				AddCode(StringUtility::ToString<char8>(Statement->GetBool()), Data);
@@ -593,7 +611,7 @@ namespace Engine
 				AddCode(StringUtility::ToString<char8>(Statement->GetFloat32()), Data);
 		}
 
-		void ASTCompilerBase::BuildFunctionCallStatement(FunctionCallStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildFunctionCallStatement(FunctionCallStatement* Statement, StageData& Data)
 		{
 			auto& funcName = Statement->GetFunctionName();
 
@@ -624,7 +642,7 @@ namespace Engine
 			THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable or function", funcName);
 		}
 
-		void ASTCompilerBase::BuildArguments(const Vector<Statement*>& Statements, const StageData& Data)
+		void ASTCompilerBase::BuildArguments(const Vector<Statement*>& Statements, StageData& Data)
 		{
 			bool isFirst = true;
 			for (auto argument : Statements)
@@ -637,12 +655,12 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, const StageData& Data)
+		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, StageData& Data)
 		{
 			BuildArguments(Statements->GetItems(), Data);
 		}
 
-		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, StageData& Data)
 		{
 			if (FindVariableType(Statement->GetName(), true))
 				THROW_PROGRAM_COMPILER_EXCEPTION("Variable redifinition", Statement->GetName());
@@ -661,7 +679,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, StageData& Data)
 		{
 			BuildStatement(Statement->GetArrayStatement(), Data);
 
@@ -672,7 +690,7 @@ namespace Engine
 			AddCode(']', Data);
 		}
 
-		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data)
 		{
 			BuildStatement(Statement->GetLeft(), Data);
 
@@ -681,7 +699,7 @@ namespace Engine
 			BuildStatement(Statement->GetRight(), Data);
 		}
 
-		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, StageData& Data)
 		{
 			AddCode("if (", Data);
 
@@ -705,7 +723,7 @@ namespace Engine
 				BuildStatement(Statement->GetElse(), Data);
 		}
 
-		void ASTCompilerBase::BuildElseStatement(ElseStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildElseStatement(ElseStatement* Statement, StageData& Data)
 		{
 			AddCode("else", Data);
 
@@ -722,7 +740,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, StageData& Data)
 		{
 			AddCode("switch (", Data);
 
@@ -739,7 +757,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, StageData& Data)
 		{
 			AddCode("case ", Data);
 
@@ -760,7 +778,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, StageData& Data)
 		{
 			AddCode("default:", Data);
 			AddNewLine(Data);
@@ -777,7 +795,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, StageData& Data)
 		{
 			AddCode("for (", Data);
 
@@ -815,7 +833,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, StageData& Data)
 		{
 			AddCode("do", Data);
 			AddNewLine(Data);
@@ -830,7 +848,7 @@ namespace Engine
 			BuildStatement(Statement->GetWhile(), Data);
 		}
 
-		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, StageData& Data)
 		{
 			AddCode("while (", Data);
 
@@ -857,19 +875,19 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, StageData& Data)
 		{
 			AddCode("continue;", Data);
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, StageData& Data)
 		{
 			AddCode("break;", Data);
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, StageData& Data)
 		{
 			if (Data.Stage != Stages::Fragment)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
@@ -878,7 +896,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, const StageData& Data)
+		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, StageData& Data)
 		{
 			uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
 
@@ -915,7 +933,7 @@ namespace Engine
 			return elementCount;
 		}
 
-		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, const StageData& Data)
+		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 		{
 			if (Statement->IsBuiltIn())
 				BuildType(Statement->GetType(), Data);
@@ -930,7 +948,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, const StageData& Data)
+		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
 		{
 			bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
 
@@ -949,7 +967,7 @@ namespace Engine
 				AddCode(')', Data);
 		}
 
-		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, const StageData& Data)
+		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, StageData& Data)
 		{
 			DataTypeStatement dataType = DataType;
 
@@ -966,7 +984,8 @@ namespace Engine
 			if (Statement->GetElementCount() != nullptr)
 			{
 				String elementCountString;
-				BuildStatement(Statement->GetElementCount(), { FunctionType::Types::None, Stages::Vertex, {}, {}, {} , elementCountString });
+				StageData data = { FunctionType::Types::None, Stages::Vertex, {}, {}, {} , elementCountString, 0 };
+				BuildStatement(Statement->GetElementCount(), data);
 
 				elementCount = StringUtility::ToInt8(elementCountString, 1);
 			}
@@ -1321,7 +1340,7 @@ namespace Engine
 			return type;
 		}
 
-		void ASTCompilerBase::AddCode(const String& Value, const StageData& Data)
+		void ASTCompilerBase::AddCode(const String& Value, StageData& Data)
 		{
 #ifdef DEBUG_MODE
 			if (Data.Shader.EndsWith('\n'))
@@ -1332,7 +1351,7 @@ namespace Engine
 			Data.Shader += Value;
 		}
 
-		void ASTCompilerBase::AddNewLine(const StageData& Data)
+		void ASTCompilerBase::AddNewLine(StageData& Data)
 		{
 #ifdef DEBUG_MODE
 			Data.Shader += '\n';

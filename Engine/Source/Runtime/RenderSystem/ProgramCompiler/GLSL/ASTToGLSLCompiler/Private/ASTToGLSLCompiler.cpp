@@ -57,7 +57,7 @@ namespace Engine
 			{
 			}
 
-			void ASTToGLSLCompiler::ResetPerStageValues(const StageData& Data)
+			void ASTToGLSLCompiler::ResetPerStageValues(StageData& Data)
 			{
 				ASTCompilerBase::ResetPerStageValues(Data);
 
@@ -65,14 +65,14 @@ namespace Engine
 				m_BindingCount = 0;
 			}
 
-			void ASTToGLSLCompiler::BuildStageShader(const StageData& Data)
+			void ASTToGLSLCompiler::BuildStageShader(StageData& Data)
 			{
 				ASTCompilerBase::BuildStageShader(Data);
 
 				Data.Shader = "#version 460 core\n" + Data.Shader;
 			}
 
-			void ASTToGLSLCompiler::BuildStruct(StructType* Struct, const StageData& Data)
+			void ASTToGLSLCompiler::BuildStruct(StructType* Struct, StageData& Data)
 			{
 				AddCode("struct ", Data);
 				AddCode(Struct->GetName(), Data);
@@ -104,7 +104,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, const StageData& Data)
+			void ASTToGLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, StageData& Data)
 			{
 				const String& name = Variable->GetName();
 				DataTypeStatement* dataType = Variable->GetDataType();
@@ -146,7 +146,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, const StageData& Data)
+			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, StageData& Data)
 			{
 				FunctionType::Types funcType = Function->GetType();
 
@@ -222,22 +222,23 @@ namespace Engine
 				DecreaseBlockIndex();
 			}
 
-			void ASTToGLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, const StageData& Data)
+			void ASTToGLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data)
 			{
 				//THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
-			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, const StageData& Data)
+			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, StageData& Data)
 			{
 				AddCode(Statement->GetName(), Data);
 			}
 
-			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data)
+			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data)
 			{
 				if (Data.FunctionType != FunctionType::Types::None)
 				{
 					String leftStm;
-					BuildStatement(Statement->GetLeft(), { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, leftStm });
+					StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, leftStm, 0 };
+					BuildStatement(Statement->GetLeft(), data);
 
 					const VariableType* leftVariable = FindVariableType(leftStm);
 					if (leftVariable != nullptr)
@@ -257,7 +258,8 @@ namespace Engine
 							auto* rightStatement = (isMemberAccess ? ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetLeft() : Statement->GetRight());
 
 							String rightStm;
-							BuildStatement(rightStatement, { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, rightStm });
+							StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, rightStm, 0 };
+							BuildStatement(rightStatement, data);
 							rightStm = rightStm.Split('.')[0];
 
 							const StructVariableType* rightVariable = GetVariableType(structType, rightStm);
@@ -279,106 +281,106 @@ namespace Engine
 				ASTCompilerBase::BuildMemberAccessStatement(Statement, Data);
 			}
 
-			void ASTToGLSLCompiler::BuildSwitchStatement(SwitchStatement* Statement, const StageData& Data)
-			{
-				bool isFirstOne = true;
-				bool isCoupling = false;
+			//void ASTToGLSLCompiler::BuildSwitchStatement(SwitchStatement* Statement, StageData& Data)
+			//{
+			//	bool isFirstOne = true;
+			//	bool isCoupling = false;
 
-				for (auto statement : Statement->GetItems())
-				{
-					if (IsAssignableFrom(statement, BreakStatement))
-						continue;
+			//	for (auto statement : Statement->GetItems())
+			//	{
+			//		if (IsAssignableFrom(statement, BreakStatement))
+			//			continue;
 
-					if (IsAssignableFrom(statement, CaseStatement))
-					{
-						if (!isCoupling)
-						{
-							if (isFirstOne)
-							{
-								AddCode("if ", Data);
-								isFirstOne = false;
-							}
-							else
-								AddCode("else if ", Data);
+			//		if (IsAssignableFrom(statement, CaseStatement))
+			//		{
+			//			if (!isCoupling)
+			//			{
+			//				if (isFirstOne)
+			//				{
+			//					AddCode("if ", Data);
+			//					isFirstOne = false;
+			//				}
+			//				else
+			//					AddCode("else if ", Data);
 
-							AddCode('(', Data);
-						}
+			//				AddCode('(', Data);
+			//			}
 
-						isCoupling = false;
+			//			isCoupling = false;
 
-						BuildStatement(Statement->GetSelector(), Data);
+			//			BuildStatement(Statement->GetSelector(), Data);
 
-						AddCode(" == ", Data);
+			//			AddCode(" == ", Data);
 
-						CaseStatement* caseStatement = ReinterpretCast(CaseStatement*, statement);
+			//			CaseStatement* caseStatement = ReinterpretCast(CaseStatement*, statement);
 
-						BuildStatement(caseStatement->GetCondition(), Data);
+			//			BuildStatement(caseStatement->GetCondition(), Data);
 
-						if (caseStatement->GetItems().GetSize() == 0)
-						{
-							AddCode(" || ", Data);
+			//			if (caseStatement->GetItems().GetSize() == 0)
+			//			{
+			//				AddCode(" || ", Data);
 
-							isCoupling = true;
-							continue;
-						}
+			//				isCoupling = true;
+			//				continue;
+			//			}
 
-						AddCode(')', Data);
-						AddNewLine(Data);
-						AddCode('{', Data);
-						AddNewLine(Data);
+			//			AddCode(')', Data);
+			//			AddNewLine(Data);
+			//			AddCode('{', Data);
+			//			AddNewLine(Data);
 
-						Data.IndentOffset++;
+			//			Data.IndentOffset++;
+			//			BuildStatementHolder(caseStatement, false, Data);
+			//			--Data.IndentOffset;
 
-						BuildStatementHolder(caseStatement, false, Data);
+			//			AddCode('}', Data);
+			//			AddNewLine(Data);
+			//		}
+			//		else if (IsAssignableFrom(statement, DefaultStatement))
+			//		{
+			//			if (!isCoupling)
+			//			{
+			//				if (isFirstOne)
+			//				{
+			//					AddCode("if ", Data);
+			//					isFirstOne = false;
+			//				}
+			//				else
+			//					AddCode("else if ", Data);
 
-						--Data.IndentOffset;
+			//				AddCode('(', Data);
+			//			}
 
-						AddCode('}', Data);
-						AddNewLine(Data);
-					}
-					else if (IsAssignableFrom(statement, DefaultStatement))
-					{
-						if (!isCoupling)
-						{
-							if (isFirstOne)
-							{
-								AddCode("if ", Data);
-								isFirstOne = false;
-							}
-							else
-								AddCode("else if ", Data);
+			//			isCoupling = false;
 
-							AddCode('(', Data);
-						}
+			//			AddCode("true", Data);
 
-						isCoupling = false;
+			//			DefaultStatement* defaultStatement = ReinterpretCast(DefaultStatement*, statement);
 
-						AddCode("true", Data);
+			//			if (defaultStatement->GetItems().GetSize() == 0)
+			//			{
+			//				AddCode(" || ", Data);
 
-						DefaultStatement* defaultStatement = ReinterpretCast(DefaultStatement*, statement);
+			//				isCoupling = true;
+			//				continue;
+			//			}
 
-						if (defaultStatement->GetItems().GetSize() == 0)
-						{
-							AddCode(" || ", Data);
+			//			AddCode(')', Data);
+			//			AddNewLine(Data);
+			//			AddCode('{', Data);
+			//			AddNewLine(Data);
 
-							isCoupling = true;
-							continue;
-						}
+			//			Data.IndentOffset++;
+			//			BuildStatementHolder(defaultStatement, false, Data);
+			//			--Data.IndentOffset;
 
-						AddCode(')', Data);
-						AddNewLine(Data);
-						AddCode('{', Data);
-						AddNewLine(Data);
+			//			AddCode('}', Data);
+			//			AddNewLine(Data);
+			//		}
+			//	}
+			//}
 
-						BuildStatementHolder(defaultStatement, false, Data);
-
-						AddCode('}', Data);
-						AddNewLine(Data);
-					}
-				}
-			}
-
-			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, const StageData& Data)
+			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, StageData& Data)
 			{
 				if (Data.FunctionType == FunctionType::Types::None)
 				{
@@ -437,7 +439,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, const StageData& Data)
+			void ASTToGLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, StageData& Data)
 			{
 				DataTypeStatement dataType = EvaluateDataType(Statement);
 
@@ -450,7 +452,7 @@ namespace Engine
 				AddCode(')', Data);
 			}
 
-			void ASTToGLSLCompiler::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, const StageData& Data)
+			void ASTToGLSLCompiler::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
 			{
 				bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
 
@@ -467,7 +469,7 @@ namespace Engine
 					AddCode(')', Data);
 			}
 
-			void ASTToGLSLCompiler::BuildType(ProgramDataTypes Type, const StageData& Data)
+			void ASTToGLSLCompiler::BuildType(ProgramDataTypes Type, StageData& Data)
 			{
 				switch (Type)
 				{
@@ -554,7 +556,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildPostDataType(const DataTypeStatement* Type, const StageData& Data)
+			void ASTToGLSLCompiler::BuildPostDataType(const DataTypeStatement* Type, StageData& Data)
 			{
 				if (Type->GetPostElementCount() != nullptr)
 				{
@@ -564,7 +566,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, const StageData& Data)
+			void ASTToGLSLCompiler::BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, StageData& Data)
 			{
 				CoreDebugAssert(Categories::ProgramCompiler, !DataType->IsBuiltIn(), "DataType must be user-defined");
 
@@ -597,7 +599,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildUniformBlock(const StructType* Struct, const String& Name, const StageData& Data)
+			void ASTToGLSLCompiler::BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data)
 			{
 				auto variables = Struct->GetItems();
 
@@ -649,7 +651,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, const StageData& Data)
+			void ASTToGLSLCompiler::BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data)
 			{
 				AddCode(Name, Data);
 				AddCode('_', Data);

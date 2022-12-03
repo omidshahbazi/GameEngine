@@ -28,49 +28,49 @@ namespace Engine
 				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
 
 			private:
-				virtual void ResetPerStageValues(const StageData& Data) override;
+				virtual void ResetPerStageValues(StageData& Data) override;
 
-				virtual void BuildStageShader(const StageData& Data) override;
+				virtual void BuildStageShader(StageData& Data) override;
 
-				virtual void BuildStruct(StructType* Struct, const StageData& Data) override;
+				virtual void BuildStruct(StructType* Struct, StageData& Data) override;
 
-				virtual void BuildGlobalVariable(GlobalVariableType* Variable, const StageData& Data) override;
+				virtual void BuildGlobalVariable(GlobalVariableType* Variable, StageData& Data) override;
 
-				virtual void BuildFunction(FunctionType* Function, const StageData& Data) override;
+				virtual void BuildFunction(FunctionType* Function, StageData& Data) override;
 
-				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, const StageData& Data)  override;
+				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data)  override;
 
-				virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, const StageData& Data)  override;
+				virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, StageData& Data)  override;
 
-				virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, const StageData& Data) override;
+				virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, StageData& Data) override;
 
-				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, const StageData& Data) override;
+				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, StageData& Data) override;
 
-				virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, const StageData& Data) override;
+				virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, StageData& Data) override;
 
-				virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, const StageData& Data) override
+				virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, StageData& Data) override
 				{
 				}
 
-				virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, const StageData& Data) override
+				virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, StageData& Data) override
 				{
 				}
 
-				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, const StageData& Data)  override;
+				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data)  override;
 
-				virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, const StageData& Data)  override;
+				virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, StageData& Data)  override;
 
-				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, const StageData& Data) override;
+				virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, StageData& Data) override;
 
-				virtual void BuildReturnStatement(ReturnStatement* Statement, const StageData& Data) override;
+				virtual void BuildReturnStatement(ReturnStatement* Statement, StageData& Data) override;
 
-				virtual void BuildArrayStatement(ArrayStatement* Statement, const StageData& Data) override;
+				virtual void BuildArrayStatement(ArrayStatement* Statement, StageData& Data) override;
 
-				virtual void BuildType(ProgramDataTypes Type, const StageData& Data) override;
+				virtual void BuildType(ProgramDataTypes Type, StageData& Data) override;
 
-				virtual void BuildRootSignature(const StageData& Data);
+				virtual void BuildRootSignature(StageData& Data);
 
-				virtual void BuildStructVariable(StructVariableType* Variable, const StageData& Data);
+				virtual void BuildStructVariable(StructVariableType* Variable, StageData& Data);
 
 				static cstr GetRootSignatureDefineName(void);
 

@@ -79,108 +79,108 @@ namespace Engine
 			virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output);
 
 		protected:
-			virtual void BuildStageShader(const StageData& Data);
+			virtual void BuildStageShader(StageData& Data);
 
-			virtual void ResetPerStageValues(const StageData& Data);
+			virtual void ResetPerStageValues(StageData& Data);
 
-			virtual void BuildStructs(const StageData& Data);
+			virtual void BuildStructs(StageData& Data);
 
-			virtual void BuildStruct(StructType* Struct, const StageData& Data) = 0;
+			virtual void BuildStruct(StructType* Struct, StageData& Data) = 0;
 
-			virtual void BuildGlobalVariables(const StageData& Data);
+			virtual void BuildGlobalVariables(StageData& Data);
 
-			virtual void BuildGlobalVariable(GlobalVariableType* Variable, const StageData& Data) = 0;
+			virtual void BuildGlobalVariable(GlobalVariableType* Variable, StageData& Data) = 0;
 
-			virtual void BuildFunctions(const StageData& Data);
+			virtual void BuildFunctions(StageData& Data);
 
-			virtual void BuildFunction(FunctionType* Function, const StageData& Data) = 0;
+			virtual void BuildFunction(FunctionType* Function, StageData& Data) = 0;
 
-			virtual void ValidateEntrypointFunction(FunctionType* Function, const StageData& Data);
+			virtual void ValidateEntrypointFunction(FunctionType* Function, StageData& Data);
 
-			virtual void BuildAttributes(const AttributeList& Attributes, const StageData& Data);
+			virtual void BuildAttributes(const AttributeList& Attributes, StageData& Data);
 
-			virtual void BuildAttribute(BaseAttributeType* Attribute, const StageData& Data);
+			virtual void BuildAttribute(BaseAttributeType* Attribute, StageData& Data);
 
-			virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildPrimitiveTypeAttributeType(PrimitiveTypeAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildOutputStreamTypeAttributeType(OutputStreamTypeAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, const StageData& Data) = 0;
+			virtual void BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildParameters(const ParameterList& Parameters, const StageData& Data);
+			virtual void BuildParameters(const ParameterList& Parameters, StageData& Data);
 
-			virtual void BuildParameter(ParameterType* Parameter, const StageData& Data);
+			virtual void BuildParameter(ParameterType* Parameter, StageData& Data);
 
-			virtual void BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, const StageData& Data);
+			virtual void BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, StageData& Data);
 
-			virtual void BuildStatement(Statement* Statement, const StageData& Data);
+			virtual void BuildStatement(Statement* Statement, StageData& Data);
 
-			virtual void BuildOperatorStatement(OperatorStatement* Statement, const StageData& Data);
+			virtual void BuildOperatorStatement(OperatorStatement* Statement, StageData& Data);
 
-			virtual void BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, const StageData& Data);
+			virtual void BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, StageData& Data);
 
-			virtual void BuildConstantStatement(ConstantStatement* Statement, const StageData& Data);
+			virtual void BuildConstantStatement(ConstantStatement* Statement, StageData& Data);
 
-			virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, const StageData& Data);
+			virtual void BuildFunctionCallStatement(FunctionCallStatement* Statement, StageData& Data);
 
-			virtual void BuildArguments(const Vector<Statement*>& Statements, const StageData& Data);
+			virtual void BuildArguments(const Vector<Statement*>& Statements, StageData& Data);
 
-			virtual void BuildArguments(StatementItemHolder* Statements, const StageData& Data);
+			virtual void BuildArguments(StatementItemHolder* Statements, StageData& Data);
 
-			virtual void BuildVariableStatement(VariableStatement* Statement, const StageData& Data);
+			virtual void BuildVariableStatement(VariableStatement* Statement, StageData& Data);
 
-			virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, const StageData& Data) = 0;
+			virtual void BuildVariableAccessStatement(VariableAccessStatement* Statement, StageData& Data) = 0;
 
-			virtual void BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, const StageData& Data);
+			virtual void BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, StageData& Data);
 
-			virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, const StageData& Data);
+			virtual void BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data);
 
-			virtual void BuildIfStatement(IfStatement* Statement, const StageData& Data);
+			virtual void BuildIfStatement(IfStatement* Statement, StageData& Data);
 
-			virtual void BuildElseStatement(ElseStatement* Statement, const StageData& Data);
+			virtual void BuildElseStatement(ElseStatement* Statement, StageData& Data);
 
-			virtual void BuildSwitchStatement(SwitchStatement* Statement, const StageData& Data);
+			virtual void BuildSwitchStatement(SwitchStatement* Statement, StageData& Data);
 
-			virtual void BuildCaseStatement(CaseStatement* Statement, const StageData& Data);
+			virtual void BuildCaseStatement(CaseStatement* Statement, StageData& Data);
 
-			virtual void BuildDefaultStatement(DefaultStatement* Statement, const StageData& Data);
+			virtual void BuildDefaultStatement(DefaultStatement* Statement, StageData& Data);
 
-			virtual void BuildForStatement(ForStatement* Statement, const StageData& Data);
+			virtual void BuildForStatement(ForStatement* Statement, StageData& Data);
 
-			virtual void BuildDoStatement(DoStatement* Statement, const StageData& Data);
+			virtual void BuildDoStatement(DoStatement* Statement, StageData& Data);
 
-			virtual void BuildWhileStatement(WhileStatement* Statement, const StageData& Data);
+			virtual void BuildWhileStatement(WhileStatement* Statement, StageData& Data);
 
-			virtual void BuildContinueStatement(ContinueStatement* Statement, const StageData& Data);
+			virtual void BuildContinueStatement(ContinueStatement* Statement, StageData& Data);
 
-			virtual void BuildBreakStatement(BreakStatement* Statement, const StageData& Data);
+			virtual void BuildBreakStatement(BreakStatement* Statement, StageData& Data);
 
-			virtual void BuildReturnStatement(ReturnStatement* Statement, const StageData& Data) = 0;
+			virtual void BuildReturnStatement(ReturnStatement* Statement, StageData& Data) = 0;
 
-			virtual void BuildArrayStatement(ArrayStatement* Statement, const StageData& Data) = 0;
+			virtual void BuildArrayStatement(ArrayStatement* Statement, StageData& Data) = 0;
 
-			virtual void BuildDiscardStatement(DiscardStatement* Statement, const StageData& Data);
+			virtual void BuildDiscardStatement(DiscardStatement* Statement, StageData& Data);
 
-			virtual uint8 BuildReturnValue(Statement* Statement, const StageData& Data);
+			virtual uint8 BuildReturnValue(Statement* Statement, StageData& Data);
 
-			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, const StageData& Data);
+			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data);
 
-			virtual void BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, const StageData& Data);
-			virtual void BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, const StageData& Data);
+			virtual void BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data);
+			virtual void BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, StageData& Data);
 
-			virtual void BuildType(ProgramDataTypes Type, const StageData& Data) = 0;
+			virtual void BuildType(ProgramDataTypes Type, StageData& Data) = 0;
 
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
@@ -206,17 +206,19 @@ namespace Engine
 			const StructVariableType* FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 			const StructVariableType* GetVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 
-			void AddCode(const String& Value, const StageData& Data);
-			void AddNewLine(const StageData& Data);
+			void AddCode(const String& Value, StageData& Data);
+			void AddNewLine(StageData& Data);
 
 			void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 			{
-				BuildStatement(Statement, { Type, Stage, {}, {}, {}, Shader });
+				StageData data = { Type, Stage, {}, {}, {}, Shader, 0 };
+				BuildStatement(Statement, data);
 			}
 
 			void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) override
 			{
-				BuildArguments(Statements, { Type, Stage, {}, {}, {}, Shader });
+				StageData data = { Type, Stage, {}, {}, {}, Shader, 0 };
+				BuildArguments(Statements, data);
 			}
 
 			AllocatorBase* GetAllocator(void) const

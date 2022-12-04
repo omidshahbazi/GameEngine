@@ -187,6 +187,7 @@ namespace Engine
 			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
 
 			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const;
+			void CheckForImplicitCast(const DataTypeStatement& Source, const DataTypeStatement& Destination) const;
 
 			const VariableType* FindVariableType(const String& Name, bool LatestBlockOnly = false) const;
 			void IncreaseBlockIndex(void);

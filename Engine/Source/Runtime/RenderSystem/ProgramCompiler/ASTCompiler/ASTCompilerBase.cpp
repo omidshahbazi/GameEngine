@@ -954,10 +954,13 @@ namespace Engine
 
 		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
 		{
-			bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
+			DataTypeStatement sourceDataType = EvaluateDataType(Statement);
+			bool needsCasting = !CompareDataTypes(sourceDataType, *DataType);
 
 			if (needsCasting)
 			{
+				CheckForImplicitCast(sourceDataType, *DataType);
+
 				AddCode('(', Data);
 
 				BuildDataTypeStatement(DataType, Data);
@@ -1198,6 +1201,20 @@ namespace Engine
 			return true;
 		}
 
+		void ASTCompilerBase::CheckForImplicitCast(const DataTypeStatement& Source, const DataTypeStatement& Destination) const
+		{
+			if (Source.IsBuiltIn())
+				return;
+
+			if (Source.GetComponentCount() == 1)
+				return;
+
+			if (Source.GetComponentCount() > -Destination.GetComponentCount())
+				return;
+
+			THROW_PROGRAM_COMPILER_EXCEPTION("Casting is not applicable", Source.ToString() + " to " + Destination.ToString());
+		}
+
 		const VariableType* ASTCompilerBase::FindVariableType(const String& Name, bool LatestBlockOnly) const
 		{
 			for (int8 i = m_BlockVariables.GetSize() - 1; i >= 0; --i)
@@ -1253,6 +1270,9 @@ namespace Engine
 		{
 			int32 index = m_Functions.FindIf([&](auto item)
 				{
+					if (item->GetName() != Name)
+						return false;
+
 					const auto& parameters = item->GetParameters();
 
 					if (parameters.GetSize() != Arguments->GetItems().GetSize())
@@ -1269,9 +1289,9 @@ namespace Engine
 							if (parameter->GetDataType()->IsNumeric() != argumentDataType.IsNumeric())
 								return false;
 						}
-
-						return true;
 					}
+
+					return true;
 				});
 
 			if (index == -1)

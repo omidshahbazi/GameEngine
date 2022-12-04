@@ -81,7 +81,7 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
-				IncreaseBlockIndex();
+				++Data.IndentOffset;
 
 				for (auto& variable : Struct->GetItems())
 				{
@@ -98,7 +98,7 @@ namespace Engine
 					AddNewLine(Data);
 				}
 
-				DecreaseBlockIndex();
+				--Data.IndentOffset;
 
 				AddCode("};", Data);
 				AddNewLine(Data);
@@ -355,10 +355,13 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
 			{
-				bool needsCasting = !CompareDataTypes(EvaluateDataType(Statement), *DataType);
+				DataTypeStatement sourceDataType = EvaluateDataType(Statement);
+				bool needsCasting = !CompareDataTypes(sourceDataType, *DataType);
 
 				if (needsCasting)
 				{
+					CheckForImplicitCast(sourceDataType, *DataType);
+
 					BuildDataTypeStatement(DataType, Data);
 
 					AddCode('(', Data);
@@ -516,7 +519,7 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
-				IncreaseBlockIndex();
+				++Data.IndentOffset;
 
 				uint16 offset = 0;
 				for (auto variable : variables)
@@ -541,7 +544,7 @@ namespace Engine
 					offset += size;
 				}
 
-				DecreaseBlockIndex();
+				--Data.IndentOffset;
 
 				AddCode("} ", Data);
 

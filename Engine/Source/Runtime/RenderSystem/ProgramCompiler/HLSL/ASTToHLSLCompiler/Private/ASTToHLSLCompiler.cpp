@@ -218,8 +218,9 @@ namespace Engine
 				AddCode('{', Data);
 				AddNewLine(Data);
 
-				auto variables = Struct->GetItems();
-				for (auto variable : variables)
+				++Data.IndentOffset;
+
+				for (auto variable : Struct->GetItems())
 				{
 					DataTypeStatement* dataType = variable->GetDataType();
 
@@ -245,6 +246,8 @@ namespace Engine
 						}
 					}
 				}
+
+				--Data.IndentOffset;
 
 				AddCode("};", Data);
 				AddNewLine(Data);
@@ -335,6 +338,8 @@ namespace Engine
 				else
 					AddCode(Function->GetName(), Data);
 
+				IncreaseBlockIndex();
+
 				AddCode('(', Data);
 
 				if (funcType == FunctionType::Types::GeometryMain)
@@ -375,6 +380,8 @@ namespace Engine
 				++Data.IndentOffset;
 
 				AddNewLine(Data);
+
+				DecreaseBlockIndex();
 			}
 
 			void ASTToHLSLCompiler::BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data)

@@ -144,14 +144,17 @@ namespace Engine
 				const int32 DEFAULT_VERSION = 460;
 
 				EShClient client;
+				EShTargetClientVersion clientVersion;
 				switch (Client)
 				{
 				case DeviceTypes::OpenGL:
 					client = EShClientOpenGL;
+					clientVersion = EShTargetOpenGL_450;
 					break;
 
 				case DeviceTypes::Vulkan:
 					client = EShClientVulkan;
+					clientVersion = EShTargetVulkan_1_2;
 					break;
 
 				default:
@@ -196,7 +199,7 @@ namespace Engine
 				TShader shader(type);
 				shader.setStrings(&Source, 1);
 				shader.setEnvInput(EShSourceGlsl, type, client, DEFAULT_VERSION);
-				shader.setEnvClient(client, EShTargetOpenGL_450);
+				shader.setEnvClient(client, clientVersion);
 				shader.setEnvTarget(EShTargetSpv, EShTargetSpv_1_5);
 				shader.setEntryPoint(EntryPointName);
 

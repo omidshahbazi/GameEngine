@@ -161,6 +161,14 @@ namespace Engine
 
 		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, StageData& Data)
 		{
+			auto checkExistenceOfEntrypoint = [&](FunctionType::Types Type)
+			{
+				if (Data.Functions.ContainsIf([&](auto item) { return item->GetType() == Type; }))
+					return;
+
+				THROW_PROGRAM_COMPILER_EXCEPTION("Complementary entrypoint is missing", Function->GetName());
+			};
+
 			auto checkRequiredRegisters = [&](const String& StructName, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
 				const StructType* structType = GetStructType(StructName);
@@ -176,11 +184,6 @@ namespace Engine
 				}
 			};
 
-			auto checkRequiredOutputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
-			{
-				checkRequiredRegisters(Function->GetReturnDataType()->GetUserDefined(), RequiredRegisters, RequiredRegisterCount);
-			};
-
 			auto checkRequiredInputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
 				for (auto& param : Function->GetParameters())
@@ -191,6 +194,11 @@ namespace Engine
 
 					checkRequiredRegisters(structName, RequiredRegisters, RequiredRegisterCount);
 				}
+			};
+
+			auto checkRequiredOutputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
+			{
+				checkRequiredRegisters(Function->GetReturnDataType()->GetUserDefined(), RequiredRegisters, RequiredRegisterCount);
 			};
 
 			const StructVariableType::Registers RequiredTessFactorsRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
@@ -217,6 +225,8 @@ namespace Engine
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint function", Function->GetName());
 
 				checkRequiredOutputRegisters(constantEntryPointFunc, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
+
+				checkExistenceOfEntrypoint(FunctionType::Types::DomainMain);
 			}
 			else if (Data.Stage == Stages::Domain)
 			{
@@ -224,6 +234,8 @@ namespace Engine
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
 
 				checkRequiredInputRegisters(Function, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
+
+				checkExistenceOfEntrypoint(FunctionType::Types::HullMain);
 			}
 			else if (Data.Stage == Stages::Geometry)
 			{

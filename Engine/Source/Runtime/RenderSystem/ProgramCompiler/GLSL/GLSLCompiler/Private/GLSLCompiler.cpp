@@ -117,15 +117,15 @@ namespace Engine
 
 				/* limits */
 				{
-					/* nonInductiveForLoops */ 1,
-					/* whileLoops */ 1,
-					/* doWhileLoops */ 1,
-					/* generalUniformIndexing */ 0,
-					/* generalAttributeMatrixVectorIndexing */ 0,
-					/* generalVaryingIndexing */ 0,
-					/* generalSamplerIndexing */ 0,
-					/* generalVariableIndexing */ 0,
-					/* generalConstantMatrixVectorIndexing */ 0,
+					/* nonInductiveForLoops */ true,
+					/* whileLoops */ true,
+					/* doWhileLoops */ true,
+					/* generalUniformIndexing */ true,
+					/* generalAttributeMatrixVectorIndexing */ true,
+					/* generalVaryingIndexing */ true,
+					/* generalSamplerIndexing */ true,
+					/* generalVariableIndexing */ true,
+					/* generalConstantMatrixVectorIndexing */ true
 				}
 			};
 

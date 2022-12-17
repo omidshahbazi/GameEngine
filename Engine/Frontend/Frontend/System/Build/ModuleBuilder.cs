@@ -98,7 +98,7 @@ namespace Engine.Frontend.System.Build
 						File.Copy(srcFilePath, dstFilePath, true);
 					}
 
-					State = States.AlreadyUpdated;
+					State = States.Built;
 				}
 				else
 				{
@@ -132,19 +132,18 @@ namespace Engine.Frontend.System.Build
 				State = States.Failed;
 			}
 
-			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
-				GenerateHashes(State == States.Failed);
+			GenerateHashes(State == States.Failed);
 		}
 
 		protected override void CreateDirectories()
 		{
 			base.CreateDirectories();
 
+			if (!Directory.Exists(IntermediateTempPath))
+				Directory.CreateDirectory(IntermediateTempPath);
+
 			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
 			{
-				if (!Directory.Exists(IntermediateTempPath))
-					Directory.CreateDirectory(IntermediateTempPath);
-
 				if (!Directory.Exists(IntermediateGeneratedDirectory))
 					Directory.CreateDirectory(IntermediateGeneratedDirectory);
 			}
@@ -152,17 +151,17 @@ namespace Engine.Frontend.System.Build
 
 		private bool MustCompile()
 		{
-			if (Module.UseType == ModuleRules.UseTypes.UseOnly)
-				return true;
-
-			if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
-				if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern).Length != 0)
-					return true;
-
-			foreach (string moduleName in Module.GetAllDependencies())
+			if (Module.UseType != ModuleRules.UseTypes.UseOnly)
 			{
-				if (targetBuilder.GetModuleBuilder(moduleName).State == States.Built)
-					return true;
+				if (!File.Exists(OutputTargetName + Module.GetOutputFileExtension()))
+					if (FileSystemUtilites.GetAllFiles(sourceCodeRootPath, EnvironmentHelper.CompileFileSearchPattern).Length != 0)
+						return true;
+
+				foreach (string moduleName in Module.GetAllDependencies())
+				{
+					if (targetBuilder.GetModuleBuilder(moduleName).State == States.Built)
+						return true;
+				}
 			}
 
 			if (!File.Exists(HashesFilePath))
@@ -178,8 +177,18 @@ namespace Engine.Frontend.System.Build
 
 			List<string> extensions = new List<string>();
 			extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
-			extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
-			extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
+
+			if (Module.UseType == ModuleRules.UseTypes.UseOnly)
+			{
+				extensions.Add($"*{EnvironmentHelper.StaticLibraryExtensions}");
+				extensions.Add($"*{EnvironmentHelper.DynamicLibraryExtensions}");
+			}
+			else
+			{
+				extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
+				extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
+			}
+
 			string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
 			foreach (string file in files)
 			{
@@ -208,8 +217,19 @@ namespace Engine.Frontend.System.Build
 
 				List<string> extensions = new List<string>();
 				extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
-				extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
-				extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
+
+				if (Module.UseType == ModuleRules.UseTypes.UseOnly)
+				{
+					extensions.AddRange(EnvironmentHelper.HeaderFileSearchPattern);
+					extensions.Add($"*{EnvironmentHelper.StaticLibraryExtensions}");
+					extensions.Add($"*{EnvironmentHelper.DynamicLibraryExtensions}");
+				}
+				else
+				{
+					extensions.AddRange(EnvironmentHelper.CompileFileSearchPattern);
+					extensions.AddRange(EnvironmentHelper.CSharpFileSearchPattern);
+				}
+
 				string[] files = FileSystemUtilites.GetAllFiles(sourceCodeRootPath, extensions.ToArray());
 
 				foreach (string file in files)

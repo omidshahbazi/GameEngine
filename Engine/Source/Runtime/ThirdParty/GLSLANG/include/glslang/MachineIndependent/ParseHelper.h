@@ -92,7 +92,8 @@ public:
             limits(resources.limits),
             globalUniformBlock(nullptr),
             globalUniformBinding(TQualifier::layoutBindingEnd),
-            globalUniformSet(TQualifier::layoutSetEnd)
+            globalUniformSet(TQualifier::layoutSetEnd),
+            atomicCounterBlockSet(TQualifier::layoutSetEnd)
     {
         if (entryPoint != nullptr)
             sourceEntryPointName = *entryPoint;
@@ -154,10 +155,11 @@ public:
             extensionCallback(line, extension, behavior);
     }
 
-#ifdef ENABLE_HLSL
     // Manage the global uniform block (default uniforms in GLSL, $Global in HLSL)
     virtual void growGlobalUniformBlock(const TSourceLoc&, TType&, const TString& memberName, TTypeList* typeList = nullptr);
-#endif
+
+    // Manage global buffer (used for backing atomic counters in GLSL when using relaxed Vulkan semantics)
+    virtual void growAtomicCounterBlock(int binding, const TSourceLoc&, TType&, const TString& memberName, TTypeList* typeList = nullptr);
 
     // Potentially rename shader entry point function
     void renameShaderFunction(TString*& name) const
@@ -230,7 +232,25 @@ protected:
     // override this to set the language-specific name
     virtual const char* getGlobalUniformBlockName() const { return ""; }
     virtual void setUniformBlockDefaults(TType&) const { }
-    virtual void finalizeGlobalUniformBlockLayout(TVariable&) { }
+    virtual void finalizeGlobalUniformBlockLayout(TVariable&) {}
+
+    // Manage the atomic counter block (used for atomic_uints with Vulkan-Relaxed)
+    TMap<int, TVariable*> atomicCounterBuffers;
+    unsigned int atomicCounterBlockSet;
+    TMap<int, int> atomicCounterBlockFirstNewMember;
+    // override this to set the language-specific name
+    virtual const char* getAtomicCounterBlockName() const { return ""; }
+    virtual void setAtomicCounterBlockDefaults(TType&) const {}
+    virtual void setInvariant(const TSourceLoc&, const char*) {}
+    virtual void finalizeAtomicCounterBlockLayout(TVariable&) {}
+    bool isAtomicCounterBlock(const TSymbol& symbol) {
+        const TVariable* var = symbol.getAsVariable();
+        if (!var)
+            return false;
+        const auto& at = atomicCounterBuffers.find(var->getType().getQualifier().layoutBinding);
+        return (at != atomicCounterBuffers.end() && (*at).second->getType() == var->getType());
+    }
+
     virtual void outputMessage(const TSourceLoc&, const char* szReason, const char* szToken,
                                const char* szExtraInfoFormat, TPrefixType prefix,
                                va_list args);
@@ -293,6 +313,9 @@ public:
     bool parseShaderStrings(TPpContext&, TInputScanner& input, bool versionWillBeError = false) override;
     void parserError(const char* s);     // for bison's yyerror
 
+    virtual void growGlobalUniformBlock(const TSourceLoc&, TType&, const TString& memberName, TTypeList* typeList = nullptr) override;
+    virtual void growAtomicCounterBlock(int binding, const TSourceLoc&, TType&, const TString& memberName, TTypeList* typeList = nullptr) override;
+
     void reservedErrorCheck(const TSourceLoc&, const TString&);
     void reservedPpErrorCheck(const TSourceLoc&, const char* name, const char* op) override;
     bool lineContinuationCheck(const TSourceLoc&, bool endOfComment) override;
@@ -340,6 +363,10 @@ public:
     void checkPrecisionQualifier(const TSourceLoc&, TPrecisionQualifier);
     void memorySemanticsCheck(const TSourceLoc&, const TFunction&, const TIntermOperator& callNode);
 
+    TIntermTyped* vkRelaxedRemapFunctionCall(const TSourceLoc&, TFunction*, TIntermNode*);
+    // returns true if the variable was remapped to something else
+    bool vkRelaxedRemapUniformVariable(const TSourceLoc&, TString&, const TPublicType&, TArraySizes*, TIntermTyped*, TType&);
+
     void assignError(const TSourceLoc&, const char* op, TString left, TString right);
     void unaryOpError(const TSourceLoc&, const char* op, TString operand);
     void binaryOpError(const TSourceLoc&, const char* op, TString left, TString right);
@@ -366,7 +393,7 @@ public:
     void accStructCheck(const TSourceLoc & loc, const TType & type, const TString & identifier);
     void transparentOpaqueCheck(const TSourceLoc&, const TType&, const TString& identifier);
     void memberQualifierCheck(glslang::TPublicType&);
-    void globalQualifierFixCheck(const TSourceLoc&, TQualifier&, bool isMemberCheck = false);
+    void globalQualifierFixCheck(const TSourceLoc&, TQualifier&, bool isMemberCheck = false, const TPublicType* publicType = nullptr);
     void globalQualifierTypeCheck(const TSourceLoc&, const TQualifier&, const TPublicType&);
     bool structQualifierErrorCheck(const TSourceLoc&, const TPublicType& pType);
     void mergeQualifiers(const TSourceLoc&, TQualifier& dst, const TQualifier& src, bool force);
@@ -411,12 +438,13 @@ public:
     const TFunction* findFunction400(const TSourceLoc& loc, const TFunction& call, bool& builtIn);
     const TFunction* findFunctionExplicitTypes(const TSourceLoc& loc, const TFunction& call, bool& builtIn);
     void declareTypeDefaults(const TSourceLoc&, const TPublicType&);
-    TIntermNode* declareVariable(const TSourceLoc&, TString& identifier, const TPublicType&, TArraySizes* typeArray = 0, TIntermTyped* initializer = 0);
+    TIntermNode* declareVariable(const TSourceLoc&, TString& identifier, const TPublicType&, TArraySizes* typeArray = nullptr, TIntermTyped* initializer = nullptr);
     TIntermTyped* addConstructor(const TSourceLoc&, TIntermNode*, const TType&);
     TIntermTyped* constructAggregate(TIntermNode*, const TType&, int, const TSourceLoc&);
     TIntermTyped* constructBuiltIn(const TType&, TOperator, TIntermTyped*, const TSourceLoc&, bool subset);
     void inheritMemoryQualifiers(const TQualifier& from, TQualifier& to);
-    void declareBlock(const TSourceLoc&, TTypeList& typeList, const TString* instanceName = 0, TArraySizes* arraySizes = 0);
+    void declareBlock(const TSourceLoc&, TTypeList& typeList, const TString* instanceName = nullptr, TArraySizes* arraySizes = nullptr);
+    void blockStorageRemap(const TSourceLoc&, const TString*, TQualifier&);
     void blockStageIoCheck(const TSourceLoc&, const TQualifier&);
     void blockQualifierCheck(const TSourceLoc&, const TQualifier&, bool instanceName);
     void fixBlockLocations(const TSourceLoc&, TQualifier&, TTypeList&, bool memberWithLocation, bool memberWithoutLocation);
@@ -428,9 +456,11 @@ public:
     void addQualifierToExisting(const TSourceLoc&, TQualifier, TIdentifierList&);
     void invariantCheck(const TSourceLoc&, const TQualifier&);
     void updateStandaloneQualifierDefaults(const TSourceLoc&, const TPublicType&);
+    void updateBindlessQualifier(TType& memberType);
     void wrapupSwitchSubsequence(TIntermAggregate* statements, TIntermNode* branchNode);
     TIntermNode* addSwitch(const TSourceLoc&, TIntermTyped* expression, TIntermAggregate* body);
     const TTypeList* recordStructCopy(TStructRecord&, const TType*, const TType*);
+    TLayoutFormat mapLegacyLayoutFormat(TLayoutFormat legacyLayoutFormat, TBasicType imageType);
 
 #ifndef GLSLANG_WEB
     TAttributeType attributeFromName(const TString& name) const;
@@ -443,6 +473,21 @@ public:
     void handleSwitchAttributes(const TAttributes& attributes, TIntermNode*);
     // Determine loop control from attributes
     void handleLoopAttributes(const TAttributes& attributes, TIntermNode*);
+    // Function attributes
+    void handleFunctionAttributes(const TSourceLoc&, const TAttributes&);
+
+    // GL_EXT_spirv_intrinsics
+    TSpirvRequirement* makeSpirvRequirement(const TSourceLoc& loc, const TString& name,
+                                            const TIntermAggregate* extensions, const TIntermAggregate* capabilities);
+    TSpirvRequirement* mergeSpirvRequirements(const TSourceLoc& loc, TSpirvRequirement* spirvReq1,
+                                                TSpirvRequirement* spirvReq2);
+    TSpirvTypeParameters* makeSpirvTypeParameters(const TSourceLoc& loc, const TIntermConstantUnion* constant);
+    TSpirvTypeParameters* mergeSpirvTypeParameters(TSpirvTypeParameters* spirvTypeParams1,
+                                                   TSpirvTypeParameters* spirvTypeParams2);
+    TSpirvInstruction* makeSpirvInstruction(const TSourceLoc& loc, const TString& name, const TString& value);
+    TSpirvInstruction* makeSpirvInstruction(const TSourceLoc& loc, const TString& name, int value);
+    TSpirvInstruction* mergeSpirvInstruction(const TSourceLoc& loc, TSpirvInstruction* spirvInst1,
+                                             TSpirvInstruction* spirvInst2);
 #endif
 
     void checkAndResizeMeshViewDim(const TSourceLoc&, TType&, bool isBlockMember);
@@ -460,6 +505,15 @@ protected:
 #ifndef GLSLANG_WEB
     void finish() override;
 #endif
+
+    virtual const char* getGlobalUniformBlockName() const override;
+    virtual void finalizeGlobalUniformBlockLayout(TVariable&) override;
+    virtual void setUniformBlockDefaults(TType& block) const override;
+
+    virtual const char* getAtomicCounterBlockName() const override;
+    virtual void finalizeAtomicCounterBlockLayout(TVariable&) override;
+    virtual void setAtomicCounterBlockDefaults(TType& block) const override;
+    virtual void setInvariant(const TSourceLoc& loc, const char* builtin) override;
 
 public:
     //

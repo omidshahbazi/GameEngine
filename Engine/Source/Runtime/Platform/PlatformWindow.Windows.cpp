@@ -1581,6 +1581,9 @@ namespace Engine
 
 		PlatformWindow::MessageBoxReturnValues PlatformWindow::ShowMessageBox(WindowHandle OwnerWindow, cstr Message, cstr Caption, MessageBoxButtons Button, MessageBoxIcons Icon, MessageBoxDefaultButtons DefaultButton, MessageBoxModlities Modality)
 		{
+			if (Caption == nullptr)
+				Caption = "";
+
 			DWORD flags = 0;
 			flags |= GetMessageBoxButton(Button);
 			flags |= GetMessageBoxIcon(Icon);

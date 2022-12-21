@@ -8,6 +8,7 @@
 #include <Allocators\AllocatorBase.h>
 #include <functional>
 #include <atomic>
+#include <memory>
 
 namespace Engine
 {

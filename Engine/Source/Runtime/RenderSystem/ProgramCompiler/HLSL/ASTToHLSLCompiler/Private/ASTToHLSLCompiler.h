@@ -38,13 +38,13 @@ namespace Engine
 
 				virtual void BuildFunction(FunctionType* Function, StageData& Data) override;
 
-				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data)  override;
+				virtual void BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data)  override;
 
 				virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, StageData& Data)  override;
 
 				virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, StageData& Data) override;
 
-				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, StageData& Data) override;
+				virtual void BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data) override;
 
 				virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, StageData& Data) override;
 

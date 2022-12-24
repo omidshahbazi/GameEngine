@@ -29,6 +29,7 @@ namespace Engine
 					PrimitiveID,
 					DomainLocation,
 					InstanceID,
+					OutputControlPointID,
 					FragmentPosition,
 					Target,
 					DispatchThreadID,

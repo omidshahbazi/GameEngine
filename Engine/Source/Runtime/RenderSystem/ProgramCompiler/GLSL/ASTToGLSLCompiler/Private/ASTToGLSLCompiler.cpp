@@ -13,6 +13,44 @@ namespace Engine
 	{
 		namespace Private
 		{
+			bool IsInternalVertexLayout(StructVariableType::Registers Register)
+			{
+				switch (Register)
+				{
+				case StructVariableType::Registers::Position:
+				case StructVariableType::Registers::Normal:
+				case StructVariableType::Registers::UV:
+				case StructVariableType::Registers::Target:
+					return true;
+
+				default:
+					return false;
+				}
+			}
+
+			bool IsAdditionalVertexLayout(StructVariableType::Registers Register)
+			{
+				switch (Register)
+				{
+				case StructVariableType::Registers::Color:
+					return true;
+
+				default:
+					return false;
+				}
+			}
+
+			bool IsVertexLayout(StructVariableType::Registers Register)
+			{
+				if (IsInternalVertexLayout(Register))
+					return true;
+
+				if (IsAdditionalVertexLayout(Register))
+					return true;
+
+				return false;
+			}
+
 			VertexLayouts GetLayout(StructVariableType::Registers Register)
 			{
 				switch (Register)
@@ -26,24 +64,115 @@ namespace Engine
 				case StructVariableType::Registers::UV:
 					return VertexLayouts::TexCoord;
 
-				case StructVariableType::Registers::Color:
-				case StructVariableType::Registers::TessellationFactor:
-				case StructVariableType::Registers::InsideTessellationFactor:
-				case StructVariableType::Registers::PrimitiveID:
-				case StructVariableType::Registers::DomainLocation:
-				case StructVariableType::Registers::InstanceID:
-				case StructVariableType::Registers::FragmentPosition:
-				case StructVariableType::Registers::Target:
-				case StructVariableType::Registers::DispatchThreadID:
-				case StructVariableType::Registers::GroupID:
-				case StructVariableType::Registers::GroupIndex:
-				case StructVariableType::Registers::GroupThreadID:
-					return VertexLayouts::Position;
-
 				default:
 					THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
 				}
+			}
 
+			String GetSystemValue(StructVariableType::Registers Register, Stages Stage)
+			{
+				switch (Register)
+				{
+				case StructVariableType::Registers::Position:
+				{
+					if (Stage == Stages::Geometry)
+						return "gl_FragCoord";
+
+					return "gl_Position ";
+				}
+
+				case StructVariableType::Registers::TessellationFactor:
+					return "gl_TessLevelOuter";
+
+				case StructVariableType::Registers::InsideTessellationFactor:
+					return "gl_TessLevelInner";
+
+				case StructVariableType::Registers::PrimitiveID:
+					return "gl_PrimitiveID";
+
+				case StructVariableType::Registers::DomainLocation:
+					return "gl_TessCord";
+
+				case StructVariableType::Registers::InstanceID:
+					return "gl_InstanceID";
+
+				case StructVariableType::Registers::OutputControlPointID:
+					return "gl_InvocationID";
+
+				case StructVariableType::Registers::FragmentPosition:
+					return "gl_FragCoord";
+
+				case StructVariableType::Registers::DispatchThreadID:
+					return "gl_LocalInvocationID";
+
+				case StructVariableType::Registers::GroupID:
+					return "gl_WorkGroupID";
+
+				case StructVariableType::Registers::GroupIndex:
+					return "gl_LocalInvocationIndex";
+
+				case StructVariableType::Registers::GroupThreadID:
+					return "gl_LocalInvocationID";
+				}
+
+				THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
+			}
+
+			String GetDomainType(DomainAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case DomainAttributeType::Types::Triangle:
+					return "triangles";
+
+				case DomainAttributeType::Types::Quad:
+					return "quads";
+
+				case DomainAttributeType::Types::Isoline:
+					return "isolines";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
+			String GetPartitioningType(PartitioningAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case PartitioningAttributeType::Types::Integer:
+					return "equal_spacing";
+
+				case PartitioningAttributeType::Types::FractionalEven:
+					return "fractional_even_spacing";
+
+				case PartitioningAttributeType::Types::FractionalOdd:
+					return "fractional_odd_spacing";
+
+				case PartitioningAttributeType::Types::PowerOfTwo:
+					return "equal_spacing";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
+			String GetTopologyType(TopologyAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case TopologyAttributeType::Types::Point:
+					return "points";
+
+				case TopologyAttributeType::Types::Line:
+					return "lines";
+
+				case TopologyAttributeType::Types::TriangleClockwise:
+					return "cw";
+
+				case TopologyAttributeType::Types::TriangleCounterClockwise:
+					return "ccw";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			String GetFragmentVariableName(uint8 Index)
@@ -69,7 +198,40 @@ namespace Engine
 			{
 				ASTCompilerBase::BuildStageShader(Data);
 
-				Data.Shader = "#version 460 core\n" + Data.Shader;
+				String header = "#version 460 core\n";
+
+				if (Data.Stage == Stages::Hull)
+				{
+					const FunctionType* hullEntrypoint = GetEntrypointFunctionType(FunctionType::Types::HullMain, Data);
+
+					header += "layout (vertices = ";
+
+					const ControlPointsAttributeType* attrib = hullEntrypoint->GetAttribute<ControlPointsAttributeType>();
+					header += StringUtility::ToString<char8>(attrib->GetNumber());
+
+					header += ") out;\n";
+				}
+				else if (Data.Stage == Stages::Domain)
+				{
+					const FunctionType* hullEntrypoint = GetEntrypointFunctionType(FunctionType::Types::HullMain, Data);
+
+					header += "layout (";
+
+					const DomainAttributeType* domainAttrib = hullEntrypoint->GetAttribute<DomainAttributeType>();
+					header += GetDomainType(domainAttrib->GetType());
+					header += ", ";
+
+					const PartitioningAttributeType* partitioningAttrib = hullEntrypoint->GetAttribute<PartitioningAttributeType>();
+					header += GetPartitioningType(partitioningAttrib->GetType());
+					header += ", ";
+
+					const TopologyAttributeType* topologyAttrib = hullEntrypoint->GetAttribute<TopologyAttributeType>();
+					header += GetTopologyType(topologyAttrib->GetType());
+
+					header += ") in;\n";
+				}
+
+				Data.Shader = header + Data.Shader;
 			}
 
 			void ASTToGLSLCompiler::BuildStruct(StructType* Struct, StageData& Data)
@@ -152,12 +314,16 @@ namespace Engine
 
 				if (funcType == FunctionType::Types::VertexMain ||
 					funcType == FunctionType::Types::HullMain ||
+					IsHullConstant(Function, Data) ||
 					funcType == FunctionType::Types::DomainMain ||
 					funcType == FunctionType::Types::FragmentMain)
 				{
+					bool haveToConvertToArray = (funcType == FunctionType::Types::HullMain);
+
 					const auto* parameter = Function->GetParameters()[0];
-					BuildInOutStruct(parameter->GetDataType(), parameter->GetName(), true, Data);
-					BuildInOutStruct(Function->GetReturnDataType(), String::Empty, false, Data);
+					BuildInputOutputStruct(parameter->GetDataType(), parameter->GetName(), true, haveToConvertToArray, Data);
+
+					BuildInputOutputStruct(Function->GetReturnDataType(), String::Empty, false, haveToConvertToArray, Data);
 				}
 
 				if (funcType == FunctionType::Types::FragmentMain)
@@ -178,7 +344,7 @@ namespace Engine
 					}
 				}
 
-				if (Function->IsEntrypoint())
+				if (IsEntrypointOrHullConstant(Function, Data))
 					BuildType(ProgramDataTypes::Void, Data);
 				else
 					BuildDataTypeStatement(Function->GetReturnDataType(), Data);
@@ -194,7 +360,7 @@ namespace Engine
 
 				AddCode('(', Data);
 
-				if (Function->IsEntrypoint())
+				if (IsEntrypointOrHullConstant(Function, Data))
 				{
 					for (auto& parameter : Function->GetParameters())
 						PushVariable(parameter);
@@ -211,6 +377,21 @@ namespace Engine
 
 				AddNewLine(Data);
 
+				if (funcType == FunctionType::Types::HullMain)
+				{
+					AddCode("if (", Data);
+					AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
+					AddCode(" == 0)", Data);
+					AddNewLine(Data);
+
+					++Data.IndentOffset;
+					AddCode(GetHullConstantFunction()->GetName(), Data);
+					AddCode("();", Data);
+					--Data.IndentOffset;
+
+					AddNewLine(Data);
+				}
+
 				BuildStatementHolder(Function, false, Data);
 
 				--Data.IndentOffset;
@@ -222,11 +403,6 @@ namespace Engine
 				DecreaseBlockIndex();
 			}
 
-			void ASTToGLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data)
-			{
-				//THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-			}
-
 			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, StageData& Data)
 			{
 				AddCode(Statement->GetName(), Data);
@@ -234,7 +410,7 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data)
 			{
-				if (Data.FunctionType != FunctionType::Types::None)
+				if (IsEntrypointOrHullConstant(GetLastFunction(), Data))
 				{
 					String leftStm;
 					StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, leftStm, 0 };
@@ -266,6 +442,13 @@ namespace Engine
 
 							BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Data);
 
+							if (Data.FunctionType == FunctionType::Types::HullMain)
+							{
+								AddCode('[', Data);
+								AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
+								AddCode(']', Data);
+							}
+
 							if (isMemberAccess)
 							{
 								AddCode('.', Data);
@@ -283,7 +466,7 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, StageData& Data)
 			{
-				if (Data.FunctionType == FunctionType::Types::None)
+				if (!IsEntrypointOrHullConstant(GetLastFunction(), Data))
 				{
 					AddCode("return ", Data);
 
@@ -301,7 +484,8 @@ namespace Engine
 
 				if (Data.FunctionType == FunctionType::Types::VertexMain)
 				{
-					AddCode("gl_Position = ", Data);
+					AddCode(GetSystemValue(StructVariableType::Registers::Position, Data.Stage), Data);
+					AddCode(" = ", Data);
 
 					variableType = FindVariableType(structType, [](const StructVariableType* item) { return item->GetRegister() == StructVariableType::Registers::Position; });
 				}
@@ -470,7 +654,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, StageData& Data)
+			void ASTToGLSLCompiler::BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, StageData& Data)
 			{
 				CoreDebugAssert(Categories::ProgramCompiler, !DataType->IsBuiltIn(), "DataType must be user-defined");
 
@@ -482,11 +666,14 @@ namespace Engine
 
 				for (auto& variable : variables)
 				{
+					if (!IsVertexLayout(variable->GetRegister()))
+						continue;
+
 					int8 location = 0;
-					if (!IsInput)
-						location = m_AdditionalLayoutCount++;
-					else
+					if (IsInput && variable->GetRegisterIndex() == 0)
 						location = SubMeshInfo::GetLayoutIndex(GetLayout(variable->GetRegister()));
+					else
+						location = m_AdditionalLayoutCount++;
 
 					AddCode("layout(location = ", Data);
 					AddCode(StringUtility::ToString<char8>(location), Data);
@@ -497,6 +684,10 @@ namespace Engine
 					AddCode(' ', Data);
 
 					BuildFlattenStructMemberVariableName(structType, variable, Name, IsInput, Data);
+
+					if (ConvertToArray)
+						AddCode("[]", Data);
+
 					AddCode(';', Data);
 
 					AddNewLine(Data);
@@ -557,6 +748,12 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data)
 			{
+				if (!IsVertexLayout(Variable->GetRegister()))
+				{
+					AddCode(GetSystemValue(Variable->GetRegister(), Data.Stage), Data);
+					return;
+				}
+
 				AddCode(Name, Data);
 				AddCode('_', Data);
 				AddCode((IsInput ? "In" : "Out"), Data);

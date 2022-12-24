@@ -12,6 +12,8 @@ namespace Engine
 
 	namespace ProgramParser
 	{
+#define ADD_TO_RESULT(Value) Parameters.Result += String(" ") + String(Value)
+
 		using namespace AbstractSyntaxTree;
 
 		cstr PREPROCESSOR_INCLUDE = "include";
@@ -22,15 +24,16 @@ namespace Engine
 		cstr PREPROCESSOR_ELSE = "else";
 		cstr PREPROCESSOR_ENDIF = "endif";
 
-		bool IsDefined(const PreprocessorParser::DefineList& Defines, const String& Define)
+		bool IsDefined(const PreprocessorParser::DefineList& Defines, const String& Define, String* Value = nullptr)
 		{
-			for (auto& define : Defines)
-			{
-				if (define == Define)
-					return true;
-			}
+			int32 index = Defines.FindIf([&Define](auto& item) { return item.Name == Define; });
+			if (index == -1)
+				return false;
 
-			return false;
+			if (Value != nullptr)
+				*Value = Defines[index].Value;
+
+			return true;
 		}
 
 		PreprocessorParser::PreprocessorParser(const String& Text) :
@@ -40,15 +43,17 @@ namespace Engine
 
 		void PreprocessorParser::Process(Parameters& Parameters)
 		{
+			PreprocessorParser::Parameters param = Parameters;
+
 			Tokenizer::Reset();
 
-			Process(Parameters, EndConditions::None);
+			Process(param, EndConditions::None);
+
+			Parameters.Result = param.Result;
 		}
 
 		void PreprocessorParser::Process(Parameters& Parameters, EndConditions ConditionMask)
 		{
-#define ADD_TO_RESULT(Value) Parameters.Result += String(" ") + String(Value)
-
 			uint32 lastLineIndex = 0;
 			while (true)
 			{
@@ -88,6 +93,9 @@ namespace Engine
 				switch (token.GetType())
 				{
 				case Token::Types::Identifier:
+					AppendIdentifier(token, Parameters);
+					break;
+
 				case Token::Types::Symbol:
 					ADD_TO_RESULT(token.GetName());
 					break;
@@ -118,11 +126,8 @@ namespace Engine
 
 				default:
 					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
-					break;
 				}
 			}
-
-#undef ADD_TO_RESULT
 		}
 
 		bool PreprocessorParser::ParsePreprocessor(Token& DeclarationToken, Parameters& Parameters)
@@ -162,16 +167,49 @@ namespace Engine
 				Token nameToken;
 				RequireToken(nameToken, "parse preprocessor definition");
 
-				bool isDuplicate = false;
-				for (const auto& define : Parameters.Defines)
-					if (define == nameToken.GetName())
-					{
-						isDuplicate = true;
-						break;
-					}
+				Token valueToken;
+				RequireToken(valueToken, "parse preprocessor definition");
+				if (nameToken.GetLineIndex() != valueToken.GetLineIndex())
+				{
+					UngetToken(valueToken);
+					valueToken.SetIdentifier(String::Empty);
+				}
 
-				if (!isDuplicate)
-					Parameters.Defines.Add({ nameToken.GetName() });
+				String value;
+				switch (valueToken.GetType())
+				{
+				case Token::Types::None:
+					break;
+
+				case Token::Types::ConstantBool:
+					value = StringUtility::ToString<char8>(valueToken.GetConstantBool());
+					break;
+
+				case Token::Types::ConstantInt32:
+					value = StringUtility::ToString<char8>(valueToken.GetConstantInt32());
+					break;
+
+				case Token::Types::ConstantInt64:
+					value = StringUtility::ToString<char8>(valueToken.GetConstantInt64());
+					break;
+
+				case Token::Types::ConstantFloat32:
+					value = StringUtility::ToString<char8>(valueToken.GetConstantFloat32());
+					break;
+
+				case Token::Types::ConstantFloat64:
+					value = StringUtility::ToString<char8>(valueToken.GetConstantFloat64());
+					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+				}
+
+				int32 index = Parameters.Defines.FindIf([&nameToken](auto& item) { return item.Name == nameToken.GetName(); });
+				if (index == -1)
+					Parameters.Defines.Add({ nameToken.GetName(), value });
+				else
+					Parameters.Defines[index].Value = value;
 
 				return true;
 			}
@@ -181,9 +219,9 @@ namespace Engine
 				Token nameToken;
 				RequireToken(nameToken, "parse preprocessor undef");
 
-				for (uint32 i = 0; i < Parameters.Defines.GetSize(); ++i)
-					if (Parameters.Defines[i] == nameToken.GetName())
-						Parameters.Defines.RemoveAt(i--);
+				int32 index = Parameters.Defines.FindIf([&nameToken](auto& item) { return item.Name == nameToken.GetName(); });
+				if (index != -1)
+					Parameters.Defines.RemoveAt(index);
 
 				return true;
 			}
@@ -268,18 +306,33 @@ namespace Engine
 			THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", preprocessorToken);
 		}
 
-		bool PreprocessorParser::IsEndCondition(Token Token, EndConditions ConditionMask)
+		void PreprocessorParser::AppendIdentifier(Token& DeclarationToken, Parameters& Parameters)
+		{
+			String value;
+			if (IsDefined(Parameters.Defines, DeclarationToken.GetName(), &value))
+			{
+				ADD_TO_RESULT(value);
+
+				return;
+			}
+
+			ADD_TO_RESULT(DeclarationToken.GetName());
+		}
+
+		bool PreprocessorParser::IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask)
 		{
 			bool isTheEnd =
-				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorElse) && Token.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive)) ||
-				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorEndIf) && Token.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive));
+				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorElse) && DeclarationToken.Matches(PREPROCESSOR_ELSE, Token::SearchCases::CaseSensitive)) ||
+				(BitwiseUtils::IsEnabled(ConditionMask, EndConditions::PreprocessorEndIf) && DeclarationToken.Matches(PREPROCESSOR_ENDIF, Token::SearchCases::CaseSensitive));
 
 			if (!isTheEnd)
 				return false;
 
-			UngetToken(Token);
+			UngetToken(DeclarationToken);
 
 			return true;
 		}
+
+#undef ADD_TO_RESULT
 	}
 }

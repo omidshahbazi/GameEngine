@@ -64,12 +64,14 @@ namespace Engine
 
 				return false;
 			};
-			preprocessParameters.Defines = Info->Defines;
+
+			for (const auto& define : Info->Defines)
+				preprocessParameters.Defines.Add({ define, String::Empty });
 
 			if (Info->DebugMode)
-				preprocessParameters.Defines.Add("DEBUG_MODE");
+				preprocessParameters.Defines.Add({ "DEBUG_MODE", String::Empty });
 			else
-				preprocessParameters.Defines.Add("RELEASE_MODE");
+				preprocessParameters.Defines.Add({ "RELEASE_MODE", String::Empty });
 
 			preprocessorParser.Process(preprocessParameters);
 

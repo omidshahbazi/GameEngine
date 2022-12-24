@@ -11,6 +11,7 @@ namespace Engine
 		ASTCompilerBase::ASTCompilerBase(void) :
 			m_Allocator(nullptr),
 			m_BlockIndex(-1),
+			m_HullConstantFunction(nullptr),
 			m_LastFunction(nullptr),
 			m_ReturnValueAlreadyBuilt(false)
 		{
@@ -95,6 +96,18 @@ namespace Engine
 			m_ReturnValueAlreadyBuilt = false;
 
 			IncreaseBlockIndex();
+
+			auto getHullConstantFunction = [this, &Data]() -> const FunctionType*
+			{
+				const FunctionType* hullEntrypoint = GetEntrypointFunctionType(FunctionType::Types::HullMain, Data);
+
+				const ConstantEntrypointAttributeType* attrib = hullEntrypoint->GetAttribute<ConstantEntrypointAttributeType>();
+
+				int32 index = Data.Functions.FindIf([attrib](auto& item) { return item->GetName() == attrib->GetEntrypoint(); });
+				return Data.Functions[index];
+			};
+
+			m_HullConstantFunction = getHullConstantFunction();
 		}
 
 		void ASTCompilerBase::BuildStructs(StageData& Data)
@@ -184,10 +197,13 @@ namespace Engine
 				}
 			};
 
-			auto checkRequiredInputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
+			auto checkRequiredInputs = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount, bool MustBeArray)
 			{
 				for (auto& param : Function->GetParameters())
 				{
+					if (param->GetDataType()->IsArray() != MustBeArray)
+						THROW_PROGRAM_COMPILER_EXCEPTION(StringUtility::Format<char8>("Parameter %S array type mismatched with the desired type", param->GetName()), Function->GetName());
+
 					auto& structName = param->GetDataType()->GetUserDefined();
 					if (structName == String::Empty)
 						continue;
@@ -196,7 +212,7 @@ namespace Engine
 				}
 			};
 
-			auto checkRequiredOutputRegisters = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
+			auto checkRequiredOutputs = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
 				checkRequiredRegisters(Function->GetReturnDataType()->GetUserDefined(), RequiredRegisters, RequiredRegisterCount);
 			};
@@ -205,6 +221,9 @@ namespace Engine
 
 			if (Function->GetParameters().GetSize() > 1)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Entrypoints cannot have more than one parameter", Function->GetName());
+
+			FunctionType::Types funcType = Function->GetType();
+			checkRequiredInputs(Function, nullptr, 0, (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain));
 
 			if (Data.Stage == Stages::Hull)
 			{
@@ -216,25 +235,18 @@ namespace Engine
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Topology attribute", Function->GetName());
 				if (Function->GetAttribute<ControlPointsAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ControlPoints attribute", Function->GetName());
-				const ConstantEntrypointAttributeType* constantEntryPoint = Function->GetAttribute<ConstantEntrypointAttributeType>();
-				if (constantEntryPoint == nullptr)
+				if (Function->GetAttribute<ConstantEntrypointAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint attribute", Function->GetName());
 
-				const FunctionType* constantEntryPointFunc = FindFunctionType(constantEntryPoint->GetEntrypoint());
-				if (constantEntryPointFunc == nullptr)
+				if (m_HullConstantFunction == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ConstantEntrypoint function", Function->GetName());
 
-				checkRequiredOutputRegisters(constantEntryPointFunc, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
+				checkRequiredOutputs(m_HullConstantFunction, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
 
 				checkExistenceOfEntrypoint(FunctionType::Types::DomainMain);
 			}
 			else if (Data.Stage == Stages::Domain)
 			{
-				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
-					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
-
-				checkRequiredInputRegisters(Function, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
-
 				checkExistenceOfEntrypoint(FunctionType::Types::HullMain);
 			}
 			else if (Data.Stage == Stages::Geometry)
@@ -1283,27 +1295,27 @@ namespace Engine
 			int32 index = m_Functions.FindIf([&](auto item)
 				{
 					if (item->GetName() != Name)
+					return false;
+
+			const auto& parameters = item->GetParameters();
+
+			if (parameters.GetSize() != Arguments->GetItems().GetSize())
+				return false;
+
+			for (uint8 i = 0; i < parameters.GetSize(); ++i)
+			{
+				const auto& parameter = parameters[i];
+				const auto& argument = Arguments->GetItems()[i];
+
+				const DataTypeStatement argumentDataType = EvaluateDataType(argument);
+				if (!CompareDataTypes(*parameter->GetDataType(), argumentDataType))
+				{
+					if (parameter->GetDataType()->IsNumeric() != argumentDataType.IsNumeric())
 						return false;
+				}
+			}
 
-					const auto& parameters = item->GetParameters();
-
-					if (parameters.GetSize() != Arguments->GetItems().GetSize())
-						return false;
-
-					for (uint8 i = 0; i < parameters.GetSize(); ++i)
-					{
-						const auto& parameter = parameters[i];
-						const auto& argument = Arguments->GetItems()[i];
-
-						const DataTypeStatement argumentDataType = EvaluateDataType(argument);
-						if (!CompareDataTypes(*parameter->GetDataType(), argumentDataType))
-						{
-							if (parameter->GetDataType()->IsNumeric() != argumentDataType.IsNumeric())
-								return false;
-						}
-					}
-
-					return true;
+			return true;
 				});
 
 			if (index == -1)
@@ -1324,6 +1336,17 @@ namespace Engine
 				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find function", Name);
 
 			return type;
+		}
+
+		const FunctionType* ASTCompilerBase::GetEntrypointFunctionType(FunctionType::Types Type, StageData& Data) const
+		{
+			CoreDebugAssert(Categories::ProgramCompiler, Type != FunctionType::Types::None, "Type cannot be None");
+
+			int32 index = Data.Functions.FindIf([Type](auto& item) { return item->GetType() == Type; });
+			if (index == -1)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find entrypoint function", String::Empty);
+
+			return Data.Functions[index];
 		}
 
 		const StructType* ASTCompilerBase::FindStructType(const String& Name) const

@@ -58,14 +58,14 @@ namespace Engine
 					if (YesNo)
 						return "Yes";
 					else
-						return "True";
+						return "true";
 				}
 				else
 				{
 					if (YesNo)
 						return "No";
 					else
-						return "False";
+						return "false";
 				}
 			}
 

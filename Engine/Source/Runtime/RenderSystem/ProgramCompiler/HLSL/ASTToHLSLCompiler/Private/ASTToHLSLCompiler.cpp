@@ -13,7 +13,7 @@ namespace Engine
 	{
 		namespace Private
 		{
-			String GetRegisterName(StructVariableType::Registers Register)
+			String GetRegisterName(StructVariableType::Registers Register, Stages Stage)
 			{
 				switch (Register)
 				{
@@ -42,7 +42,15 @@ namespace Engine
 					return "SV_DomainLocation";
 
 				case StructVariableType::Registers::InstanceID:
-					return "SV_GSInstanceID";
+				{
+					if (Stage == Stages::Geometry)
+						return "SV_GSInstanceID";
+
+					return "SV_OutputControlPointID";
+				}
+
+				case StructVariableType::Registers::OutputControlPointID:
+					return "SV_OutputControlPointID";
 
 				case StructVariableType::Registers::FragmentPosition:
 					return "SV_Position";
@@ -326,6 +334,13 @@ namespace Engine
 					AddCode(")]", Data);
 					AddNewLine(Data);
 				}
+				else if (funcType == FunctionType::Types::DomainMain)
+				{
+					const FunctionType* hullEntrypoint = GetEntrypointFunctionType(FunctionType::Types::HullMain, Data);
+
+					BuildDomainAttributeType(hullEntrypoint->GetAttribute<DomainAttributeType>(), Data);
+					AddNewLine(Data);
+				}
 
 				BuildAttributes(Function->GetAttributes(), Data);
 
@@ -361,7 +376,27 @@ namespace Engine
 					AddCode(' ', Data);
 				}
 
-				BuildParameters(Function->GetParameters(), Data);
+				if (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain)
+				{
+					const ParameterType* param = Function->GetParameters()[0];
+					
+					if (funcType == FunctionType::Types::HullMain)
+						AddCode("InputPatch", Data);
+					else if (funcType == FunctionType::Types::DomainMain)
+					{
+						AddCode(GetHullConstantFunction()->GetReturnDataType()->GetUserDefined(), Data);
+						AddCode(" __RequiredValues, const OutputPatch", Data);
+					}
+
+					AddCode('<', Data);
+					BuildDataTypeStatement(param->GetDataType(), Data);
+					AddCode(", ", Data);
+					BuildStatement(param->GetDataType()->GetPostElementCount(), Data);
+					AddCode("> ", Data);
+					AddCode(param->GetName(), Data);
+				}
+				else
+					BuildParameters(Function->GetParameters(), Data);
 
 				AddCode(')', Data);
 
@@ -384,7 +419,7 @@ namespace Engine
 				DecreaseBlockIndex();
 			}
 
-			void ASTToHLSLCompiler::BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[domain(\"", Data);
 
@@ -411,7 +446,7 @@ namespace Engine
 				AddCode("\")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[outputcontrolpoints(", Data);
 
@@ -622,7 +657,7 @@ namespace Engine
 				if (Variable->GetRegister() != StructVariableType::Registers::None)
 				{
 					AddCode(" : ", Data);
-					AddCode(GetRegisterName(Variable->GetRegister()), Data);
+					AddCode(GetRegisterName(Variable->GetRegister(), Data.Stage), Data);
 					AddCode(StringUtility::ToString<char8>(Variable->GetRegisterIndex()), Data);
 				}
 

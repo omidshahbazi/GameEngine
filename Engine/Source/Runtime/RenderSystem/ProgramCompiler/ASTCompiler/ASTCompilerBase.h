@@ -101,13 +101,13 @@ namespace Engine
 
 			virtual void BuildAttribute(BaseAttributeType* Attribute, StageData& Data);
 
-			virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data) = 0;
 
 			virtual void BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, StageData& Data) = 0;
 
 			virtual void BuildTopologyAttributeType(TopologyAttributeType* Attribute, StageData& Data) = 0;
 
-			virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data) = 0;
 
 			virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data) = 0;
 
@@ -197,6 +197,7 @@ namespace Engine
 			const FunctionType* FindFunctionType(const String& Name) const;
 			const FunctionType* FindMatchingFunction(const String& Name, const StatementItemHolder* Arguments) const;
 			const FunctionType* GetFunctionType(const String& Name) const;
+			const FunctionType* GetEntrypointFunctionType(FunctionType::Types Type, StageData& Data) const;
 
 			const StructType* FindStructType(const String& Name) const;
 			const StructType* GetStructType(const String& Name) const;
@@ -222,6 +223,21 @@ namespace Engine
 				BuildArguments(Statements, data);
 			}
 
+			bool IsHullConstant(const FunctionType* Function, StageData& Data) const
+			{
+				return (Data.Stage == Stages::Hull && Function == m_HullConstantFunction);
+			}
+
+			bool IsEntrypointOrHullConstant(const FunctionType* Function, StageData& Data) const
+			{
+				return (Function->IsEntrypoint() || IsHullConstant(Function, Data));
+			}
+
+			const FunctionType* GetHullConstantFunction(void) const
+			{
+				return m_HullConstantFunction;
+			}
+
 			AllocatorBase* GetAllocator(void) const
 			{
 				return m_Allocator;
@@ -243,6 +259,7 @@ namespace Engine
 			BlockVariablesList m_BlockVariables;
 			int8 m_BlockIndex;
 
+			const FunctionType* m_HullConstantFunction;
 			FunctionType* m_LastFunction;
 
 			bool m_ReturnValueAlreadyBuilt;

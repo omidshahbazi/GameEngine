@@ -37,13 +37,13 @@ namespace Engine
 			Content += "			" + VariableName + ".SetExtraValueType(\"" + Type.GetExtraValueType() + "\");";
 			ADD_NEW_LINE();
 
-			Content += "			" + VariableName + ".SetIsConst(" + StringUtility::ToString<char8>(Type.GetIsConst()).ToLower() + ");";
+			Content += "			" + VariableName + ".SetIsConst(" + StringUtility::ToString<char8>(Type.GetIsConst()) + ");";
 			ADD_NEW_LINE();
 
-			Content += "			" + VariableName + ".SetIsConstValue(" + StringUtility::ToString<char8>(Type.GetIsConstValue()).ToLower() + ");";
+			Content += "			" + VariableName + ".SetIsConstValue(" + StringUtility::ToString<char8>(Type.GetIsConstValue()) + ");";
 			ADD_NEW_LINE();
 
-			Content += "			" + VariableName + ".SetIsTemplate(" + StringUtility::ToString<char8>(Type.GetIsTemplate()).ToLower() + ");";
+			Content += "			" + VariableName + ".SetIsTemplate(" + StringUtility::ToString<char8>(Type.GetIsTemplate()) + ");";
 			ADD_NEW_LINE();
 
 			uint32 index = 0;

@@ -275,11 +275,11 @@ namespace Engine
 					ADD_NEW_LINE();
 					Content += "			SetNamespace(\"" + Type->GetNamespace() + "\");";
 					ADD_NEW_LINE();
-					Content += "			SetIsStruct(" + StringUtility::ToString<char8>(Type->GetIsStruct()).ToLower() + ");";
+					Content += "			SetIsStruct(" + StringUtility::ToString<char8>(Type->GetIsStruct()) + ");";
 					ADD_NEW_LINE();
-					Content += "			SetIsAbstract(" + StringUtility::ToString<char8>(Type->GetIsAbstract()).ToLower() + ");";
+					Content += "			SetIsAbstract(" + StringUtility::ToString<char8>(Type->GetIsAbstract()) + ");";
 					ADD_NEW_LINE();
-					Content += "			SetIsStatic(" + StringUtility::ToString<char8>(Type->GetIsStatic()).ToLower() + ");";
+					Content += "			SetIsStatic(" + StringUtility::ToString<char8>(Type->GetIsStatic()) + ");";
 					ADD_NEW_LINE();
 
 					auto generateAddParents = [&Content](MetaObject* Type, AccessSpecifiers AccessLevel)
@@ -582,10 +582,10 @@ namespace Engine
 					ADD_NEW_LINE();
 				}
 
-				Content += "			SetIsConst(" + StringUtility::ToString<char8>(Type->GetIsConst()).ToLower() + ");";
+				Content += "			SetIsConst(" + StringUtility::ToString<char8>(Type->GetIsConst()) + ");";
 				ADD_NEW_LINE();
 
-				Content += "			SetIsStatic(" + StringUtility::ToString<char8>(Type->GetIsStatic()).ToLower() + ");";
+				Content += "			SetIsStatic(" + StringUtility::ToString<char8>(Type->GetIsStatic()) + ");";
 				ADD_NEW_LINE();
 
 				Content += "		}";
@@ -693,7 +693,7 @@ namespace Engine
 				Content += "			SetDataType(" + DATA_TYPE_VARIALBE_NAME + ");";
 				ADD_NEW_LINE();
 
-				Content += "			SetIsReadOnly(" + StringUtility::ToString<char8>(Type->GetIsReadOnly()).ToLower() + ");";
+				Content += "			SetIsReadOnly(" + StringUtility::ToString<char8>(Type->GetIsReadOnly()) + ");";
 				ADD_NEW_LINE();
 
 				Content += "		}";

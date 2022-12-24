@@ -31,7 +31,14 @@ namespace Engine
 
 		public:
 			typedef std::function<bool(const String& FileName, String& Source)> IncludeFunction;
-			typedef Vector<String> DefineList;
+
+			struct DefineInfo
+			{
+			public:
+				String Name;
+				String Value;
+			};
+			typedef Vector<DefineInfo> DefineList;
 
 			struct Parameters
 			{
@@ -53,7 +60,9 @@ namespace Engine
 
 			void ParsePreprocessorBlock(Parameters& Parameters, bool ShouldRemove);
 
-			bool IsEndCondition(Token Token, EndConditions ConditionMask);
+			void AppendIdentifier(Token& DeclarationToken, Parameters& Parameters);
+
+			bool IsEndCondition(Token& DeclarationToken, EndConditions ConditionMask);
 		};
 	}
 }

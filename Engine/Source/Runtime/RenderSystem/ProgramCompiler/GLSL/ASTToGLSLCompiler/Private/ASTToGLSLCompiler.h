@@ -31,7 +31,7 @@ namespace Engine
 
 				virtual void BuildFunction(FunctionType* Function, StageData& Data) override;
 
-				virtual void BuildDomainAttributeType(DomainAttributeType* Attribute, StageData& Data) override
+				virtual void BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data) override
 				{
 				}
 
@@ -43,11 +43,13 @@ namespace Engine
 				{
 				}
 
-				virtual void BuildControlPointsAttributeType(ControlPointsAttributeType* Attribute, StageData& Data) override
+				virtual void BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data) override
 				{
 				}
 
-				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data) override;
+				virtual void BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data) override
+				{
+				}
 
 				virtual void BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, StageData& Data) override
 				{
@@ -79,7 +81,7 @@ namespace Engine
 
 				virtual void BuildPostDataType(const DataTypeStatement* Type, StageData& Data);
 
-				virtual void BuildInOutStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, StageData& Data);
+				virtual void BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, StageData& Data);
 
 				virtual void BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data);
 

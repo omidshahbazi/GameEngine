@@ -26,12 +26,12 @@ namespace Engine
 
 			bool BuildFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader);
 
-			bool BuildFunctionCallStatement(FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
+			bool BuildFunctionCallStatement(const FunctionCallStatement* Statement, FunctionType::Types Type, Stages Stage, String& Shader)
 			{
 				return BuildFunctionCallStatement(Statement->GetFunctionName(), Statement->GetArguments()->GetItems(), Type, Stage, Shader);
 			}
 
-			ProgramDataTypes EvaluateFunctionReturnValue(FunctionCallStatement* Statement) const;
+			ProgramDataTypes EvaluateFunctionReturnValue(const FunctionCallStatement* Statement) const;
 
 			uint32 CalculateFunctionSignatureHash(const String& Name, const Vector<Statement*>& Arguments) const;
 

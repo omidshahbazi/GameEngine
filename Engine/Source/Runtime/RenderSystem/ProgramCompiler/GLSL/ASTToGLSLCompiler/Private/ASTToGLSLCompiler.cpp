@@ -78,7 +78,7 @@ namespace Engine
 					if (Stage == Stages::Geometry)
 						return "gl_FragCoord";
 
-					return "gl_Position ";
+					return "gl_Position";
 				}
 
 				case StructVariableType::Registers::TessellationFactor:
@@ -318,12 +318,12 @@ namespace Engine
 					funcType == FunctionType::Types::DomainMain ||
 					funcType == FunctionType::Types::FragmentMain)
 				{
-					bool haveToConvertToArray = (funcType == FunctionType::Types::HullMain);
-
+					const bool inputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain);
 					const auto* parameter = Function->GetParameters()[0];
-					BuildInputOutputStruct(parameter->GetDataType(), parameter->GetName(), true, haveToConvertToArray, Data);
+					BuildInputOutputStruct(parameter->GetDataType(), parameter->GetName(), true, inputHaveToConvertToArray, Data);
 
-					BuildInputOutputStruct(Function->GetReturnDataType(), String::Empty, false, haveToConvertToArray, Data);
+					const bool outputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain);
+					BuildInputOutputStruct(Function->GetReturnDataType(), String::Empty, false, outputHaveToConvertToArray, Data);
 				}
 
 				if (funcType == FunctionType::Types::FragmentMain)
@@ -414,7 +414,17 @@ namespace Engine
 				{
 					String leftStm;
 					StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, leftStm, 0 };
-					BuildStatement(Statement->GetLeft(), data);
+
+					ArrayElementAccessStatement* leftAsArrayElementAccess = nullptr;
+					if (IsAssignableFrom(Statement->GetLeft(), ArrayElementAccessStatement))
+					{
+						leftAsArrayElementAccess = ReinterpretCast(ArrayElementAccessStatement*, Statement->GetLeft());
+						BuildStatement(leftAsArrayElementAccess->GetArrayStatement(), data);
+					}
+					else
+						BuildStatement(Statement->GetLeft(), data);
+
+					CheckMemberAccess(Statement->GetLeft());
 
 					const VariableType* leftVariable = FindVariableType(leftStm);
 					if (leftVariable != nullptr)
@@ -442,11 +452,22 @@ namespace Engine
 
 							BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Data);
 
-							if (Data.FunctionType == FunctionType::Types::HullMain)
+							if (Data.FunctionType == FunctionType::Types::HullMain ||
+								Data.FunctionType == FunctionType::Types::DomainMain)
 							{
-								AddCode('[', Data);
-								AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
-								AddCode(']', Data);
+								if (isOutputVariable && Data.FunctionType == FunctionType::Types::HullMain)
+								{
+									AddCode('[', Data);
+									AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
+									AddCode(']', Data);
+								}
+								else if (leftAsArrayElementAccess != nullptr &&
+									(rightVariable->GetRegister() == StructVariableType::Registers::None || IsVertexLayout(rightVariable->GetRegister())))
+								{
+									AddCode('[', Data);
+									BuildStatement(leftAsArrayElementAccess->GetElementStatement(), Data);
+									AddCode(']', Data);
+								}
 							}
 
 							if (isMemberAccess)
@@ -482,7 +503,7 @@ namespace Engine
 				const StructType* structType = GetStructType(returnDataType);
 				const StructVariableType* variableType = nullptr;
 
-				if (Data.FunctionType == FunctionType::Types::VertexMain)
+				if (Data.FunctionType == FunctionType::Types::VertexMain || Data.FunctionType == FunctionType::Types::DomainMain)
 				{
 					AddCode(GetSystemValue(StructVariableType::Registers::Position, Data.Stage), Data);
 					AddCode(" = ", Data);
@@ -512,13 +533,26 @@ namespace Engine
 					}
 				}
 
-				if (variableType == nullptr)
-					return;
+				if (variableType != nullptr)
+				{
+					const uint8 requiredComponentCount = 4;
+					const uint8 variableComponentCount = variableType->GetDataType()->GetComponentCount();
+					if (variableComponentCount != requiredComponentCount)
+						AddCode("vec4(", Data);
 
-				BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Data);
+					BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Data);
 
-				AddCode(';', Data);
-				AddNewLine(Data);
+					if (variableComponentCount != requiredComponentCount)
+					{
+						for (uint8 i = 0; i < requiredComponentCount - variableComponentCount; ++i)
+							AddCode(", 1", Data);
+
+						AddCode(')', Data);
+					}
+
+					AddCode(';', Data);
+					AddNewLine(Data);
+				}
 
 				AddCode("return;", Data);
 				AddNewLine(Data);

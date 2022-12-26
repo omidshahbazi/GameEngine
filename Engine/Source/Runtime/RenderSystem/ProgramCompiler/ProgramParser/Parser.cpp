@@ -360,6 +360,8 @@ namespace Engine
 					reg = StructVariableType::Registers::DomainLocation;
 				else if (registerName == "INSTANCE_ID")
 					reg = StructVariableType::Registers::InstanceID;
+				else if (registerName == "OUTPUT_CONTROL_POINT_ID")
+					reg = StructVariableType::Registers::OutputControlPointID;
 				else if (registerName == "FRAGMENT_POSITION")
 					reg = StructVariableType::Registers::FragmentPosition;
 				else if (registerName == "TARGET")
@@ -1419,7 +1421,7 @@ namespace Engine
 				Token token;
 				RequireToken(token, "function call statement");
 
-				stm->GetArguments()->AddItem(ParseExpression(token, EndConditions::Comma | EndConditions::Brace));
+				stm->AddArgument(ParseExpression(token, EndConditions::Comma | EndConditions::Brace));
 			}
 
 			Token token;

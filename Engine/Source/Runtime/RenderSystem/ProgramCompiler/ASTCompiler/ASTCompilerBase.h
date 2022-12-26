@@ -183,8 +183,8 @@ namespace Engine
 			virtual void BuildType(ProgramDataTypes Type, StageData& Data) = 0;
 
 			virtual uint8 EvaluateDataTypeElementCount(DataTypeStatement* Statement);
-			DataTypeStatement EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement = nullptr) const;
-			ProgramDataTypes EvaluateProgramDataType(Statement* Statement) const override;
+			DataTypeStatement EvaluateDataType(const Statement* CurrentStatement, const Statement* TopStatement = nullptr) const;
+			ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const override;
 
 			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const;
 			void CheckForImplicitCast(const DataTypeStatement& Source, const DataTypeStatement& Destination) const;
@@ -207,6 +207,8 @@ namespace Engine
 
 			const StructVariableType* FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 			const StructVariableType* GetVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
+
+			virtual void CheckMemberAccess(const Statement* LeftSide) const;
 
 			void AddCode(const String& Value, StageData& Data);
 			void AddNewLine(StageData& Data);

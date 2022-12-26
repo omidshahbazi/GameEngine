@@ -110,39 +110,7 @@ namespace Engine
 
 				uint8 GetComponentCount(void) const
 				{
-					switch (m_Type)
-					{
-					case ProgramDataTypes::Bool:
-					case ProgramDataTypes::Integer:
-					case ProgramDataTypes::UnsignedInteger:
-					case ProgramDataTypes::Float:
-					case ProgramDataTypes::Double:
-						return 1;
-
-					case ProgramDataTypes::Integer2:
-					case ProgramDataTypes::UnsignedInteger2:
-					case ProgramDataTypes::Float2:
-					case ProgramDataTypes::Double2:
-						return 2;
-
-					case ProgramDataTypes::Float3:
-					case ProgramDataTypes::Integer3:
-					case ProgramDataTypes::UnsignedInteger3:
-					case ProgramDataTypes::Double3:
-						return 3;
-
-					case ProgramDataTypes::Float4:
-					case ProgramDataTypes::Integer4:
-					case ProgramDataTypes::UnsignedInteger4:
-					case ProgramDataTypes::Double4:
-						return 4;
-
-					case ProgramDataTypes::Matrix4F:
-					case ProgramDataTypes::Matrix4D:
-						return 16;
-					}
-
-					return 0;
+					return GetComponentCount(m_Type);
 				}
 
 				String ToString(void) const
@@ -258,6 +226,43 @@ namespace Engine
 					}
 
 					return result;
+				}
+
+				static uint8 GetComponentCount(ProgramDataTypes Type)
+				{
+					switch (Type)
+					{
+					case ProgramDataTypes::Bool:
+					case ProgramDataTypes::Integer:
+					case ProgramDataTypes::UnsignedInteger:
+					case ProgramDataTypes::Float:
+					case ProgramDataTypes::Double:
+						return 1;
+
+					case ProgramDataTypes::Integer2:
+					case ProgramDataTypes::UnsignedInteger2:
+					case ProgramDataTypes::Float2:
+					case ProgramDataTypes::Double2:
+						return 2;
+
+					case ProgramDataTypes::Float3:
+					case ProgramDataTypes::Integer3:
+					case ProgramDataTypes::UnsignedInteger3:
+					case ProgramDataTypes::Double3:
+						return 3;
+
+					case ProgramDataTypes::Float4:
+					case ProgramDataTypes::Integer4:
+					case ProgramDataTypes::UnsignedInteger4:
+					case ProgramDataTypes::Double4:
+						return 4;
+
+					case ProgramDataTypes::Matrix4F:
+					case ProgramDataTypes::Matrix4D:
+						return 16;
+					}
+
+					return 0;
 				}
 
 			private:

@@ -126,6 +126,9 @@ namespace Engine
 					case Registers::InstanceID:
 						return "INSTANCE_ID";
 
+					case Registers::OutputControlPointID:
+						return "OUTPUT_CONTROL_POINT_ID";
+
 					case Registers::FragmentPosition:
 						return "FRAGMENT_POSITION";
 

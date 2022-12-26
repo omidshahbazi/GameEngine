@@ -70,7 +70,7 @@ namespace Engine
 			return true;
 		}
 
-		ProgramDataTypes IntrinsicsBuilder::EvaluateFunctionReturnValue(FunctionCallStatement* Statement) const
+		ProgramDataTypes IntrinsicsBuilder::EvaluateFunctionReturnValue(const FunctionCallStatement* Statement) const
 		{
 			auto function = FindOverride(Statement->GetFunctionName(), Statement->GetArguments()->GetItems());
 			if (function == nullptr)

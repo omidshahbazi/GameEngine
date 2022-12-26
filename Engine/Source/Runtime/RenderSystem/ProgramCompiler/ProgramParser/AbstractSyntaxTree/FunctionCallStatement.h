@@ -37,7 +37,12 @@ namespace Engine
 					m_FunctionName = FunctionName;
 				}
 
-				StatementItemHolder* GetArguments(void)
+				void AddArgument(Statement* Statement)
+				{
+					m_Arguments.AddItem(Statement);
+				}
+
+				const StatementItemHolder* GetArguments(void) const
 				{
 					return &m_Arguments;
 				}

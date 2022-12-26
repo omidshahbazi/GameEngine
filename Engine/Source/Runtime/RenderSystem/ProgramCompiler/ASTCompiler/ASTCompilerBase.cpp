@@ -104,6 +104,9 @@ namespace Engine
 				const ConstantEntrypointAttributeType* attrib = hullEntrypoint->GetAttribute<ConstantEntrypointAttributeType>();
 
 				int32 index = Data.Functions.FindIf([attrib](auto& item) { return item->GetName() == attrib->GetEntrypoint(); });
+				if (index == -1)
+					return nullptr;
+
 				return Data.Functions[index];
 			};
 
@@ -716,6 +719,8 @@ namespace Engine
 
 		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data)
 		{
+			CheckMemberAccess(Statement->GetLeft());
+
 			BuildStatement(Statement->GetLeft(), Data);
 
 			AddCode('.', Data);
@@ -1024,7 +1029,7 @@ namespace Engine
 			return elementCount;
 		}
 
-		DataTypeStatement ASTCompilerBase::EvaluateDataType(Statement* CurrentStatement, Statement* TopStatement) const
+		DataTypeStatement ASTCompilerBase::EvaluateDataType(const Statement* CurrentStatement, const Statement* TopStatement) const
 		{
 			static ProgramDataTypes MULTIPLY_RESULT[(uint8)ProgramDataTypes::Unknown][(uint8)ProgramDataTypes::Unknown] =
 			{
@@ -1051,9 +1056,9 @@ namespace Engine
 				/*Matrix4D*/			{ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,		ProgramDataTypes::Matrix4D,		ProgramDataTypes::Matrix4D,			ProgramDataTypes::Matrix4D,		ProgramDataTypes::Matrix4D,		ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,			ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,			ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,		ProgramDataTypes::Unknown,			ProgramDataTypes::Float4,		ProgramDataTypes::Double4,		ProgramDataTypes::Matrix4D,		ProgramDataTypes::Matrix4D	},
 			};
 
-			if (IsAssignableFrom(CurrentStatement, OperatorStatement))
+			if (IsAssignableFrom(CurrentStatement, const OperatorStatement))
 			{
-				OperatorStatement* stm = ReinterpretCast(OperatorStatement*, CurrentStatement);
+				const OperatorStatement* stm = ReinterpretCast(const OperatorStatement*, CurrentStatement);
 
 				DataTypeStatement leftType = EvaluateDataType(stm->GetLeft());
 				DataTypeStatement rightType = EvaluateDataType(stm->GetRight());
@@ -1089,21 +1094,21 @@ namespace Engine
 					return leftType;
 				}
 			}
-			else if (IsAssignableFrom(CurrentStatement, UnaryOperatorStatement))
+			else if (IsAssignableFrom(CurrentStatement, const UnaryOperatorStatement))
 			{
-				UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, CurrentStatement);
+				const UnaryOperatorStatement* stm = ReinterpretCast(const UnaryOperatorStatement*, CurrentStatement);
 
 				return EvaluateDataType(stm->GetStatement());
 			}
-			else if (IsAssignableFrom(CurrentStatement, ConstantStatement))
+			else if (IsAssignableFrom(CurrentStatement, const ConstantStatement))
 			{
-				ConstantStatement* stm = ReinterpretCast(ConstantStatement*, CurrentStatement);
+				const ConstantStatement* stm = ReinterpretCast(const ConstantStatement*, CurrentStatement);
 
 				return stm->GetType();
 			}
-			else if (IsAssignableFrom(CurrentStatement, FunctionCallStatement))
+			else if (IsAssignableFrom(CurrentStatement, const FunctionCallStatement))
 			{
-				FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, CurrentStatement);
+				const FunctionCallStatement* stm = ReinterpretCast(const FunctionCallStatement*, CurrentStatement);
 
 				const FunctionType* functionType = FindMatchingFunction(stm->GetFunctionName(), stm->GetArguments());
 				if (functionType != nullptr)
@@ -1115,9 +1120,9 @@ namespace Engine
 
 				return dataType;
 			}
-			else if (IsAssignableFrom(CurrentStatement, VariableAccessStatement))
+			else if (IsAssignableFrom(CurrentStatement, const VariableAccessStatement))
 			{
-				VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, CurrentStatement);
+				const VariableAccessStatement* stm = ReinterpretCast(const VariableAccessStatement*, CurrentStatement);
 
 				const String& variableName = stm->GetName();
 
@@ -1140,15 +1145,15 @@ namespace Engine
 
 				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't evaluate result of the statement", stm->ToString());
 			}
-			else if (IsAssignableFrom(CurrentStatement, ArrayElementAccessStatement))
+			else if (IsAssignableFrom(CurrentStatement, const ArrayElementAccessStatement))
 			{
-				ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, CurrentStatement);
+				const ArrayElementAccessStatement* stm = ReinterpretCast(const ArrayElementAccessStatement*, CurrentStatement);
 
 				return EvaluateDataType(stm->GetArrayStatement());
 			}
-			else if (IsAssignableFrom(CurrentStatement, MemberAccessStatement))
+			else if (IsAssignableFrom(CurrentStatement, const MemberAccessStatement))
 			{
-				MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, CurrentStatement);
+				const MemberAccessStatement* stm = ReinterpretCast(const MemberAccessStatement*, CurrentStatement);
 
 				DataTypeStatement leftDataType = EvaluateDataType(stm->GetLeft(), TopStatement);
 
@@ -1184,9 +1189,9 @@ namespace Engine
 				else
 					return EvaluateDataType(stm->GetRight(), stm->GetLeft());
 			}
-			else if (IsAssignableFrom(CurrentStatement, ArrayStatement))
+			else if (IsAssignableFrom(CurrentStatement, const ArrayStatement))
 			{
-				ArrayStatement* stm = ReinterpretCast(ArrayStatement*, CurrentStatement);
+				const ArrayStatement* stm = ReinterpretCast(const ArrayStatement*, CurrentStatement);
 
 				if (stm->GetItems().GetSize() == 0)
 					return ProgramDataTypes::Unknown;
@@ -1197,7 +1202,7 @@ namespace Engine
 			return ProgramDataTypes::Unknown;
 		}
 
-		ProgramDataTypes ASTCompilerBase::EvaluateProgramDataType(Statement* Statement) const
+		ProgramDataTypes ASTCompilerBase::EvaluateProgramDataType(const Statement* Statement) const
 		{
 			return EvaluateDataType(Statement).GetType();
 		}
@@ -1397,6 +1402,18 @@ namespace Engine
 				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find the variable", StructType->GetName());
 
 			return type;
+		}
+
+		void ASTCompilerBase::CheckMemberAccess(const Statement* LeftSide) const
+		{
+			if (IsAssignableFrom(LeftSide, const ArrayElementAccessStatement))
+				return;
+
+			DataTypeStatement dataType = EvaluateDataType(LeftSide);
+			if (!dataType.IsArray())
+				return;
+
+			THROW_PROGRAM_COMPILER_EXCEPTION("Array doesn't have any member to access", LeftSide->ToString());
 		}
 
 		void ASTCompilerBase::AddCode(const String& Value, StageData& Data)

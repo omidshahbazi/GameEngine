@@ -42,12 +42,7 @@ namespace Engine
 					return "SV_DomainLocation";
 
 				case StructVariableType::Registers::InstanceID:
-				{
-					if (Stage == Stages::Geometry)
-						return "SV_GSInstanceID";
-
-					return "SV_OutputControlPointID";
-				}
+					return "SV_GSInstanceID";
 
 				case StructVariableType::Registers::OutputControlPointID:
 					return "SV_OutputControlPointID";
@@ -379,7 +374,7 @@ namespace Engine
 				if (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain)
 				{
 					const ParameterType* param = Function->GetParameters()[0];
-					
+
 					if (funcType == FunctionType::Types::HullMain)
 						AddCode("InputPatch", Data);
 					else if (funcType == FunctionType::Types::DomainMain)

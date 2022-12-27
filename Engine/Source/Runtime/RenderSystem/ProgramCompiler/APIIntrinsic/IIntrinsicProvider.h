@@ -42,7 +42,7 @@ namespace Engine
 			class ICompiler
 			{
 			public:
-				virtual void BuildStatement(Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
+				virtual void BuildStatement(const Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const = 0;
 			};

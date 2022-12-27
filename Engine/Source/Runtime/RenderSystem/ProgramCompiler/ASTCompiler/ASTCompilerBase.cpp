@@ -175,7 +175,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::ValidateEntrypointFunction(FunctionType* Function, StageData& Data)
+		void ASTCompilerBase::ValidateEntrypointFunction(const FunctionType* Function, StageData& Data)
 		{
 			auto checkExistenceOfEntrypoint = [&](FunctionType::Types Type)
 			{
@@ -296,59 +296,59 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildAttribute(BaseAttributeType* Attribute, StageData& Data)
+		void ASTCompilerBase::BuildAttribute(const BaseAttributeType* Attribute, StageData& Data)
 		{
-			if (IsAssignableFrom(Attribute, DomainAttributeType))
+			if (IsAssignableFrom(Attribute, const DomainAttributeType))
 			{
-				DomainAttributeType* stm = ReinterpretCast(DomainAttributeType*, Attribute);
+				const DomainAttributeType* stm = ReinterpretCast(const DomainAttributeType*, Attribute);
 
 				BuildDomainAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, PartitioningAttributeType))
+			else if (IsAssignableFrom(Attribute, const PartitioningAttributeType))
 			{
-				PartitioningAttributeType* stm = ReinterpretCast(PartitioningAttributeType*, Attribute);
+				const PartitioningAttributeType* stm = ReinterpretCast(const PartitioningAttributeType*, Attribute);
 
 				BuildPartitioningAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, TopologyAttributeType))
+			else if (IsAssignableFrom(Attribute, const TopologyAttributeType))
 			{
-				TopologyAttributeType* stm = ReinterpretCast(TopologyAttributeType*, Attribute);
+				const TopologyAttributeType* stm = ReinterpretCast(const TopologyAttributeType*, Attribute);
 
 				BuildTopologyAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, ControlPointsAttributeType))
+			else if (IsAssignableFrom(Attribute, const ControlPointsAttributeType))
 			{
-				ControlPointsAttributeType* stm = ReinterpretCast(ControlPointsAttributeType*, Attribute);
+				const ControlPointsAttributeType* stm = ReinterpretCast(const ControlPointsAttributeType*, Attribute);
 
 				BuildControlPointsAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, ConstantEntrypointAttributeType))
+			else if (IsAssignableFrom(Attribute, const ConstantEntrypointAttributeType))
 			{
-				ConstantEntrypointAttributeType* stm = ReinterpretCast(ConstantEntrypointAttributeType*, Attribute);
+				const ConstantEntrypointAttributeType* stm = ReinterpretCast(const ConstantEntrypointAttributeType*, Attribute);
 
 				BuildConstantEntrypointAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, MaxVertexCountAttributeType))
+			else if (IsAssignableFrom(Attribute, const MaxVertexCountAttributeType))
 			{
-				MaxVertexCountAttributeType* stm = ReinterpretCast(MaxVertexCountAttributeType*, Attribute);
+				const MaxVertexCountAttributeType* stm = ReinterpretCast(const MaxVertexCountAttributeType*, Attribute);
 
 				BuildMaxVertexCountAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, PrimitiveTypeAttributeType))
+			else if (IsAssignableFrom(Attribute, const PrimitiveTypeAttributeType))
 			{
-				PrimitiveTypeAttributeType* stm = ReinterpretCast(PrimitiveTypeAttributeType*, Attribute);
+				const PrimitiveTypeAttributeType* stm = ReinterpretCast(const PrimitiveTypeAttributeType*, Attribute);
 
 				BuildPrimitiveTypeAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, OutputStreamTypeAttributeType))
+			else if (IsAssignableFrom(Attribute, const OutputStreamTypeAttributeType))
 			{
-				OutputStreamTypeAttributeType* stm = ReinterpretCast(OutputStreamTypeAttributeType*, Attribute);
+				const OutputStreamTypeAttributeType* stm = ReinterpretCast(const OutputStreamTypeAttributeType*, Attribute);
 
 				BuildOutputStreamTypeAttributeType(stm, Data);
 			}
-			else if (IsAssignableFrom(Attribute, ThreadCountAttributeType))
+			else if (IsAssignableFrom(Attribute, const ThreadCountAttributeType))
 			{
-				ThreadCountAttributeType* stm = ReinterpretCast(ThreadCountAttributeType*, Attribute);
+				const ThreadCountAttributeType* stm = ReinterpretCast(const ThreadCountAttributeType*, Attribute);
 
 				BuildThreadCountAttributeType(stm, Data);
 			}
@@ -369,7 +369,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildParameter(ParameterType* Parameter, StageData& Data)
+		void ASTCompilerBase::BuildParameter(const ParameterType* Parameter, StageData& Data)
 		{
 			BuildDataTypeStatement(Parameter->GetDataType(), Data);
 			AddCode(' ', Data);
@@ -383,7 +383,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildStatementHolder(StatementItemHolder* Holder, bool IncreamentBlock, StageData& Data)
+		void ASTCompilerBase::BuildStatementHolder(const StatementItemHolder* Holder, bool IncreamentBlock, StageData& Data)
 		{
 			if (IncreamentBlock)
 				IncreaseBlockIndex();
@@ -406,125 +406,125 @@ namespace Engine
 				DecreaseBlockIndex();
 		}
 
-		void ASTCompilerBase::BuildStatement(Statement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildStatement(const Statement* Statement, StageData& Data)
 		{
-			if (IsAssignableFrom(Statement, OperatorStatement))
+			if (IsAssignableFrom(Statement, const OperatorStatement))
 			{
-				OperatorStatement* stm = ReinterpretCast(OperatorStatement*, Statement);
+				const OperatorStatement* stm = ReinterpretCast(const OperatorStatement*, Statement);
 
 				BuildOperatorStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, UnaryOperatorStatement))
+			else if (IsAssignableFrom(Statement, const UnaryOperatorStatement))
 			{
-				UnaryOperatorStatement* stm = ReinterpretCast(UnaryOperatorStatement*, Statement);
+				const UnaryOperatorStatement* stm = ReinterpretCast(const UnaryOperatorStatement*, Statement);
 
 				BuildUnaryOperatorStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, ConstantStatement))
+			else if (IsAssignableFrom(Statement, const ConstantStatement))
 			{
-				ConstantStatement* stm = ReinterpretCast(ConstantStatement*, Statement);
+				const ConstantStatement* stm = ReinterpretCast(const ConstantStatement*, Statement);
 
 				BuildConstantStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, FunctionCallStatement))
+			else if (IsAssignableFrom(Statement, const FunctionCallStatement))
 			{
-				FunctionCallStatement* stm = ReinterpretCast(FunctionCallStatement*, Statement);
+				const FunctionCallStatement* stm = ReinterpretCast(const FunctionCallStatement*, Statement);
 
 				BuildFunctionCallStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, VariableStatement))
+			else if (IsAssignableFrom(Statement, const VariableStatement))
 			{
-				VariableStatement* stm = ReinterpretCast(VariableStatement*, Statement);
+				const VariableStatement* stm = ReinterpretCast(const VariableStatement*, Statement);
 
 				BuildVariableStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, VariableAccessStatement))
+			else if (IsAssignableFrom(Statement, const VariableAccessStatement))
 			{
-				VariableAccessStatement* stm = ReinterpretCast(VariableAccessStatement*, Statement);
+				const VariableAccessStatement* stm = ReinterpretCast(const VariableAccessStatement*, Statement);
 
 				BuildVariableAccessStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, ArrayElementAccessStatement))
+			else if (IsAssignableFrom(Statement, const ArrayElementAccessStatement))
 			{
-				ArrayElementAccessStatement* stm = ReinterpretCast(ArrayElementAccessStatement*, Statement);
+				const ArrayElementAccessStatement* stm = ReinterpretCast(const ArrayElementAccessStatement*, Statement);
 
 				BuildArrayElementAccessStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, MemberAccessStatement))
+			else if (IsAssignableFrom(Statement, const MemberAccessStatement))
 			{
-				MemberAccessStatement* stm = ReinterpretCast(MemberAccessStatement*, Statement);
+				const MemberAccessStatement* stm = ReinterpretCast(const MemberAccessStatement*, Statement);
 
 				BuildMemberAccessStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, IfStatement))
+			else if (IsAssignableFrom(Statement, const IfStatement))
 			{
-				IfStatement* stm = ReinterpretCast(IfStatement*, Statement);
+				const IfStatement* stm = ReinterpretCast(const IfStatement*, Statement);
 
 				BuildIfStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, ElseStatement))
+			else if (IsAssignableFrom(Statement, const ElseStatement))
 			{
-				ElseStatement* stm = ReinterpretCast(ElseStatement*, Statement);
+				const ElseStatement* stm = ReinterpretCast(const ElseStatement*, Statement);
 
 				BuildElseStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, SwitchStatement))
+			else if (IsAssignableFrom(Statement, const SwitchStatement))
 			{
-				SwitchStatement* stm = ReinterpretCast(SwitchStatement*, Statement);
+				const SwitchStatement* stm = ReinterpretCast(const SwitchStatement*, Statement);
 
 				BuildSwitchStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, CaseStatement))
+			else if (IsAssignableFrom(Statement, const CaseStatement))
 			{
-				CaseStatement* stm = ReinterpretCast(CaseStatement*, Statement);
+				const CaseStatement* stm = ReinterpretCast(const CaseStatement*, Statement);
 
 				BuildCaseStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, DefaultStatement))
+			else if (IsAssignableFrom(Statement, const DefaultStatement))
 			{
-				DefaultStatement* stm = ReinterpretCast(DefaultStatement*, Statement);
+				const DefaultStatement* stm = ReinterpretCast(const DefaultStatement*, Statement);
 
 				BuildDefaultStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, ForStatement))
+			else if (IsAssignableFrom(Statement, const ForStatement))
 			{
-				ForStatement* stm = ReinterpretCast(ForStatement*, Statement);
+				const ForStatement* stm = ReinterpretCast(const ForStatement*, Statement);
 
 				BuildForStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, DoStatement))
+			else if (IsAssignableFrom(Statement, const DoStatement))
 			{
-				DoStatement* stm = ReinterpretCast(DoStatement*, Statement);
+				const DoStatement* stm = ReinterpretCast(const DoStatement*, Statement);
 
 				BuildDoStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, WhileStatement))
+			else if (IsAssignableFrom(Statement, const WhileStatement))
 			{
-				WhileStatement* stm = ReinterpretCast(WhileStatement*, Statement);
+				const WhileStatement* stm = ReinterpretCast(const WhileStatement*, Statement);
 
 				BuildWhileStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, BreakStatement))
+			else if (IsAssignableFrom(Statement, const BreakStatement))
 			{
-				BreakStatement* stm = ReinterpretCast(BreakStatement*, Statement);
+				const BreakStatement* stm = ReinterpretCast(const BreakStatement*, Statement);
 
 				BuildBreakStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, ReturnStatement))
+			else if (IsAssignableFrom(Statement, const ReturnStatement))
 			{
-				ReturnStatement* stm = ReinterpretCast(ReturnStatement*, Statement);
+				const ReturnStatement* stm = ReinterpretCast(const ReturnStatement*, Statement);
 
 				BuildReturnStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, ArrayStatement))
+			else if (IsAssignableFrom(Statement, const ArrayStatement))
 			{
-				ArrayStatement* stm = ReinterpretCast(ArrayStatement*, Statement);
+				const ArrayStatement* stm = ReinterpretCast(const ArrayStatement*, Statement);
 
 				BuildArrayStatement(stm, Data);
 			}
-			else if (IsAssignableFrom(Statement, DiscardStatement))
+			else if (IsAssignableFrom(Statement, const DiscardStatement))
 			{
-				DiscardStatement* stm = ReinterpretCast(DiscardStatement*, Statement);
+				const DiscardStatement* stm = ReinterpretCast(const DiscardStatement*, Statement);
 
 				BuildDiscardStatement(stm, Data);
 			}
@@ -532,7 +532,7 @@ namespace Engine
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 		}
 
-		void ASTCompilerBase::BuildOperatorStatement(OperatorStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildOperatorStatement(const OperatorStatement* Statement, StageData& Data)
 		{
 			OperatorStatement::Operators op = Statement->GetOperator();
 
@@ -601,7 +601,7 @@ namespace Engine
 				AddCode(')', Data);
 		}
 
-		void ASTCompilerBase::BuildUnaryOperatorStatement(UnaryOperatorStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildUnaryOperatorStatement(const UnaryOperatorStatement* Statement, StageData& Data)
 		{
 			AddCode('(', Data);
 
@@ -628,7 +628,7 @@ namespace Engine
 			AddCode(')', Data);
 		}
 
-		void ASTCompilerBase::BuildConstantStatement(ConstantStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildConstantStatement(const ConstantStatement* Statement, StageData& Data)
 		{
 			if (Statement->GetType() == ProgramDataTypes::Bool)
 				AddCode(StringUtility::ToString<char8>(Statement->GetBool()), Data);
@@ -638,7 +638,7 @@ namespace Engine
 				AddCode(StringUtility::ToString<char8>(Statement->GetFloat32()), Data);
 		}
 
-		void ASTCompilerBase::BuildFunctionCallStatement(FunctionCallStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildFunctionCallStatement(const FunctionCallStatement* Statement, StageData& Data)
 		{
 			auto& funcName = Statement->GetFunctionName();
 
@@ -682,12 +682,12 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildArguments(StatementItemHolder* Statements, StageData& Data)
+		void ASTCompilerBase::BuildArguments(const StatementItemHolder* Statements, StageData& Data)
 		{
 			BuildArguments(Statements->GetItems(), Data);
 		}
 
-		void ASTCompilerBase::BuildVariableStatement(VariableStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildVariableStatement(const VariableStatement* Statement, StageData& Data)
 		{
 			if (FindVariableType(Statement->GetName(), true))
 				THROW_PROGRAM_COMPILER_EXCEPTION("Variable redifinition", Statement->GetName());
@@ -706,7 +706,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildArrayElementAccessStatement(ArrayElementAccessStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildArrayElementAccessStatement(const ArrayElementAccessStatement* Statement, StageData& Data)
 		{
 			BuildStatement(Statement->GetArrayStatement(), Data);
 
@@ -717,7 +717,7 @@ namespace Engine
 			AddCode(']', Data);
 		}
 
-		void ASTCompilerBase::BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data)
 		{
 			CheckMemberAccess(Statement->GetLeft());
 
@@ -728,7 +728,7 @@ namespace Engine
 			BuildStatement(Statement->GetRight(), Data);
 		}
 
-		void ASTCompilerBase::BuildIfStatement(IfStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildIfStatement(const IfStatement* Statement, StageData& Data)
 		{
 			AddCode("if (", Data);
 
@@ -752,7 +752,7 @@ namespace Engine
 				BuildStatement(Statement->GetElse(), Data);
 		}
 
-		void ASTCompilerBase::BuildElseStatement(ElseStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildElseStatement(const ElseStatement* Statement, StageData& Data)
 		{
 			AddCode("else", Data);
 
@@ -769,7 +769,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildSwitchStatement(SwitchStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildSwitchStatement(const SwitchStatement* Statement, StageData& Data)
 		{
 			AddCode("switch (", Data);
 
@@ -786,7 +786,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildCaseStatement(CaseStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildCaseStatement(const CaseStatement* Statement, StageData& Data)
 		{
 			AddCode("case ", Data);
 
@@ -809,7 +809,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildDefaultStatement(DefaultStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildDefaultStatement(const DefaultStatement* Statement, StageData& Data)
 		{
 			AddCode("default:", Data);
 			AddNewLine(Data);
@@ -828,7 +828,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildForStatement(ForStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildForStatement(const ForStatement* Statement, StageData& Data)
 		{
 			AddCode("for (", Data);
 
@@ -866,7 +866,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildDoStatement(DoStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildDoStatement(const DoStatement* Statement, StageData& Data)
 		{
 			AddCode("do", Data);
 			AddNewLine(Data);
@@ -881,7 +881,7 @@ namespace Engine
 			BuildStatement(Statement->GetWhile(), Data);
 		}
 
-		void ASTCompilerBase::BuildWhileStatement(WhileStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildWhileStatement(const WhileStatement* Statement, StageData& Data)
 		{
 			AddCode("while (", Data);
 
@@ -908,19 +908,19 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildContinueStatement(ContinueStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildContinueStatement(const ContinueStatement* Statement, StageData& Data)
 		{
 			AddCode("continue;", Data);
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildBreakStatement(BreakStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildBreakStatement(const BreakStatement* Statement, StageData& Data)
 		{
 			AddCode("break;", Data);
 			AddNewLine(Data);
 		}
 
-		void ASTCompilerBase::BuildDiscardStatement(DiscardStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildDiscardStatement(const DiscardStatement* Statement, StageData& Data)
 		{
 			if (Data.Stage != Stages::Fragment)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Not a valid statement in this stage", Statement->ToString());
@@ -929,7 +929,7 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		uint8 ASTCompilerBase::BuildReturnValue(Statement* Statement, StageData& Data)
+		uint8 ASTCompilerBase::BuildReturnValue(const Statement* Statement, StageData& Data)
 		{
 			uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
 
@@ -937,8 +937,7 @@ namespace Engine
 				return elementCount;
 			m_ReturnValueAlreadyBuilt = true;
 
-			bool isArray = IsAssignableFrom(Statement, ArrayStatement);
-
+			bool isArray = IsAssignableFrom(Statement, const ArrayStatement);
 			if (elementCount > 1 && !isArray)
 			{
 				return 0;
@@ -981,7 +980,7 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
+		void ASTCompilerBase::BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
 		{
 			DataTypeStatement sourceDataType = EvaluateDataType(Statement);
 			bool needsCasting = !CompareDataTypes(sourceDataType, *DataType);
@@ -1003,14 +1002,14 @@ namespace Engine
 				AddCode(')', Data);
 		}
 
-		void ASTCompilerBase::BuildExplicitCast(Statement* Statement, ProgramDataTypes DataType, StageData& Data)
+		void ASTCompilerBase::BuildExplicitCast(const Statement* Statement, ProgramDataTypes DataType, StageData& Data)
 		{
 			DataTypeStatement dataType = DataType;
 
 			BuildExplicitCast(Statement, &dataType, Data);
 		}
 
-		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(DataTypeStatement* Statement)
+		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(const DataTypeStatement* Statement)
 		{
 			if (Statement == nullptr)
 				return 0;
@@ -1281,9 +1280,9 @@ namespace Engine
 			m_BlockVariables.RemoveAt(m_BlockIndex--);
 		}
 
-		void ASTCompilerBase::PushVariable(VariableType* Variable)
+		void ASTCompilerBase::PushVariable(const VariableType* Variable)
 		{
-			m_BlockVariables[m_BlockIndex].Add(Variable);
+			m_BlockVariables[m_BlockIndex].Add(ConstCast(VariableType*, Variable));
 		}
 
 		const FunctionType* ASTCompilerBase::FindFunctionType(const String& Name) const

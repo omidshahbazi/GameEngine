@@ -209,7 +209,7 @@ namespace Engine
 				Data.Shader = rootSignature + Data.Shader;
 			}
 
-			void ASTToHLSLCompiler::BuildStruct(StructType* Struct, StageData& Data)
+			void ASTToHLSLCompiler::BuildStruct(const StructType* Struct, StageData& Data)
 			{
 				AddCode("struct ", Data);
 
@@ -256,7 +256,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToHLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, StageData& Data)
+			void ASTToHLSLCompiler::BuildGlobalVariable(const GlobalVariableType* Variable, StageData& Data)
 			{
 				DataTypeStatement* dataType = Variable->GetDataType();
 
@@ -317,7 +317,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToHLSLCompiler::BuildFunction(FunctionType* Function, StageData& Data)
+			void ASTToHLSLCompiler::BuildFunction(const FunctionType* Function, StageData& Data)
 			{
 				FunctionType::Types funcType = Function->GetType();
 
@@ -423,7 +423,7 @@ namespace Engine
 				AddCode("\")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildPartitioningAttributeType(PartitioningAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildPartitioningAttributeType(const PartitioningAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[partitioning(\"", Data);
 
@@ -432,7 +432,7 @@ namespace Engine
 				AddCode("\")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildTopologyAttributeType(TopologyAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildTopologyAttributeType(const TopologyAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[outputtopology(\"", Data);
 
@@ -450,7 +450,7 @@ namespace Engine
 				AddCode(")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildMaxVertexCountAttributeType(MaxVertexCountAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildMaxVertexCountAttributeType(const MaxVertexCountAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[maxvertexcount(", Data);
 
@@ -459,7 +459,7 @@ namespace Engine
 				AddCode(")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildConstantEntrypointAttributeType(ConstantEntrypointAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildConstantEntrypointAttributeType(const ConstantEntrypointAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[patchconstantfunc(\"", Data);
 
@@ -468,7 +468,7 @@ namespace Engine
 				AddCode("\")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildThreadCountAttributeType(ThreadCountAttributeType* Attribute, StageData& Data)
+			void ASTToHLSLCompiler::BuildThreadCountAttributeType(const ThreadCountAttributeType* Attribute, StageData& Data)
 			{
 				AddCode("[numthreads(", Data);
 
@@ -481,12 +481,12 @@ namespace Engine
 				AddCode(")]", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, StageData& Data)
+			void ASTToHLSLCompiler::BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data)
 			{
 				AddCode(Statement->GetName(), Data);
 			}
 
-			void ASTToHLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, StageData& Data)
+			void ASTToHLSLCompiler::BuildReturnStatement(const ReturnStatement* Statement, StageData& Data)
 			{
 				AddCode("return ", Data);
 
@@ -497,7 +497,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToHLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, StageData& Data)
+			void ASTToHLSLCompiler::BuildArrayStatement(const ArrayStatement* Statement, StageData& Data)
 			{
 				AddCode('{', Data);
 
@@ -635,7 +635,7 @@ namespace Engine
 				AddCode("\"\n", Data);
 			}
 
-			void ASTToHLSLCompiler::BuildStructVariable(StructVariableType* Variable, StageData& Data)
+			void ASTToHLSLCompiler::BuildStructVariable(const StructVariableType* Variable, StageData& Data)
 			{
 				BuildDataTypeStatement(Variable->GetDataType(), Data);
 

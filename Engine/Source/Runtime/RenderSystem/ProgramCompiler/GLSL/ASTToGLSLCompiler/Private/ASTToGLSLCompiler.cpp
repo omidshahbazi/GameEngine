@@ -234,7 +234,7 @@ namespace Engine
 				Data.Shader = header + Data.Shader;
 			}
 
-			void ASTToGLSLCompiler::BuildStruct(StructType* Struct, StageData& Data)
+			void ASTToGLSLCompiler::BuildStruct(const StructType* Struct, StageData& Data)
 			{
 				AddCode("struct ", Data);
 				AddCode(Struct->GetName(), Data);
@@ -266,7 +266,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildGlobalVariable(GlobalVariableType* Variable, StageData& Data)
+			void ASTToGLSLCompiler::BuildGlobalVariable(const GlobalVariableType* Variable, StageData& Data)
 			{
 				const String& name = Variable->GetName();
 				DataTypeStatement* dataType = Variable->GetDataType();
@@ -308,7 +308,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildFunction(FunctionType* Function, StageData& Data)
+			void ASTToGLSLCompiler::BuildFunction(const FunctionType* Function, StageData& Data)
 			{
 				FunctionType::Types funcType = Function->GetType();
 
@@ -403,12 +403,12 @@ namespace Engine
 				DecreaseBlockIndex();
 			}
 
-			void ASTToGLSLCompiler::BuildVariableAccessStatement(VariableAccessStatement* Statement, StageData& Data)
+			void ASTToGLSLCompiler::BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data)
 			{
 				AddCode(Statement->GetName(), Data);
 			}
 
-			void ASTToGLSLCompiler::BuildMemberAccessStatement(MemberAccessStatement* Statement, StageData& Data)
+			void ASTToGLSLCompiler::BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data)
 			{
 				if (IsEntrypointOrHullConstant(GetLastFunction(), Data))
 				{
@@ -485,7 +485,7 @@ namespace Engine
 				ASTCompilerBase::BuildMemberAccessStatement(Statement, Data);
 			}
 
-			void ASTToGLSLCompiler::BuildReturnStatement(ReturnStatement* Statement, StageData& Data)
+			void ASTToGLSLCompiler::BuildReturnStatement(const ReturnStatement* Statement, StageData& Data)
 			{
 				if (!IsEntrypointOrHullConstant(GetLastFunction(), Data))
 				{
@@ -558,7 +558,7 @@ namespace Engine
 				AddNewLine(Data);
 			}
 
-			void ASTToGLSLCompiler::BuildArrayStatement(ArrayStatement* Statement, StageData& Data)
+			void ASTToGLSLCompiler::BuildArrayStatement(const ArrayStatement* Statement, StageData& Data)
 			{
 				DataTypeStatement dataType = EvaluateDataType(Statement);
 
@@ -571,7 +571,7 @@ namespace Engine
 				AddCode(')', Data);
 			}
 
-			void ASTToGLSLCompiler::BuildExplicitCast(Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
+			void ASTToGLSLCompiler::BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
 			{
 				DataTypeStatement sourceDataType = EvaluateDataType(Statement);
 				bool needsCasting = !CompareDataTypes(sourceDataType, *DataType);

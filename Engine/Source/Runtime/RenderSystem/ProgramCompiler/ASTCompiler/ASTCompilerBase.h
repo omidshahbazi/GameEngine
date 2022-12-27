@@ -101,23 +101,41 @@ namespace Engine
 
 			virtual void BuildAttribute(const BaseAttributeType* Attribute, StageData& Data);
 
-			virtual void BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildPartitioningAttributeType(const PartitioningAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildPartitioningAttributeType(const PartitioningAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildTopologyAttributeType(const TopologyAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildTopologyAttributeType(const TopologyAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildConstantEntrypointAttributeType(const ConstantEntrypointAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildConstantEntrypointAttributeType(const ConstantEntrypointAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildMaxVertexCountAttributeType(const MaxVertexCountAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildMaxVertexCountAttributeType(const MaxVertexCountAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildPrimitiveTypeAttributeType(const PrimitiveTypeAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildPrimitiveTypeAttributeType(const PrimitiveTypeAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildOutputStreamTypeAttributeType(const OutputStreamTypeAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildOutputStreamTypeAttributeType(const OutputStreamTypeAttributeType* Attribute, StageData& Data)
+			{
+			}
 
-			virtual void BuildThreadCountAttributeType(const ThreadCountAttributeType* Attribute, StageData& Data) = 0;
+			virtual void BuildThreadCountAttributeType(const ThreadCountAttributeType* Attribute, StageData& Data)
+			{
+			}
 
 			virtual void BuildParameters(const ParameterList& Parameters, StageData& Data);
 

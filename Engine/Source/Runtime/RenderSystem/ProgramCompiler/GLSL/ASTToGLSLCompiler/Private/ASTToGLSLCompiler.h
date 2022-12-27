@@ -31,42 +31,6 @@ namespace Engine
 
 				virtual void BuildFunction(const FunctionType* Function, StageData& Data) override;
 
-				virtual void BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildPartitioningAttributeType(const PartitioningAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildTopologyAttributeType(const TopologyAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildControlPointsAttributeType(const ControlPointsAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildConstantEntrypointAttributeType(const ConstantEntrypointAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildMaxVertexCountAttributeType(const MaxVertexCountAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildPrimitiveTypeAttributeType(const PrimitiveTypeAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildOutputStreamTypeAttributeType(const OutputStreamTypeAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildThreadCountAttributeType(const ThreadCountAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
 				virtual void BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data) override;
 
 				virtual void BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data) override;

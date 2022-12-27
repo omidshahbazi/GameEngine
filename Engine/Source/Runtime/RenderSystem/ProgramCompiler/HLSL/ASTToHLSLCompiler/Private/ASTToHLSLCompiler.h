@@ -48,14 +48,6 @@ namespace Engine
 
 				virtual void BuildMaxVertexCountAttributeType(const MaxVertexCountAttributeType* Attribute, StageData& Data) override;
 
-				virtual void BuildPrimitiveTypeAttributeType(const PrimitiveTypeAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
-				virtual void BuildOutputStreamTypeAttributeType(const OutputStreamTypeAttributeType* Attribute, StageData& Data) override
-				{
-				}
-
 				virtual void BuildConstantEntrypointAttributeType(const ConstantEntrypointAttributeType* Attribute, StageData& Data)  override;
 
 				virtual void BuildThreadCountAttributeType(const ThreadCountAttributeType* Attribute, StageData& Data)  override;

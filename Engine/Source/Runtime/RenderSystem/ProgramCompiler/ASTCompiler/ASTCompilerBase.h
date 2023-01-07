@@ -39,6 +39,7 @@
 #include <ProgramParser\AbstractSyntaxTree\ArrayElementAccessStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\MemberAccessStatement.h>
 #include <ProgramParser\AbstractSyntaxTree\ArrayStatement.h>
+#include <Containers\Stack.h>
 #include <Allocators\AllocatorBase.h>
 
 namespace Engine
@@ -67,6 +68,7 @@ namespace Engine
 			typedef Map<String, String> OutputMap;
 			typedef Map<String, DataTypeStatement*> VariableTypeMap;
 			typedef Vector<VariableList> BlockVariablesList;
+			typedef Vector<const Statement*> StatementStack;
 
 		public:
 			ASTCompilerBase(void);
@@ -159,7 +161,7 @@ namespace Engine
 
 			virtual void BuildVariableStatement(const VariableStatement* Statement, StageData& Data);
 
-			virtual void BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data) = 0;
+			virtual void BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data);
 
 			virtual void BuildArrayElementAccessStatement(const ArrayElementAccessStatement* Statement, StageData& Data);
 
@@ -207,10 +209,13 @@ namespace Engine
 			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const;
 			void CheckForImplicitCast(const DataTypeStatement& Source, const DataTypeStatement& Destination) const;
 
+			void CheckVariableExsitence(const String& Name) const;
+
 			const VariableType* FindVariableType(const String& Name, bool LatestBlockOnly = false) const;
 			void IncreaseBlockIndex(void);
 			void DecreaseBlockIndex(void);
 			void PushVariable(const VariableType* Variable);
+			void IncreaseBlockIndexAndPushStructVariables(const StructType* Struct);
 
 			const FunctionType* FindFunctionType(const String& Name) const;
 			const FunctionType* FindMatchingFunction(const String& Name, const StatementItemHolder* Arguments) const;
@@ -226,7 +231,7 @@ namespace Engine
 			const StructVariableType* FindVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 			const StructVariableType* GetVariableType(const StructType* StructType, std::function<bool(const StructVariableType*)> Condition) const;
 
-			virtual void CheckMemberAccess(const Statement* LeftSide) const;
+			String StatementToString(const Statement* Statement, const StageData& Data);
 
 			void AddCode(const String& Value, StageData& Data);
 			void AddNewLine(StageData& Data);
@@ -268,6 +273,17 @@ namespace Engine
 				return m_LastFunction;
 			}
 
+			void PushDataAccessStatement(const Statement* Statement)
+			{
+				m_DataAccessStatements.Insert(0, Statement);
+			}
+			void PopDataAceessStatement(void)
+			{
+				CoreDebugAssert(Categories::ProgramCompiler, m_DataAccessStatements.GetSize() != 0, "A mismatch has happend in data-access stack");
+
+				m_DataAccessStatements.RemoveAt(0);
+			}
+
 			static cstr GetStageResultArrayVariableName(void);
 
 		private:
@@ -281,6 +297,8 @@ namespace Engine
 
 			const FunctionType* m_HullConstantFunction;
 			FunctionType* m_LastFunction;
+
+			StatementStack m_DataAccessStatements;
 
 			bool m_ReturnValueAlreadyBuilt;
 		};

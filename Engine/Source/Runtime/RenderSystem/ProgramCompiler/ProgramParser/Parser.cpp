@@ -183,8 +183,7 @@ namespace Engine
 			m_Allocator(Allocator),
 			m_Parameters(nullptr),
 			m_StructsStack(m_Allocator),
-			m_AttributesList(m_Allocator),
-			m_VariablesStack(m_Allocator)
+			m_AttributesList(m_Allocator)
 		{
 			m_KeywordParsers[IF] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseIfStatement(DeclarationToken); });
 			m_KeywordParsers[ELSE] = std::make_shared<KeywordParseFunction>([&](const Token& DeclarationToken) { return ParseElseStatement(DeclarationToken); });
@@ -216,8 +215,6 @@ namespace Engine
 
 			m_Parameters = &Parameters;
 
-			PushAVariableList();
-
 			while (true)
 			{
 				Token token;
@@ -237,10 +234,7 @@ namespace Engine
 					continue;
 			}
 
-			PopAVariableList();
-
 			CoreDebugAssert(Categories::RenderSystem, m_StructsStack.GetSize() == 0, "m_StructsStack didn't get evacuated from stack");
-			CoreDebugAssert(Categories::RenderSystem, m_VariablesStack.GetSize() == 0, "m_VariablesStack didn't get evacuated from stack");
 
 			m_Parameters = nullptr;
 		}
@@ -453,7 +447,6 @@ namespace Engine
 				}
 
 				m_Parameters->Variables.Add(variableType);
-				AddVariableToStack(variableType);
 			}
 			else
 				Deallocate(variableType);
@@ -515,8 +508,6 @@ namespace Engine
 
 			functionType->SetName(name);
 
-			PushAVariableList();
-
 			while (true)
 			{
 				if (MatchSymbol(CLOSE_BRACE))
@@ -532,13 +523,9 @@ namespace Engine
 				RequireToken(parameterToken, "function");
 
 				ParseParameter(parameterToken, parameterType);
-
-				AddVariableToStack(parameterType);
 			}
 
 			ParseScopedStatements(functionType, true, EndConditions::None);
-
-			PopAVariableList();
 
 			return true;
 		}
@@ -1106,8 +1093,6 @@ namespace Engine
 				stm->SetInitialStatement(ParseExpression(initialToken, ConditionMask));
 			}
 
-			AddVariableToStack(stm);
-
 			return stm;
 		}
 
@@ -1203,12 +1188,7 @@ namespace Engine
 				Token memberAccessToken;
 				RequireToken(memberAccessToken, "unary expression");
 
-				DataTypeStatement* parentDataType = nullptr;
-				VariableType* varType = FindVariableType(DeclarationToken.GetName());
-				if (varType != nullptr)
-					parentDataType = varType->GetDataType();
-
-				Statement* memberAccessStm = ParseMemberAccessStatement(memberAccessToken, stm, parentDataType);
+				Statement* memberAccessStm = ParseMemberAccessStatement(memberAccessToken, stm);
 				if (memberAccessStm != stm)
 					return memberAccessStm;
 
@@ -1356,12 +1336,7 @@ namespace Engine
 			Token token;
 			RequireToken(token, "variable access statement");
 
-			DataTypeStatement* parentDataType = nullptr;
-			VariableType* varType = FindVariableType(stm->GetName());
-			if (varType != nullptr)
-				parentDataType = varType->GetDataType();
-
-			return ParseMemberAccessStatement(token, stm, parentDataType);
+			return ParseMemberAccessStatement(token, stm);
 		}
 
 		Statement* Parser::ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement)
@@ -1376,12 +1351,8 @@ namespace Engine
 			return stm;
 		}
 
-		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, const DataTypeStatement* ParentDataType)
+		Statement* Parser::ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement)
 		{
-			StructType* parentStructType = nullptr;
-			if (ParentDataType != nullptr && !ParentDataType->IsBuiltIn())
-				parentStructType = FindStructType(ParentDataType->GetUserDefined());
-
 			if (DeclarationToken.Matches(DOT, Token::SearchCases::CaseSensitive))
 			{
 				MemberAccessStatement* stm = Allocate<MemberAccessStatement>();
@@ -1427,12 +1398,7 @@ namespace Engine
 			Token token;
 			RequireToken(token, "function call statement");
 
-			DataTypeStatement* parentDataType = nullptr;
-			FunctionType* funcType = FindFunctionType(stm->GetFunctionName());
-			if (funcType != nullptr)
-				parentDataType = funcType->GetReturnDataType();
-
-			return ParseMemberAccessStatement(token, stm, parentDataType);
+			return ParseMemberAccessStatement(token, stm);
 		}
 
 		bool Parser::IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask)
@@ -1452,62 +1418,6 @@ namespace Engine
 			UngetToken(DeclarationToken);
 
 			return true;
-		}
-
-		void Parser::PushAVariableList(void)
-		{
-			VariableList variables(m_Allocator);
-
-			m_VariablesStack.Push(variables);
-		}
-
-		void Parser::PopAVariableList(void)
-		{
-			m_VariablesStack.Pop();
-		}
-
-		void Parser::AddVariableToStack(VariableType* Variable)
-		{
-			CoreDebugAssert(Categories::ProgramCompiler, m_VariablesStack.GetSize() != 0, "There's nothing in the m_VariablesStack");
-
-			VariableList list(m_Allocator);
-			m_VariablesStack.Pop(&list);
-
-			list.Add(Variable);
-
-			m_VariablesStack.Push(list);
-		}
-
-		StructType* Parser::FindStructType(const String& Name)
-		{
-			int32 index = m_Parameters->Structs.FindIf([&Name](const auto structType) { return structType->GetName() == Name; });
-			if (index == -1)
-				return nullptr;
-
-			return m_Parameters->Structs[index];
-		}
-
-		VariableType* Parser::FindVariableType(const String& Name)
-		{
-			for (const auto& list : m_VariablesStack)
-			{
-				int32 index = list.FindIf([&Name](auto& variable) { return variable->GetName() == Name; });
-				if (index == -1)
-					continue;
-
-				return list[index];
-			}
-
-			return nullptr;
-		}
-
-		FunctionType* Parser::FindFunctionType(const String& Name)
-		{
-			int32 index = m_Parameters->Functions.FindIf([&Name](const auto structType) { return structType->GetName() == Name; });
-			if (index == -1)
-				return nullptr;
-
-			return m_Parameters->Functions[index];
 		}
 
 		ProgramDataTypes Parser::GetPrimitiveDataType(const String& Name)

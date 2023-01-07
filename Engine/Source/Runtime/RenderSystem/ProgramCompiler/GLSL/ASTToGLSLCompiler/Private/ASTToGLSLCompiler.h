@@ -31,7 +31,7 @@ namespace Engine
 
 				virtual void BuildFunction(const FunctionType* Function, StageData& Data) override;
 
-				virtual void BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data) override;
+				virtual void BuildFunctionCallStatement(const FunctionCallStatement* Statement, StageData& Data) override;
 
 				virtual void BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data) override;
 
@@ -45,15 +45,19 @@ namespace Engine
 
 				virtual void BuildPostDataType(const DataTypeStatement* Type, StageData& Data);
 
-				virtual void BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, StageData& Data);
+				virtual void BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, bool ExplicitArrayLength, StageData& Data);
 
 				virtual void BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data);
 
 				virtual void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data);
 
+				virtual String BuildSequentialVariable(const Statement* IntializerStatement, StageData& Data);
+				virtual String BuildSequentialVariable(const DataTypeStatement* DataType, const Statement* IntializerStatement, StageData& Data);
+
 			private:
 				uint8 m_AdditionalLayoutCount;
 				uint8 m_BindingCount;
+				uint32 m_SequentialVariableNumber = 0;
 			};
 		}
 	}

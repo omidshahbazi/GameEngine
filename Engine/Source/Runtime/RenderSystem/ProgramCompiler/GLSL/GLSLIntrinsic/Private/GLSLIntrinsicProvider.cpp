@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <GLSLIntrinsic\Private\GLSLIntrinsicProvider.h>
+#include <ProgramCompilerCommon\ProgramCompilerException.h>
 
 namespace Engine
 {
@@ -2057,6 +2058,9 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
+								if (Arguments.GetSize() != 1)
+									THROW_PROGRAM_COMPILER_EXCEPTION("Not enough arguments for AppendToStrea", String::Empty);
+
 								Shader += "EmitVertex();\n";
 							});
 					}
@@ -2071,6 +2075,9 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
+								if (Arguments.GetSize() != 0)
+									THROW_PROGRAM_COMPILER_EXCEPTION("Not enough arguments for RestartStrip", String::Empty);
+
 								Shader += "EndPrimitive();\n";
 							});
 					}

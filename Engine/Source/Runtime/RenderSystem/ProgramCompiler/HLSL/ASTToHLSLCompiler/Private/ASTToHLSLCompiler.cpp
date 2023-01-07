@@ -348,8 +348,6 @@ namespace Engine
 				else
 					AddCode(Function->GetName(), Data);
 
-				IncreaseBlockIndex();
-
 				AddCode('(', Data);
 
 				if (funcType == FunctionType::Types::GeometryMain)
@@ -403,15 +401,13 @@ namespace Engine
 
 				AddNewLine(Data);
 
-				BuildStatementHolder(Function, false, Data);
+				BuildStatementHolder(Function, true, Data);
 
 				--Data.IndentOffset;
 				AddCode('}', Data);
 				++Data.IndentOffset;
 
 				AddNewLine(Data);
-
-				DecreaseBlockIndex();
 			}
 
 			void ASTToHLSLCompiler::BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data)
@@ -479,11 +475,6 @@ namespace Engine
 				AddCode(StringUtility::ToString<char8>(Attribute->GetZCount()), Data);
 
 				AddCode(")]", Data);
-			}
-
-			void ASTToHLSLCompiler::BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data)
-			{
-				AddCode(Statement->GetName(), Data);
 			}
 
 			void ASTToHLSLCompiler::BuildReturnStatement(const ReturnStatement* Statement, StageData& Data)

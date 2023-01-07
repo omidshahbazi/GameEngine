@@ -36,7 +36,6 @@ namespace Engine
 
 			typedef Vector<StructType*> StructList;
 			typedef Stack<StructType*> StructStack;
-			typedef Vector<VariableType*> VariableList;
 			typedef Vector<GlobalVariableType*> GlobalVariableList;
 			typedef Vector<BaseAttributeType*> AttributeList;
 			typedef Vector<FunctionType*> FunctionList;
@@ -65,7 +64,6 @@ namespace Engine
 			typedef std::function<BaseAttributeType* (const Token& DeclarationToken)> AttributeParseFunction;
 			typedef std::shared_ptr<AttributeParseFunction> AttributeParseFunctionPtr;
 			typedef Map<String, AttributeParseFunctionPtr> AttributeParseMap;
-			typedef Stack<VariableList> VariablesStack;
 
 		public:
 			struct Parameters
@@ -131,18 +129,10 @@ namespace Engine
 			Statement* ParseConstantStatement(const Token& DeclarationToken);
 			Statement* ParseVariableAccessStatement(const Token& DeclarationToken);
 			Statement* ParseArrayElementAccessStatement(const Token& DeclarationToken, Statement* ArrayStatement);
-			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement, const DataTypeStatement* ParentDataType);
+			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement);
 			Statement* ParseFunctionCallStatement(const Token& DeclarationToken);
 
 			bool IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask);
-
-			void PushAVariableList(void);
-			void PopAVariableList(void);
-			void AddVariableToStack(VariableType* Variable);
-
-			StructType* FindStructType(const String& Name);
-			VariableType* FindVariableType(const String& Name);
-			FunctionType* FindFunctionType(const String& Name);
 
 			template<typename T>
 			INLINE T* Allocate(void)
@@ -177,7 +167,6 @@ namespace Engine
 			Parameters* m_Parameters;
 			StructStack m_StructsStack;
 			AttributeList m_AttributesList;
-			VariablesStack m_VariablesStack;
 		};
 	}
 }

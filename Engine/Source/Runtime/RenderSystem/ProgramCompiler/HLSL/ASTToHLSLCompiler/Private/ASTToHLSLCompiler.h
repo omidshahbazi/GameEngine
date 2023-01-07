@@ -52,8 +52,6 @@ namespace Engine
 
 				virtual void BuildThreadCountAttributeType(const ThreadCountAttributeType* Attribute, StageData& Data)  override;
 
-				virtual void BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data) override;
-
 				virtual void BuildReturnStatement(const ReturnStatement* Statement, StageData& Data) override;
 
 				virtual void BuildArrayStatement(const ArrayStatement* Statement, StageData& Data) override;

@@ -163,6 +163,8 @@ namespace Engine
 				m_Functions.Add(function);
 				m_LastFunction = function;
 
+				IncreaseBlockIndex();
+
 				for (auto parameter : function->GetParameters())
 					PushVariable(parameter);
 
@@ -172,6 +174,8 @@ namespace Engine
 					ValidateEntrypointFunction(function, data);
 
 				BuildFunction(function, data);
+
+				DecreaseBlockIndex();
 			}
 		}
 
@@ -706,6 +710,13 @@ namespace Engine
 			}
 		}
 
+		void ASTCompilerBase::BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data)
+		{
+			CheckVariableExsitence(Statement->GetName());
+
+			AddCode(Statement->GetName(), Data);
+		}
+
 		void ASTCompilerBase::BuildArrayElementAccessStatement(const ArrayElementAccessStatement* Statement, StageData& Data)
 		{
 			BuildStatement(Statement->GetArrayStatement(), Data);
@@ -719,13 +730,22 @@ namespace Engine
 
 		void ASTCompilerBase::BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data)
 		{
-			CheckMemberAccess(Statement->GetLeft());
+			//CheckMemberAccess(Statement->GetLeft());
+
+			PushDataAccessStatement(Statement->GetLeft());
 
 			BuildStatement(Statement->GetLeft(), Data);
 
 			AddCode('.', Data);
 
+			DataTypeStatement dataType = EvaluateDataType(Statement->GetLeft());
+			IncreaseBlockIndexAndPushStructVariables(FindStructType(dataType.GetUserDefined()));
+
 			BuildStatement(Statement->GetRight(), Data);
+
+			DecreaseBlockIndex();
+
+			PopDataAceessStatement();
 		}
 
 		void ASTCompilerBase::BuildIfStatement(const IfStatement* Statement, StageData& Data)
@@ -1243,6 +1263,137 @@ namespace Engine
 			THROW_PROGRAM_COMPILER_EXCEPTION("Casting is not applicable", Source.ToString() + " to " + Destination.ToString());
 		}
 
+		void ASTCompilerBase::CheckVariableExsitence(const String& Name) const
+		{
+			//void CheckMemberAccess(const Statement * LeftSide)
+			//{
+			//	if (IsAssignableFrom(LeftSide, const ArrayElementAccessStatement))
+			//		return;
+
+			//	DataTypeStatement dataType = EvaluateDataType(LeftSide);
+			//	if (!dataType.IsArray())
+			//		return;
+
+			//	THROW_PROGRAM_COMPILER_EXCEPTION("Array doesn't have any member to access", LeftSide->ToString());
+			//}
+
+			auto checkVariableInParent = [this, &Name](const DataTypeStatement* ParentDataType)
+			{
+				if (ParentDataType->IsBuiltIn())
+				{
+					auto checkSwizzling = [&Name](const char8* ValidSwizzles, uint8 Length)
+					{
+						for (uint8 i = 0; i < Name.GetLength(); ++i)
+						{
+							char8 c = Name[i];
+
+							bool found = false;
+							for (uint8 j = 0; j < Length; ++j)
+							{
+								if (c != ValidSwizzles[j])
+									continue;
+
+								found = true;
+								break;
+							}
+							if (found)
+								continue;
+
+							THROW_PROGRAM_COMPILER_EXCEPTION("Invalid swizzle", String(c));
+						}
+					};
+
+					switch (ParentDataType->GetType())
+					{
+					case ProgramDataTypes::Void:
+					case ProgramDataTypes::Bool:
+					case ProgramDataTypes::Integer:
+					case ProgramDataTypes::UnsignedInteger:
+					case ProgramDataTypes::Float:
+					case ProgramDataTypes::Double:
+					case ProgramDataTypes::Texture2D:
+						THROW_PROGRAM_COMPILER_EXCEPTION("Data type hasn't any member", ParentDataType->ToString());
+
+					case ProgramDataTypes::Integer2:
+					case ProgramDataTypes::UnsignedInteger2:
+					case ProgramDataTypes::Float2:
+					case ProgramDataTypes::Double2:
+					{
+						const char8 VALID_SWIZZLES[] = { 'x', 'y', 'r', 'g', 's', 't' };
+
+						checkSwizzling(VALID_SWIZZLES, _countof(VALID_SWIZZLES));
+
+						return true;
+					}
+
+					case ProgramDataTypes::Integer3:
+					case ProgramDataTypes::UnsignedInteger3:
+					case ProgramDataTypes::Float3:
+					case ProgramDataTypes::Double3:
+					{
+						const char8 VALID_SWIZZLES[] = { 'x', 'y', 'z', 'r', 'g', 'b', 's', 't', 'p' };
+
+						checkSwizzling(VALID_SWIZZLES, _countof(VALID_SWIZZLES));
+
+						return true;
+					}
+
+					case ProgramDataTypes::Integer4:
+					case ProgramDataTypes::UnsignedInteger4:
+					case ProgramDataTypes::Float4:
+					case ProgramDataTypes::Double4:
+					{
+						const char8 VALID_SWIZZLES[] = { 'x', 'y', 'z', 'w', 'r', 'g', 'b', 'a', 's', 't', 'p', 'q' };
+
+						checkSwizzling(VALID_SWIZZLES, _countof(VALID_SWIZZLES));
+
+						return true;
+					}
+
+					case ProgramDataTypes::Matrix4F:
+					case ProgramDataTypes::Matrix4D:
+						break;
+					}
+				}
+				else
+				{
+					return (FindVariableType(FindStructType(ParentDataType->GetUserDefined()), Name) != nullptr);
+				}
+
+				return false;
+			};
+
+			if (m_DataAccessStatements.GetSize() != 0)
+			{
+				const Statement* statement = m_DataAccessStatements[0];
+
+				if (IsAssignableFrom(statement, const VariableAccessStatement))
+				{
+					const VariableAccessStatement* stm = ReinterpretCast(const VariableAccessStatement*, statement);
+
+					const VariableType* type = FindVariableType(stm->GetName());
+					if (type != nullptr && checkVariableInParent(type->GetDataType()))
+						return;
+				}
+				else if (IsAssignableFrom(statement, const ArrayElementAccessStatement))
+				{
+					const ArrayElementAccessStatement* stm = ReinterpretCast(const ArrayElementAccessStatement*, statement);
+
+					DataTypeStatement dataType = EvaluateDataType(stm->GetArrayStatement());
+					if (checkVariableInParent(&dataType))
+						return;
+				}
+			}
+
+			//if (m_CurrentDataType != nullptr && m_CurrentDataType->IsBuiltIn())
+				//return;
+
+			if (FindVariableType(Name) != nullptr)
+				return;
+
+			THROW_PROGRAM_COMPILER_EXCEPTION("Variable not defined", Name);
+		}
+
 		const VariableType* ASTCompilerBase::FindVariableType(const String& Name, bool LatestBlockOnly) const
 		{
 			for (int8 i = m_BlockVariables.GetSize() - 1; i >= 0; --i)
@@ -1283,6 +1434,14 @@ namespace Engine
 		void ASTCompilerBase::PushVariable(const VariableType* Variable)
 		{
 			m_BlockVariables[m_BlockIndex].Add(ConstCast(VariableType*, Variable));
+		}
+
+		void ASTCompilerBase::IncreaseBlockIndexAndPushStructVariables(const StructType* Struct)
+		{
+			IncreaseBlockIndex();
+
+			for (const auto& variable : Struct->GetItems())
+				PushVariable(variable);
 		}
 
 		const FunctionType* ASTCompilerBase::FindFunctionType(const String& Name) const
@@ -1403,16 +1562,13 @@ namespace Engine
 			return type;
 		}
 
-		void ASTCompilerBase::CheckMemberAccess(const Statement* LeftSide) const
+		String ASTCompilerBase::StatementToString(const Statement* Statement, const StageData& Data)
 		{
-			if (IsAssignableFrom(LeftSide, const ArrayElementAccessStatement))
-				return;
+			String stmStr;
+			StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, stmStr, 0 };
+			BuildStatement(Statement, data);
 
-			DataTypeStatement dataType = EvaluateDataType(LeftSide);
-			if (!dataType.IsArray())
-				return;
-
-			THROW_PROGRAM_COMPILER_EXCEPTION("Array doesn't have any member to access", LeftSide->ToString());
+			return stmStr;
 		}
 
 		void ASTCompilerBase::AddCode(const String& Value, StageData& Data)

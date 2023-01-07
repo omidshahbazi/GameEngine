@@ -175,6 +175,46 @@ namespace Engine
 				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
+			String GetPrimitiveType(PrimitiveTypeAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case PrimitiveTypeAttributeType::Types::Point:
+					return "points";
+
+				case PrimitiveTypeAttributeType::Types::Line:
+					return "lines";
+
+				case PrimitiveTypeAttributeType::Types::Triangle:
+					return "triangles";
+
+				case PrimitiveTypeAttributeType::Types::LineAdjacency:
+					return "lines_adjacency";
+
+				case PrimitiveTypeAttributeType::Types::TriangleAdjacency:
+					return "triangles_adjacency";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
+			String GetOutputStreamType(OutputStreamTypeAttributeType::Types Type)
+			{
+				switch (Type)
+				{
+				case OutputStreamTypeAttributeType::Types::Point:
+					return "points";
+
+				case OutputStreamTypeAttributeType::Types::Line:
+					return "line_strip";
+
+				case OutputStreamTypeAttributeType::Types::Triangle:
+					return "triangle_strip";
+				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+			}
+
 			String GetFragmentVariableName(uint8 Index)
 			{
 				return String(Constants::FRAGMENT_ENTRY_POINT_NAME) + "_FragColor" + StringUtility::ToString<char8>(Index);
@@ -182,7 +222,8 @@ namespace Engine
 
 			ASTToGLSLCompiler::ASTToGLSLCompiler() :
 				m_AdditionalLayoutCount(0),
-				m_BindingCount(0)
+				m_BindingCount(0),
+				m_SequentialVariableNumber(0)
 			{
 			}
 
@@ -192,6 +233,7 @@ namespace Engine
 
 				m_AdditionalLayoutCount = SubMeshInfo::GetLayoutCount();
 				m_BindingCount = 0;
+				m_SequentialVariableNumber = 0;
 			}
 
 			void ASTToGLSLCompiler::BuildStageShader(StageData& Data)
@@ -229,6 +271,27 @@ namespace Engine
 					header += GetTopologyType(topologyAttrib->GetType());
 
 					header += ") in;\n";
+				}
+				else if (Data.Stage == Stages::Geometry)
+				{
+					const FunctionType* geometryEntrypoint = GetEntrypointFunctionType(FunctionType::Types::GeometryMain, Data);
+
+					header += "layout (";
+
+					const PrimitiveTypeAttributeType* primitiveTypeAttrib = geometryEntrypoint->GetAttribute<PrimitiveTypeAttributeType>();
+					header += GetPrimitiveType(primitiveTypeAttrib->GetType());
+					header += ") in;\n";
+
+					header += "layout (";
+
+					const OutputStreamTypeAttributeType* outputStreamTypeAttrib = geometryEntrypoint->GetAttribute<OutputStreamTypeAttributeType>();
+					header += GetOutputStreamType(outputStreamTypeAttrib->GetType());
+					header += ", max_vertices = ";
+
+					const MaxVertexCountAttributeType* maxVertexCountAttrib = geometryEntrypoint->GetAttribute<MaxVertexCountAttributeType>();
+					header += StringUtility::ToString<char8>(maxVertexCountAttrib->GetCount());
+
+					header += ") out;\n";
 				}
 
 				Data.Shader = header + Data.Shader;
@@ -312,18 +375,18 @@ namespace Engine
 			{
 				FunctionType::Types funcType = Function->GetType();
 
-				if (funcType == FunctionType::Types::VertexMain ||
-					funcType == FunctionType::Types::HullMain ||
-					IsHullConstant(Function, Data) ||
-					funcType == FunctionType::Types::DomainMain ||
-					funcType == FunctionType::Types::FragmentMain)
+				if (IsEntrypointOrHullConstant(Function, Data))
 				{
-					const bool inputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain);
+					const bool inputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain);
 					const auto* parameter = Function->GetParameters()[0];
-					BuildInputOutputStruct(parameter->GetDataType(), parameter->GetName(), true, inputHaveToConvertToArray, Data);
+					BuildInputOutputStruct(parameter->GetDataType(), parameter->GetName(), true, inputHaveToConvertToArray, (funcType == FunctionType::Types::GeometryMain), Data);
 
-					const bool outputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain);
-					BuildInputOutputStruct(Function->GetReturnDataType(), String::Empty, false, outputHaveToConvertToArray, Data);
+					if (funcType != FunctionType::Types::GeometryMain &&
+						funcType != FunctionType::Types::ComputeMain)
+					{
+						const bool outputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain);
+						BuildInputOutputStruct(Function->GetReturnDataType(), String::Empty, false, outputHaveToConvertToArray, false, Data);
+					}
 				}
 
 				if (funcType == FunctionType::Types::FragmentMain)
@@ -355,8 +418,6 @@ namespace Engine
 					AddCode(Constants::ENTRY_POINT_NAME, Data);
 				else
 					AddCode(Function->GetName(), Data);
-
-				IncreaseBlockIndex();
 
 				AddCode('(', Data);
 
@@ -392,43 +453,65 @@ namespace Engine
 					AddNewLine(Data);
 				}
 
-				BuildStatementHolder(Function, false, Data);
+				BuildStatementHolder(Function, true, Data);
 
 				--Data.IndentOffset;
 				AddCode('}', Data);
 				++Data.IndentOffset;
 
 				AddNewLine(Data);
-
-				DecreaseBlockIndex();
 			}
 
-			void ASTToGLSLCompiler::BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data)
+			void ASTToGLSLCompiler::BuildFunctionCallStatement(const FunctionCallStatement* Statement, StageData& Data)
 			{
-				AddCode(Statement->GetName(), Data);
+				if (Data.FunctionType == FunctionType::Types::GeometryMain)
+				{
+					String temp;
+					if (IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Data.FunctionType, Data.Stage, temp))
+					{
+						if (temp.StartsWith("EmitVertex"))
+						{
+							const String& returnDataType = GetEntrypointFunctionType(FunctionType::Types::GeometryMain, Data)->GetAttribute<OutputStreamTypeAttributeType>()->GetDataType();
+
+							auto* argument = Statement->GetArguments()->GetItems()[0];
+							DataTypeStatement dataType = EvaluateDataType(argument);
+
+							if (dataType.GetUserDefined() != returnDataType)
+								THROW_PROGRAM_COMPILER_EXCEPTION("Invalid data-type to append to the output stream", dataType.GetUserDefined());
+
+							const String varName = BuildSequentialVariable(&dataType, argument, Data);
+
+
+						}
+					}
+				}
+
+				ASTCompilerBase::BuildFunctionCallStatement(Statement, Data);
 			}
 
 			void ASTToGLSLCompiler::BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data)
 			{
+				bool handled = false;
+
 				if (IsEntrypointOrHullConstant(GetLastFunction(), Data))
 				{
-					String leftStm;
-					StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, leftStm, 0 };
-
+					String leftStm = String::Empty;
 					ArrayElementAccessStatement* leftAsArrayElementAccess = nullptr;
 					if (IsAssignableFrom(Statement->GetLeft(), ArrayElementAccessStatement))
 					{
 						leftAsArrayElementAccess = ReinterpretCast(ArrayElementAccessStatement*, Statement->GetLeft());
-						BuildStatement(leftAsArrayElementAccess->GetArrayStatement(), data);
+						leftStm = StatementToString(leftAsArrayElementAccess->GetArrayStatement(), Data);
 					}
 					else
-						BuildStatement(Statement->GetLeft(), data);
+						leftStm = StatementToString(Statement->GetLeft(), Data);
 
-					CheckMemberAccess(Statement->GetLeft());
+					//CheckMemberAccess(Statement->GetLeft());
 
 					const VariableType* leftVariable = FindVariableType(leftStm);
 					if (leftVariable != nullptr)
 					{
+						PushDataAccessStatement(Statement->GetLeft());
+
 						bool isParameter = IsAssignableFrom(leftVariable, const ParameterType);
 						bool isOutputVariable = (IsAssignableFrom(leftVariable, const VariableStatement) && leftVariable->GetDataType()->GetUserDefined() == GetLastFunction()->GetReturnDataType()->GetUserDefined());
 
@@ -443,9 +526,9 @@ namespace Engine
 							bool isMemberAccess = IsAssignableFrom(Statement->GetRight(), MemberAccessStatement);
 							auto* rightStatement = (isMemberAccess ? ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetLeft() : Statement->GetRight());
 
-							String rightStm;
-							StageData data = { Data.FunctionType, Data.Stage, Data.Structs, Data.Variables, Data.Functions, rightStm, 0 };
-							BuildStatement(rightStatement, data);
+							IncreaseBlockIndexAndPushStructVariables(structType);
+
+							String rightStm = StatementToString(rightStatement, Data);
 							rightStm = rightStm.Split('.')[0];
 
 							const StructVariableType* rightVariable = GetVariableType(structType, rightStm);
@@ -453,7 +536,8 @@ namespace Engine
 							BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Data);
 
 							if (Data.FunctionType == FunctionType::Types::HullMain ||
-								Data.FunctionType == FunctionType::Types::DomainMain)
+								Data.FunctionType == FunctionType::Types::DomainMain ||
+								Data.FunctionType == FunctionType::Types::GeometryMain)
 							{
 								if (isOutputVariable && Data.FunctionType == FunctionType::Types::HullMain)
 								{
@@ -470,6 +554,8 @@ namespace Engine
 								}
 							}
 
+							PushDataAccessStatement(rightStatement);
+
 							if (isMemberAccess)
 							{
 								AddCode('.', Data);
@@ -477,12 +563,19 @@ namespace Engine
 								BuildStatement(ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetRight(), Data);
 							}
 
-							return;
+							DecreaseBlockIndex();
+
+							PopDataAceessStatement();
+
+							handled = true;
 						}
+
+						PopDataAceessStatement();
 					}
 				}
 
-				ASTCompilerBase::BuildMemberAccessStatement(Statement, Data);
+				if (!handled)
+					ASTCompilerBase::BuildMemberAccessStatement(Statement, Data);
 			}
 
 			void ASTToGLSLCompiler::BuildReturnStatement(const ReturnStatement* Statement, StageData& Data)
@@ -499,7 +592,7 @@ namespace Engine
 					return;
 				}
 
-				const String& returnDataType = GetLastFunction()->GetReturnDataType()->GetUserDefined();
+				const String returnDataType = GetLastFunction()->GetReturnDataType()->GetUserDefined();
 				const StructType* structType = GetStructType(returnDataType);
 				const StructVariableType* variableType = nullptr;
 
@@ -688,7 +781,7 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, StageData& Data)
+			void ASTToGLSLCompiler::BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, bool ExplicitArrayLength, StageData& Data)
 			{
 				CoreDebugAssert(Categories::ProgramCompiler, !DataType->IsBuiltIn(), "DataType must be user-defined");
 
@@ -720,7 +813,14 @@ namespace Engine
 					BuildFlattenStructMemberVariableName(structType, variable, Name, IsInput, Data);
 
 					if (ConvertToArray)
-						AddCode("[]", Data);
+					{
+						AddCode('[', Data);
+
+						if (ExplicitArrayLength && DataType->GetPostElementCount() != nullptr)
+							BuildStatement(DataType->GetPostElementCount(), Data);
+
+						AddCode(']', Data);
+					}
 
 					AddCode(';', Data);
 
@@ -795,6 +895,27 @@ namespace Engine
 				AddCode(Parent->GetName(), Data);
 				AddCode('_', Data);
 				AddCode(Variable->GetName(), Data);
+			}
+
+			String ASTToGLSLCompiler::BuildSequentialVariable(const Statement* IntializerStatement, StageData& Data)
+			{
+				DataTypeStatement dataType = EvaluateDataType(IntializerStatement);
+				return BuildSequentialVariable(&dataType, IntializerStatement, Data);
+			}
+
+			String ASTToGLSLCompiler::BuildSequentialVariable(const DataTypeStatement* DataType, const Statement* IntializerStatement, StageData& Data)
+			{
+				const String varName = '_' + StringUtility::ToString<char8>(++m_SequentialVariableNumber);
+
+				BuildDataTypeStatement(DataType, Data);
+				AddCode(' ', Data);
+				AddCode(varName, Data);
+				AddCode(" = ", Data);
+				BuildStatement(IntializerStatement, Data);
+				AddCode(';', Data);
+				AddNewLine(Data);
+
+				return varName;
 			}
 		}
 	}

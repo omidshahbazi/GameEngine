@@ -75,7 +75,7 @@ namespace Engine
 				{
 				case StructVariableType::Registers::Position:
 				{
-					if (Stage == Stages::Geometry)
+					if (Stage == Stages::Fragment)
 						return "gl_FragCoord";
 
 					return "gl_Position";
@@ -407,6 +407,8 @@ namespace Engine
 					}
 				}
 
+				--Data.IndentOffset;
+
 				if (IsEntrypointOrHullConstant(Function, Data))
 					BuildType(ProgramDataTypes::Void, Data);
 				else
@@ -432,9 +434,7 @@ namespace Engine
 				AddCode(')', Data);
 				AddNewLine(Data);
 
-				--Data.IndentOffset;
 				AddCode('{', Data);
-				++Data.IndentOffset;
 
 				AddNewLine(Data);
 
@@ -455,8 +455,8 @@ namespace Engine
 
 				BuildStatementHolder(Function, true, Data);
 
-				--Data.IndentOffset;
 				AddCode('}', Data);
+
 				++Data.IndentOffset;
 
 				AddNewLine(Data);
@@ -481,7 +481,24 @@ namespace Engine
 
 							const String varName = BuildSequentialVariable(&dataType, argument, Data);
 
+							auto* structType = GetStructType(dataType.GetUserDefined());
 
+							for (auto& variable : structType->GetItems())
+							{
+								if (variable->GetRegister() == StructVariableType::Registers::None || variable->GetRegisterIndex() != 0)
+									continue;
+
+								if (IsVertexLayout(variable->GetRegister()) && variable->GetRegister() != StructVariableType::Registers::Position)
+									continue;
+
+								AddCode(GetSystemValue(variable->GetRegister(), Data.Stage), Data);
+								AddCode(" = ", Data);
+								AddCode(varName, Data);
+								AddCode('.', Data);
+								AddCode(variable->GetName(), Data);
+								AddCode(';', Data);
+								AddNewLine(Data);
+							}
 						}
 					}
 				}

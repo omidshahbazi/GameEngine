@@ -339,6 +339,8 @@ namespace Engine
 
 				BuildAttributes(Function->GetAttributes(), Data);
 
+				--Data.IndentOffset;
+
 				BuildDataTypeStatement(Function->GetReturnDataType(), Data);
 
 				AddCode(' ', Data);
@@ -395,16 +397,14 @@ namespace Engine
 
 				AddNewLine(Data);
 
-				--Data.IndentOffset;
 				AddCode('{', Data);
-				++Data.IndentOffset;
 
 				AddNewLine(Data);
 
 				BuildStatementHolder(Function, true, Data);
 
-				--Data.IndentOffset;
 				AddCode('}', Data);
+
 				++Data.IndentOffset;
 
 				AddNewLine(Data);

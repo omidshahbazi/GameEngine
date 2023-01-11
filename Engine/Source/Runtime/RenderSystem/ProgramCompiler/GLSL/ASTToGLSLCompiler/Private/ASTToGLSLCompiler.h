@@ -47,7 +47,6 @@ namespace Engine
 
 				virtual void BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data);
 
-				virtual void BuildBoundedFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data);
 				virtual void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data);
 
 			private:

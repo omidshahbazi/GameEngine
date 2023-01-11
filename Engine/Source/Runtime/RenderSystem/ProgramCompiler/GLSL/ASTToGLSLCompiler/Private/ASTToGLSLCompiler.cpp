@@ -74,12 +74,7 @@ namespace Engine
 				switch (Register)
 				{
 				case StructVariableType::Registers::Position:
-				{
-					if (Stage == Stages::Fragment)
-						return "gl_FragCoord";
-
 					return "gl_Position";
-				}
 
 				case StructVariableType::Registers::TessellationFactor:
 					return "gl_TessLevelOuter";
@@ -97,7 +92,12 @@ namespace Engine
 					return "gl_InstanceID";
 
 				case StructVariableType::Registers::OutputControlPointID:
-					return "gl_InvocationID";
+				{
+					if (Stage == Stages::Hull)
+						return "gl_InvocationID";
+
+					return '0';
+				}
 
 				case StructVariableType::Registers::FragmentPosition:
 					return "gl_FragCoord";
@@ -113,6 +113,33 @@ namespace Engine
 
 				case StructVariableType::Registers::GroupThreadID:
 					return "gl_LocalInvocationID";
+				}
+
+				THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
+			}
+
+			bool IsWritable(StructVariableType::Registers Register, Stages Stage)
+			{
+				switch (Register)
+				{
+				case StructVariableType::Registers::Position:
+				case StructVariableType::Registers::Normal:
+				case StructVariableType::Registers::UV:
+				case StructVariableType::Registers::Target:
+				case StructVariableType::Registers::TessellationFactor:
+				case StructVariableType::Registers::InsideTessellationFactor:
+					return true;
+
+				case StructVariableType::Registers::PrimitiveID:
+				case StructVariableType::Registers::DomainLocation:
+				case StructVariableType::Registers::InstanceID:
+				case StructVariableType::Registers::OutputControlPointID:
+				case StructVariableType::Registers::FragmentPosition:
+				case StructVariableType::Registers::DispatchThreadID:
+				case StructVariableType::Registers::GroupID:
+				case StructVariableType::Registers::GroupIndex:
+				case StructVariableType::Registers::GroupThreadID:
+					return false;
 				}
 
 				THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
@@ -222,8 +249,7 @@ namespace Engine
 
 			ASTToGLSLCompiler::ASTToGLSLCompiler() :
 				m_AdditionalLayoutCount(0),
-				m_BindingCount(0),
-				m_SequentialVariableNumber(0)
+				m_BindingCount(0)
 			{
 			}
 
@@ -233,7 +259,6 @@ namespace Engine
 
 				m_AdditionalLayoutCount = SubMeshInfo::GetLayoutCount();
 				m_BindingCount = 0;
-				m_SequentialVariableNumber = 0;
 			}
 
 			void ASTToGLSLCompiler::BuildStageShader(StageData& Data)
@@ -373,13 +398,16 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildFunction(const FunctionType* Function, StageData& Data)
 			{
+				--Data.IndentOffset;
+
 				FunctionType::Types funcType = Function->GetType();
 
-				if (IsEntrypointOrHullConstant(Function, Data))
+				if (Function->IsEntrypoint())
 				{
+					const ParameterType* parameterType = Function->GetParameters()[0];
+
 					const bool inputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain);
-					const auto* parameter = Function->GetParameters()[0];
-					BuildInputOutputStruct(parameter->GetDataType(), parameter->GetName(), true, inputHaveToConvertToArray, (funcType == FunctionType::Types::GeometryMain), Data);
+					BuildInputOutputStruct(parameterType->GetDataType(), parameterType->GetName(), true, inputHaveToConvertToArray, (funcType == FunctionType::Types::GeometryMain), Data);
 
 					if (funcType != FunctionType::Types::GeometryMain &&
 						funcType != FunctionType::Types::ComputeMain)
@@ -407,9 +435,9 @@ namespace Engine
 					}
 				}
 
-				--Data.IndentOffset;
+				bool isEntrypoint = IsEntrypointOrHullConstant(Function, Data);
 
-				if (IsEntrypointOrHullConstant(Function, Data))
+				if (isEntrypoint)
 					BuildType(ProgramDataTypes::Void, Data);
 				else
 					BuildDataTypeStatement(Function->GetReturnDataType(), Data);
@@ -423,7 +451,7 @@ namespace Engine
 
 				AddCode('(', Data);
 
-				if (IsEntrypointOrHullConstant(Function, Data))
+				if (isEntrypoint)
 				{
 					for (auto& parameter : Function->GetParameters())
 						PushVariable(parameter);
@@ -440,6 +468,8 @@ namespace Engine
 
 				if (funcType == FunctionType::Types::HullMain)
 				{
+					++Data.IndentOffset;
+
 					AddCode("if (", Data);
 					AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
 					AddCode(" == 0)", Data);
@@ -451,15 +481,98 @@ namespace Engine
 					--Data.IndentOffset;
 
 					AddNewLine(Data);
+
+					--Data.IndentOffset;
+				}
+
+				if (isEntrypoint)
+				{
+					++Data.IndentOffset;
+
+					const ParameterType* parameterType = Function->GetParameters()[0];
+					const String& parameterName = parameterType->GetName();
+
+					BuildDataTypeStatement(parameterType->GetDataType(), Data);
+					AddCode(' ', Data);
+					AddCode(parameterName, Data);
+					BuildPostDataType(parameterType->GetDataType(), Data);
+
+					AddCode(';', Data);
+					AddNewLine(Data);
+
+					bool isParamAnArray = parameterType->GetDataType()->IsArray();
+					const String loopStepVar = GetSequentialVariableName();
+					if (isParamAnArray)
+					{
+						AddCode("for (", Data);
+						BuildType(ProgramDataTypes::UnsignedInteger, Data);
+						AddCode(' ', Data);
+						AddCode(loopStepVar, Data);
+						AddCode(" = 0; ", Data);
+
+						AddCode(loopStepVar, Data);
+						AddCode(" < ", Data);
+						BuildStatement(parameterType->GetDataType()->GetPostElementCount(), Data);
+						AddCode("; ", Data);
+
+						AddCode("++", Data);
+						AddCode(loopStepVar, Data);
+						AddCode(')', Data);
+						AddNewLine(Data);
+
+						AddCode('{', Data);
+						AddNewLine(Data);
+
+						++Data.IndentOffset;
+					}
+
+					const StructType* paramStructType = FindStructType(parameterType->GetDataType()->GetUserDefined());
+					for (const auto& variable : paramStructType->GetItems())
+					{
+						AddCode(parameterName, Data);
+
+						if (isParamAnArray)
+						{
+							AddCode('[', Data);
+							AddCode(loopStepVar, Data);
+							AddCode(']', Data);
+						}
+
+						AddCode('.', Data);
+						AddCode(variable->GetName(), Data);
+						AddCode(" = ", Data);
+
+						BuildFlattenStructMemberVariableName(paramStructType, variable, parameterName, true, Data);
+
+						if (isParamAnArray && IsVertexLayout(variable->GetRegister()))
+						{
+							AddCode('[', Data);
+							AddCode(loopStepVar, Data);
+							AddCode(']', Data);
+						}
+
+						AddCode(';', Data);
+						AddNewLine(Data);
+					}
+
+					if (isParamAnArray)
+					{
+						--Data.IndentOffset;
+
+						AddCode('}', Data);
+						AddNewLine(Data);
+					}
+
+					--Data.IndentOffset;
 				}
 
 				BuildStatementHolder(Function, true, Data);
 
 				AddCode('}', Data);
 
-				++Data.IndentOffset;
-
 				AddNewLine(Data);
+
+				++Data.IndentOffset;
 			}
 
 			void ASTToGLSLCompiler::BuildFunctionCallStatement(const FunctionCallStatement* Statement, StageData& Data)
@@ -506,95 +619,6 @@ namespace Engine
 				ASTCompilerBase::BuildFunctionCallStatement(Statement, Data);
 			}
 
-			void ASTToGLSLCompiler::BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data)
-			{
-				bool handled = false;
-
-				if (IsEntrypointOrHullConstant(GetLastFunction(), Data))
-				{
-					String leftStm = String::Empty;
-					ArrayElementAccessStatement* leftAsArrayElementAccess = nullptr;
-					if (IsAssignableFrom(Statement->GetLeft(), ArrayElementAccessStatement))
-					{
-						leftAsArrayElementAccess = ReinterpretCast(ArrayElementAccessStatement*, Statement->GetLeft());
-						leftStm = StatementToString(leftAsArrayElementAccess->GetArrayStatement(), Data);
-					}
-					else
-						leftStm = StatementToString(Statement->GetLeft(), Data);
-
-					//CheckMemberAccess(Statement->GetLeft());
-
-					const VariableType* leftVariable = FindVariableType(leftStm);
-					if (leftVariable != nullptr)
-					{
-						PushDataAccessStatement(Statement->GetLeft());
-
-						bool isParameter = IsAssignableFrom(leftVariable, const ParameterType);
-						bool isOutputVariable = (IsAssignableFrom(leftVariable, const VariableStatement) && leftVariable->GetDataType()->GetUserDefined() == GetLastFunction()->GetReturnDataType()->GetUserDefined());
-
-						String name = String::Empty;
-						if (isParameter)
-							name = ReinterpretCast(const ParameterType*, leftVariable)->GetName();
-
-						if (isParameter || isOutputVariable)
-						{
-							const StructType* structType = GetStructType(leftVariable->GetDataType()->GetUserDefined());
-
-							bool isMemberAccess = IsAssignableFrom(Statement->GetRight(), MemberAccessStatement);
-							auto* rightStatement = (isMemberAccess ? ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetLeft() : Statement->GetRight());
-
-							IncreaseBlockIndexAndPushStructVariables(structType);
-
-							String rightStm = StatementToString(rightStatement, Data);
-							rightStm = rightStm.Split('.')[0];
-
-							const StructVariableType* rightVariable = GetVariableType(structType, rightStm);
-
-							BuildFlattenStructMemberVariableName(structType, rightVariable, name, isParameter, Data);
-
-							if (Data.FunctionType == FunctionType::Types::HullMain ||
-								Data.FunctionType == FunctionType::Types::DomainMain ||
-								Data.FunctionType == FunctionType::Types::GeometryMain)
-							{
-								if (isOutputVariable && Data.FunctionType == FunctionType::Types::HullMain)
-								{
-									AddCode('[', Data);
-									AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
-									AddCode(']', Data);
-								}
-								else if (leftAsArrayElementAccess != nullptr &&
-									(rightVariable->GetRegister() == StructVariableType::Registers::None || IsVertexLayout(rightVariable->GetRegister())))
-								{
-									AddCode('[', Data);
-									BuildStatement(leftAsArrayElementAccess->GetElementStatement(), Data);
-									AddCode(']', Data);
-								}
-							}
-
-							PushDataAccessStatement(rightStatement);
-
-							if (isMemberAccess)
-							{
-								AddCode('.', Data);
-
-								BuildStatement(ReinterpretCast(MemberAccessStatement*, Statement->GetRight())->GetRight(), Data);
-							}
-
-							DecreaseBlockIndex();
-
-							PopDataAceessStatement();
-
-							handled = true;
-						}
-
-						PopDataAceessStatement();
-					}
-				}
-
-				if (!handled)
-					ASTCompilerBase::BuildMemberAccessStatement(Statement, Data);
-			}
-
 			void ASTToGLSLCompiler::BuildReturnStatement(const ReturnStatement* Statement, StageData& Data)
 			{
 				if (!IsEntrypointOrHullConstant(GetLastFunction(), Data))
@@ -609,9 +633,38 @@ namespace Engine
 					return;
 				}
 
-				const String returnDataType = GetLastFunction()->GetReturnDataType()->GetUserDefined();
-				const StructType* structType = GetStructType(returnDataType);
+				const DataTypeStatement* returnDataType = GetLastFunction()->GetReturnDataType();
+				const StructType* structType = GetStructType(returnDataType->GetUserDefined());
 				const StructVariableType* variableType = nullptr;
+
+				DataTypeStatement statementDataType = EvaluateDataType(Statement->GetStatement());
+				if (!CompareDataTypes(*returnDataType, statementDataType))
+					THROW_PROGRAM_COMPILER_EXCEPTION("Data type of return value is not match with the function's return type", returnDataType->GetUserDefined());
+
+				const String& varName = BuildSequentialVariable(&statementDataType, Statement->GetStatement(), Data);
+
+				bool mustReturnAsArray = (Data.FunctionType == FunctionType::Types::HullMain);
+
+				for (const auto& variable : structType->GetItems())
+				{
+					BuildFlattenStructMemberVariableName(structType, variable, String::Empty, false, Data);
+
+					if (mustReturnAsArray)
+					{
+						AddCode('[', Data);
+						AddCode(GetSystemValue(StructVariableType::Registers::OutputControlPointID, Data.Stage), Data);
+						AddCode(']', Data);
+					}
+
+					AddCode(" = ", Data);
+					AddCode(varName, Data);
+					AddCode('.', Data);
+					AddCode(variable->GetName(), Data);
+
+					AddCode(';', Data);
+
+					AddNewLine(Data);
+				}
 
 				if (Data.FunctionType == FunctionType::Types::VertexMain || Data.FunctionType == FunctionType::Types::DomainMain)
 				{
@@ -650,7 +703,9 @@ namespace Engine
 					if (variableComponentCount != requiredComponentCount)
 						AddCode("vec4(", Data);
 
-					BuildFlattenStructMemberVariableName(structType, variableType, String::Empty, false, Data);
+					AddCode(varName, Data);
+					AddCode('.', Data);
+					AddCode(variableType->GetName(), Data);
 
 					if (variableComponentCount != requiredComponentCount)
 					{
@@ -810,7 +865,7 @@ namespace Engine
 
 				for (auto& variable : variables)
 				{
-					if (!IsVertexLayout(variable->GetRegister()))
+					if (IsInput && !IsVertexLayout(variable->GetRegister()))
 						continue;
 
 					int8 location = 0;
@@ -899,7 +954,7 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data)
 			{
-				if (!IsVertexLayout(Variable->GetRegister()))
+				if (!IsVertexLayout(Variable->GetRegister()) && (IsInput || IsWritable(Variable->GetRegister(), Data.Stage)))
 				{
 					AddCode(GetSystemValue(Variable->GetRegister(), Data.Stage), Data);
 					return;
@@ -912,27 +967,6 @@ namespace Engine
 				AddCode(Parent->GetName(), Data);
 				AddCode('_', Data);
 				AddCode(Variable->GetName(), Data);
-			}
-
-			String ASTToGLSLCompiler::BuildSequentialVariable(const Statement* IntializerStatement, StageData& Data)
-			{
-				DataTypeStatement dataType = EvaluateDataType(IntializerStatement);
-				return BuildSequentialVariable(&dataType, IntializerStatement, Data);
-			}
-
-			String ASTToGLSLCompiler::BuildSequentialVariable(const DataTypeStatement* DataType, const Statement* IntializerStatement, StageData& Data)
-			{
-				const String varName = '_' + StringUtility::ToString<char8>(++m_SequentialVariableNumber);
-
-				BuildDataTypeStatement(DataType, Data);
-				AddCode(' ', Data);
-				AddCode(varName, Data);
-				AddCode(" = ", Data);
-				BuildStatement(IntializerStatement, Data);
-				AddCode(';', Data);
-				AddNewLine(Data);
-
-				return varName;
 			}
 		}
 	}

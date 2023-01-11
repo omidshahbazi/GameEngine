@@ -72,7 +72,7 @@ namespace Engine
 					m_ReturnType = Type;
 				}
 
-				DataTypeStatement* GetReturnDataType(void) const
+				const DataTypeStatement* GetReturnDataType(void) const
 				{
 					return m_ReturnType;
 				}

@@ -319,6 +319,8 @@ namespace Engine
 
 			void ASTToHLSLCompiler::BuildFunction(const FunctionType* Function, StageData& Data)
 			{
+				--Data.IndentOffset;
+
 				FunctionType::Types funcType = Function->GetType();
 
 				if (funcType == FunctionType::Types::VertexMain ||
@@ -338,8 +340,6 @@ namespace Engine
 				}
 
 				BuildAttributes(Function->GetAttributes(), Data);
-
-				--Data.IndentOffset;
 
 				BuildDataTypeStatement(Function->GetReturnDataType(), Data);
 
@@ -405,9 +405,9 @@ namespace Engine
 
 				AddCode('}', Data);
 
-				++Data.IndentOffset;
-
 				AddNewLine(Data);
+
+				++Data.IndentOffset;
 			}
 
 			void ASTToHLSLCompiler::BuildDomainAttributeType(const DomainAttributeType* Attribute, StageData& Data)

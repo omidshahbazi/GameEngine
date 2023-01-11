@@ -13,6 +13,7 @@ namespace Engine
 			m_BlockIndex(-1),
 			m_HullConstantFunction(nullptr),
 			m_LastFunction(nullptr),
+			m_SequentialVariableNumber(0),
 			m_ReturnValueAlreadyBuilt(false)
 		{
 		}
@@ -93,24 +94,28 @@ namespace Engine
 			m_BlockVariables.Clear();
 			m_BlockIndex = -1;
 			m_LastFunction = nullptr;
+			m_SequentialVariableNumber = 0;
 			m_ReturnValueAlreadyBuilt = false;
 
 			IncreaseBlockIndex();
 
-			auto getHullConstantFunction = [this, &Data]() -> const FunctionType*
+			if (Data.Stage == Stages::Hull || Data.Stage == Stages::Domain)
 			{
-				const FunctionType* hullEntrypoint = GetEntrypointFunctionType(FunctionType::Types::HullMain, Data);
+				auto getHullConstantFunction = [this, &Data]() -> const FunctionType*
+				{
+					const FunctionType* hullEntrypoint = GetEntrypointFunctionType(FunctionType::Types::HullMain, Data);
 
-				const ConstantEntrypointAttributeType* attrib = hullEntrypoint->GetAttribute<ConstantEntrypointAttributeType>();
+					const ConstantEntrypointAttributeType* attrib = hullEntrypoint->GetAttribute<ConstantEntrypointAttributeType>();
 
-				int32 index = Data.Functions.FindIf([attrib](auto& item) { return item->GetName() == attrib->GetEntrypoint(); });
-				if (index == -1)
-					return nullptr;
+					int32 index = Data.Functions.FindIf([attrib](auto& item) { return item->GetName() == attrib->GetEntrypoint(); });
+					if (index == -1)
+						return nullptr;
 
-				return Data.Functions[index];
-			};
+					return Data.Functions[index];
+				};
 
-			m_HullConstantFunction = getHullConstantFunction();
+				m_HullConstantFunction = getHullConstantFunction();
+			}
 		}
 
 		void ASTCompilerBase::BuildStructs(StageData& Data)
@@ -730,20 +735,20 @@ namespace Engine
 
 		void ASTCompilerBase::BuildMemberAccessStatement(const MemberAccessStatement* Statement, StageData& Data)
 		{
-			//CheckMemberAccess(Statement->GetLeft());
-
-			PushDataAccessStatement(Statement->GetLeft());
-
 			BuildStatement(Statement->GetLeft(), Data);
 
 			AddCode('.', Data);
 
+			PushDataAccessStatement(Statement->GetLeft());
+
 			DataTypeStatement dataType = EvaluateDataType(Statement->GetLeft());
-			IncreaseBlockIndexAndPushStructVariables(FindStructType(dataType.GetUserDefined()));
+			if (!dataType.IsBuiltIn())
+				IncreaseBlockIndexAndPushStructVariables(FindStructType(dataType.GetUserDefined()));
 
 			BuildStatement(Statement->GetRight(), Data);
 
-			DecreaseBlockIndex();
+			if (!dataType.IsBuiltIn())
+				DecreaseBlockIndex();
 
 			PopDataAceessStatement();
 		}
@@ -1145,7 +1150,7 @@ namespace Engine
 
 				const String& variableName = stm->GetName();
 
-				const VariableType* variableType = FindVariableType(stm->GetName());
+				const VariableType* variableType = FindVariableType(variableName);
 				if (variableType != nullptr)
 					return *variableType->GetDataType();
 
@@ -1265,18 +1270,6 @@ namespace Engine
 
 		void ASTCompilerBase::CheckVariableExsitence(const String& Name) const
 		{
-			//void CheckMemberAccess(const Statement * LeftSide)
-			//{
-			//	if (IsAssignableFrom(LeftSide, const ArrayElementAccessStatement))
-			//		return;
-
-			//	DataTypeStatement dataType = EvaluateDataType(LeftSide);
-			//	if (!dataType.IsArray())
-			//		return;
-
-			//	THROW_PROGRAM_COMPILER_EXCEPTION("Array doesn't have any member to access", LeftSide->ToString());
-			//}
-
 			auto checkVariableInParent = [this, &Name](const DataTypeStatement* ParentDataType)
 			{
 				if (ParentDataType->IsBuiltIn())
@@ -1384,9 +1377,6 @@ namespace Engine
 						return;
 				}
 			}
-
-			//if (m_CurrentDataType != nullptr && m_CurrentDataType->IsBuiltIn())
-				//return;
 
 			if (FindVariableType(Name) != nullptr)
 				return;
@@ -1587,6 +1577,32 @@ namespace Engine
 #ifdef DEBUG_MODE
 			Data.Shader += '\n';
 #endif
+		}
+
+		String ASTCompilerBase::BuildSequentialVariable(const Statement* IntializerStatement, StageData& Data)
+		{
+			DataTypeStatement dataType = EvaluateDataType(IntializerStatement);
+			return BuildSequentialVariable(&dataType, IntializerStatement, Data);
+		}
+
+		String ASTCompilerBase::BuildSequentialVariable(const DataTypeStatement* DataType, const Statement* IntializerStatement, StageData& Data)
+		{
+			const String varName = GetSequentialVariableName();
+
+			BuildDataTypeStatement(DataType, Data);
+			AddCode(' ', Data);
+			AddCode(varName, Data);
+			AddCode(" = ", Data);
+			BuildStatement(IntializerStatement, Data);
+			AddCode(';', Data);
+			AddNewLine(Data);
+
+			return varName;
+		}
+
+		String ASTCompilerBase::GetSequentialVariableName(void)
+		{
+			return '_' + StringUtility::ToString<char8>(++m_SequentialVariableNumber);
 		}
 
 		cstr ASTCompilerBase::GetStageResultArrayVariableName(void)

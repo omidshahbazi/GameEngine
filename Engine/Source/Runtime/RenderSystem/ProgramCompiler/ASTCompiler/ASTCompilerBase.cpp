@@ -13,8 +13,7 @@ namespace Engine
 			m_BlockIndex(-1),
 			m_HullConstantFunction(nullptr),
 			m_LastFunction(nullptr),
-			m_SequentialVariableNumber(0),
-			m_ReturnValueAlreadyBuilt(false)
+			m_SequentialVariableNumber(0)
 		{
 		}
 
@@ -95,7 +94,6 @@ namespace Engine
 			m_BlockIndex = -1;
 			m_LastFunction = nullptr;
 			m_SequentialVariableNumber = 0;
-			m_ReturnValueAlreadyBuilt = false;
 
 			IncreaseBlockIndex();
 
@@ -954,42 +952,6 @@ namespace Engine
 			AddNewLine(Data);
 		}
 
-		uint8 ASTCompilerBase::BuildReturnValue(const Statement* Statement, StageData& Data)
-		{
-			uint8 elementCount = EvaluateDataTypeElementCount(m_LastFunction->GetReturnDataType());
-
-			if (m_ReturnValueAlreadyBuilt)
-				return elementCount;
-			m_ReturnValueAlreadyBuilt = true;
-
-			bool isArray = IsAssignableFrom(Statement, const ArrayStatement);
-			if (elementCount > 1 && !isArray)
-			{
-				return 0;
-			}
-
-			BuildType(m_LastFunction->GetReturnDataType()->GetType(), Data);
-			AddCode(' ', Data);
-			AddCode(GetStageResultArrayVariableName(), Data);
-
-			if (isArray)
-			{
-				AddCode('[', Data);
-				AddCode(StringUtility::ToString<char8>(elementCount), Data);
-				AddCode(']', Data);
-			}
-
-			AddCode(" = ", Data);
-
-			BuildStatement(Statement, Data);
-
-			AddCode(';', Data);
-
-			AddNewLine(Data);
-
-			return elementCount;
-		}
-
 		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 		{
 			if (Statement->IsBuiltIn())
@@ -1603,13 +1565,6 @@ namespace Engine
 		String ASTCompilerBase::GetSequentialVariableName(void)
 		{
 			return '_' + StringUtility::ToString<char8>(++m_SequentialVariableNumber);
-		}
-
-		cstr ASTCompilerBase::GetStageResultArrayVariableName(void)
-		{
-			static cstr name = "__result_value__";
-
-			return name;
 		}
 	}
 }

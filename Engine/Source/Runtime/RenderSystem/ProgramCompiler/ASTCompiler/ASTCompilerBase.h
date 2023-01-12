@@ -193,8 +193,6 @@ namespace Engine
 
 			virtual void BuildDiscardStatement(const DiscardStatement* Statement, StageData& Data);
 
-			virtual uint8 BuildReturnValue(const Statement* Statement, StageData& Data);
-
 			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data);
 
 			virtual void BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data);
@@ -287,8 +285,6 @@ namespace Engine
 
 				m_DataAccessStatements.RemoveAt(0);
 			}
-
-			static cstr GetStageResultArrayVariableName(void);
 
 		private:
 			AllocatorBase* m_Allocator;

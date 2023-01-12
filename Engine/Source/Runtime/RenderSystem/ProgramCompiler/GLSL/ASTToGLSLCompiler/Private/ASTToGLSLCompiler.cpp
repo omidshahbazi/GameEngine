@@ -318,6 +318,23 @@ namespace Engine
 
 					header += ") out;\n";
 				}
+				else if (Data.Stage == Stages::Compute)
+				{
+					const FunctionType* computeEntrypoint = GetEntrypointFunctionType(FunctionType::Types::ComputeMain, Data);
+
+					const ThreadCountAttributeType* threadCountAttrib = computeEntrypoint->GetAttribute<ThreadCountAttributeType>();
+
+					header += "layout (local_size_x = ";
+					header += StringUtility::ToString<char8>(threadCountAttrib->GetXCount());
+
+					header += ", local_size_y = ";
+					header += StringUtility::ToString<char8>(threadCountAttrib->GetYCount());
+
+					header += ", local_size_z = ";
+					header += StringUtility::ToString<char8>(threadCountAttrib->GetZCount());
+
+					header += ") in;\n";
+				}
 
 				Data.Shader = header + Data.Shader;
 			}

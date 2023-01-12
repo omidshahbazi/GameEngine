@@ -417,24 +417,6 @@ namespace Engine
 					}
 				}
 
-				if (funcType == FunctionType::Types::FragmentMain)
-				{
-					uint8 elementCount = EvaluateDataTypeElementCount(Function->GetReturnDataType());
-
-					for (uint8 i = 0; i < elementCount; ++i)
-					{
-						AddCode("layout(location = ", Data);
-						AddCode(StringUtility::ToString<char8>(i), Data);
-						AddCode(") out ", Data);
-						BuildType(ProgramDataTypes::Float4, Data);
-						AddCode(' ', Data);
-						AddCode(GetFragmentVariableName(i), Data);
-						AddCode(';', Data);
-
-						AddNewLine(Data);
-					}
-				}
-
 				bool isEntrypoint = IsEntrypointOrHullConstant(Function, Data);
 
 				if (isEntrypoint)
@@ -676,24 +658,6 @@ namespace Engine
 				else if (Data.FunctionType == FunctionType::Types::FragmentMain)
 				{
 					variableType = FindVariableType(structType, [](const StructVariableType* item) { return item->GetRegister() == StructVariableType::Registers::Color; });
-
-					uint8 elementCount = BuildReturnValue(Statement->GetStatement(), Data);
-					for (uint8 i = 0; i < elementCount; ++i)
-					{
-						AddCode(GetFragmentVariableName(i) + " = ", Data);
-
-						AddCode(GetStageResultArrayVariableName(), Data);
-
-						if (elementCount > 1)
-						{
-							AddCode('[', Data);
-							AddCode(StringUtility::ToString<char8>(i), Data);
-							AddCode(']', Data);
-						}
-
-						AddCode(';', Data);
-						AddNewLine(Data);
-					}
 				}
 
 				if (variableType != nullptr)
@@ -871,6 +835,8 @@ namespace Engine
 					int8 location = 0;
 					if (IsInput && variable->GetRegisterIndex() == 0)
 						location = SubMeshInfo::GetLayoutIndex(GetLayout(variable->GetRegister()));
+					else if (variable->GetRegister() == StructVariableType::Registers::Target)
+						location = variable->GetRegisterIndex();
 					else
 						location = m_AdditionalLayoutCount++;
 

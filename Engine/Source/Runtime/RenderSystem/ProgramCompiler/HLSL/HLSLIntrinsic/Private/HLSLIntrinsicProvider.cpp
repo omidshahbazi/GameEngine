@@ -1548,7 +1548,7 @@ namespace Engine
 								Shader += textureVarialeName;
 								Shader += ".Sample(";
 								Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetSamplerVariableName(textureVarialeName);
-								Shader += ',';
+								Shader += ", ";
 								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
 								Shader += ')';
 							});

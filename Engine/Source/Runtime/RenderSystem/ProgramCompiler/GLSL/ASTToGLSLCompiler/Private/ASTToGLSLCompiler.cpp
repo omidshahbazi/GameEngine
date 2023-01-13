@@ -63,10 +63,9 @@ namespace Engine
 
 				case StructVariableType::Registers::UV:
 					return VertexLayouts::TexCoord;
-
-				default:
-					THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
 				}
+
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			String GetSystemValue(StructVariableType::Registers Register, Stages Stage)
@@ -115,7 +114,7 @@ namespace Engine
 					return "gl_LocalInvocationID";
 				}
 
-				THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			bool IsWritable(StructVariableType::Registers Register, Stages Stage)
@@ -142,7 +141,7 @@ namespace Engine
 					return false;
 				}
 
-				THROW_PROGRAM_COMPILER_EXCEPTION("Register not defined", String::Empty);
+				THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 			}
 
 			String GetDomainType(DomainAttributeType::Types Type)

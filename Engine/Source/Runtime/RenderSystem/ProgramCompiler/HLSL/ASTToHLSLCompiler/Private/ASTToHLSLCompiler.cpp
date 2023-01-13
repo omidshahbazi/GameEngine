@@ -13,7 +13,52 @@ namespace Engine
 	{
 		namespace Private
 		{
-			String GetRegisterName(StructVariableType::Registers Register, Stages Stage)
+			bool IsRegisterAvailable(StructVariableType::Registers Register, Stages Stage)
+			{
+				switch (Register)
+				{
+				case StructVariableType::Registers::Position:
+				case StructVariableType::Registers::Normal:
+				case StructVariableType::Registers::Color:
+				case StructVariableType::Registers::UV:
+					return true;
+
+				case StructVariableType::Registers::PrimitiveID:
+					return (Stage == Stages::Hull || Stage == Stages::Domain || Stage == Stages::Geometry || Stage == Stages::Fragment);
+
+				case StructVariableType::Registers::TessellationFactor:
+				case StructVariableType::Registers::InsideTessellationFactor:
+					return (Stage == Stages::Hull || Stage == Stages::Domain);
+
+				case StructVariableType::Registers::DomainLocation:
+					return (Stage == Stages::Domain);
+
+				case StructVariableType::Registers::InstanceID:
+					return (Stage == Stages::Geometry);
+
+				case StructVariableType::Registers::OutputControlPointID:
+					return (Stage == Stages::Hull);
+
+				case StructVariableType::Registers::FragmentPosition:
+					return true;
+
+				case StructVariableType::Registers::Target:
+					return (Stage == Stages::Fragment);
+
+				case StructVariableType::Registers::DispatchThreadID:
+				case StructVariableType::Registers::GroupID:
+				case StructVariableType::Registers::GroupIndex:
+				case StructVariableType::Registers::GroupThreadID:
+					return (Stage == Stages::Compute);
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+				}
+
+				return false;
+			}
+
+			String GetRegisterName(StructVariableType::Registers Register)
 			{
 				switch (Register)
 				{
@@ -640,10 +685,12 @@ namespace Engine
 					AddCode(']', Data);
 				}
 
-				if (Variable->GetRegister() != StructVariableType::Registers::None)
+				if (Variable->GetRegister() != StructVariableType::Registers::None && IsRegisterAvailable(Variable->GetRegister(), Data.Stage))
 				{
 					AddCode(" : ", Data);
-					AddCode(GetRegisterName(Variable->GetRegister(), Data.Stage), Data);
+					AddCode(GetRegisterName(Variable->GetRegister()), Data);
+
+					//if (!IsSystemValue(Variable->GetRegister()))
 					AddCode(StringUtility::ToString<char8>(Variable->GetRegisterIndex()), Data);
 				}
 
@@ -663,6 +710,7 @@ namespace Engine
 			{
 				return TextureVariableName + "Sampler";
 			}
+
 			String ASTToHLSLCompiler::GetGeometryOutputStreamParameterName(void)
 			{
 				return "outputStream";

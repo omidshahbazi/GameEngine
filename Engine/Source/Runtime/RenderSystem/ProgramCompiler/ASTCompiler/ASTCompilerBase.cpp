@@ -1223,7 +1223,7 @@ namespace Engine
 					}
 				}
 
-				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't evaluate result of the statement", stm->ToString());
+				THROW_PROGRAM_COMPILER_EXCEPTION("Variable not defined", variableName);
 			}
 			else if (IsAssignableFrom(CurrentStatement, const ArrayElementAccessStatement))
 			{

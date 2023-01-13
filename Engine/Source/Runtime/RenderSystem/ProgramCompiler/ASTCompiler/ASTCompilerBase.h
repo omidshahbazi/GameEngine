@@ -198,6 +198,8 @@ namespace Engine
 			virtual void BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data);
 			virtual void BuildExplicitCast(const Statement* Statement, ProgramDataTypes DataType, StageData& Data);
 
+			virtual void BuildDataTypeInitializer(const DataTypeStatement* DataType, StageData& Data);
+
 			virtual void BuildType(ProgramDataTypes Type, StageData& Data) = 0;
 
 			virtual uint8 EvaluateDataTypeElementCount(const DataTypeStatement* Statement);

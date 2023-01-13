@@ -706,11 +706,12 @@ namespace Engine
 			AddCode(' ', Data);
 			AddCode(Statement->GetName(), Data);
 
-			if (Statement->GetInitialStatement() != nullptr)
-			{
-				AddCode(" = ", Data);
+			AddCode(" = ", Data);
+
+			if (Statement->GetInitialStatement() == nullptr)
+				BuildDataTypeInitializer(Statement->GetDataType(), Data);
+			else
 				BuildStatement(Statement->GetInitialStatement(), Data);
-			}
 		}
 
 		void ASTCompilerBase::BuildVariableAccessStatement(const VariableAccessStatement* Statement, StageData& Data)
@@ -994,6 +995,99 @@ namespace Engine
 			DataTypeStatement dataType = DataType;
 
 			BuildExplicitCast(Statement, &dataType, Data);
+		}
+
+		void ASTCompilerBase::BuildDataTypeInitializer(const DataTypeStatement* DataType, StageData& Data)
+		{
+			if (DataType->IsArray())
+			{
+				AddCode("{ ", Data);
+
+				uint16 elementCount = StringUtility::ToUInt16(StatementToString(DataType->GetPostElementCount(), Data));
+				for (uint16 i = 0; i < elementCount; ++i)
+				{
+					if (i != 0)
+						AddCode(", ", Data);
+
+					DataTypeStatement elementDataType = *DataType;
+					elementDataType.SetPostElementCount(nullptr);
+
+					BuildDataTypeInitializer(&elementDataType, Data);
+				}
+
+				AddCode(" }", Data);
+
+				return;
+			}
+
+			if (DataType->IsBuiltIn())
+			{
+				switch (DataType->GetType())
+				{
+				case ProgramDataTypes::Bool:
+				{
+					AddCode("false", Data);
+				}
+				break;
+
+				case ProgramDataTypes::Integer:
+				case ProgramDataTypes::UnsignedInteger:
+				case ProgramDataTypes::Float:
+				case ProgramDataTypes::Double:
+				case ProgramDataTypes::Integer2:
+				case ProgramDataTypes::UnsignedInteger2:
+				case ProgramDataTypes::Float2:
+				case ProgramDataTypes::Double2:
+				case ProgramDataTypes::Integer3:
+				case ProgramDataTypes::UnsignedInteger3:
+				case ProgramDataTypes::Float3:
+				case ProgramDataTypes::Double3:
+				case ProgramDataTypes::Integer4:
+				case ProgramDataTypes::UnsignedInteger4:
+				case ProgramDataTypes::Float4:
+				case ProgramDataTypes::Double4:
+				case ProgramDataTypes::Matrix4F:
+				case ProgramDataTypes::Matrix4D:
+				{
+					BuildType(DataType->GetType(), Data);
+
+					AddCode('(', Data);
+
+					uint8 componentCount = DataType->GetComponentCount();
+					for (uint8 i = 0; i < componentCount; ++i)
+					{
+						if (i != 0)
+							AddCode(", ", Data);
+
+						AddCode('0', Data);
+					}
+
+					AddCode(')', Data);
+				}
+				break;
+
+				default:
+					THROW_PROGRAM_COMPILER_EXCEPTION("Not handled data type to generate a default value", String::Empty);
+				}
+
+				return;
+			}
+
+			AddCode("{ ", Data);
+
+			const StructType* structType = GetStructType(DataType->GetUserDefined());
+
+			bool isFirst = true;
+			for (const auto& variable : structType->GetItems())
+			{
+				if (!isFirst)
+					AddCode(", ", Data);
+				isFirst = false;
+
+				BuildDataTypeInitializer(variable->GetDataType(), Data);
+			}
+
+			AddCode(" }", Data);
 		}
 
 		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(const DataTypeStatement* Statement)

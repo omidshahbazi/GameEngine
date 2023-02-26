@@ -794,8 +794,8 @@ namespace Engine
 				uint16 offset;
 				uint8 size;
 				StructType::GetAlignedOffset(templateElementType, offset, size);
-				if (size != TEMPLATE_TYPE_SIZE)
-					THROW_PROGRAM_PARSER_EXCEPTION(StringUtility::Format(String("Template type must be %i"), TEMPLATE_TYPE_SIZE), templateElementToken);
+				if (size % TEMPLATE_TYPE_SIZE != 0 && size % TEMPLATE_TYPE_SIZE != size)
+					THROW_PROGRAM_PARSER_EXCEPTION(StringUtility::Format(String("Template type must be aligned by %i"), TEMPLATE_TYPE_SIZE), templateElementToken);
 
 				RequireSymbol(CLOSE_ANGLE_BRACKET, "Texture element type");
 

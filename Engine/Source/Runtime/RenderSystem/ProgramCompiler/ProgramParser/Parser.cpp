@@ -776,9 +776,34 @@ namespace Engine
 			}
 
 			DataTypeStatement* stm = Allocate<DataTypeStatement>(primitiveType);
-
 			if (primitiveType == ProgramDataTypes::Unknown)
 				Construct(stm, m_Allocator, userDefinedType);
+
+			if (MatchSymbol(OPEN_ANGLE_BRACKET))
+			{
+				const uint8 TEMPLATE_TYPE_SIZE = 32;
+
+				if (!DataTypeStatement::IsTexture(primitiveType))
+					THROW_PROGRAM_PARSER_EXCEPTION("Template type is not applicable on primitive types", DeclarationToken);
+
+				Token templateElementToken;
+				RequireIdentifierToken(templateElementToken, "Texture element type");
+
+				ProgramDataTypes templateElementType = GetPrimitiveDataType(templateElementToken.GetName());
+
+				uint16 offset;
+				uint8 size;
+				StructType::GetAlignedOffset(templateElementType, offset, size);
+				if (size != TEMPLATE_TYPE_SIZE)
+					THROW_PROGRAM_PARSER_EXCEPTION(StringUtility::Format(String("Template type must be %i"), TEMPLATE_TYPE_SIZE), templateElementToken);
+
+				RequireSymbol(CLOSE_ANGLE_BRACKET, "Texture element type");
+
+				DataTypeStatement* templateDataTypeStm = Allocate<DataTypeStatement>(primitiveType);
+				Construct(templateDataTypeStm, templateElementType);
+
+				stm->SetTemplateElementDataType(templateDataTypeStm);
+			}
 
 			stm->SetElementCount(ParseArrayElementCountStatement());
 
@@ -1449,7 +1474,13 @@ namespace Engine
 				dataTypesName["double4"] = ProgramDataTypes::Double4;
 				dataTypesName["matrix4d"] = ProgramDataTypes::Matrix4F;
 				dataTypesName["matrix4f"] = ProgramDataTypes::Matrix4D;
+				dataTypesName["texture1D"] = ProgramDataTypes::Texture1D;
 				dataTypesName["texture2D"] = ProgramDataTypes::Texture2D;
+				dataTypesName["texture3D"] = ProgramDataTypes::Texture3D;
+				dataTypesName["textureCube"] = ProgramDataTypes::TextureCube;
+				dataTypesName["texture1DRW"] = ProgramDataTypes::Texture1DRW;
+				dataTypesName["texture2DRW"] = ProgramDataTypes::Texture2DRW;
+				dataTypesName["texture3DRW"] = ProgramDataTypes::Texture3DRW;
 			}
 
 			if (dataTypesName.Contains(Name))

@@ -817,8 +817,32 @@ namespace Engine
 					AddCode("mat4", Data);
 					break;
 
+				case ProgramDataTypes::Texture1D:
+					AddCode("sampler1D", Data);
+					break;
+
 				case ProgramDataTypes::Texture2D:
 					AddCode("sampler2D", Data);
+					break;
+
+				case ProgramDataTypes::Texture3D:
+					AddCode("sampler3D", Data);
+					break;
+
+				case ProgramDataTypes::TextureCube:
+					AddCode("samplerCube", Data);
+					break;
+
+				case ProgramDataTypes::Texture1DRW:
+					AddCode("image1D", Data);
+					break;
+
+				case ProgramDataTypes::Texture2DRW:
+					AddCode("image2D", Data);
+					break;
+
+				case ProgramDataTypes::Texture3DRW:
+					AddCode("image3D", Data);
 					break;
 				}
 			}

@@ -56,6 +56,8 @@ namespace Engine
 
 				virtual void BuildArrayStatement(const ArrayStatement* Statement, StageData& Data) override;
 
+				virtual void BuildPostDataTypeStatement(const DataTypeStatement* Statement, StageData& Data) override;
+
 				virtual void BuildType(const ProgramDataTypes Type, StageData& Data) override;
 
 				virtual void BuildRootSignature(StageData& Data);

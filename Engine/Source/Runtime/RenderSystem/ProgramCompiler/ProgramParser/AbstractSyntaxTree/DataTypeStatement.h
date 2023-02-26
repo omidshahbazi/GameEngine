@@ -24,6 +24,7 @@ namespace Engine
 			public:
 				DataTypeStatement(ProgramDataTypes Type) :
 					m_Type(Type),
+					m_TemplateElementDataType(nullptr),
 					m_ElementCount(nullptr),
 					m_PostElementCount(nullptr)
 				{
@@ -31,6 +32,7 @@ namespace Engine
 
 				DataTypeStatement(AllocatorBase* Allocator, const String& UserDefined) :
 					m_Type(ProgramDataTypes::Unknown),
+					m_TemplateElementDataType(nullptr),
 					m_UserDefined(Allocator, UserDefined),
 					m_ElementCount(nullptr),
 					m_PostElementCount(nullptr)
@@ -40,6 +42,16 @@ namespace Engine
 				ProgramDataTypes GetType(void) const
 				{
 					return m_Type;
+				}
+
+				DataTypeStatement* GetTemplateElementDataType(void) const
+				{
+					return m_TemplateElementDataType;
+				}
+
+				void SetTemplateElementDataType(DataTypeStatement* Value)
+				{
+					m_TemplateElementDataType = Value;
 				}
 
 				const String& GetUserDefined(void) const
@@ -106,6 +118,11 @@ namespace Engine
 				bool IsNumeric(void) const
 				{
 					return IsIntegral() || IsFloating();
+				}
+
+				bool IsTexture(void) const
+				{
+					return IsTexture(m_Type);
 				}
 
 				uint8 GetComponentCount(void) const
@@ -199,9 +216,45 @@ namespace Engine
 						result = "matrix4d";
 						break;
 
+					case ProgramDataTypes::Texture1D:
+						result = "texture1D";
+						break;
+
+					case ProgramDataTypes::Texture2D:
+						result = "texture2D";
+						break;
+
+					case ProgramDataTypes::Texture3D:
+						result = "texture3D";
+						break;
+
+					case ProgramDataTypes::TextureCube:
+						result = "textureCube";
+						break;
+
+					case ProgramDataTypes::Texture1DRW:
+						result = "texture1DRW";
+						break;
+
+					case ProgramDataTypes::Texture2DRW:
+						result = "texture2DRW";
+						break;
+
+					case ProgramDataTypes::Texture3DRW:
+						result = "texture3DRW";
+						break;
+
+
 					default:
 						result = m_UserDefined;
 						break;
+					}
+
+					if (m_TemplateElementDataType != nullptr)
+					{
+						result += '<';
+						result += m_TemplateElementDataType->ToString();
+						result += '>';
 					}
 
 					if (m_ElementCount != nullptr)
@@ -265,8 +318,21 @@ namespace Engine
 					return 0;
 				}
 
+				static bool IsTexture(ProgramDataTypes Type)
+				{
+					return (
+						Type == ProgramDataTypes::Texture1D ||
+						Type == ProgramDataTypes::Texture2D ||
+						Type == ProgramDataTypes::Texture3D ||
+						Type == ProgramDataTypes::TextureCube ||
+						Type == ProgramDataTypes::Texture1DRW ||
+						Type == ProgramDataTypes::Texture2DRW ||
+						Type == ProgramDataTypes::Texture3DRW);
+				}
+
 			private:
 				ProgramDataTypes m_Type;
+				DataTypeStatement* m_TemplateElementDataType;
 				String m_UserDefined;
 				Statement* m_ElementCount;
 				Statement* m_PostElementCount;

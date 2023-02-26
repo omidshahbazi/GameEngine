@@ -43,11 +43,26 @@ namespace Engine
 			Double4,
 			Matrix4F,
 			Matrix4D,
+			Texture1D,
 			Texture2D,
+			Texture3D,
+			TextureCube,
+			Texture1DRW,
+			Texture2DRW,
+			Texture3DRW,
 			Unknown
 		};
 
-		const ProgramDataTypes ALLOWED_CONTEXT_FREE_DATA_TYPES[]{ ProgramDataTypes::Texture2D };
+		const ProgramDataTypes ALLOWED_CONTEXT_FREE_DATA_TYPES[]
+		{
+			ProgramDataTypes::Texture1D,
+			ProgramDataTypes::Texture2D,
+			ProgramDataTypes::Texture3D,
+			ProgramDataTypes::TextureCube,
+			ProgramDataTypes::Texture1DRW,
+			ProgramDataTypes::Texture2DRW,
+			ProgramDataTypes::Texture3DRW
+		};
 
 		class PROGRAMCOMPILERCOMMON_API Constants
 		{

@@ -195,6 +195,9 @@ namespace Engine
 
 			virtual void BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data);
 
+			virtual void BuildPreDataTypeStatement(const DataTypeStatement* Statement, StageData& Data);
+			virtual void BuildPostDataTypeStatement(const DataTypeStatement* Statement, StageData& Data);
+
 			virtual void BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data);
 			virtual void BuildExplicitCast(const Statement* Statement, ProgramDataTypes DataType, StageData& Data);
 

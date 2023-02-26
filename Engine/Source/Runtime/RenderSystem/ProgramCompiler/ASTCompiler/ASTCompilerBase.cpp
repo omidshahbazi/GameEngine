@@ -955,10 +955,14 @@ namespace Engine
 
 		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 		{
+			BuildPreDataTypeStatement(Statement, Data);
+
 			if (Statement->IsBuiltIn())
 				BuildType(Statement->GetType(), Data);
 			else
 				AddCode(Statement->GetUserDefined(), Data);
+
+			BuildPostDataTypeStatement(Statement, Data);
 
 			if (Statement->GetElementCount() != nullptr)
 			{
@@ -966,6 +970,14 @@ namespace Engine
 				BuildStatement(Statement->GetElementCount(), Data);
 				AddCode(']', Data);
 			}
+		}
+
+		void ASTCompilerBase::BuildPreDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
+		{
+		}
+
+		void ASTCompilerBase::BuildPostDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
+		{
 		}
 
 		void ASTCompilerBase::BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data)
@@ -1360,7 +1372,13 @@ namespace Engine
 					case ProgramDataTypes::UnsignedInteger:
 					case ProgramDataTypes::Float:
 					case ProgramDataTypes::Double:
+					case ProgramDataTypes::Texture1D:
 					case ProgramDataTypes::Texture2D:
+					case ProgramDataTypes::Texture3D:
+					case ProgramDataTypes::TextureCube:
+					case ProgramDataTypes::Texture1DRW:
+					case ProgramDataTypes::Texture2DRW:
+					case ProgramDataTypes::Texture3DRW:
 						THROW_PROGRAM_COMPILER_EXCEPTION("Data type hasn't any member", ParentDataType->ToString());
 
 					case ProgramDataTypes::Integer2:

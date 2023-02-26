@@ -330,7 +330,7 @@ namespace Engine
 
 				if (dataType->IsBuiltIn())
 				{
-					if (dataType->GetType() == ProgramDataTypes::Texture2D)
+					if (dataType->IsTexture())
 					{
 						AddCode(":register(t", Data);
 						AddCode(StringUtility::ToString<char8>(m_TextureBindingCount), Data);
@@ -348,7 +348,7 @@ namespace Engine
 
 				AddNewLine(Data);
 
-				if (dataType->GetType() == ProgramDataTypes::Texture2D)
+				if (dataType->IsTexture())
 				{
 					AddCode("SamplerState ", Data);
 					AddCode(GetSamplerVariableName(Variable->GetName()), Data);
@@ -542,6 +542,18 @@ namespace Engine
 				AddCode('}', Data);
 			}
 
+			void ASTToHLSLCompiler::BuildPostDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
+			{
+				if (Statement->GetTemplateElementDataType() == nullptr)
+					return;
+
+				AddCode('<', Data);
+
+				BuildDataTypeStatement(Statement->GetTemplateElementDataType(), Data);
+
+				AddCode('>', Data);
+			}
+
 			void ASTToHLSLCompiler::BuildType(ProgramDataTypes Type, StageData& Data)
 			{
 				switch (Type)
@@ -626,8 +638,32 @@ namespace Engine
 					AddCode("double4x4", Data);
 					break;
 
+				case ProgramDataTypes::Texture1D:
+					AddCode("Texture1D", Data);
+					break;
+
 				case ProgramDataTypes::Texture2D:
 					AddCode("Texture2D", Data);
+					break;
+
+				case ProgramDataTypes::Texture3D:
+					AddCode("Texture3D", Data);
+					break;
+
+				case ProgramDataTypes::TextureCube:
+					AddCode("TextureCube", Data);
+					break;
+
+				case ProgramDataTypes::Texture1DRW:
+					AddCode("RWTexture1D", Data);
+					break;
+
+				case ProgramDataTypes::Texture2DRW:
+					AddCode("RWTexture2D", Data);
+					break;
+
+				case ProgramDataTypes::Texture3DRW:
+					AddCode("RWTexture3D", Data);
 					break;
 				}
 			}
@@ -654,7 +690,7 @@ namespace Engine
 
 						AddCode(StringUtility::ToString<char8>(cbvIndex++), Data);
 					}
-					else if (dataType->GetType() == ProgramDataTypes::Texture2D)
+					else if (dataType->IsTexture())
 					{
 						AddCode("DescriptorTable(SRV(t", Data);
 						AddCode(StringUtility::ToString<char8>(textureIndex), Data);

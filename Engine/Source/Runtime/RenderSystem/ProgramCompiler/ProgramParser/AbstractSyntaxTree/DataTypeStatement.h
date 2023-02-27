@@ -91,33 +91,17 @@ namespace Engine
 
 				bool IsIntegral(void) const
 				{
-					return (
-						m_Type == ProgramDataTypes::Integer ||
-						m_Type == ProgramDataTypes::UnsignedInteger ||
-						m_Type == ProgramDataTypes::Integer2 ||
-						m_Type == ProgramDataTypes::UnsignedInteger2 ||
-						m_Type == ProgramDataTypes::Integer3 ||
-						m_Type == ProgramDataTypes::UnsignedInteger3 ||
-						m_Type == ProgramDataTypes::Integer4 ||
-						m_Type == ProgramDataTypes::UnsignedInteger4);
+					return IsIntegral(m_Type);
 				}
 
 				bool IsFloating(void) const
 				{
-					return (
-						m_Type == ProgramDataTypes::Float ||
-						m_Type == ProgramDataTypes::Float2 ||
-						m_Type == ProgramDataTypes::Float3 ||
-						m_Type == ProgramDataTypes::Float4 ||
-						m_Type == ProgramDataTypes::Double ||
-						m_Type == ProgramDataTypes::Double2 ||
-						m_Type == ProgramDataTypes::Double3 ||
-						m_Type == ProgramDataTypes::Double4);
+					return IsFloating(m_Type);
 				}
 
 				bool IsNumeric(void) const
 				{
-					return IsIntegral() || IsFloating();
+					return IsNumeric(m_Type);
 				}
 
 				bool IsTexture(void) const
@@ -316,6 +300,37 @@ namespace Engine
 					}
 
 					return 0;
+				}
+
+				static bool IsIntegral(ProgramDataTypes Type)
+				{
+					return (
+						Type == ProgramDataTypes::Integer ||
+						Type == ProgramDataTypes::UnsignedInteger ||
+						Type == ProgramDataTypes::Integer2 ||
+						Type == ProgramDataTypes::UnsignedInteger2 ||
+						Type == ProgramDataTypes::Integer3 ||
+						Type == ProgramDataTypes::UnsignedInteger3 ||
+						Type == ProgramDataTypes::Integer4 ||
+						Type == ProgramDataTypes::UnsignedInteger4);
+				}
+
+				static bool IsFloating(ProgramDataTypes Type)
+				{
+					return (
+						Type == ProgramDataTypes::Float ||
+						Type == ProgramDataTypes::Float2 ||
+						Type == ProgramDataTypes::Float3 ||
+						Type == ProgramDataTypes::Float4 ||
+						Type == ProgramDataTypes::Double ||
+						Type == ProgramDataTypes::Double2 ||
+						Type == ProgramDataTypes::Double3 ||
+						Type == ProgramDataTypes::Double4);
+				}
+
+				static bool IsNumeric(ProgramDataTypes Type)
+				{
+					return IsIntegral(Type) || IsFloating(Type);
 				}
 
 				static bool IsTexture(ProgramDataTypes Type)

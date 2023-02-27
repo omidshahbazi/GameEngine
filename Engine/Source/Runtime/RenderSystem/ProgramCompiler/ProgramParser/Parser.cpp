@@ -790,6 +790,8 @@ namespace Engine
 				RequireIdentifierToken(templateElementToken, "Texture element type");
 
 				ProgramDataTypes templateElementType = GetPrimitiveDataType(templateElementToken.GetName());
+				if (!DataTypeStatement::IsNumeric(templateElementType))
+					THROW_PROGRAM_PARSER_EXCEPTION("Template type must be numeric type", templateElementToken);
 
 				uint16 offset;
 				uint8 size;

@@ -395,7 +395,7 @@ namespace Engine
 						AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
 						AddCode(", binding = ", Data);
 						AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
-						AddCode(')', Data);
+						AddCode(") ", Data);
 
 						++m_BindingCount;
 					}
@@ -714,6 +714,39 @@ namespace Engine
 				BuildArguments(Statement, Data);
 
 				AddCode(')', Data);
+			}
+
+			void ASTToGLSLCompiler::BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, Engine::ASTCompiler::ASTCompilerBase::StageData& Data)
+			{
+				switch (Statement->GetType())
+				{
+				case ProgramDataTypes::Integer:
+				case ProgramDataTypes::Integer2:
+				case ProgramDataTypes::Integer3:
+				case ProgramDataTypes::Integer4:
+					AddCode("i", Data);
+					break;
+
+				case ProgramDataTypes::UnsignedInteger:
+				case ProgramDataTypes::UnsignedInteger2:
+				case ProgramDataTypes::UnsignedInteger3:
+				case ProgramDataTypes::UnsignedInteger4:
+					AddCode("u", Data);
+					break;
+
+				case ProgramDataTypes::Float:
+				case ProgramDataTypes::Float2:
+				case ProgramDataTypes::Float3:
+				case ProgramDataTypes::Float4:
+				case ProgramDataTypes::Double:
+				case ProgramDataTypes::Double2:
+				case ProgramDataTypes::Double3:
+				case ProgramDataTypes::Double4:
+					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+				}
 			}
 
 			void ASTToGLSLCompiler::BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data)

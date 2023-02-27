@@ -37,6 +37,8 @@ namespace Engine
 
 				virtual void BuildArrayStatement(const ArrayStatement* Statement, StageData& Data) override;
 
+				virtual void BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, Engine::ASTCompiler::ASTCompilerBase::StageData& Data) override;
+
 				virtual void BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data) override;
 
 				virtual void BuildType(ProgramDataTypes Type, StageData& Data) override;

@@ -955,14 +955,16 @@ namespace Engine
 
 		void ASTCompilerBase::BuildDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 		{
-			BuildPreDataTypeStatement(Statement, Data);
+			if (Statement->GetTemplateElementDataType() != nullptr)
+				BuildPreTemplateDataTypeStatement(Statement->GetTemplateElementDataType(), Data);
 
 			if (Statement->IsBuiltIn())
 				BuildType(Statement->GetType(), Data);
 			else
 				AddCode(Statement->GetUserDefined(), Data);
 
-			BuildPostDataTypeStatement(Statement, Data);
+			if (Statement->GetTemplateElementDataType() != nullptr)
+				BuildPostTemplateDataTypeStatement(Statement->GetTemplateElementDataType(), Data);
 
 			if (Statement->GetElementCount() != nullptr)
 			{
@@ -972,11 +974,11 @@ namespace Engine
 			}
 		}
 
-		void ASTCompilerBase::BuildPreDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 		{
 		}
 
-		void ASTCompilerBase::BuildPostDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
+		void ASTCompilerBase::BuildPostTemplateDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 		{
 		}
 

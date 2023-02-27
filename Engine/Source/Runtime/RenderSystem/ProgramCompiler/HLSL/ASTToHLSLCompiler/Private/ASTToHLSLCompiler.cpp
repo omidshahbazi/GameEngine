@@ -542,14 +542,11 @@ namespace Engine
 				AddCode('}', Data);
 			}
 
-			void ASTToHLSLCompiler::BuildPostDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
+			void ASTToHLSLCompiler::BuildPostTemplateDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 			{
-				if (Statement->GetTemplateElementDataType() == nullptr)
-					return;
-
 				AddCode('<', Data);
 
-				BuildDataTypeStatement(Statement->GetTemplateElementDataType(), Data);
+				BuildDataTypeStatement(Statement, Data);
 
 				AddCode('>', Data);
 			}

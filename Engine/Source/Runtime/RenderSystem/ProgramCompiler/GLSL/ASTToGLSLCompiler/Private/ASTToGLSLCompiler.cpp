@@ -384,25 +384,18 @@ namespace Engine
 					return;
 				}
 
-				for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+				if (DataTypeStatement::IsTexture(dataType->GetType()))
 				{
-					if (allowedDataType != dataType->GetType())
-						continue;
+					AddCode("layout(location = ", Data);
+					AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
+					AddCode(", binding = ", Data);
+					AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
+					AddCode(") ", Data);
 
-					if (allowedDataType == ProgramDataTypes::Texture2D)
-					{
-						AddCode("layout(location = ", Data);
-						AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
-						AddCode(", binding = ", Data);
-						AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
-						AddCode(") ", Data);
-
-						++m_BindingCount;
-					}
-
-					AddCode("uniform ", Data);
-					break;
+					++m_BindingCount;
 				}
+
+				AddCode("uniform ", Data);
 
 				BuildDataTypeStatement(dataType, Data);
 				AddCode(' ', Data);

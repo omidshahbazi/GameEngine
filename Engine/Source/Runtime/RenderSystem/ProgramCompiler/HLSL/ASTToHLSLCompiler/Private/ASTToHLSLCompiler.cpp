@@ -305,20 +305,8 @@ namespace Engine
 			{
 				DataTypeStatement* dataType = Variable->GetDataType();
 
-				if (dataType->IsBuiltIn())
-				{
-					for (auto allowedDataType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
-					{
-						if (allowedDataType != dataType->GetType())
-							continue;
-
-						break;
-					}
-				}
-				else
-				{
+				if (!dataType->IsBuiltIn())
 					AddCode("ConstantBuffer<", Data);
-				}
 
 				BuildDataTypeStatement(dataType, Data);
 

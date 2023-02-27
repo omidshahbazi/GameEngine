@@ -109,6 +109,33 @@ namespace Engine
 					return IsTexture(m_Type);
 				}
 
+				bool IsAllowedToDefineInGlobalScope(void)
+				{
+					if (!IsBuiltIn())
+						return true;
+
+					const ProgramDataTypes ALLOWED_CONTEXT_FREE_DATA_TYPES[]
+					{
+						ProgramDataTypes::Texture1D,
+						ProgramDataTypes::Texture2D,
+						ProgramDataTypes::Texture3D,
+						ProgramDataTypes::TextureCube,
+						ProgramDataTypes::Texture1DRW,
+						ProgramDataTypes::Texture2DRW,
+						ProgramDataTypes::Texture3DRW
+					};
+
+					for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
+					{
+						if (allowedType != m_Type)
+							continue;
+
+						return true;
+					}
+
+					return false;
+				}
+
 				uint8 GetComponentCount(void) const
 				{
 					return GetComponentCount(m_Type);

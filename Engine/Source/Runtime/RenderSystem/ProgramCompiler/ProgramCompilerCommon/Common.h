@@ -53,17 +53,6 @@ namespace Engine
 			Unknown
 		};
 
-		const ProgramDataTypes ALLOWED_CONTEXT_FREE_DATA_TYPES[]
-		{
-			ProgramDataTypes::Texture1D,
-			ProgramDataTypes::Texture2D,
-			ProgramDataTypes::Texture3D,
-			ProgramDataTypes::TextureCube,
-			ProgramDataTypes::Texture1DRW,
-			ProgramDataTypes::Texture2DRW,
-			ProgramDataTypes::Texture3DRW
-		};
-
 		class PROGRAMCOMPILERCOMMON_API Constants
 		{
 		public:

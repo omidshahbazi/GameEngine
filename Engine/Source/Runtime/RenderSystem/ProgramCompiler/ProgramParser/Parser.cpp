@@ -416,9 +416,12 @@ namespace Engine
 			if (MatchSymbol(OPEN_BRACE))
 			{
 				UngetToken(nameToken);
-
-				return false;
+				result = false;
+				goto FinishUp;
 			}
+
+			if (!dataType->IsAllowedToDefineInGlobalScope())
+				THROW_PROGRAM_PARSER_EXCEPTION("Cannot be declared in global context", DeclarationToken);
 
 			ValidateDataType(dataType);
 
@@ -428,26 +431,7 @@ namespace Engine
 
 		FinishUp:
 			if (result)
-			{
-				if (dataType->IsBuiltIn())
-				{
-					bool allowed = false;
-
-					for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
-					{
-						if (allowedType != dataType->GetType())
-							continue;
-
-						allowed = true;
-						break;
-					}
-
-					if (!allowed)
-						THROW_PROGRAM_PARSER_EXCEPTION("Cannot be declared in global context", DeclarationToken);
-				}
-
 				m_Parameters->Variables.Add(variableType);
-			}
 			else
 				Deallocate(variableType);
 

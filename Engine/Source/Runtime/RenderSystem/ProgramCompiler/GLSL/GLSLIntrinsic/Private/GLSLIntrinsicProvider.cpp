@@ -1,6 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <GLSLIntrinsic\Private\GLSLIntrinsicProvider.h>
-#include <ProgramCompilerCommon\ProgramCompilerException.h>
+#include <ASTCompiler\ASTCompilerBase.h>
 
 namespace Engine
 {
@@ -1537,9 +1537,19 @@ namespace Engine
 				{
 					BEGIN_OVERRIDE(ProgramDataTypes::Float4);
 					{
-						ADD_PARAMETER(ProgramDataTypes::Texture2D);
-						ADD_PARAMETER(ProgramDataTypes::Float2);
-						SET_NATIVE_DESCRIPTION("texture");
+						ADD_PARAMETER(ProgramDataTypes::Texture1D);
+						ADD_PARAMETER(ProgramDataTypes::Float);						
+						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+							{
+								String textureVarialeName;
+								Compiler->BuildStatement(Arguments[0], Type, Stage, textureVarialeName);
+
+								Shader += "texture(";
+								Shader += ASTCompiler::ASTCompilerBase::GetSamplerVariableName(textureVarialeName);
+								Shader += ", ";
+								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
+								Shader += ')';
+							});
 					}
 					END_OVERRIDE();
 				}
@@ -2058,9 +2068,6 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
-								if (Arguments.GetSize() != 1)
-									THROW_PROGRAM_COMPILER_EXCEPTION("Not enough arguments for AppendToStrea", String::Empty);
-
 								Shader += "EmitVertex();\n";
 							});
 					}
@@ -2075,9 +2082,6 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
-								if (Arguments.GetSize() != 0)
-									THROW_PROGRAM_COMPILER_EXCEPTION("Not enough arguments for RestartStrip", String::Empty);
-
 								Shader += "EndPrimitive();\n";
 							});
 					}

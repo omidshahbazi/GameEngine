@@ -18,6 +18,7 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.GLSL
 		{
 			PrivateDependencyModuleNames.Add("APIIntrinsic");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("ASTCompiler");
 		}
 	}
 }

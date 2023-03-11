@@ -67,7 +67,6 @@ namespace Engine
 				static cstr GetRootSignatureDefineName(void);
 
 			public:
-				static String GetSamplerVariableName(const String& TextureVariableName);
 				static String GetGeometryOutputStreamParameterName(void);
 
 			private:

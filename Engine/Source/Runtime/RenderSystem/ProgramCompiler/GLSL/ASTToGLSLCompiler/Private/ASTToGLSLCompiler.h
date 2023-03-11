@@ -45,6 +45,8 @@ namespace Engine
 
 				virtual void BuildPostDataType(const DataTypeStatement* Type, StageData& Data);
 
+				virtual void BuildImageFormat(const DataTypeStatement* TemplateType, StageData& Data);
+
 				virtual void BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, bool ExplicitArrayLength, StageData& Data);
 
 				virtual void BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data);

@@ -1,7 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <HLSLIntrinsic\Private\HLSLIntrinsicProvider.h>
 #include <ASTToHLSLCompiler\Private\ASTToHLSLCompiler.h>
-#include <ProgramCompilerCommon\ProgramCompilerException.h>
 
 namespace Engine
 {
@@ -1547,7 +1546,7 @@ namespace Engine
 
 								Shader += textureVarialeName;
 								Shader += ".Sample(";
-								Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetSamplerVariableName(textureVarialeName);
+								Shader += ASTCompiler::ASTCompilerBase::GetSamplerVariableName(textureVarialeName);
 								Shader += ", ";
 								Compiler->BuildStatement(Arguments[1], Type, Stage, Shader);
 								Shader += ')';
@@ -2030,9 +2029,6 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
-								if (Arguments.GetSize() != 1)
-									THROW_PROGRAM_COMPILER_EXCEPTION("Not enough arguments for AppendToStrea", String::Empty);
-
 								String argument;
 								Compiler->BuildStatement(Arguments[0], Type, Stage, argument);
 
@@ -2053,9 +2049,6 @@ namespace Engine
 						MARK_AS_TEMPLATE();
 						SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 							{
-								if (Arguments.GetSize() != 0)
-									THROW_PROGRAM_COMPILER_EXCEPTION("Not enough arguments for RestartStrip", String::Empty);
-
 								Shader += ASTToHLSLCompiler::Private::ASTToHLSLCompiler::GetGeometryOutputStreamParameterName();
 								Shader += ".RestartStrip();\n";
 							});

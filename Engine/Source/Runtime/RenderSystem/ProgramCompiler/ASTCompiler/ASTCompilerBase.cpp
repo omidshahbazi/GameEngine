@@ -1680,5 +1680,10 @@ namespace Engine
 		{
 			return '_' + StringUtility::ToString<char8>(++m_SequentialVariableNumber);
 		}
+
+		String ASTCompilerBase::GetSamplerVariableName(const String& TextureVariableName)
+		{
+			return TextureVariableName + "Sampler";
+		}
 	}
 }

@@ -727,11 +727,6 @@ namespace Engine
 				return name;
 			}
 
-			String ASTToHLSLCompiler::GetSamplerVariableName(const String& TextureVariableName)
-			{
-				return TextureVariableName + "Sampler";
-			}
-
 			String ASTToHLSLCompiler::GetGeometryOutputStreamParameterName(void)
 			{
 				return "outputStream";

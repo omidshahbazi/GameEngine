@@ -372,37 +372,89 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildGlobalVariable(const GlobalVariableType* Variable, StageData& Data)
 			{
-				const String& name = Variable->GetName();
 				DataTypeStatement* dataType = Variable->GetDataType();
 
 				if (!dataType->IsBuiltIn())
 				{
 					const StructType* structType = GetStructType(dataType->GetUserDefined());
 
-					BuildUniformBlock(structType, name, Data);
+					BuildUniformBlock(structType, Variable->GetName(), Data);
 
 					return;
 				}
 
-				if (DataTypeStatement::IsTexture(dataType->GetType()))
+				if (dataType->IsTexture())
 				{
 					AddCode("layout(location = ", Data);
 					AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
 					AddCode(", binding = ", Data);
 					AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
+					AddCode(", ", Data);
+					BuildImageFormat(dataType->GetTemplateElementDataType(), Data);
 					AddCode(") ", Data);
-
-					++m_BindingCount;
 				}
 
 				AddCode("uniform ", Data);
 
+				switch (dataType->GetType())
+				{
+				case ProgramDataTypes::Texture1DRW:
+				case ProgramDataTypes::Texture2DRW:
+				case ProgramDataTypes::Texture3DRW:
+					AddCode("readonly writeonly ", Data);
+					break;
+				}
+
 				BuildDataTypeStatement(dataType, Data);
 				AddCode(' ', Data);
-				AddCode(name, Data);
+				AddCode(Variable->GetName(), Data);
 				AddCode(';', Data);
 
 				AddNewLine(Data);
+
+				if (dataType->IsTexture())
+				{
+					AddCode("layout(location = ", Data);
+					AddCode(StringUtility::ToString<char8>(m_BindingCount + 1), Data);
+					AddCode(", binding = ", Data);
+					AddCode(StringUtility::ToString<char8>(m_BindingCount), Data);
+					AddCode(") uniform ", Data);
+
+					if (dataType->GetTemplateElementDataType() != nullptr)
+						BuildPreTemplateDataTypeStatement(dataType->GetTemplateElementDataType(), Data);
+
+					switch (dataType->GetType())
+					{
+					case ProgramDataTypes::Texture1D:
+					case ProgramDataTypes::Texture1DRW:
+						AddCode("sampler1D ", Data);
+						break;
+
+					case ProgramDataTypes::Texture2D:
+					case ProgramDataTypes::Texture2DRW:
+						AddCode("sampler2D ", Data);
+						break;
+
+					case ProgramDataTypes::Texture3D:
+					case ProgramDataTypes::Texture3DRW:
+						AddCode("sampler3D ", Data);
+						break;
+
+					case ProgramDataTypes::TextureCube:
+						AddCode("samplerCube ", Data);
+						break;
+
+					default:
+						THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+					}
+
+					AddCode(GetSamplerVariableName(Variable->GetName()), Data);
+					AddCode(';', Data);
+
+					AddNewLine(Data);
+
+					m_BindingCount += 2;
+				}
 			}
 
 			void ASTToGLSLCompiler::BuildFunction(const FunctionType* Function, StageData& Data)
@@ -715,25 +767,21 @@ namespace Engine
 				{
 				case ProgramDataTypes::Integer:
 				case ProgramDataTypes::Integer2:
-				case ProgramDataTypes::Integer3:
 				case ProgramDataTypes::Integer4:
 					AddCode("i", Data);
 					break;
 
 				case ProgramDataTypes::UnsignedInteger:
 				case ProgramDataTypes::UnsignedInteger2:
-				case ProgramDataTypes::UnsignedInteger3:
 				case ProgramDataTypes::UnsignedInteger4:
 					AddCode("u", Data);
 					break;
 
 				case ProgramDataTypes::Float:
 				case ProgramDataTypes::Float2:
-				case ProgramDataTypes::Float3:
 				case ProgramDataTypes::Float4:
 				case ProgramDataTypes::Double:
 				case ProgramDataTypes::Double2:
-				case ProgramDataTypes::Double3:
 				case ProgramDataTypes::Double4:
 					break;
 
@@ -844,19 +892,19 @@ namespace Engine
 					break;
 
 				case ProgramDataTypes::Texture1D:
-					AddCode("sampler1D", Data);
+					AddCode("image1D", Data);
 					break;
 
 				case ProgramDataTypes::Texture2D:
-					AddCode("sampler2D", Data);
+					AddCode("image2D", Data);
 					break;
 
 				case ProgramDataTypes::Texture3D:
-					AddCode("sampler3D", Data);
+					AddCode("image3D", Data);
 					break;
 
 				case ProgramDataTypes::TextureCube:
-					AddCode("samplerCube", Data);
+					AddCode("imageCube", Data);
 					break;
 
 				case ProgramDataTypes::Texture1DRW:
@@ -880,6 +928,70 @@ namespace Engine
 					AddCode('[', Data);
 					BuildStatement(Type->GetPostElementCount(), Data);
 					AddCode(']', Data);
+				}
+			}
+
+			void ASTToGLSLCompiler::BuildImageFormat(const DataTypeStatement* TemplateType, StageData& Data)
+			{
+				if (TemplateType == nullptr)
+				{
+					AddCode("rgba8", Data);
+
+					return;
+				}
+
+				switch (TemplateType->GetType())
+				{
+				case ProgramDataTypes::Integer:
+					AddCode("r8i", Data);
+					break;
+
+				case ProgramDataTypes::Integer2:
+					AddCode("rg8i", Data);
+					break;
+
+				case ProgramDataTypes::Integer4:
+					AddCode("rgba8i", Data);
+					break;
+
+				case ProgramDataTypes::UnsignedInteger:
+					AddCode("r8ui", Data);
+					break;
+
+				case ProgramDataTypes::UnsignedInteger2:
+					AddCode("rg8ui", Data);
+					break;
+
+				case ProgramDataTypes::UnsignedInteger4:
+					AddCode("rgba8ui", Data);
+					break;
+
+				case ProgramDataTypes::Float:
+					AddCode("r8", Data);
+					break;
+
+				case ProgramDataTypes::Float2:
+					AddCode("rg8", Data);
+					break;
+
+				case ProgramDataTypes::Float4:
+					AddCode("rgba8", Data);
+					break;
+
+				case ProgramDataTypes::Double:
+					AddCode("r16", Data);
+					break;
+
+				case ProgramDataTypes::Double2:
+					AddCode("rg16", Data);
+					break;
+
+				case ProgramDataTypes::Double4:
+					AddCode("rgba16", Data);
+					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 			}
 

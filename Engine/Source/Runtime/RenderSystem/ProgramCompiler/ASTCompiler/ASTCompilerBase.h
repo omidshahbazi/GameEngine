@@ -291,6 +291,9 @@ namespace Engine
 				m_DataAccessStatements.RemoveAt(0);
 			}
 
+		public:
+			static String GetSamplerVariableName(const String& TextureVariableName);
+
 		private:
 			AllocatorBase* m_Allocator;
 

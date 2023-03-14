@@ -243,6 +243,12 @@ namespace Engine
 			String BuildSequentialVariable(const DataTypeStatement* DataType, const Statement* IntializerStatement, StageData& Data);
 			String GetSequentialVariableName(void);
 
+			void BuildType(ProgramDataTypes Type, String& Shader) override
+			{
+				StageData data = { FunctionType::Types::None, Stages::Vertex, {}, {}, {}, Shader, 0 };
+				BuildType(Type, data);
+			}
+
 			void BuildStatement(const Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) override
 			{
 				StageData data = { Type, Stage, {}, {}, {}, Shader, 0 };
@@ -308,9 +314,7 @@ namespace Engine
 
 			StatementStack m_DataAccessStatements;
 
-			uint32 m_SequentialVariableNumber = 0;
-
-			bool m_ReturnValueAlreadyBuilt;
+			uint32 m_SequentialVariableNumber;
 		};
 	}
 }

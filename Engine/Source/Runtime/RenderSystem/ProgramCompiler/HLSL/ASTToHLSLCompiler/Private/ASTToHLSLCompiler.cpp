@@ -217,11 +217,6 @@ namespace Engine
 			{
 			}
 
-			void ASTToHLSLCompiler::Initialize(DeviceTypes DeviceType)
-			{
-				ASTCompilerBase::Initialize(DeviceType);
-			}
-
 			void ASTToHLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
 			{
 				m_Functions = Functions;
@@ -320,7 +315,11 @@ namespace Engine
 				{
 					if (dataType->IsTexture())
 					{
-						AddCode(":register(t", Data);
+						if (dataType->IsWritableTexture())
+							AddCode(":register(u", Data);
+						else
+							AddCode(":register(t", Data);
+
 						AddCode(StringUtility::ToString<char8>(m_TextureBindingCount), Data);
 						AddCode(')', Data);
 					}
@@ -677,7 +676,11 @@ namespace Engine
 					}
 					else if (dataType->IsTexture())
 					{
-						AddCode("DescriptorTable(SRV(t", Data);
+						if (dataType->IsWritableTexture())
+							AddCode("DescriptorTable(UAV(u", Data);
+						else
+							AddCode("DescriptorTable(SRV(t", Data);
+
 						AddCode(StringUtility::ToString<char8>(textureIndex), Data);
 						AddCode(")),DescriptorTable(Sampler(s", Data);
 						AddCode(StringUtility::ToString<char8>(textureIndex), Data);

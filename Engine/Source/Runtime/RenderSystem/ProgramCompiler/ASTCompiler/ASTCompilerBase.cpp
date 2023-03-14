@@ -83,6 +83,8 @@ namespace Engine
 
 			BuildGlobalVariables(Data);
 
+			IntrinsicsBuilder::BuildBuiltIns(Data.Stage, Data.Shader);
+
 			BuildFunctions(Data);
 		}
 

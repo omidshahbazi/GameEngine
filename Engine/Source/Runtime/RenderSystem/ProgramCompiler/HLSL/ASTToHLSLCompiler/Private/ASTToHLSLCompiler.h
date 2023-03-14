@@ -23,8 +23,6 @@ namespace Engine
 			public:
 				ASTToHLSLCompiler(void);
 
-				virtual void Initialize(DeviceTypes DeviceType) override;
-
 				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
 
 			private:

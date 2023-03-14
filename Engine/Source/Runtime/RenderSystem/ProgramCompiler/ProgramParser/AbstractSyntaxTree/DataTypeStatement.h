@@ -109,6 +109,11 @@ namespace Engine
 					return IsTexture(m_Type);
 				}
 
+				bool IsWritableTexture(void) const
+				{
+					return IsWritableTexture(m_Type);
+				}
+
 				bool IsAllowedToDefineInGlobalScope(void)
 				{
 					if (!IsBuiltIn())
@@ -367,6 +372,14 @@ namespace Engine
 						Type == ProgramDataTypes::Texture2D ||
 						Type == ProgramDataTypes::Texture3D ||
 						Type == ProgramDataTypes::TextureCube ||
+						Type == ProgramDataTypes::Texture1DRW ||
+						Type == ProgramDataTypes::Texture2DRW ||
+						Type == ProgramDataTypes::Texture3DRW);
+				}
+
+				static bool IsWritableTexture(ProgramDataTypes Type)
+				{
+					return (
 						Type == ProgramDataTypes::Texture1DRW ||
 						Type == ProgramDataTypes::Texture2DRW ||
 						Type == ProgramDataTypes::Texture3DRW);

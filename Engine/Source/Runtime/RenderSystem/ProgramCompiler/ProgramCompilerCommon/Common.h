@@ -64,6 +64,25 @@ namespace Engine
 			static cstr GEOMETRY_ENTRY_POINT_NAME;
 			static cstr FRAGMENT_ENTRY_POINT_NAME;
 			static cstr COMPUTE_ENTRY_POINT_NAME;
+
+			static const ProgramDataTypes UNSIGNED_DATA_TYPES[3];
+			static const ProgramDataTypes FLOATING_POINT_TYPES[8];
+			static const ProgramDataTypes FLOATING_POINT_VECTOR_TYPES[6];
+			static const ProgramDataTypes NUMERIC_DATA_TYPES[4];
+			static const ProgramDataTypes VECTOR_DATA_TYPES[12];
+			static const ProgramDataTypes NUMERIC_AND_VECTOR_DATA_TYPES[16];
+			static const ProgramDataTypes MATRICES_DATA_TYPES[2];
+			static const ProgramDataTypes NUMERIC_VECTOR_AND_MATRICES_DATA_TYPES[18];
+			static const ProgramDataTypes TEXTURE_DATA_TYPES[11];
+
+			static const ProgramDataTypes SAMPLABLE_TEXTURE_TYPES[4];
+			static const ProgramDataTypes SAMPLABLE_TEXTURE_UV_TYPES[4];
+
+			static const ProgramDataTypes READABLE_TEXTURE_TYPES[7];
+			static const ProgramDataTypes READABLE_TEXTURE_UV_TYPES[7];
+
+			static const ProgramDataTypes WRITEABLE_TEXTURE_TYPES[3];
+			static const ProgramDataTypes WRITEABLE_TEXTURE_UV_TYPES[3];
 		};
 	}
 }

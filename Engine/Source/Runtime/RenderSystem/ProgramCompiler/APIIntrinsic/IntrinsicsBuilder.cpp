@@ -49,6 +49,11 @@ namespace Engine
 			m_Provider->Initialize(this);
 		}
 
+		void IntrinsicsBuilder::BuildBuiltIns(Stages Stage, String& Shader)
+		{
+			m_Provider->BuildBuiltIns(this, Stage, Shader);
+		}
+
 		bool IntrinsicsBuilder::BuildFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader)
 		{
 			auto function = FindOverride(Name, Arguments);

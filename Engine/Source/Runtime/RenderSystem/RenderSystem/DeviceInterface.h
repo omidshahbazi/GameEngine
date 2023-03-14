@@ -56,7 +56,7 @@ namespace Engine
 			typedef Delegate<const RenderContext*> ContextChangedEventHandler;
 			typedef Delegate<const Vector2I&> ContextResizedEventHandler;
 
-			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 32768;
+			static const uint16 DEFAULT_COMPILED_SHADER_BUFFER_SIZE = 65535;
 
 		private:
 			DeviceInterface(DeviceTypes DeviceType);

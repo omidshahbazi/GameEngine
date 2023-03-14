@@ -42,6 +42,7 @@ namespace Engine
 			class ICompiler
 			{
 			public:
+				virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 				virtual void BuildStatement(const Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const = 0;
@@ -72,6 +73,10 @@ namespace Engine
 			}
 
 			virtual void Initialize(IInitializeHelper* Helper) = 0;
+
+			virtual void BuildBuiltIns(ICompiler* Compiler, Stages Stage, String& Shader)
+			{
+			}
 
 			virtual const FunctionMap& GetFunctions(void) const = 0;
 		};

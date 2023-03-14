@@ -22,7 +22,9 @@ namespace Engine
 			IntrinsicsBuilder(void);
 			virtual ~IntrinsicsBuilder(void);
 
-			void Initialize(DeviceTypes Device);
+			virtual void Initialize(DeviceTypes Device);
+
+			void BuildBuiltIns(Stages Stage, String& Shader);
 
 			bool BuildFunctionCallStatement(const String& Name, const Vector<Statement*>& Arguments, FunctionType::Types Type, Stages Stage, String& Shader);
 

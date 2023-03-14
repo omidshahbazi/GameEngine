@@ -18,6 +18,8 @@ namespace Engine
 			public:
 				void Initialize(IInitializeHelper* Helper) override;
 
+				void BuildBuiltIns(ICompiler* Compiler, Stages Stage, String& Shader) override;
+
 				virtual const FunctionMap& GetFunctions(void) const override
 				{
 					return m_Functions;

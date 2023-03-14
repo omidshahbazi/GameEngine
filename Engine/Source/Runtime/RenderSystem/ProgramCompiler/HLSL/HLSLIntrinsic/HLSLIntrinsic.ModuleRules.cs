@@ -18,7 +18,9 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler.HLSL
 		{
 			PrivateDependencyModuleNames.Add("APIIntrinsic");
 			PrivateDependencyModuleNames.Add("DynamicModuleDefinition");
+			PrivateDependencyModuleNames.Add("ProgramCompilerCommon");
 			PrivateDependencyModuleNames.Add("ASTToHLSLCompiler");
+			PrivateDependencyModuleNames.Add("ProgramParser");
 		}
 	}
 }

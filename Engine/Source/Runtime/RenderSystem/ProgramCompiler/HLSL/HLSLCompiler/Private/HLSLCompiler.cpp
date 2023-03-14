@@ -3,6 +3,7 @@
 #include <Common\CharacterUtility.h>
 #include <Platform\PlatformMemory.h>
 #include <Containers\Exception.h>
+#include <Debugging\CoreDebug.h>
 #include <d3dcompiler.h>
 
 namespace Engine
@@ -79,6 +80,8 @@ namespace Engine
 
 				if (SUCCEEDED(D3DCompile2(Source, CharacterUtility::GetLength(Source), nullptr, nullptr, nullptr, EntryPointName, target, flags, 0, 0, nullptr, 0, &dataBlob, &messageBlob)))
 				{
+					CoreDebugAssert(Categories::ProgramCompiler, dataBlob->GetBufferSize() <= Size, "The buffer is not big enough to store %i bytes", dataBlob->GetBufferSize());
+
 					PlatformMemory::Copy(ReinterpretCast(byte*, dataBlob->GetBufferPointer()), ByteCode, dataBlob->GetBufferSize());
 					Size = dataBlob->GetBufferSize();
 

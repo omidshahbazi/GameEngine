@@ -228,6 +228,9 @@ namespace Engine
 
 			auto checkRequiredOutputs = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount)
 			{
+				if (Function->GetReturnDataType()->IsBuiltIn())
+					THROW_PROGRAM_COMPILER_EXCEPTION("Function return type couldn't be a builtin type", Function->GetName());
+
 				checkRequiredRegisters(Function->GetReturnDataType()->GetUserDefined(), RequiredRegisters, RequiredRegisterCount);
 			};
 
@@ -239,7 +242,11 @@ namespace Engine
 			FunctionType::Types funcType = Function->GetType();
 			checkRequiredInputs(Function, nullptr, 0, (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain));
 
-			if (Data.Stage == Stages::Hull)
+			if (Data.Stage == Stages::Vertex)
+			{
+				checkRequiredOutputs(Function, nullptr, 0);
+			}
+			else if (Data.Stage == Stages::Hull)
 			{
 				if (Function->GetAttribute<DomainAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find Domain attribute", Function->GetName());
@@ -261,6 +268,8 @@ namespace Engine
 			}
 			else if (Data.Stage == Stages::Domain)
 			{
+				checkRequiredOutputs(Function, nullptr, 0);
+
 				checkExistenceOfEntrypoint(FunctionType::Types::HullMain);
 			}
 			else if (Data.Stage == Stages::Geometry)
@@ -287,8 +296,14 @@ namespace Engine
 				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Geometry program must not return any value", Function->GetName());
 			}
+			else if (Data.Stage == Stages::Fragment)
+			{
+				checkRequiredOutputs(Function, nullptr, 0);
+			}
 			else if (Data.Stage == Stages::Compute)
 			{
+				checkRequiredOutputs(Function, nullptr, 0);
+
 				if (Function->GetAttribute<ThreadCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ThreadCount attribute", Function->GetName());
 

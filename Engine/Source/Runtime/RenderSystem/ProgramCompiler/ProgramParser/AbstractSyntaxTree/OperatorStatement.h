@@ -93,15 +93,11 @@ namespace Engine
 				{
 					String result;
 
-					result += "(";
-
 					result += m_Left->ToString();
 
 					result += GetOperatorSymbol(m_Operator);
 
 					result += m_Right->ToString();
-
-					result += ")";
 
 					return result;
 				}

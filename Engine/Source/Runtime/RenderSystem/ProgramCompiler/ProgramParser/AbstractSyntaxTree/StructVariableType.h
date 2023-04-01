@@ -81,7 +81,10 @@ namespace Engine
 				{
 					String result;
 
-					result += GetDataType()->ToString() + " " + GetName();
+					result += GetDataType()->ToString();
+					result += ' ';
+					result += GetName();
+					result += GetDataType()->PostElementCountToString();
 
 					if (m_Register != Registers::None)
 					{

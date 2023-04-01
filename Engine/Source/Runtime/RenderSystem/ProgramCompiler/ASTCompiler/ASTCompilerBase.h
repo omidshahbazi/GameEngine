@@ -78,7 +78,7 @@ namespace Engine
 
 			virtual void Initialize(DeviceTypes DeviceType);
 
-			virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output);
+			virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, bool DebugMode, OutputInfo& Output);
 
 		protected:
 			virtual void BuildStageShader(StageData& Data);
@@ -301,6 +301,7 @@ namespace Engine
 
 		private:
 			AllocatorBase* m_Allocator;
+			bool m_DebugMode;
 
 			StructList m_Structs;
 			FunctionList m_Functions;

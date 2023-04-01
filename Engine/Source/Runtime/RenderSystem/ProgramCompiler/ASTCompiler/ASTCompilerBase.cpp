@@ -10,6 +10,7 @@ namespace Engine
 	{
 		ASTCompilerBase::ASTCompilerBase(void) :
 			m_Allocator(nullptr),
+			m_DebugMode(false),
 			m_BlockIndex(-1),
 			m_HullConstantFunction(nullptr),
 			m_LastFunction(nullptr),
@@ -22,8 +23,9 @@ namespace Engine
 			IntrinsicsBuilder::Initialize(DeviceType);
 		}
 
-		void ASTCompilerBase::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+		void ASTCompilerBase::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, bool DebugMode, OutputInfo& Output)
 		{
+			m_DebugMode = DebugMode;
 			m_BlockIndex = -1;
 			m_LastFunction = nullptr;
 			m_Allocator = Allocator;
@@ -79,11 +81,11 @@ namespace Engine
 		{
 			ResetPerStageValues(Data);
 
+			IntrinsicsBuilder::BuildBuiltIns(Data.Stage, Data.Shader);
+
 			BuildStructs(Data);
 
 			BuildGlobalVariables(Data);
-
-			IntrinsicsBuilder::BuildBuiltIns(Data.Stage, Data.Shader);
 
 			BuildFunctions(Data);
 		}
@@ -1674,20 +1676,17 @@ namespace Engine
 
 		void ASTCompilerBase::AddCode(const String& Value, StageData& Data)
 		{
-#ifdef DEBUG_MODE
-			if (Data.Shader.EndsWith('\n'))
+			if (m_DebugMode && Data.Shader.EndsWith('\n'))
 				for (uint8 i = 0; i < m_BlockIndex + Data.IndentOffset; ++i)
 					Data.Shader += '\t';
-#endif
 
 			Data.Shader += Value;
 		}
 
 		void ASTCompilerBase::AddNewLine(StageData& Data)
 		{
-#ifdef DEBUG_MODE
-			Data.Shader += '\n';
-#endif
+			if (m_DebugMode)
+				Data.Shader += '\n';
 		}
 
 		String ASTCompilerBase::BuildSequentialVariable(const Statement* IntializerStatement, StageData& Data)

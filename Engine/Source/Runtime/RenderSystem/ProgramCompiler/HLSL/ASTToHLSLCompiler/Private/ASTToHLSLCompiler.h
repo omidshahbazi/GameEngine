@@ -23,7 +23,7 @@ namespace Engine
 			public:
 				ASTToHLSLCompiler(void);
 
-				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output) override;
+				virtual void Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, bool DebugMode, OutputInfo& Output) override;
 
 			private:
 				virtual void ResetPerStageValues(StageData& Data) override;

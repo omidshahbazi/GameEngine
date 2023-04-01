@@ -458,19 +458,18 @@ namespace Engine
 						Compiler->BuildType(textureType, Shader);
 						Shader += "<";
 						Compiler->BuildType(textureDataType, Shader);
-						Shader += "> Texture)\n{\n";
+						Shader += "> Texture){";
 
 						uint8 componentCount = DataTypeStatement::GetComponentCount(returnType);
 						for (uint8 i = 0; i < componentCount; ++i)
 						{
-							Shader += '\t';
 							Compiler->BuildType(ProgramDataTypes::UnsignedInteger, Shader);
 							Shader += " result";
 							Shader += StringUtility::ToString<char8>(i);
-							Shader += ";\n";
+							Shader += ";";
 						}
 
-						Shader += "\tTexture.GetDimensions(";
+						Shader += "Texture.GetDimensions(";
 
 						for (uint8 i = 0; i < componentCount; ++i)
 						{
@@ -481,9 +480,9 @@ namespace Engine
 							Shader += StringUtility::ToString<char8>(i);
 						}
 
-						Shader += ");\n";
+						Shader += ");";
 
-						Shader += "\treturn ";
+						Shader += "return ";
 
 						if (componentCount == 1)
 							Shader += "result0";
@@ -504,8 +503,10 @@ namespace Engine
 							Shader += ')';
 						}
 
-						Shader += ";\n}\n";
+						Shader += ";}";
 					}
+
+				Shader += '\n';
 			}
 		}
 	}

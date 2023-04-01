@@ -217,13 +217,13 @@ namespace Engine
 			{
 			}
 
-			void ASTToHLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, OutputInfo& Output)
+			void ASTToHLSLCompiler::Compile(AllocatorBase* Allocator, const StructList& Structs, const GlobalVariableList& Variables, const FunctionList& Functions, bool DebugMode, OutputInfo& Output)
 			{
 				m_Functions = Functions;
 				m_ConstantBufferBindingCount = 0;
 				m_ViewBindingCount = 0;
 
-				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
+				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, DebugMode, Output);
 			}
 
 			void ASTToHLSLCompiler::ResetPerStageValues(StageData& Data)

@@ -374,12 +374,14 @@ namespace Engine
 			{
 				DataTypeStatement* dataType = Variable->GetDataType();
 
-				if (!dataType->IsBuiltIn())
+				if (dataType->IsBuffer())
 				{
-					const StructType* structType = GetStructType(dataType->GetUserDefined());
-
-					BuildUniformBlock(structType, Variable->GetName(), Data);
-
+					BuildBufferBlock(dataType, Variable->GetName(), Data);
+					return;
+				}
+				else if (!dataType->IsBuiltIn())
+				{
+					BuildUniformBlock(dataType, Variable->GetName(), Data);
 					return;
 				}
 
@@ -396,14 +398,8 @@ namespace Engine
 
 				AddCode("uniform ", Data);
 
-				switch (dataType->GetType())
-				{
-				case ProgramDataTypes::Texture1DRW:
-				case ProgramDataTypes::Texture2DRW:
-				case ProgramDataTypes::Texture3DRW:
+				if (dataType->IsWritableTexture())
 					AddCode("readonly writeonly ", Data);
-					break;
-				}
 
 				BuildDataTypeStatement(dataType, Data);
 				AddCode(' ', Data);
@@ -761,7 +757,7 @@ namespace Engine
 				AddCode(')', Data);
 			}
 
-			void ASTToGLSLCompiler::BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, Engine::ASTCompiler::ASTCompilerBase::StageData& Data)
+			void ASTToGLSLCompiler::BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, StageData& Data)
 			{
 				switch (Statement->GetType())
 				{
@@ -918,6 +914,9 @@ namespace Engine
 				case ProgramDataTypes::Texture3DRW:
 					AddCode("image3D", Data);
 					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 			}
 
@@ -1044,16 +1043,13 @@ namespace Engine
 				}
 			}
 
-			void ASTToGLSLCompiler::BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data)
+			void ASTToGLSLCompiler::BuildUniformBlock(const DataTypeStatement* DataType, const String& Name, StageData& Data)
 			{
-				auto variables = Struct->GetItems();
-
-				if (FindVariableType(Struct, [](auto item) { return item->GetRegister() != StructVariableType::Registers::None; }) != nullptr)
-					CoreDebugAssert(Categories::ProgramCompiler, false, "Struct %S cannot have variables with register specified", Struct->GetName());
+				const StructType* structType = GetStructType(DataType->GetUserDefined());
 
 				AddCode("layout(std140, binding = ", Data);
 				AddCode(StringUtility::ToString<char8>(m_BindingCount++), Data);
-				AddCode(") uniform " + Struct->GetName(), Data);
+				AddCode(") uniform " + structType->GetName(), Data);
 				AddCode('_', Data);
 				AddCode(Name, Data);
 				AddNewLine(Data);
@@ -1063,7 +1059,7 @@ namespace Engine
 				++Data.IndentOffset;
 
 				uint16 offset = 0;
-				for (auto variable : variables)
+				for (auto variable : structType->GetItems())
 				{
 					ProgramDataTypes dataType = variable->GetDataType()->GetType();
 
@@ -1092,6 +1088,42 @@ namespace Engine
 				AddCode(Name, Data);
 
 				AddCode(';', Data);
+
+				AddNewLine(Data);
+			}
+
+			void ASTToGLSLCompiler::BuildBufferBlock(const DataTypeStatement* DataType, const String& Name, StageData& Data)
+			{
+				CoreDebugAssert(Categories::ProgramCompiler, DataType->IsBuffer(), "DataType is not a buffer", DataType->ToString());
+
+				String dataTypeName = DataType->GetTemplateElementDataType()->ToString();
+
+				AddCode("layout(std140, binding = ", Data);
+				AddCode(StringUtility::ToString<char8>(m_BindingCount++), Data);
+				AddCode(')', Data);
+
+				if (DataType->IsWritableBuffer())
+					AddCode(" readonly writeonly", Data);
+
+				AddCode(" buffer " , Data);
+				AddCode(dataTypeName, Data);
+				AddCode('_', Data);
+				AddCode(Name, Data);
+				AddNewLine(Data);
+				AddCode('{', Data);
+				AddNewLine(Data);
+
+				++Data.IndentOffset;
+
+				BuildDataTypeStatement(DataType->GetTemplateElementDataType(), Data);
+				AddCode(' ', Data);
+				AddCode(Name, Data);
+				AddCode("[];", Data);
+				AddNewLine(Data);
+
+				--Data.IndentOffset;
+
+				AddCode("};", Data);
 
 				AddNewLine(Data);
 			}

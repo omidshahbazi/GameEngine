@@ -205,7 +205,6 @@ namespace Engine
 
 			virtual void BuildType(ProgramDataTypes Type, StageData& Data) = 0;
 
-			virtual uint8 EvaluateDataTypeElementCount(const DataTypeStatement* Statement);
 			DataTypeStatement EvaluateDataType(const Statement* CurrentStatement, const Statement* TopStatement = nullptr) const;
 			ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const override;
 

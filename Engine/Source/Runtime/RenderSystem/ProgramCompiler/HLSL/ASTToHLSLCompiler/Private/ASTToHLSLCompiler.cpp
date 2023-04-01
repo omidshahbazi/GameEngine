@@ -213,7 +213,7 @@ namespace Engine
 
 			ASTToHLSLCompiler::ASTToHLSLCompiler(void) :
 				m_ConstantBufferBindingCount(0),
-				m_TextureBindingCount(0)
+				m_ViewBindingCount(0)
 			{
 			}
 
@@ -221,7 +221,7 @@ namespace Engine
 			{
 				m_Functions = Functions;
 				m_ConstantBufferBindingCount = 0;
-				m_TextureBindingCount = 0;
+				m_ViewBindingCount = 0;
 
 				ASTCompilerBase::Compile(Allocator, Structs, Variables, Functions, Output);
 			}
@@ -231,7 +231,7 @@ namespace Engine
 				ASTCompilerBase::ResetPerStageValues(Data);
 
 				m_ConstantBufferBindingCount = 0;
-				m_TextureBindingCount = 0;
+				m_ViewBindingCount = 0;
 			}
 
 			void ASTToHLSLCompiler::BuildStageShader(StageData& Data)
@@ -311,22 +311,27 @@ namespace Engine
 				AddCode(' ', Data);
 				AddCode(Variable->GetName(), Data);
 
+				bool isAView = false;
+				AddCode(" : register(", Data);
+
 				if (dataType->IsBuiltIn())
 				{
-					if (dataType->IsTexture())
+					if (dataType->IsTexture() || dataType->IsBuffer())
 					{
-						if (dataType->IsWritableTexture())
-							AddCode(":register(u", Data);
-						else
-							AddCode(":register(t", Data);
+						isAView = true;
 
-						AddCode(StringUtility::ToString<char8>(m_TextureBindingCount), Data);
+						if (dataType->IsWritableTexture() || dataType->IsWritableBuffer())
+							AddCode('u', Data);
+						else
+							AddCode('t', Data);
+
+						AddCode(StringUtility::ToString<char8>(m_ViewBindingCount), Data);
 						AddCode(')', Data);
 					}
 				}
 				else
 				{
-					AddCode(":register(b", Data);
+					AddCode('b', Data);
 					AddCode(StringUtility::ToString<char8>(m_ConstantBufferBindingCount++), Data);
 					AddCode(')', Data);
 				}
@@ -339,14 +344,15 @@ namespace Engine
 				{
 					AddCode("SamplerState ", Data);
 					AddCode(GetSamplerVariableName(Variable->GetName()), Data);
-					AddCode(":register(s", Data);
-					AddCode(StringUtility::ToString<char8>(m_TextureBindingCount), Data);
+					AddCode(" : register(s", Data);
+					AddCode(StringUtility::ToString<char8>(m_ViewBindingCount), Data);
 					AddCode(");", Data);
 
 					AddNewLine(Data);
-
-					++m_TextureBindingCount;
 				}
+
+				if (isAView)
+					++m_ViewBindingCount;
 			}
 
 			void ASTToHLSLCompiler::BuildFunction(const FunctionType* Function, StageData& Data)
@@ -649,6 +655,17 @@ namespace Engine
 				case ProgramDataTypes::Texture3DRW:
 					AddCode("RWTexture3D", Data);
 					break;
+
+				case ProgramDataTypes::Buffer:
+					AddCode("StructuredBuffer", Data);
+					break;
+
+				case ProgramDataTypes::BufferRW:
+					AddCode("RWStructuredBuffer", Data);
+					break;
+
+				default:
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 			}
 
@@ -661,7 +678,7 @@ namespace Engine
 				AddCode("RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)", Data);
 
 				uint8 cbvIndex = 0;
-				uint8 textureIndex = 0;
+				uint8 viewIndex = 0;
 				for (auto variableType : Data.Variables)
 				{
 					const DataTypeStatement* dataType = variableType->GetDataType();
@@ -674,19 +691,24 @@ namespace Engine
 
 						AddCode(StringUtility::ToString<char8>(cbvIndex++), Data);
 					}
-					else if (dataType->IsTexture())
+					else if (dataType->IsTexture() || dataType->IsBuffer())
 					{
-						if (dataType->IsWritableTexture())
+						if (dataType->IsWritableTexture() || dataType->IsWritableBuffer())
 							AddCode("DescriptorTable(UAV(u", Data);
 						else
 							AddCode("DescriptorTable(SRV(t", Data);
 
-						AddCode(StringUtility::ToString<char8>(textureIndex), Data);
-						AddCode(")),DescriptorTable(Sampler(s", Data);
-						AddCode(StringUtility::ToString<char8>(textureIndex), Data);
+						AddCode(StringUtility::ToString<char8>(viewIndex), Data);
+
+						if (dataType->IsTexture())
+						{
+							AddCode(")),DescriptorTable(Sampler(s", Data);
+							AddCode(StringUtility::ToString<char8>(viewIndex), Data);
+						}
+
 						AddCode(")", Data);
 
-						++textureIndex;
+						++viewIndex;
 					}
 
 					AddCode(')', Data);

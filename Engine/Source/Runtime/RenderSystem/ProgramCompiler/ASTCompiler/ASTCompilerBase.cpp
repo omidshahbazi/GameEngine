@@ -729,6 +729,10 @@ namespace Engine
 
 			AddCode('[', Data);
 
+			DataTypeStatement elementIndexDataType = EvaluateDataType(Statement->GetElementStatement());
+			if (elementIndexDataType.GetType() != ProgramDataTypes::Integer && elementIndexDataType.GetType() != ProgramDataTypes::UnsignedInteger)
+				THROW_PROGRAM_COMPILER_EXCEPTION("Invalid type of index", elementIndexDataType.ToString());
+
 			BuildStatement(Statement->GetElementStatement(), Data);
 
 			AddCode(']', Data);
@@ -1083,7 +1087,7 @@ namespace Engine
 				break;
 
 				default:
-					THROW_PROGRAM_COMPILER_EXCEPTION("Not handled data type to generate a default value", String::Empty);
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 				return;
@@ -1104,25 +1108,6 @@ namespace Engine
 			}
 
 			AddCode(" }", Data);
-		}
-
-		uint8 ASTCompilerBase::EvaluateDataTypeElementCount(const DataTypeStatement* Statement)
-		{
-			if (Statement == nullptr)
-				return 0;
-
-			uint8 elementCount = 1;
-
-			if (Statement->GetElementCount() != nullptr)
-			{
-				String elementCountString;
-				StageData data = { FunctionType::Types::None, Stages::Vertex, {}, {}, {} , elementCountString, 0 };
-				BuildStatement(Statement->GetElementCount(), data);
-
-				elementCount = StringUtility::ToInt8(elementCountString, 1);
-			}
-
-			return elementCount;
 		}
 
 		DataTypeStatement ASTCompilerBase::EvaluateDataType(const Statement* CurrentStatement, const Statement* TopStatement) const
@@ -1451,7 +1436,8 @@ namespace Engine
 					const ArrayElementAccessStatement* stm = ReinterpretCast(const ArrayElementAccessStatement*, statement);
 
 					DataTypeStatement dataType = EvaluateDataType(stm->GetArrayStatement());
-					if (checkVariableInParent(&dataType))
+
+					if (checkVariableInParent((dataType.GetTemplateElementDataType() == nullptr ? &dataType : dataType.GetTemplateElementDataType())))
 						return;
 				}
 			}

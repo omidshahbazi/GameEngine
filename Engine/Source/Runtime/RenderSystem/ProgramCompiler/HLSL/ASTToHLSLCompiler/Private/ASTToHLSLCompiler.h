@@ -70,7 +70,7 @@ namespace Engine
 			private:
 				FunctionList m_Functions;
 				uint8 m_ConstantBufferBindingCount;
-				uint8 m_TextureBindingCount;
+				uint8 m_ViewBindingCount;
 			};
 		}
 	}

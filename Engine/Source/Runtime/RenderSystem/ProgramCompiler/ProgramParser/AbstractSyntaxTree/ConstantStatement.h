@@ -41,6 +41,17 @@ namespace Engine
 					m_Bool = Value;
 				}
 
+				int32 GetInt32(void) const
+				{
+					return m_Int32;
+				}
+
+				void SetInt32(int32 Value)
+				{
+					m_Type = ProgramDataTypes::Integer;
+					m_Int32 = Value;
+				}
+
 				float32 GetFloat32(void) const
 				{
 					return m_Float32;
@@ -57,6 +68,9 @@ namespace Engine
 					if (m_Type == ProgramDataTypes::Bool)
 						return (m_Bool ? "true" : "false");
 
+					if (m_Type == ProgramDataTypes::Integer)
+						return StringUtility::ToString<char8>(m_Int32);
+
 					return StringUtility::ToString<char8>(m_Float32);
 				}
 
@@ -66,6 +80,7 @@ namespace Engine
 				union
 				{
 					bool m_Bool;
+					int32 m_Int32;
 					float32 m_Float32;
 				};
 			};

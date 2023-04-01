@@ -37,7 +37,7 @@ namespace Engine
 
 				virtual void BuildArrayStatement(const ArrayStatement* Statement, StageData& Data) override;
 
-				virtual void BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, Engine::ASTCompiler::ASTCompilerBase::StageData& Data) override;
+				virtual void BuildPreTemplateDataTypeStatement(const DataTypeStatement* Statement, StageData& Data) override;
 
 				virtual void BuildExplicitCast(const Statement* Statement, const DataTypeStatement* DataType, StageData& Data) override;
 
@@ -48,8 +48,8 @@ namespace Engine
 				virtual void BuildImageFormat(const DataTypeStatement* TemplateType, StageData& Data);
 
 				virtual void BuildInputOutputStruct(const DataTypeStatement* DataType, const String& Name, bool IsInput, bool ConvertToArray, bool ExplicitArrayLength, StageData& Data);
-
-				virtual void BuildUniformBlock(const StructType* Struct, const String& Name, StageData& Data);
+				virtual void BuildUniformBlock(const DataTypeStatement* DataType, const String& Name, StageData& Data);
+				virtual void BuildBufferBlock(const DataTypeStatement* DataType, const String& Name, StageData& Data);
 
 				virtual void BuildFlattenStructMemberVariableName(const StructType* Parent, const StructVariableType* Variable, const String& Name, bool IsInput, StageData& Data);
 

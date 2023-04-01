@@ -420,8 +420,14 @@ namespace Engine
 				goto FinishUp;
 			}
 
+			if (m_Parameters->Variables.ContainsIf([&nameToken](auto item) { return item->GetName() == nameToken.GetName(); }))
+				THROW_PROGRAM_PARSER_EXCEPTION(StringUtility::Format<char8>("Variable already defined %S", nameToken.GetName()), DeclarationToken);
+
 			if (!dataType->IsAllowedToDefineInGlobalScope())
 				THROW_PROGRAM_PARSER_EXCEPTION("Cannot be declared in global context", DeclarationToken);
+
+			if (dataType->IsBuffer() && dataType->GetTemplateElementDataType() == nullptr)
+				THROW_PROGRAM_PARSER_EXCEPTION("Buffer types need to have template paramter", DeclarationToken);
 
 			ValidateDataType(dataType);
 
@@ -748,7 +754,7 @@ namespace Engine
 			if (DeclarationToken.GetType() != Token::Types::Identifier)
 				THROW_PROGRAM_PARSER_EXCEPTION("Unexpected token", DeclarationToken);
 
-			ProgramDataTypes primitiveType = GetPrimitiveDataType(identifier);
+			ProgramDataTypes primitiveType = Constants::GetPrimitiveDataType(identifier);
 
 			String userDefinedType;
 			if (primitiveType == ProgramDataTypes::Unknown)
@@ -767,28 +773,28 @@ namespace Engine
 			{
 				const uint8 TEMPLATE_TYPE_SIZE = 32;
 
-				if (!DataTypeStatement::IsTexture(primitiveType))
+				if (!DataTypeStatement::IsTexture(primitiveType) && !DataTypeStatement::IsBuffer(primitiveType))
 					THROW_PROGRAM_PARSER_EXCEPTION("Template type is not applicable on primitive types", DeclarationToken);
 
 				Token templateElementToken;
-				RequireIdentifierToken(templateElementToken, "Texture element type");
+				RequireIdentifierToken(templateElementToken, "template element type");
 
-				ProgramDataTypes templateElementType = GetPrimitiveDataType(templateElementToken.GetName());
-				if (!DataTypeStatement::IsNumeric(templateElementType))
-					THROW_PROGRAM_PARSER_EXCEPTION("Template type must be numeric type", templateElementToken);
+				DataTypeStatement* templateDataTypeStm = ParseDataType(templateElementToken);
+				if (DataTypeStatement::IsTexture(primitiveType))
+				{
+					if (!templateDataTypeStm->IsNumeric())
+						THROW_PROGRAM_PARSER_EXCEPTION("Template type must be numeric type", templateElementToken);
 
-				uint16 offset;
-				uint8 size;
-				StructType::GetAlignedOffset(templateElementType, offset, size);
-				if (size % TEMPLATE_TYPE_SIZE != 0 && size % TEMPLATE_TYPE_SIZE != size)
-					THROW_PROGRAM_PARSER_EXCEPTION(StringUtility::Format(String("Template type must be aligned by %i"), TEMPLATE_TYPE_SIZE), templateElementToken);
-
-				RequireSymbol(CLOSE_ANGLE_BRACKET, "Texture element type");
-
-				DataTypeStatement* templateDataTypeStm = Allocate<DataTypeStatement>(primitiveType);
-				Construct(templateDataTypeStm, templateElementType);
+					uint16 offset;
+					uint8 size;
+					StructType::GetAlignedOffset(templateDataTypeStm->GetType(), offset, size);
+					if (size % TEMPLATE_TYPE_SIZE != 0 && size % TEMPLATE_TYPE_SIZE != size)
+						THROW_PROGRAM_PARSER_EXCEPTION(StringUtility::Format(String("Template type must be aligned by %i"), TEMPLATE_TYPE_SIZE), templateElementToken);
+				}
 
 				stm->SetTemplateElementDataType(templateDataTypeStm);
+
+				RequireSymbol(CLOSE_ANGLE_BRACKET, "template element type");
 			}
 
 			stm->SetElementCount(ParseArrayElementCountStatement());
@@ -1323,8 +1329,7 @@ namespace Engine
 				break;
 
 			case Token::Types::ConstantInt32:
-				stm->SetFloat32(DeclarationToken.GetConstantInt32());
-				break;
+				stm->SetInt32(DeclarationToken.GetConstantInt32());
 				break;
 
 			case Token::Types::ConstantFloat32:
@@ -1429,50 +1434,6 @@ namespace Engine
 			UngetToken(DeclarationToken);
 
 			return true;
-		}
-
-		ProgramDataTypes Parser::GetPrimitiveDataType(const String& Name)
-		{
-			static bool initialized = false;
-			static Map<String, ProgramDataTypes> dataTypesName;
-
-			if (!initialized)
-			{
-				initialized = true;
-
-				dataTypesName["void"] = ProgramDataTypes::Void;
-				dataTypesName["bool"] = ProgramDataTypes::Bool;
-				dataTypesName["int"] = ProgramDataTypes::Integer;
-				dataTypesName["uint"] = ProgramDataTypes::UnsignedInteger;
-				dataTypesName["float"] = ProgramDataTypes::Float;
-				dataTypesName["double"] = ProgramDataTypes::Double;
-				dataTypesName["int2"] = ProgramDataTypes::Integer2;
-				dataTypesName["uint2"] = ProgramDataTypes::UnsignedInteger2;
-				dataTypesName["float2"] = ProgramDataTypes::Float2;
-				dataTypesName["double2"] = ProgramDataTypes::Double2;
-				dataTypesName["int3"] = ProgramDataTypes::Integer3;
-				dataTypesName["uint3"] = ProgramDataTypes::UnsignedInteger3;
-				dataTypesName["float3"] = ProgramDataTypes::Float3;
-				dataTypesName["double3"] = ProgramDataTypes::Double3;
-				dataTypesName["int4"] = ProgramDataTypes::Integer4;
-				dataTypesName["uint4"] = ProgramDataTypes::UnsignedInteger4;
-				dataTypesName["float4"] = ProgramDataTypes::Float4;
-				dataTypesName["double4"] = ProgramDataTypes::Double4;
-				dataTypesName["matrix4d"] = ProgramDataTypes::Matrix4F;
-				dataTypesName["matrix4f"] = ProgramDataTypes::Matrix4D;
-				dataTypesName["texture1D"] = ProgramDataTypes::Texture1D;
-				dataTypesName["texture2D"] = ProgramDataTypes::Texture2D;
-				dataTypesName["texture3D"] = ProgramDataTypes::Texture3D;
-				dataTypesName["textureCube"] = ProgramDataTypes::TextureCube;
-				dataTypesName["texture1DRW"] = ProgramDataTypes::Texture1DRW;
-				dataTypesName["texture2DRW"] = ProgramDataTypes::Texture2DRW;
-				dataTypesName["texture3DRW"] = ProgramDataTypes::Texture3DRW;
-			}
-
-			if (dataTypesName.Contains(Name))
-				return dataTypesName[Name];
-
-			return ProgramDataTypes::Unknown;
 		}
 	}
 }

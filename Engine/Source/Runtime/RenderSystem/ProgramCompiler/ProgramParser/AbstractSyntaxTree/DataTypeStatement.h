@@ -114,6 +114,16 @@ namespace Engine
 					return IsWritableTexture(m_Type);
 				}
 
+				bool IsBuffer(void) const
+				{
+					return IsBuffer(m_Type);
+				}
+
+				bool IsWritableBuffer(void) const
+				{
+					return IsWritableBuffer(m_Type);
+				}
+
 				bool IsAllowedToDefineInGlobalScope(void)
 				{
 					if (!IsBuiltIn())
@@ -127,7 +137,9 @@ namespace Engine
 						ProgramDataTypes::TextureCube,
 						ProgramDataTypes::Texture1DRW,
 						ProgramDataTypes::Texture2DRW,
-						ProgramDataTypes::Texture3DRW
+						ProgramDataTypes::Texture3DRW,
+						ProgramDataTypes::Buffer,
+						ProgramDataTypes::BufferRW
 					};
 
 					for (auto allowedType : ALLOWED_CONTEXT_FREE_DATA_TYPES)
@@ -260,6 +272,13 @@ namespace Engine
 						result = "texture3DRW";
 						break;
 
+					case ProgramDataTypes::Buffer:
+						result = "buffer";
+						break;
+
+					case ProgramDataTypes::BufferRW:
+						result = "bufferRW";
+						break;
 
 					default:
 						result = m_UserDefined;
@@ -372,9 +391,7 @@ namespace Engine
 						Type == ProgramDataTypes::Texture2D ||
 						Type == ProgramDataTypes::Texture3D ||
 						Type == ProgramDataTypes::TextureCube ||
-						Type == ProgramDataTypes::Texture1DRW ||
-						Type == ProgramDataTypes::Texture2DRW ||
-						Type == ProgramDataTypes::Texture3DRW);
+						IsWritableTexture(Type));
 				}
 
 				static bool IsWritableTexture(ProgramDataTypes Type)
@@ -383,6 +400,18 @@ namespace Engine
 						Type == ProgramDataTypes::Texture1DRW ||
 						Type == ProgramDataTypes::Texture2DRW ||
 						Type == ProgramDataTypes::Texture3DRW);
+				}
+
+				static bool IsBuffer(ProgramDataTypes Type)
+				{
+					return (
+						Type == ProgramDataTypes::Buffer ||
+						IsWritableBuffer(Type));
+				}
+
+				static bool IsWritableBuffer(ProgramDataTypes Type)
+				{
+					return (Type == ProgramDataTypes::BufferRW);
 				}
 
 			private:

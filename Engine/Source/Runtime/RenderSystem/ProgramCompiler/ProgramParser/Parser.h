@@ -157,9 +157,6 @@ namespace Engine
 				DeallocateMemory(m_Allocator, Address);
 			}
 
-		public:
-			static ProgramDataTypes GetPrimitiveDataType(const String& Name);
-
 		private:
 			AllocatorBase* m_Allocator;
 			KeywordParseMap m_KeywordParsers;

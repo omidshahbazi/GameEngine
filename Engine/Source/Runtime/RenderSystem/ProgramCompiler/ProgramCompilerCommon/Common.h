@@ -4,10 +4,12 @@
 #define COMMON_H
 
 #include <Common\PrimitiveTypes.h>
+#include <Containers\Strings.h>
 
 namespace Engine
 {
 	using namespace Common;
+	using namespace Containers;
 
 	namespace ProgramCompilerCommon
 	{
@@ -50,6 +52,8 @@ namespace Engine
 			Texture1DRW,
 			Texture2DRW,
 			Texture3DRW,
+			Buffer,
+			BufferRW,
 			Unknown
 		};
 
@@ -83,6 +87,8 @@ namespace Engine
 
 			static const ProgramDataTypes WRITEABLE_TEXTURE_TYPES[3];
 			static const ProgramDataTypes WRITEABLE_TEXTURE_UV_TYPES[3];
+
+			static ProgramDataTypes GetPrimitiveDataType(const String& Name);
 		};
 	}
 }

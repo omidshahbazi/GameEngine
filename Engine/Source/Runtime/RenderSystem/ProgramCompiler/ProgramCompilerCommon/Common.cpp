@@ -1,5 +1,6 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 #include <ProgramCompilerCommon\Common.h>
+#include <Containers\Map.h>
 
 namespace Engine
 {
@@ -34,5 +35,51 @@ namespace Engine
 
 		const ProgramDataTypes Constants::WRITEABLE_TEXTURE_TYPES[] = { ProgramDataTypes::Texture1DRW, ProgramDataTypes::Texture2DRW, ProgramDataTypes::Texture3DRW };
 		const ProgramDataTypes Constants::WRITEABLE_TEXTURE_UV_TYPES[] = { ProgramDataTypes::Integer, ProgramDataTypes::Integer2, ProgramDataTypes::Integer3 };
+
+		ProgramDataTypes Constants::GetPrimitiveDataType(const String& Name)
+		{
+			static bool initialized = false;
+			static Map<String, ProgramDataTypes> dataTypesName;
+
+			if (!initialized)
+			{
+				initialized = true;
+
+				dataTypesName["void"] = ProgramDataTypes::Void;
+				dataTypesName["bool"] = ProgramDataTypes::Bool;
+				dataTypesName["int"] = ProgramDataTypes::Integer;
+				dataTypesName["uint"] = ProgramDataTypes::UnsignedInteger;
+				dataTypesName["float"] = ProgramDataTypes::Float;
+				dataTypesName["double"] = ProgramDataTypes::Double;
+				dataTypesName["int2"] = ProgramDataTypes::Integer2;
+				dataTypesName["uint2"] = ProgramDataTypes::UnsignedInteger2;
+				dataTypesName["float2"] = ProgramDataTypes::Float2;
+				dataTypesName["double2"] = ProgramDataTypes::Double2;
+				dataTypesName["int3"] = ProgramDataTypes::Integer3;
+				dataTypesName["uint3"] = ProgramDataTypes::UnsignedInteger3;
+				dataTypesName["float3"] = ProgramDataTypes::Float3;
+				dataTypesName["double3"] = ProgramDataTypes::Double3;
+				dataTypesName["int4"] = ProgramDataTypes::Integer4;
+				dataTypesName["uint4"] = ProgramDataTypes::UnsignedInteger4;
+				dataTypesName["float4"] = ProgramDataTypes::Float4;
+				dataTypesName["double4"] = ProgramDataTypes::Double4;
+				dataTypesName["matrix4f"] = ProgramDataTypes::Matrix4F;
+				dataTypesName["matrix4d"] = ProgramDataTypes::Matrix4D;
+				dataTypesName["texture1D"] = ProgramDataTypes::Texture1D;
+				dataTypesName["texture2D"] = ProgramDataTypes::Texture2D;
+				dataTypesName["texture3D"] = ProgramDataTypes::Texture3D;
+				dataTypesName["textureCube"] = ProgramDataTypes::TextureCube;
+				dataTypesName["texture1DRW"] = ProgramDataTypes::Texture1DRW;
+				dataTypesName["texture2DRW"] = ProgramDataTypes::Texture2DRW;
+				dataTypesName["texture3DRW"] = ProgramDataTypes::Texture3DRW;
+				dataTypesName["buffer"] = ProgramDataTypes::Buffer;
+				dataTypesName["bufferRW"] = ProgramDataTypes::BufferRW;
+			}
+
+			if (dataTypesName.Contains(Name))
+				return dataTypesName[Name];
+
+			return ProgramDataTypes::Unknown;
+		}
 	}
 }

@@ -398,8 +398,8 @@ namespace Engine
 
 				AddCode("uniform ", Data);
 
-				if (dataType->IsWritableTexture())
-					AddCode("readonly writeonly ", Data);
+				if (!dataType->IsWritableTexture())
+					AddCode("readonly ", Data);
 
 				BuildDataTypeStatement(dataType, Data);
 				AddCode(' ', Data);
@@ -1102,8 +1102,8 @@ namespace Engine
 				AddCode(StringUtility::ToString<char8>(m_BindingCount++), Data);
 				AddCode(')', Data);
 
-				if (DataType->IsWritableBuffer())
-					AddCode(" readonly writeonly", Data);
+				if (!DataType->IsWritableBuffer())
+					AddCode(" readonly", Data);
 
 				AddCode(" buffer " , Data);
 				AddCode(dataTypeName, Data);

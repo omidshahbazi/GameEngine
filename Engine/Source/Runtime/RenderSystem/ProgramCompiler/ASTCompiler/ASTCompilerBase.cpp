@@ -641,8 +641,8 @@ namespace Engine
 		{
 			if (Statement->GetType() == ProgramDataTypes::Bool)
 				AddCode(StringUtility::ToString<char8>(Statement->GetBool()), Data);
-			else if (Statement->GetFloat32() == 0 || Statement->GetFloat32() / (int32)Statement->GetFloat32() == 1)
-				AddCode(StringUtility::ToString<char8>((int32)Statement->GetFloat32()), Data);
+			else if (Statement->GetType() == ProgramDataTypes::Integer)
+				AddCode(StringUtility::ToString<char8>((int32)Statement->GetInt32()), Data);
 			else
 				AddCode(StringUtility::ToString<char8>(Statement->GetFloat32()), Data);
 		}
@@ -674,6 +674,34 @@ namespace Engine
 
 			if (IntrinsicsBuilder::BuildFunctionCallStatement(Statement, Data.FunctionType, Data.Stage, Data.Shader))
 				return;
+
+			ProgramDataTypes dataType = Constants::GetPrimitiveDataType(Statement->GetFunctionName());
+			if (dataType != ProgramDataTypes::Unknown)
+			{
+				BuildType(dataType, Data);
+				AddCode('(', Data);
+
+				uint8 providedComponentCount = 0;
+				uint8 i = 0;
+				for (auto argument : Statement->GetArguments()->GetItems())
+				{
+					if (i != 0)
+						AddCode(", ", Data);
+
+					BuildStatement(argument, Data);
+
+					providedComponentCount += DataTypeStatement::GetComponentCount(EvaluateProgramDataType(argument));
+
+					++i;
+				}
+
+				AddCode(')', Data);
+
+				if (providedComponentCount != 1 && providedComponentCount != DataTypeStatement::GetComponentCount(dataType))
+					THROW_PROGRAM_COMPILER_EXCEPTION("Provided argument do not match with the required data type components", funcName);
+
+				return;
+			}
 
 			THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find variable or function", funcName);
 		}
@@ -1196,10 +1224,14 @@ namespace Engine
 					return *(functionType->GetReturnDataType());
 
 				ProgramDataTypes dataType = IntrinsicsBuilder::EvaluateFunctionReturnValue(stm);
-				if (dataType == ProgramDataTypes::Unknown)
-					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't evaluate result of the statement", stm->ToString());
+				if (dataType != ProgramDataTypes::Unknown)
+					return dataType;
 
-				return dataType;
+				dataType = Constants::GetPrimitiveDataType(stm->GetFunctionName());
+				if (dataType != ProgramDataTypes::Unknown)
+					return dataType;
+
+				THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't evaluate result of the statement", stm->ToString());
 			}
 			else if (IsAssignableFrom(CurrentStatement, const VariableAccessStatement))
 			{
@@ -1242,6 +1274,21 @@ namespace Engine
 				{
 					ProgramDataTypes leftType = leftDataType.GetType();
 					uint8 advance = (stm->GetRight()->ToString().GetLength() - 1) * 2;
+
+					if (leftType == ProgramDataTypes::Integer2 ||
+						leftType == ProgramDataTypes::Integer3 ||
+						leftType == ProgramDataTypes::Integer4)
+						return (ProgramDataTypes)((uint8)ProgramDataTypes::Integer + advance);
+
+					if (leftType == ProgramDataTypes::UnsignedInteger2 ||
+						leftType == ProgramDataTypes::UnsignedInteger3 ||
+						leftType == ProgramDataTypes::UnsignedInteger4)
+						return (ProgramDataTypes)((uint8)ProgramDataTypes::UnsignedInteger + advance);
+
+					if (leftType == ProgramDataTypes::Float2 ||
+						leftType == ProgramDataTypes::Float3 ||
+						leftType == ProgramDataTypes::Float4)
+						return (ProgramDataTypes)((uint8)ProgramDataTypes::Float + advance);
 
 					if (leftType == ProgramDataTypes::Float2 ||
 						leftType == ProgramDataTypes::Float3 ||

@@ -17,6 +17,7 @@ namespace Engine.Runtime.RenderSystem.ProgramCompiler
 			base(OperatingSystem, Configuration, Platform)
 		{
 			PublicDependencyModuleNames.Add("Common");
+			PublicDependencyModuleNames.Add("Containers");
 		}
 	}
 }

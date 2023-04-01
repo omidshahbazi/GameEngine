@@ -10,9 +10,6 @@
 #include <DynamicModuleSystem\ModuleManager.h>
 #include <Debugging\CoreDebug.h>
 
-#include <FileUtility\FileSystem.h>
-using namespace Engine::FileUtility;
-
 namespace Engine
 {
 	using namespace ProgramCompilerCommon;
@@ -80,10 +77,10 @@ namespace Engine
 			Parser::Parameters parameters;
 			parser.Parse(parameters);
 
-			FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderSystemAllocators::ProgramCompilerAllocator, MegaByte);
-
 			if (!parameters.Functions.ContainsIf([](auto& item) { return item->GetType() != FunctionType::Types::None; }))
 				return;
+
+			FrameAllocator compilerAllocator("Program APICompiler Allocator", RenderSystemAllocators::ProgramCompilerAllocator, MegaByte);
 
 			for (uint8 i = 0; i < TypeCount; ++i)
 			{
@@ -118,7 +115,7 @@ namespace Engine
 					compiler->Initialize(deviceType);
 				}
 
-				compiler->Compile(&compilerAllocator, parameters.Structs, parameters.Variables, parameters.Functions, output);
+				compiler->Compile(&compilerAllocator, parameters.Structs, parameters.Variables, parameters.Functions, Info->DebugMode, output);
 
 				for (auto& structType : parameters.Structs)
 				{
@@ -156,7 +153,7 @@ namespace Engine
 					variableMeta.DataType = type->GetType();
 					variableMeta.UserDefinedType = type->GetUserDefined();
 
-					if (deviceType != DeviceTypes::OpenGL && type->GetType() == ProgramDataTypes::Texture2D)
+					if (deviceType != DeviceTypes::OpenGL && type->IsTexture())
 						++bindingCount;
 				}
 			}

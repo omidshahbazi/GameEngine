@@ -90,7 +90,14 @@ namespace Engine
 			uint8 parameterTypeCount = 0;
 
 			for (auto& statement : Arguments)
-				parameterTypes[parameterTypeCount++] = EvaluateProgramDataType(statement);
+			{
+				DataTypeStatement dataType = EvaluateStatement(statement);
+
+				parameterTypes[parameterTypeCount++] = dataType.GetType();
+
+				if (dataType.GetTemplateElementDataType() != nullptr)
+					parameterTypes[parameterTypeCount++] = dataType.GetTemplateElementDataType()->GetType();
+			}
 
 			return CalculateFunctionSignatureHash(Name, parameterTypes, parameterTypeCount);
 		}

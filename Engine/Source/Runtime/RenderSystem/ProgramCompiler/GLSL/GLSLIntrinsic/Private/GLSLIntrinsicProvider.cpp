@@ -13,26 +13,27 @@ namespace Engine
 		{
 			void GLSLIntrinsicProvider::Initialize(IInitializeHelper* Helper)
 			{
-				BEGIN_FUNCTION("GetDimentions", _countof(Constants::UNSIGNED_DATA_TYPES) * _countof(Constants::READABLE_TEXTURE_TYPES));
+				BEGIN_FUNCTION("GetDimentions", _countof(Constants::UNSIGNED_DATA_TYPES) * _countof(Constants::TEXTURE_DATA_TYPES) * _countof(Constants::READABLE_TEXTURE_TYPES));
 				{
 					for (ProgramDataTypes returnType : Constants::UNSIGNED_DATA_TYPES)
-						for (uint8 i = 0; i < _countof(Constants::READABLE_TEXTURE_TYPES); ++i)
-						{
-							BEGIN_OVERRIDE(returnType);
+						for (ProgramDataTypes textureDataType : Constants::TEXTURE_DATA_TYPES)
+							for (uint8 i = 0; i < _countof(Constants::READABLE_TEXTURE_TYPES); ++i)
 							{
-								ADD_PARAMETER(Constants::READABLE_TEXTURE_TYPES[i]);
-								SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
-									{
-										String textureVarialeName;
-								Compiler->BuildStatement(Arguments[0], Type, Stage, textureVarialeName);
+								BEGIN_OVERRIDE(returnType);
+								{
+									ADD_TEMPLATE_PARAMETER(Constants::READABLE_TEXTURE_TYPES[i], textureDataType);
+									SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
+										{
+											String textureVarialeName;
+									Compiler->BuildStatement(Arguments[0], Type, Stage, textureVarialeName);
 
-								Shader += "imageSize(";
-								Shader += textureVarialeName;
-								Shader += ")";
-									});
+									Shader += "imageSize(";
+									Shader += textureVarialeName;
+									Shader += ")";
+										});
+								}
+								END_OVERRIDE();
 							}
-							END_OVERRIDE();
-						}
 				}
 				END_FUNCTION();
 
@@ -43,7 +44,7 @@ namespace Engine
 						{
 							BEGIN_OVERRIDE(returnType);
 							{
-								ADD_PARAMETER(Constants::SAMPLABLE_TEXTURE_TYPES[i]);
+								ADD_TEMPLATE_PARAMETER(Constants::SAMPLABLE_TEXTURE_TYPES[i], returnType);
 								ADD_PARAMETER(Constants::SAMPLABLE_TEXTURE_UV_TYPES[i]);
 								SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 									{
@@ -69,7 +70,7 @@ namespace Engine
 						{
 							BEGIN_OVERRIDE(returnType);
 							{
-								ADD_PARAMETER(Constants::READABLE_TEXTURE_TYPES[i]);
+								ADD_TEMPLATE_PARAMETER(Constants::READABLE_TEXTURE_TYPES[i], returnType);
 								ADD_PARAMETER(Constants::READABLE_TEXTURE_UV_TYPES[i]);
 								SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)
 									{
@@ -95,7 +96,7 @@ namespace Engine
 						{
 							BEGIN_OVERRIDE(ProgramDataTypes::Void);
 							{
-								ADD_PARAMETER(Constants::WRITEABLE_TEXTURE_TYPES[i]);
+								ADD_TEMPLATE_PARAMETER(Constants::WRITEABLE_TEXTURE_TYPES[i], dataType);
 								ADD_PARAMETER(Constants::WRITEABLE_TEXTURE_UV_TYPES[i]);
 								ADD_PARAMETER(dataType);
 								SET_CUSTOM_NATIVE_DESCRIPTION([this](auto Compiler, auto Arguments, auto Type, auto Stage, auto& Shader)

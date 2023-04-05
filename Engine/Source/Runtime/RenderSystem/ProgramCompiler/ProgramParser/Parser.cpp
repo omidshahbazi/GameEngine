@@ -796,6 +796,8 @@ namespace Engine
 
 				RequireSymbol(CLOSE_ANGLE_BRACKET, "template element type");
 			}
+			else if (stm->IsTexture())
+				stm->SetTemplateElementDataType(Allocate<DataTypeStatement>(ProgramDataTypes::Float4));
 
 			stm->SetElementCount(ParseArrayElementCountStatement());
 

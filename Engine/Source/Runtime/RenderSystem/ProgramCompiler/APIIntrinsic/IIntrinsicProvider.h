@@ -45,7 +45,7 @@ namespace Engine
 				virtual void BuildType(ProgramDataTypes Type, String& Shader) = 0;
 				virtual void BuildStatement(const Statement* Statement, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
 				virtual void BuildArguments(const Vector<Statement*>& Statements, FunctionType::Types Type, Stages Stage, String& Shader) = 0;
-				virtual ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const = 0;
+				virtual DataTypeStatement EvaluateStatement(const Statement* Statement) const = 0;
 			};
 
 			struct FunctionInfo
@@ -102,6 +102,10 @@ namespace Engine
 				function.IsTemplate = true;
 
 #define ADD_PARAMETER(DataType) \
+				parameterTypes[parameterTypeCount++] = DataType;
+
+#define ADD_TEMPLATE_PARAMETER(TemplateDataType, DataType) \
+				parameterTypes[parameterTypeCount++] = TemplateDataType; \
 				parameterTypes[parameterTypeCount++] = DataType;
 
 #define SET_NATIVE_DESCRIPTION(NativeName) \

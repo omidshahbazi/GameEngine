@@ -128,7 +128,6 @@ namespace Engine
 		bool FileSystem::ReadAllBytes(const WString& Path, byte* Data, uint64& Length)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Binary | PlatformFile::OpenModes::Input);
-
 			if (handle == 0)
 				return false;
 
@@ -156,13 +155,12 @@ namespace Engine
 		bool FileSystem::ReadAllText(const WString& Path, String* Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+			if (handle == 0)
+				return false;
 
 			uint64 size = PlatformFile::Size(handle);
 
 			*Data = String((uint32)size);
-
-			if (handle == 0)
-				return false;
 
 			size = PlatformFile::Read(handle, Data->GetValue(), size);
 
@@ -176,13 +174,12 @@ namespace Engine
 		bool FileSystem::ReadAllText(const WString& Path, WString* Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Input);
+			if (handle == 0)
+				return false;
 
 			uint64 size = PlatformFile::Size(handle);
 
 			*Data = WString((uint32)size);
-
-			if (handle == 0)
-				return false;
 
 			size = PlatformFile::Read(handle, Data->GetValue(), size);
 
@@ -196,7 +193,6 @@ namespace Engine
 		bool FileSystem::WriteAllText(const WString& Path, const WString& Data)
 		{
 			PlatformFile::Handle handle = PlatformFile::Open(Path.GetValue(), PlatformFile::OpenModes::Output);
-
 			if (handle == 0)
 				return false;
 

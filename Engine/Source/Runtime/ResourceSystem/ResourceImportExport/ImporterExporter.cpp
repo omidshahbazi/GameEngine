@@ -67,9 +67,11 @@ namespace Engine
 
 			char8 str[1024];
 			uint64 readCount = PlatformFile::Read(handle, str, 1024);
-			str[readCount] = '\0';
-
 			PlatformFile::Close(handle);
+
+			if (readCount == 0)
+				return false;
+			str[readCount] = '\0';
 
 			JSONParser::Parse(Allocator, str, &Object);
 

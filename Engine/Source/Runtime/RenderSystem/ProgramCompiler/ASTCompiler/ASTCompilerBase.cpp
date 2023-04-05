@@ -71,10 +71,6 @@ namespace Engine
 				StageData data = { FunctionType::Types::None, Stages::Compute, Structs, Variables, Functions, Output.ComputeShader, 0 };
 				BuildStageShader(data);
 			}
-
-			m_Structs.Clear();
-			m_Functions.Clear();
-			m_BlockVariables.Clear();
 		}
 
 		void ASTCompilerBase::BuildStageShader(StageData& Data)
@@ -97,6 +93,7 @@ namespace Engine
 			m_BlockVariables.Clear();
 			m_BlockIndex = -1;
 			m_LastFunction = nullptr;
+			m_DataAccessStatements.Clear();
 			m_SequentialVariableNumber = 0;
 
 			IncreaseBlockIndex();
@@ -1347,11 +1344,6 @@ namespace Engine
 			return ProgramDataTypes::Unknown;
 		}
 
-		ProgramDataTypes ASTCompilerBase::EvaluateProgramDataType(const Statement* Statement) const
-		{
-			return EvaluateDataType(Statement).GetType();
-		}
-
 		bool ASTCompilerBase::CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const
 		{
 			if (Left.IsBuiltIn() != Right.IsBuiltIn())
@@ -1393,6 +1385,9 @@ namespace Engine
 		{
 			auto checkVariableInParent = [this, &Name](const DataTypeStatement* ParentDataType)
 			{
+				if (ParentDataType->GetTemplateElementDataType() != nullptr)
+					ParentDataType = ParentDataType->GetTemplateElementDataType();
+
 				if (ParentDataType->IsBuiltIn())
 				{
 					auto checkSwizzling = [&Name](const char8* ValidSwizzles, uint8 Length)
@@ -1501,7 +1496,16 @@ namespace Engine
 
 					DataTypeStatement dataType = EvaluateDataType(stm->GetArrayStatement());
 
-					if (checkVariableInParent((dataType.GetTemplateElementDataType() == nullptr ? &dataType : dataType.GetTemplateElementDataType())))
+					if (checkVariableInParent(&dataType))
+						return;
+				}
+				else if (IsAssignableFrom(statement, const FunctionCallStatement))
+				{
+					const FunctionCallStatement* stm = ReinterpretCast(const FunctionCallStatement*, statement);
+
+					DataTypeStatement dataType = EvaluateDataType(stm);
+
+					if (checkVariableInParent(&dataType))
 						return;
 				}
 			}

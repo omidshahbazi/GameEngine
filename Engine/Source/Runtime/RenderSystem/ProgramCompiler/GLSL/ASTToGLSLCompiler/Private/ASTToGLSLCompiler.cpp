@@ -932,13 +932,6 @@ namespace Engine
 
 			void ASTToGLSLCompiler::BuildImageFormat(const DataTypeStatement* TemplateType, StageData& Data)
 			{
-				if (TemplateType == nullptr)
-				{
-					AddCode("rgba8", Data);
-
-					return;
-				}
-
 				switch (TemplateType->GetType())
 				{
 				case ProgramDataTypes::Integer:

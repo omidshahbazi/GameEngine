@@ -206,7 +206,10 @@ namespace Engine
 			virtual void BuildType(ProgramDataTypes Type, StageData& Data) = 0;
 
 			DataTypeStatement EvaluateDataType(const Statement* CurrentStatement, const Statement* TopStatement = nullptr) const;
-			ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const override;
+			ProgramDataTypes EvaluateProgramDataType(const Statement* Statement) const
+			{
+				return EvaluateDataType(Statement).GetType();
+			}
 
 			bool CompareDataTypes(const DataTypeStatement& Left, const DataTypeStatement& Right) const;
 			void CheckForImplicitCast(const DataTypeStatement& Source, const DataTypeStatement& Destination) const;
@@ -258,6 +261,11 @@ namespace Engine
 			{
 				StageData data = { Type, Stage, {}, {}, {}, Shader, 0 };
 				BuildArguments(Statements, data);
+			}
+
+			DataTypeStatement EvaluateStatement(const Statement* Statement) const override
+			{
+				return EvaluateDataType(Statement);
 			}
 
 			bool IsHullConstant(const FunctionType* Function, StageData& Data) const

@@ -200,9 +200,7 @@ namespace Engine
 				Reflection::PropertyTypeList properties;
 				GetProperties(T::GetType(), properties);
 
-				ReadMetaFile(metaFilePath, properties, Settings);
-
-				return true;
+				return ReadMetaFile(metaFilePath, properties, Settings);
 			}
 
 			template<typename T>
@@ -216,9 +214,7 @@ namespace Engine
 				Reflection::PropertyTypeList properties;
 				GetProperties(T::GetType(), properties);
 
-				WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings, Overwrite);
-
-				return true;
+				return WriteMetaFile(GetMetaFilePath(FilePath), properties, Settings, Overwrite);
 			}
 
 			static WString GetResourceFilePath(const WString& FilePath);

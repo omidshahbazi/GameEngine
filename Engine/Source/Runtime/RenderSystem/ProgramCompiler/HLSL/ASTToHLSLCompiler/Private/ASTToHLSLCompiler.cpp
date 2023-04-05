@@ -253,9 +253,7 @@ namespace Engine
 			{
 				AddCode("struct ", Data);
 
-				const String& name = Struct->GetName();
-
-				AddCode(name, Data);
+				AddCode(Struct->GetName(), Data);
 
 				AddNewLine(Data);
 				AddCode('{', Data);
@@ -281,7 +279,7 @@ namespace Engine
 							BuildType(ProgramDataTypes::Float, Data);
 							AddCode(StringUtility::ToString<char8>((GPUAlignedVector4F::Alignment - overflowByteCount) / GPUAlignedFloat32::Size), Data);
 							AddCode(' ', Data);
-							AddCode(name, Data);
+							AddCode(variable->GetName(), Data);
 							AddCode("Padding", Data);
 							AddCode(';', Data);
 

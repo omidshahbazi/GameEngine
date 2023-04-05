@@ -12,9 +12,9 @@ Data data;
 
 VertexOutput VertexMain(InputData inputData)
 {
-	VertexOutput out;
-	out.Position = _TransformData.MVP * float4(inputData.Position, 1);
-	return out;
+	VertexOutput o;
+	o.Position = _TransformData.MVP * float4(inputData.Position, 1);
+	return o;
 }
 
 FragmentOutput FragmentMain(InputData inputData)
@@ -23,7 +23,7 @@ FragmentOutput FragmentMain(InputData inputData)
 	finalUV.x = Map(inputData.UV.x, 0, 1, data.FontTextureBound.x, data.FontTextureBound.x + data.FontTextureBound.z, 1);
 	finalUV.y = 1 - Map(inputData.UV.y, 0, 1, data.FontTextureBound.y, data.FontTextureBound.y + data.FontTextureBound.w, 1);
 
-	FragmentOutput out;
-	out.Color = data.Color * Sample(FontTexture, finalUV).r;
-	return out;
+	FragmentOutput o;
+	o.Color = data.Color * Sample(FontTexture, finalUV).r;
+	return o;
 }

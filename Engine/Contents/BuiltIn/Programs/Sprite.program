@@ -17,9 +17,9 @@ Data data;
 
 VertexOutput VertexMain(InputData inputData)
 {
-	VertexOutput out;
-	out.Position = _TransformData.MVP * float4(inputData.Position, 1);
-	return out;
+	VertexOutput o;
+	o.Position = _TransformData.MVP * float4(inputData.Position, 1);
+	return o;
 }
 
 float ProcessCoord(float Coord, float ElementBorderSizeMin, float ElementBorderSizeMax, float TextureBorderSizeMin, float TextureBorderSizeMax, float TileCount)
@@ -53,7 +53,7 @@ FragmentOutput FragmentMain(InputData inputData)
 		}
 	}
 
-	FragmentOutput out;
-	out.Color = Sample(DiffuseTexture, finalUV) * data.Color;
-	return out;
+	FragmentOutput o;
+	o.Color = Sample(DiffuseTexture, finalUV) * data.Color;
+	return o;
 }

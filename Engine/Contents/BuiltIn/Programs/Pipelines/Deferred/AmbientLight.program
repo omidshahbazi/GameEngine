@@ -17,16 +17,16 @@ VertexOutput VertexMain(InputData inputData)
 		0, 0, 1, 0,
 		0, 0, 0, 1);
 
-	VertexOutput out;
-	out.Position = mat * float4(inputData.Position, 1);
-	return out;
+	VertexOutput o;
+	o.Position = mat * float4(inputData.Position, 1);
+	return o;
 }
 
 FragmentOutput FragmentMain(InputData inputData)
 {
 	float3 diffuse = Sample(AlbedoSpecTexture, inputData.UV).rgb;
 
-	FragmentOutput out;
-	out.Color = float4(diffuse * data.Color.rgb * data.Strength, 1);
-	return out;
+	FragmentOutput o;
+	o.Color = float4(diffuse * data.Color.rgb * data.Strength, 1);
+	return o;
 }

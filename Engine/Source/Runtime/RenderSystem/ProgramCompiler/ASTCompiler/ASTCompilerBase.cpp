@@ -566,7 +566,8 @@ namespace Engine
 				if (dataType == ProgramDataTypes::Matrix4F ||
 					dataType == ProgramDataTypes::Matrix4D)
 				{
-					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
+					if (!IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader))
+						THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build remainder", Statement->ToString());
 
 					return;
 				}
@@ -582,14 +583,16 @@ namespace Engine
 
 					AddCode(" = ", Data);
 
-					IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
+					if (!IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader))
+						THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build remainder", Statement->ToString());
 
 					return;
 				}
 			}
 			else if (op == OperatorStatement::Operators::Remainder)
 			{
-				IntrinsicsBuilder::BuildFunctionCallStatement("Reminder", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader);
+				if (!IntrinsicsBuilder::BuildFunctionCallStatement("Reminder", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader))
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build Reminder", Statement->ToString());
 
 				return;
 			}

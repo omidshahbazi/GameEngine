@@ -185,18 +185,19 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Reminder", _countof(Constants::NUMERIC_DATA_TYPES));
+				BEGIN_FUNCTION("Reminder", _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
 				{
-					for (ProgramDataTypes dataType : Constants::NUMERIC_DATA_TYPES)
-					{
-						BEGIN_OVERRIDE(ProgramDataTypes::Float);
+					for (ProgramDataTypes dataType1 : Constants::NUMERIC_DATA_TYPES)
+						for (ProgramDataTypes dataType2 : Constants::NUMERIC_DATA_TYPES)
 						{
-							ADD_PARAMETER(dataType);
-							ADD_PARAMETER(dataType);
-							SET_NATIVE_DESCRIPTION("mod");
+							BEGIN_OVERRIDE(ProgramDataTypes::Float);
+							{
+								ADD_PARAMETER(dataType1);
+								ADD_PARAMETER(dataType2);
+								SET_NATIVE_DESCRIPTION("mod");
+							}
+							END_OVERRIDE();
 						}
-						END_OVERRIDE();
-					}
 				}
 				END_FUNCTION();
 
@@ -360,18 +361,19 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Pow", _countof(Constants::NUMERIC_AND_VECTOR_DATA_TYPES));
+				BEGIN_FUNCTION("Pow", _countof(Constants::NUMERIC_AND_VECTOR_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
 				{
 					for (ProgramDataTypes dataType : Constants::NUMERIC_AND_VECTOR_DATA_TYPES)
-					{
-						BEGIN_OVERRIDE(dataType);
+						for (ProgramDataTypes powDataType : Constants::NUMERIC_DATA_TYPES)
 						{
-							ADD_PARAMETER(dataType);
-							ADD_PARAMETER(dataType);
-							SET_NATIVE_DESCRIPTION("pow");
+							BEGIN_OVERRIDE(dataType);
+							{
+								ADD_PARAMETER(dataType);
+								ADD_PARAMETER(powDataType);
+								SET_NATIVE_DESCRIPTION("pow");
+							}
+							END_OVERRIDE();
 						}
-						END_OVERRIDE();
-					}
 				}
 				END_FUNCTION();
 

@@ -100,7 +100,6 @@ namespace Engine
 			DataTypeStatement* ParseDataType(const Token& DeclarationToken);
 			void ParsePostArrayDataType(DataTypeStatement* DataType);
 			Statement* ParseArrayElementCountStatement(void);
-			void ValidateDataType(DataTypeStatement* DataType);
 
 			Statement* ParseIfStatement(const Token& DeclarationToken);
 			Statement* ParseElseStatement(const Token& DeclarationToken);
@@ -132,6 +131,8 @@ namespace Engine
 			Statement* ParseMemberAccessStatement(const Token& DeclarationToken, Statement* LeftStatement);
 			Statement* ParseFunctionCallStatement(const Token& DeclarationToken);
 
+			void ValidateName(const String& Name);
+			void ValidateVariable(DataTypeStatement* DataType, const String& Name);
 			bool IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask);
 
 			template<typename T>

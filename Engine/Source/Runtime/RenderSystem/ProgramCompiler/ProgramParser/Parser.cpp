@@ -251,6 +251,9 @@ namespace Engine
 
 			Token nameToken;
 			RequireIdentifierToken(nameToken, "struct");
+			
+			ValidateName(nameToken.GetName());
+
 			structType->SetName(nameToken.GetName());
 
 			RequireSymbol(OPEN_BRACKET, "struct");
@@ -296,7 +299,6 @@ namespace Engine
 				return false;
 
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
-			ValidateDataType(dataType);
 			VariableType->SetDataType(dataType);
 
 			Token nameToken;
@@ -306,6 +308,8 @@ namespace Engine
 
 				return false;
 			}
+
+			ValidateVariable(dataType, nameToken.GetName());
 
 			if (MatchSymbol(OPEN_BRACE))
 			{
@@ -429,7 +433,7 @@ namespace Engine
 			if (dataType->IsBuffer() && dataType->GetTemplateElementDataType() == nullptr)
 				THROW_PROGRAM_PARSER_EXCEPTION("Buffer types need to have template paramter", DeclarationToken);
 
-			ValidateDataType(dataType);
+			ValidateVariable(dataType, nameToken.GetName());
 
 			variableType->SetName(nameToken.GetName());
 
@@ -469,6 +473,8 @@ namespace Engine
 			Token nameToken;
 			if (!MatchIdentifierToken(nameToken))
 				return false;
+
+			ValidateName(nameToken.GetName());
 
 			if (!MatchSymbol(OPEN_BRACE))
 				return false;
@@ -523,12 +529,13 @@ namespace Engine
 		bool Parser::ParseParameter(const Token& DeclarationToken, ParameterType* ParameterType)
 		{
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
-			ValidateDataType(dataType);
 
 			ParameterType->SetDataType(dataType);
 
 			Token nameToken;
 			RequireIdentifierToken(nameToken, "function parameter");
+
+			ValidateVariable(dataType, nameToken.GetName());
 
 			ParameterType->SetName(nameToken.GetName());
 
@@ -824,12 +831,6 @@ namespace Engine
 			return stm;
 		}
 
-		void Parser::ValidateDataType(DataTypeStatement* DataType)
-		{
-			if (DataType->GetType() == ProgramDataTypes::Void)
-				THROW_EXCEPTION(Categories::ProgramCompiler, "Expected a valid data type");
-		}
-
 		Statement* Parser::ParseIfStatement(const Token& DeclarationToken)
 		{
 			IfStatement* stm = Allocate<IfStatement>(m_Allocator);
@@ -1098,7 +1099,7 @@ namespace Engine
 				return nullptr;
 
 			DataTypeStatement* dataType = ParseDataType(DeclarationToken);
-			ValidateDataType(dataType);
+			ValidateVariable(dataType, nameToken.GetName());
 
 			VariableStatement* stm = Allocate<VariableStatement>(m_Parameters->Functions[m_Parameters->Functions.GetSize() - 1], m_Allocator);
 			stm->SetDataType(dataType);
@@ -1417,6 +1418,27 @@ namespace Engine
 			RequireToken(token, "function call statement");
 
 			return ParseMemberAccessStatement(token, stm);
+		}
+
+		void Parser::ValidateName(const String& Name)
+		{
+			static cstr ForbiddenNames[] = { "out" };
+
+			for (cstr forbiddenName : ForbiddenNames)
+			{
+				if (Name != forbiddenName)
+					continue;
+
+				THROW_EXCEPTION(Categories::ProgramCompiler, StringUtility::Format<char8>("%S is a built-in name, using it is forbidden", Name));
+			}
+		}
+
+		void Parser::ValidateVariable(DataTypeStatement* DataType, const String& Name)
+		{
+			if (DataType->GetType() == ProgramDataTypes::Void)
+				THROW_EXCEPTION(Categories::ProgramCompiler, "Expected a valid data type");
+
+			ValidateName(Name);
 		}
 
 		bool Parser::IsEndCondition(const Token& DeclarationToken, EndConditions ConditionMask)

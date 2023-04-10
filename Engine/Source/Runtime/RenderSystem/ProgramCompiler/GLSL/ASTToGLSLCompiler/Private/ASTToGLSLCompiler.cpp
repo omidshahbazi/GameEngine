@@ -1002,6 +1002,8 @@ namespace Engine
 					if (IsInput && !IsVertexLayout(variable->GetRegister()))
 						continue;
 
+					CheckSystemValueDataType(variable);
+
 					int8 location = 0;
 					if (IsInput && variable->GetRegisterIndex() == 0)
 						location = SubMeshInfo::GetLayoutIndex(GetLayout(variable->GetRegister()));
@@ -1098,7 +1100,7 @@ namespace Engine
 				if (!DataType->IsWritableBuffer())
 					AddCode(" readonly", Data);
 
-				AddCode(" buffer " , Data);
+				AddCode(" buffer ", Data);
 				AddCode(dataTypeName, Data);
 				AddCode('_', Data);
 				AddCode(Name, Data);

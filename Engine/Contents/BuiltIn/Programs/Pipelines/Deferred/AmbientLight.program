@@ -2,7 +2,7 @@
 
 struct InputData { float3 Position : POSITION; float2 UV : UV; };
 struct TransformData { matrix4f Model; matrix4f View; matrix4f Projection; matrix4f MVP; };
-struct VertexOutput { float4 Position : POSITION0; };
+struct VertexOutput { float4 Position : POSITION0; float2 UV : UV; };
 struct FragmentOutput {	float4 Color : TARGET0; };
 
 texture2D AlbedoSpecTexture;
@@ -19,10 +19,11 @@ VertexOutput VertexMain(InputData inputData)
 
 	VertexOutput o;
 	o.Position = mat * float4(inputData.Position, 1);
+	o.UV = inputData.UV;
 	return o;
 }
 
-FragmentOutput FragmentMain(InputData inputData)
+FragmentOutput FragmentMain(VertexOutput inputData)
 {
 	float3 diffuse = Sample(AlbedoSpecTexture, inputData.UV).rgb;
 

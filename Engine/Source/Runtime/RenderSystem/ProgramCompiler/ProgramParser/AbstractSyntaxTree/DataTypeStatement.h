@@ -5,6 +5,7 @@
 
 #include <ProgramParser\AbstractSyntaxTree\Statement.h>
 #include <ProgramCompilerCommon\Common.h>
+#include <ProgramCompilerCommon\ProgramCompilerException.h>
 #include <RenderCommon\Enums.h>
 #include <Containers\Strings.h>
 #include <Containers\StringUtility.h>
@@ -162,128 +163,10 @@ namespace Engine
 				{
 					String result = "";
 
-					switch (m_Type)
-					{
-					case ProgramDataTypes::Void:
-						result = "void";
-						break;
-
-					case ProgramDataTypes::Bool:
-						result = "bool";
-						break;
-
-					case ProgramDataTypes::Integer:
-						result = "int";
-						break;
-
-					case ProgramDataTypes::UnsignedInteger:
-						result = "uint";
-						break;
-
-					case ProgramDataTypes::Float:
-						result = "float";
-						break;
-
-					case ProgramDataTypes::Double:
-						result = "double";
-						break;
-
-					case ProgramDataTypes::Integer2:
-						result = "int2";
-						break;
-
-					case ProgramDataTypes::UnsignedInteger2:
-						result = "uint2";
-						break;
-
-					case ProgramDataTypes::Float2:
-						result = "float2";
-						break;
-
-					case ProgramDataTypes::Double2:
-						result = "double2";
-						break;
-
-					case ProgramDataTypes::Float3:
-						result = "float3";
-						break;
-
-					case ProgramDataTypes::Integer3:
-						result = "int3";
-						break;
-
-					case ProgramDataTypes::UnsignedInteger3:
-						result = "uint3";
-						break;
-
-					case ProgramDataTypes::Double3:
-						result = "double3";
-						break;
-
-					case ProgramDataTypes::Float4:
-						result = "float4";
-						break;
-
-					case ProgramDataTypes::Integer4:
-						result = "int4";
-						break;
-
-					case ProgramDataTypes::UnsignedInteger4:
-						result = "uint4";
-						break;
-
-					case ProgramDataTypes::Double4:
-						result = "double4";
-						break;
-
-					case ProgramDataTypes::Matrix4F:
-						result = "matrix4f";
-						break;
-
-					case ProgramDataTypes::Matrix4D:
-						result = "matrix4d";
-						break;
-
-					case ProgramDataTypes::Texture1D:
-						result = "texture1D";
-						break;
-
-					case ProgramDataTypes::Texture2D:
-						result = "texture2D";
-						break;
-
-					case ProgramDataTypes::Texture3D:
-						result = "texture3D";
-						break;
-
-					case ProgramDataTypes::TextureCube:
-						result = "textureCube";
-						break;
-
-					case ProgramDataTypes::Texture1DRW:
-						result = "texture1DRW";
-						break;
-
-					case ProgramDataTypes::Texture2DRW:
-						result = "texture2DRW";
-						break;
-
-					case ProgramDataTypes::Texture3DRW:
-						result = "texture3DRW";
-						break;
-
-					case ProgramDataTypes::Buffer:
-						result = "buffer";
-						break;
-
-					case ProgramDataTypes::BufferRW:
-						result = "bufferRW";
-						break;
-
-					default:
+					if (IsBuiltIn())
+						result = GetType(m_Type);
+					else
 						result = m_UserDefined;
-						break;
-					}
 
 					if (m_TemplateElementDataType != nullptr)
 					{
@@ -314,6 +197,101 @@ namespace Engine
 					}
 
 					return result;
+				}
+
+				static String GetType(ProgramDataTypes Type)
+				{
+					switch (Type)
+					{
+					case ProgramDataTypes::Void:
+						return "void";
+
+					case ProgramDataTypes::Bool:
+						return "bool";
+
+					case ProgramDataTypes::Integer:
+						return "int";
+
+					case ProgramDataTypes::UnsignedInteger:
+						return "uint";
+
+					case ProgramDataTypes::Float:
+						return "float";
+
+					case ProgramDataTypes::Double:
+						return "double";
+
+					case ProgramDataTypes::Integer2:
+						return "int2";
+
+					case ProgramDataTypes::UnsignedInteger2:
+						return "uint2";
+
+					case ProgramDataTypes::Float2:
+						return "float2";
+
+					case ProgramDataTypes::Double2:
+						return "double2";
+
+					case ProgramDataTypes::Float3:
+						return "float3";
+
+					case ProgramDataTypes::Integer3:
+						return "int3";
+
+					case ProgramDataTypes::UnsignedInteger3:
+						return "uint3";
+
+					case ProgramDataTypes::Double3:
+						return "double3";
+
+					case ProgramDataTypes::Float4:
+						return "float4";
+
+					case ProgramDataTypes::Integer4:
+						return "int4";
+
+					case ProgramDataTypes::UnsignedInteger4:
+						return "uint4";
+
+					case ProgramDataTypes::Double4:
+						return "double4";
+
+					case ProgramDataTypes::Matrix4F:
+						return "matrix4f";
+
+					case ProgramDataTypes::Matrix4D:
+						return "matrix4d";
+
+					case ProgramDataTypes::Texture1D:
+						return "texture1D";
+
+					case ProgramDataTypes::Texture2D:
+						return "texture2D";
+
+					case ProgramDataTypes::Texture3D:
+						return "texture3D";
+
+					case ProgramDataTypes::TextureCube:
+						return "textureCube";
+
+					case ProgramDataTypes::Texture1DRW:
+						return "texture1DRW";
+
+					case ProgramDataTypes::Texture2DRW:
+						return "texture2DRW";
+
+					case ProgramDataTypes::Texture3DRW:
+						return "texture3DRW";
+
+					case ProgramDataTypes::Buffer:
+						return "buffer";
+
+					case ProgramDataTypes::BufferRW:
+						return "bufferRW";
+					}
+
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 				static uint8 GetComponentCount(ProgramDataTypes Type)

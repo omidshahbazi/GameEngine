@@ -226,7 +226,10 @@ namespace Engine
 			T& Wait(void)
 			{
 				while (!PromiseBase<T>::GetIsDone())
+				{
+					PlatformThread::Sleep(1);
 					PlatformThread::YieldThread();
+				}
 
 				return GetValue();
 			}

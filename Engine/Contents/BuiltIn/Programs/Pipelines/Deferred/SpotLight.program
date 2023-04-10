@@ -1,9 +1,11 @@
 #include <Programs/Pipelines/Deferred/Common.program>
 
 struct InputData { float3 Position : POSITION; };
-struct TransformData { matrix4 Model; matrix4 View; matrix4 Projection; matrix4 MVP; };
+struct TransformData { matrix4f Model; matrix4f View; matrix4f Projection; matrix4f MVP; };
 struct ViewportData { float2 FrameSize; };
-struct AutoData { matrix4 MVP; float2 FrameSize; };
+struct AutoData { matrix4f MVP; float2 FrameSize; };
+struct VertexOutput { float4 Position : POSITION0; float4 FragPos : FRAGMENT_POSITION; };
+struct FragmentOutput {	float4 Color : TARGET0; };
 
 texture2D PositionTexture;
 texture2D NormalTexture;
@@ -12,22 +14,25 @@ TransformData _TransformData;
 ViewportData _ViewportData;
 Data data;
 
-float4 VertexMain(InputData inputData)
+VertexOutput VertexMain(InputData inputData)
 {
-	matrix4 mvp = _TransformData.MVP;
+	matrix4f mvp = _TransformData.MVP;
 	float coneRadius = Sin(data.OuterCutOff / 2) * (data.Radius / Cos(data.OuterCutOff / 2));
-	matrix4 scaleMat = matrix4(
+	matrix4f scaleMat = matrix4f(
 		coneRadius * 2, 0, 0, 0,
 		0, coneRadius * 2, 0, 0,
 		0, 0, data.Radius, 0,
 		0, 0, 0, 1);
 	mvp *= scaleMat;
-	return mvp * float4(inputData.Position, 1);
+
+	VertexOutput o;
+	o.Position = mvp * float4(inputData.Position, 1);
+	return o;
 }
 
-float4 FragmentMain(InputData inputData)
+FragmentOutput FragmentMain(VertexOutput inputData)
 {
-	float2 uv = _FragPosition / _ViewportData.FrameSize;
+	float2 uv = inputData.FragPos.xy / _ViewportData.FrameSize;
 	float3 gPos = Sample(PositionTexture, uv).rgb;
 	float3 toFragDir = Normalize(gPos - data.WorldPosition);
 	float theta = ACos(Dot(toFragDir, data.Direction) / Length(toFragDir) * Length(data.Direction));
@@ -57,5 +62,8 @@ float4 FragmentMain(InputData inputData)
 		specular *= intensity;
 		result = diffuse + specular;
 	}
-	return float4(result, 1);
+
+	FragmentOutput o;
+	o.Color =  float4(result, 1);
+	return o;
 }

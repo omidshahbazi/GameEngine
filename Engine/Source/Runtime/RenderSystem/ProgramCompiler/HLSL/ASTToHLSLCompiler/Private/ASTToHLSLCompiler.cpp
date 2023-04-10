@@ -731,6 +731,8 @@ namespace Engine
 
 				if (Variable->GetRegister() != StructVariableType::Registers::None && IsRegisterAvailable(Variable->GetRegister(), Data.Stage))
 				{
+					CheckSystemValueDataType(Variable);
+
 					AddCode(" : ", Data);
 					AddCode(GetRegisterName(Variable->GetRegister()), Data);
 

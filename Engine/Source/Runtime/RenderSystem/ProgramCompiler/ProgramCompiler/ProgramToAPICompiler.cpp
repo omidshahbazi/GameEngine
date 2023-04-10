@@ -120,7 +120,7 @@ namespace Engine
 				for (auto& structType : parameters.Structs)
 				{
 					auto variables = structType->GetItems();
-					variables.RemoveIf([](auto item) { return item->GetRegisterName() != String::Empty; });
+					variables.RemoveIf([](auto item) { return item->GetRegister() != StructVariableType::Registers::None; });
 
 					if (variables.GetSize() == 0)
 						continue;

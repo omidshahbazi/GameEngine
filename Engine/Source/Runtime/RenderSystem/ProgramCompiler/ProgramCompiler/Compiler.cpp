@@ -50,18 +50,17 @@ namespace Engine
 
 			for (uint8 i = 0; i < TypesCount; ++i)
 			{
-				if (outputInfos->VertexShader == String::Empty &&
-					outputInfos->HullShader == String::Empty &&
-					outputInfos->DomainShader == String::Empty &&
-					outputInfos->GeometryShader == String::Empty &&
-					outputInfos->FragmentShader == String::Empty &&
-					outputInfos->ComputeShader == String::Empty)
-					continue;
-
 				DeviceTypes deviceType = Types[i];
-
 				OutputInfo& outputInfo = outputInfos[i];
 				CompiledProgramInfo& compiledProgrm = CompiledInfos[i];
+
+				if (outputInfo.VertexShader == String::Empty &&
+					outputInfo.HullShader == String::Empty &&
+					outputInfo.DomainShader == String::Empty &&
+					outputInfo.GeometryShader == String::Empty &&
+					outputInfo.FragmentShader == String::Empty &&
+					outputInfo.ComputeShader == String::Empty)
+					continue;
 
 				IByteCodeCompiler* compiler = compilers[(int32)deviceType];
 

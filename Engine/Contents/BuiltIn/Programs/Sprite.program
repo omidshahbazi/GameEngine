@@ -2,7 +2,7 @@
 
 struct InputData { float3 Position : POSITION; float2 UV : UV; };
 struct TransformData { matrix4f Model; matrix4f View; matrix4f Projection; matrix4f MVP; };
-struct VertexOutput { float4 Position : POSITION0; };
+struct VertexOutput { float4 Position : POSITION0; float2 UV : UV; };
 struct FragmentOutput {	float4 Color : TARGET0; };
 
 // DrawModes
@@ -19,6 +19,7 @@ VertexOutput VertexMain(InputData inputData)
 {
 	VertexOutput o;
 	o.Position = _TransformData.MVP * float4(inputData.Position, 1);
+	o.UV = inputData.UV;
 	return o;
 }
 
@@ -33,7 +34,7 @@ float ProcessCoord(float Coord, float ElementBorderSizeMin, float ElementBorderS
 	return Map(Coord, ElementBorderSizeMin, 1 - ElementBorderSizeMax, TextureBorderSizeMin, 1 - TextureBorderSizeMax, TileCount);
 }
 
-FragmentOutput FragmentMain(InputData inputData)
+FragmentOutput FragmentMain(VertexOutput inputData)
 {
 	float2 finalUV = inputData.UV;
 

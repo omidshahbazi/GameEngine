@@ -185,9 +185,14 @@ namespace Engine
 
 		void ASTCompilerBase::ValidateEntrypointFunction(const FunctionType* Function, StageData& Data)
 		{
+			auto doesEntrypointExists = [&](FunctionType::Types Type)
+			{
+				return Data.Functions.ContainsIf([&](auto item) { return item->GetType() == Type; });
+			};
+
 			auto checkExistenceOfEntrypoint = [&](FunctionType::Types Type)
 			{
-				if (Data.Functions.ContainsIf([&](auto item) { return item->GetType() == Type; }))
+				if (doesEntrypointExists(Type))
 					return;
 
 				THROW_PROGRAM_COMPILER_EXCEPTION("Complementary entrypoint is missing", Function->GetName());
@@ -261,6 +266,7 @@ namespace Engine
 
 				checkRequiredOutputs(m_HullConstantFunction, RequiredTessFactorsRegisters, _countof(RequiredTessFactorsRegisters));
 
+				checkExistenceOfEntrypoint(FunctionType::Types::VertexMain);
 				checkExistenceOfEntrypoint(FunctionType::Types::DomainMain);
 			}
 			else if (Data.Stage == Stages::Domain)
@@ -292,10 +298,14 @@ namespace Engine
 
 				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Geometry program must not return any value", Function->GetName());
+
+				checkExistenceOfEntrypoint(FunctionType::Types::VertexMain);
 			}
 			else if (Data.Stage == Stages::Fragment)
 			{
 				checkRequiredOutputs(Function, nullptr, 0);
+
+				checkExistenceOfEntrypoint(FunctionType::Types::VertexMain);
 			}
 			else if (Data.Stage == Stages::Compute)
 			{
@@ -584,15 +594,15 @@ namespace Engine
 					AddCode(" = ", Data);
 
 					if (!IntrinsicsBuilder::BuildFunctionCallStatement("Multiply", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader))
-						THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build remainder", Statement->ToString());
+						THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build Multiply", Statement->ToString());
 
 					return;
 				}
 			}
 			else if (op == OperatorStatement::Operators::Remainder)
 			{
-				if (!IntrinsicsBuilder::BuildFunctionCallStatement("Reminder", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader))
-					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build Reminder", Statement->ToString());
+				if (!IntrinsicsBuilder::BuildFunctionCallStatement("Remainder", { Statement->GetLeft(), Statement->GetRight() }, Data.FunctionType, Data.Stage, Data.Shader))
+					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't build Remainder", Statement->ToString());
 
 				return;
 			}
@@ -1517,6 +1527,18 @@ namespace Engine
 				return;
 
 			THROW_PROGRAM_COMPILER_EXCEPTION("Variable not defined", Name);
+		}
+
+		void ASTCompilerBase::CheckSystemValueDataType(const StructVariableType* Variable)
+		{
+			ProgramDataTypes requiredDataType = StructVariableType::GetRegisterDataType(Variable->GetRegister());
+			if (requiredDataType == ProgramDataTypes::Unknown)
+				return;
+
+			if (requiredDataType == Variable->GetDataType()->GetType())
+				return;
+
+			THROW_PROGRAM_COMPILER_EXCEPTION(StringUtility::Format<char8>("System value %S type is wrong", Variable->GetName()), DataTypeStatement::GetType(requiredDataType));
 		}
 
 		const VariableType* ASTCompilerBase::FindVariableType(const String& Name, bool LatestBlockOnly) const

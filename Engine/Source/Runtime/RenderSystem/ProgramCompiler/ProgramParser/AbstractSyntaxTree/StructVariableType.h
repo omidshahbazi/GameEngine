@@ -150,6 +150,58 @@ namespace Engine
 					case Registers::GroupThreadID:
 						return "GROUP_THREAD_ID";
 					}
+
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
+				}
+
+				static ProgramDataTypes GetRegisterDataType(Registers Register)
+				{
+					switch (Register)
+					{
+					case Registers::Position:
+					case Registers::Normal:
+					case Registers::Color:
+					case Registers::UV:
+						return ProgramDataTypes::Unknown;
+
+					case Registers::PrimitiveID:
+						return ProgramDataTypes::Integer;
+
+					case Registers::TessellationFactor:
+						return ProgramDataTypes::Float;
+
+					case Registers::InsideTessellationFactor:
+						return ProgramDataTypes::Float;
+
+					case Registers::DomainLocation:
+						return ProgramDataTypes::Float3;
+
+					case Registers::InstanceID:
+						return ProgramDataTypes::Integer;
+
+					case Registers::OutputControlPointID:
+						return ProgramDataTypes::Integer;
+
+					case Registers::FragmentPosition:
+						return ProgramDataTypes::Float4;
+
+					case Registers::Target:
+						return ProgramDataTypes::Float4;
+
+					case Registers::DispatchThreadID:
+						return ProgramDataTypes::UnsignedInteger3;
+
+					case Registers::GroupID:
+						return ProgramDataTypes::UnsignedInteger3;
+
+					case Registers::GroupIndex:
+						return ProgramDataTypes::UnsignedInteger;
+
+					case Registers::GroupThreadID:
+						return ProgramDataTypes::UnsignedInteger3;
+					}
+
+					THROW_NOT_IMPLEMENTED_EXCEPTION(Categories::ProgramCompiler);
 				}
 
 			private:

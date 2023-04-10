@@ -125,33 +125,35 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Min", _countof(Constants::NUMERIC_DATA_TYPES));
+				BEGIN_FUNCTION("Min", _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
 				{
-					for (ProgramDataTypes dataType : Constants::NUMERIC_DATA_TYPES)
-					{
-						BEGIN_OVERRIDE(dataType);
+					for (ProgramDataTypes dataType1 : Constants::NUMERIC_DATA_TYPES)
+						for (ProgramDataTypes dataType2 : Constants::NUMERIC_DATA_TYPES)
 						{
-							ADD_PARAMETER(dataType);
-							ADD_PARAMETER(dataType);
-							SET_NATIVE_DESCRIPTION("min");
+							BEGIN_OVERRIDE(dataType1);
+							{
+								ADD_PARAMETER(dataType1);
+								ADD_PARAMETER(dataType2);
+								SET_NATIVE_DESCRIPTION("min");
+							}
+							END_OVERRIDE();
 						}
-						END_OVERRIDE();
-					}
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Max", _countof(Constants::NUMERIC_DATA_TYPES));
+				BEGIN_FUNCTION("Max", _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
 				{
-					for (ProgramDataTypes dataType : Constants::NUMERIC_DATA_TYPES)
-					{
-						BEGIN_OVERRIDE(dataType);
+					for (ProgramDataTypes dataType1 : Constants::NUMERIC_DATA_TYPES)
+						for (ProgramDataTypes dataType2 : Constants::NUMERIC_DATA_TYPES)
 						{
-							ADD_PARAMETER(dataType);
-							ADD_PARAMETER(dataType);
-							SET_NATIVE_DESCRIPTION("max");
+							BEGIN_OVERRIDE(dataType1);
+							{
+								ADD_PARAMETER(dataType1);
+								ADD_PARAMETER(dataType2);
+								SET_NATIVE_DESCRIPTION("max");
+							}
+							END_OVERRIDE();
 						}
-						END_OVERRIDE();
-					}
 				}
 				END_FUNCTION();
 
@@ -171,7 +173,7 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Reminder", _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
+				BEGIN_FUNCTION("Remainder", _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
 				{
 					for (ProgramDataTypes dataType1 : Constants::NUMERIC_DATA_TYPES)
 						for (ProgramDataTypes dataType2 : Constants::NUMERIC_DATA_TYPES)
@@ -238,7 +240,7 @@ namespace Engine
 				{
 					for (ProgramDataTypes dataType : Constants::VECTOR_DATA_TYPES)
 					{
-						BEGIN_OVERRIDE(dataType);
+						BEGIN_OVERRIDE(ProgramDataTypes::Float);
 						{
 							ADD_PARAMETER(dataType);
 							SET_NATIVE_DESCRIPTION("length");
@@ -248,31 +250,18 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Distance", 3);
+				BEGIN_FUNCTION("Distance", _countof(Constants::VECTOR_DATA_TYPES));
 				{
-					BEGIN_OVERRIDE(ProgramDataTypes::Float);
+					for (ProgramDataTypes dataType : Constants::VECTOR_DATA_TYPES)
 					{
-						ADD_PARAMETER(ProgramDataTypes::Float2);
-						ADD_PARAMETER(ProgramDataTypes::Float2);
-						SET_NATIVE_DESCRIPTION("distance");
+						BEGIN_OVERRIDE(ProgramDataTypes::Float);
+						{
+							ADD_PARAMETER(dataType);
+							ADD_PARAMETER(dataType);
+							SET_NATIVE_DESCRIPTION("distance");
+						}
+						END_OVERRIDE();
 					}
-					END_OVERRIDE();
-
-					BEGIN_OVERRIDE(ProgramDataTypes::Float);
-					{
-						ADD_PARAMETER(ProgramDataTypes::Float3);
-						ADD_PARAMETER(ProgramDataTypes::Float3);
-						SET_NATIVE_DESCRIPTION("distance");
-					}
-					END_OVERRIDE();
-
-					BEGIN_OVERRIDE(ProgramDataTypes::Float);
-					{
-						ADD_PARAMETER(ProgramDataTypes::Float4);
-						ADD_PARAMETER(ProgramDataTypes::Float4);
-						SET_NATIVE_DESCRIPTION("distance");
-					}
-					END_OVERRIDE();
 				}
 				END_FUNCTION();
 
@@ -376,19 +365,21 @@ namespace Engine
 				}
 				END_FUNCTION();
 
-				BEGIN_FUNCTION("Clamp", _countof(Constants::NUMERIC_AND_VECTOR_DATA_TYPES));
+				BEGIN_FUNCTION("Clamp", _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES) * _countof(Constants::NUMERIC_DATA_TYPES));
 				{
-					for (ProgramDataTypes dataType : Constants::NUMERIC_AND_VECTOR_DATA_TYPES)
-					{
-						BEGIN_OVERRIDE(dataType);
-						{
-							ADD_PARAMETER(dataType);
-							ADD_PARAMETER(dataType);
-							ADD_PARAMETER(dataType);
-							SET_NATIVE_DESCRIPTION("clamp");
-						}
-						END_OVERRIDE();
-					}
+					for (ProgramDataTypes dataType1 : Constants::NUMERIC_DATA_TYPES)
+						for (ProgramDataTypes dataType2 : Constants::NUMERIC_DATA_TYPES)
+							for (ProgramDataTypes dataType3 : Constants::NUMERIC_DATA_TYPES)
+							{
+								BEGIN_OVERRIDE(dataType1);
+								{
+									ADD_PARAMETER(dataType1);
+									ADD_PARAMETER(dataType2);
+									ADD_PARAMETER(dataType3);
+									SET_NATIVE_DESCRIPTION("clamp");
+								}
+								END_OVERRIDE();
+							}
 				}
 				END_FUNCTION();
 

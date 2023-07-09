@@ -213,8 +213,11 @@ namespace Engine
 				}
 			};
 
-			auto checkRequiredInputs = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount, bool MustBeArray)
+			auto checkRequiredInputs = [&](const FunctionType* Function, const StructVariableType::Registers* RequiredRegisters, uint8 RequiredRegisterCount, bool CanBeParameterless, bool MustBeArray)
 			{
+				if (!CanBeParameterless && Function->GetParameters().GetSize() == 0)
+					THROW_PROGRAM_COMPILER_EXCEPTION("Function cannot be parameterless", Function->GetName());
+
 				for (auto& param : Function->GetParameters())
 				{
 					if (param->GetDataType()->IsArray() != MustBeArray)
@@ -244,7 +247,9 @@ namespace Engine
 				THROW_PROGRAM_COMPILER_EXCEPTION("Entrypoints cannot have more than one parameter", Function->GetName());
 
 			FunctionType::Types funcType = Function->GetType();
-			checkRequiredInputs(Function, nullptr, 0, (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain));
+			checkRequiredInputs(Function, nullptr, 0,
+				(funcType == FunctionType::Types::VertexMain || funcType == FunctionType::Types::FragmentMain || funcType == FunctionType::Types::ComputeMain),
+				(funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain));
 
 			if (Data.Stage == Stages::Vertex)
 			{
@@ -308,10 +313,6 @@ namespace Engine
 				checkRequiredOutputs(Function, RequiredFragmentRegisters, _countof(RequiredFragmentRegisters));
 
 				checkExistenceOfEntrypoint(FunctionType::Types::VertexMain);
-
-				//const FunctionType* vertFunc = GetEntrypointFunctionType(FunctionType::Types::VertexMain, Data);
-				////vertFunc->GetReturnDataType()
-				////	CompareDataTypes()
 			}
 			else if (Data.Stage == Stages::Compute)
 			{

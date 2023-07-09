@@ -461,10 +461,13 @@ namespace Engine
 
 				if (Function->IsEntrypoint())
 				{
-					const ParameterType* parameterType = Function->GetParameters()[0];
+					if (Function->GetParameters().GetSize() != 0)
+					{
+						const ParameterType* parameterType = Function->GetParameters()[0];
 
-					const bool inputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain);
-					BuildInputOutputStruct(parameterType->GetDataType(), parameterType->GetName(), true, inputHaveToConvertToArray, (funcType == FunctionType::Types::GeometryMain), Data);
+						const bool inputHaveToConvertToArray = (funcType == FunctionType::Types::HullMain || funcType == FunctionType::Types::DomainMain || funcType == FunctionType::Types::GeometryMain);
+						BuildInputOutputStruct(parameterType->GetDataType(), parameterType->GetName(), true, inputHaveToConvertToArray, (funcType == FunctionType::Types::GeometryMain), Data);
+					}
 
 					if (funcType != FunctionType::Types::GeometryMain &&
 						funcType != FunctionType::Types::ComputeMain)
@@ -524,7 +527,7 @@ namespace Engine
 					--Data.IndentOffset;
 				}
 
-				if (isEntrypoint)
+				if (isEntrypoint && Function->GetParameters().GetSize() != 0)
 				{
 					++Data.IndentOffset;
 

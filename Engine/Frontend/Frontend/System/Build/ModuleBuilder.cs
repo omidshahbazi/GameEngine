@@ -1,6 +1,7 @@
 // Copyright 2016-2020 ?????????????. All Rights Reserved.
 using Engine.Frontend.Project;
 using Engine.Frontend.System.Compile;
+using Engine.Frontend.System.Generator;
 using Engine.Frontend.Utilities;
 using GameFramework.ASCIISerializer;
 using GameFramework.Common.Utilities;
@@ -244,43 +245,7 @@ namespace Engine.Frontend.System.Build
 			if (Module.UseType != ModuleRules.UseTypes.Executable)
 				throw new FrontendException($"Cannot generate RenderDoc settings for {Module.Name} as it is a non-executable module");
 
-			ISerializeObject rootObj = Creator.Create<ISerializeObject>();
-			{
-				rootObj["rdocCaptureSettings"] = 1;
-
-				ISerializeObject settingsObj = rootObj.AddObject("settings");
-				{
-					settingsObj["executable"] = OutputTargetName + EnvironmentHelper.ExecutableExtensions;
-					settingsObj["workingDir"] = FinalOutputDirectory;
-
-					settingsObj["autoStart"] = false;
-					settingsObj["commandLine"] = "";
-					settingsObj["inject"] = false;
-					settingsObj["numQueuedFrames"] = 0;
-					settingsObj["queuedFrameCap"] = 0;
-
-					ISerializeArray environmentArr = settingsObj.AddArray("environment");
-					{
-					}
-
-					ISerializeObject optionsObj = settingsObj.AddObject("options");
-					{
-						optionsObj["allowFullscreen"] = true;
-						optionsObj["allowVSync"] = true;
-						optionsObj["apiValidation"] = true;
-						optionsObj["captureAllCmdLists"] = true;
-						optionsObj["captureCallstacks"] = true;
-						optionsObj["captureCallstacksOnlyDraws"] = false;
-						optionsObj["debugOutputMute"] = true;
-						optionsObj["delayForDebugger"] = 0;
-						optionsObj["hookIntoChildren"] = false;
-						optionsObj["refAllResources"] = true;
-						optionsObj["verifyBufferAccess"] = true;
-					}
-				}
-			}
-
-			File.WriteAllText(OutputTargetName + ".RenderDoc.cap", rootObj.Content);
+			RenderDocSettingsGenerator.Generate(OutputTargetName + ".RenderDoc.cap", OutputTargetName + EnvironmentHelper.ExecutableExtensions, FinalOutputDirectory, "DeviceType", string.Empty);
 		}
 
 		private CPPProject GenerateProject()

@@ -215,6 +215,7 @@ namespace Engine
 			void CheckForImplicitCast(const DataTypeStatement& Source, const DataTypeStatement& Destination) const;
 
 			void CheckVariableExsitence(const String& Name) const;
+			void CheckSystemValueDataType(const StructVariableType* Variable);
 
 			const VariableType* FindVariableType(const String& Name, bool LatestBlockOnly = false) const;
 			void IncreaseBlockIndex(void);

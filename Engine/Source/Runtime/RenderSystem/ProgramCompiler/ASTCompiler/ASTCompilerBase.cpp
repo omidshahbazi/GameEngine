@@ -236,7 +236,9 @@ namespace Engine
 				checkRequiredRegisters(Function->GetReturnDataType()->GetUserDefined(), RequiredRegisters, RequiredRegisterCount);
 			};
 
+			const StructVariableType::Registers RequiredVertexRegisters[]{ StructVariableType::Registers::Position };
 			const StructVariableType::Registers RequiredTessFactorsRegisters[]{ StructVariableType::Registers::TessellationFactor, StructVariableType::Registers::InsideTessellationFactor };
+			const StructVariableType::Registers RequiredFragmentRegisters[]{ StructVariableType::Registers::Target };
 
 			if (Function->GetParameters().GetSize() > 1)
 				THROW_PROGRAM_COMPILER_EXCEPTION("Entrypoints cannot have more than one parameter", Function->GetName());
@@ -246,7 +248,7 @@ namespace Engine
 
 			if (Data.Stage == Stages::Vertex)
 			{
-				checkRequiredOutputs(Function, nullptr, 0);
+				checkRequiredOutputs(Function, RequiredVertexRegisters, _countof(RequiredVertexRegisters));
 			}
 			else if (Data.Stage == Stages::Hull)
 			{
@@ -303,19 +305,23 @@ namespace Engine
 			}
 			else if (Data.Stage == Stages::Fragment)
 			{
-				checkRequiredOutputs(Function, nullptr, 0);
+				checkRequiredOutputs(Function, RequiredFragmentRegisters, _countof(RequiredFragmentRegisters));
 
 				checkExistenceOfEntrypoint(FunctionType::Types::VertexMain);
+
+				//const FunctionType* vertFunc = GetEntrypointFunctionType(FunctionType::Types::VertexMain, Data);
+				////vertFunc->GetReturnDataType()
+				////	CompareDataTypes()
 			}
 			else if (Data.Stage == Stages::Compute)
 			{
-				checkRequiredOutputs(Function, nullptr, 0);
-
 				if (Function->GetAttribute<ThreadCountAttributeType>() == nullptr)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Couldn't find ThreadCount attribute", Function->GetName());
 
 				if (Function->GetReturnDataType()->GetType() != ProgramDataTypes::Void)
 					THROW_PROGRAM_COMPILER_EXCEPTION("Compute program must not return any value", Function->GetName());
+
+				checkRequiredOutputs(Function, nullptr, 0);
 			}
 		}
 

@@ -71,6 +71,7 @@
     <Compile Include="Frontend\EntryPoint.cs" />
     <Compile Include="Frontend\Project\ResourceDefinition.cs" />
     <Compile Include="Frontend\System\Compile\ReflectionBuildProcess.cs" />
+    <Compile Include="Frontend\System\Generator\RenderDocSettingsGenerator.cs" />
     <Compile Include="Frontend\System\RulesLibrary.cs" />
     <Compile Include="BaseRules.cs" />
     <Compile Include="TargetRules.cs" />
